@@ -8,7 +8,7 @@ from analyze.models import Experiment
 
 ## import ADAGE utilities
 # we've stashed a copy of get_pseudo_sdrf here for deployment (see fabfile.py)
-sys.path.append(os.path.abspath('../'))
+sys.path.append(os.path.abspath('../../'))
 import get_pseudo_sdrf as gp
 
 def main():
