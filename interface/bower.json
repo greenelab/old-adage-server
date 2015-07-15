@@ -10,5 +10,8 @@
     "angular-resource": "~1.4.1",
     "angular-sanitize": "~1.4.1"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "resolutions": {
+    "angular": "1.2.28"
+  }
 }
