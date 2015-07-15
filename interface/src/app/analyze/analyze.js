@@ -24,7 +24,7 @@ angular.module( 'adage.analyze', [
 }])
 
 .factory( 'ExperimentSearch', ['$resource', '$http', function($resource, $http) {
-  return $resource('http://localhost:8000/api/v0/experiment/search/');
+  return $resource('/api/v0/experiment/search/');
 }])
 
 .controller( 'AnalyzeCtrl', function AnalyzeCtrl( $scope, ExperimentSearch ) {
