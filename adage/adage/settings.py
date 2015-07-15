@@ -12,11 +12,14 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
-
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+execfile(os.path.join(BASE_DIR, '..', 'config.py'))
+CONFIG = DEV_CONFIG
+# CONFIG = TEST_CONFIG
 
 # Quick-start development settings - unsuitable for production
+# TODO: review Django deployment checklist
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -45,12 +48,7 @@ INSTALLED_APPS = (
 # > pip install -e git+https://github.com/django-tastypie/django-tastypie#egg=TastyPie
 # see <https://github.com/django-tastypie/django-tastypie/issues/1290> for details
 
-HAYSTACK_CONNECTIONS = {
-    'default': {
-        'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
-        'PATH': os.path.join(os.path.dirname(__file__), 'whoosh_index'),
-    },
-}
+HAYSTACK_CONNECTIONS = CONFIG['haystack']
 HAYSTACK_SEARCH_RESULTS_PER_PAGE = 10
 
 MIDDLEWARE_CLASSES = (
@@ -69,7 +67,7 @@ ROOT_URLCONF = 'adage.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -88,12 +86,7 @@ WSGI_APPLICATION = 'adage.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
-}
+DATABASES = CONFIG['databases']
 
 
 # Internationalization
@@ -114,3 +107,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.8/howto/static-files/
 
 STATIC_URL = '/static/'
+# STATIC_ROOT = os.path.join(BASE_DIR, '/static/')
+STATICFILES_DIRS = (
+    os.path.join(BASE_DIR, '/static/'),
+)
