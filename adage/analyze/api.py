@@ -34,7 +34,10 @@ class ExperimentResource(ModelResource):
         
         objects = []
         for result in sqs:
-            snippet = { 'snippet': result.highlighted['text'][0] }
+            # This is they way whoosh returns highlighted results
+            # snippet = { 'snippet': result.highlighted['text'][0] }
+            # This is the way elasticsearch returns highlighted results
+            snippet = { 'snippet': ' ...'.join(result.highlighted) }
             bundle = self.build_bundle(obj=result.object, data=snippet, request=request)
             bundle = self.full_dehydrate(bundle)
             objects.append(bundle)
