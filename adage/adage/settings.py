@@ -15,8 +15,8 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 execfile(os.path.join(BASE_DIR, '..', 'config.py'))
-CONFIG = DEV_CONFIG
-# CONFIG = TEST_CONFIG
+# CONFIG = DEV_CONFIG
+CONFIG = TEST_CONFIG
 
 # Quick-start development settings - unsuitable for production
 # TODO: review Django deployment checklist
