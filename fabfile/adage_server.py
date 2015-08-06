@@ -9,7 +9,7 @@ from fabric.api import env, local, run, settings, hide, abort, task, runs_once
 from fabric.api import cd, prefix, sudo, put
 from fabric.contrib.console import confirm
 
-BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG_DIR = os.path.join(BASE_DIR, 'adage', 'adage')
 if CONFIG_DIR not in sys.path:
     sys.path.append(CONFIG_DIR)
