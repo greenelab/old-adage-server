@@ -39,9 +39,11 @@ TEST_CONFIG = {
     'home_dir':         '/home/adage',
     'virt_env':         '/home/adage/.virtualenvs/adage',
     'django_dir':       '/home/adage/adage-server/adage',
+    'django_key':       '<config-secret>',
     'interface_dir':    '/home/adage/adage-server/interface',
     'databases':        {   'default': {
                                 'ENGINE': 'django.db.backends.postgresql_psycopg2',
+                                # make sure database name and user have no upper case letters
                                 'NAME': '<configure>',
                                 'USER': '<configure>',
                                 'PASSWORD': '<config-secret>',
@@ -50,7 +52,7 @@ TEST_CONFIG = {
                             }
                         },
     'haystack':         {   'default': {
-                                'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
+                                'ENGINE': 'adage.search_backend.ADAGEElasticsearchSearchEngine',
                                 'URL': 'http://127.0.0.1:9200/',
                                 'INDEX_NAME': 'haystack',
                             },
@@ -68,16 +70,23 @@ DEPLOY_TEST_CONFIG.update({
 
 DEV_CONFIG = TEST_CONFIG.copy()
 DEV_CONFIG.update({
-    'databases':    {   'default': {
-                            'ENGINE': 'django.db.backends.sqlite3',
-                            'NAME': os.path.join(os.path.dirname(__file__), 'db.sqlite3'),
-                        }
-                    },
-    'haystack':     {   'default': {
-                            'ENGINE': 'haystack.backends.whoosh_backend.WhooshEngine',
-                            'PATH': os.path.join(os.path.dirname(__file__), 'whoosh_index'),
+    'databases':        {   'default': {
+                                'ENGINE': 'django.db.backends.postgresql_psycopg2',
+                                # make sure database name and user have no upper case letters
+                                'NAME': '<configure>',
+                                'USER': '<configure>',
+                                'PASSWORD': '<config-secret>',
+                                'HOST': '<configure>',
+                                'PORT': '5432',
+                            }
                         },
-                    },
+    'dbmaster':         {
+                            'NAME': '<configure>',
+                            'USER': '<configure>',
+                            'PASSWORD': '<config-secret>',
+                            'HOST': '<configure>',
+                            'PORT': '5432',
+                        },
 })
 
 CONFIG = TEST_CONFIG

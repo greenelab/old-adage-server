@@ -14,6 +14,7 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
+# Any deployment configuration settings (including all secrets) come from config.py
 import config
 CONFIG = config.CONFIG
 
@@ -22,7 +23,7 @@ CONFIG = config.CONFIG
 # See https://docs.djangoproject.com/en/1.8/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'jedupiq^)m6!0#61x32_y@o26!2j$^w$zzq^l(lf#69dzn-0w2'
+SECRET_KEY = CONFIG['django_key']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -48,7 +49,40 @@ INSTALLED_APPS = (
 # see <https://github.com/django-tastypie/django-tastypie/issues/1290> for details
 
 HAYSTACK_CONNECTIONS = CONFIG['haystack']
+HAYSTACK_DEFAULT_OPERATOR = 'OR'
 HAYSTACK_SEARCH_RESULTS_PER_PAGE = 10
+
+# define and activate an Elasticsearch Custom Analyzer that mimics Snowball 
+# but adds a word_delimiter token filter where we want it (fixes bitbucket 
+# issue #1: "search on PA14 does not find E-GEOD-24262")
+ELASTICSEARCH_DEFAULT_ANALYZER = "adage_snowball"
+ELASTICSEARCH_INDEX_SETTINGS = {
+    'settings': {
+        "analysis": {
+            "analyzer": {
+                "adage_snowball": {
+                    "type": "custom",
+                    "tokenizer": "standard",
+                    "filter": [
+                        "standard",
+                        "lowercase",
+                        "word_delimiter",
+                        "stop",
+                        "snowball"
+                    ]
+                },
+            }
+        }
+    }
+}
+
+# adjust the default kwargs passed to Elasticsearch when searching
+ELASTICSEARCH_DEFAULT_KWARGS = {
+    'highlight': {
+        'pre_tags': ['<strong>'],
+        'post_tags': ['</strong>']
+    }
+}
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
