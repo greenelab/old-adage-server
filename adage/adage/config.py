@@ -52,7 +52,7 @@ TEST_CONFIG = {
                             }
                         },
     'haystack':         {   'default': {
-                                'ENGINE': 'adage.search_backend.ADAGEElasticsearchSearchEngine',
+                                'ENGINE': 'adage.search_backend.CustomElasticsearchEngine',
                                 'URL': 'http://127.0.0.1:9200/',
                                 'INDEX_NAME': 'haystack',
                             },

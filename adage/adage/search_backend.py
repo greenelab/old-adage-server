@@ -22,7 +22,7 @@ def merge_dicts(a, b):
             a[key] = b[key]
     return a
 
-class ADAGEElasticBackend(ElasticsearchSearchBackend):
+class CustomElasticsearchBackend(ElasticsearchSearchBackend):
     """
     Subclass ElasticsearchSearchBackend so we can make our own adjustments to 
     the settings
@@ -31,7 +31,7 @@ class ADAGEElasticBackend(ElasticsearchSearchBackend):
     DEFAULT_ANALYZER = "snowball"
     
     def __init__(self, connection_alias, **connection_options):
-        super(ADAGEElasticBackend, self).__init__(
+        super(CustomElasticsearchBackend, self).__init__(
             connection_alias, **connection_options
         )
         user_settings = getattr(settings, 'ELASTICSEARCH_INDEX_SETTINGS', {})
@@ -52,7 +52,7 @@ class ADAGEElasticBackend(ElasticsearchSearchBackend):
                             models=None, limit_to_registered_models=None,
                             result_class=None):
         # run the superclass's implementation
-        kwargs = super(ADAGEElasticBackend, self).build_search_kwargs(query_string, 
+        kwargs = super(CustomElasticsearchBackend, self).build_search_kwargs(query_string, 
                             sort_by, start_offset, end_offset,
                             fields, highlight, facets,
                             date_facets, query_facets,
@@ -67,7 +67,7 @@ class ADAGEElasticBackend(ElasticsearchSearchBackend):
     
     def build_schema(self, fields):
         # run the superclass's implementation
-        content_field_name, mapping = super(ADAGEElasticBackend, self).build_schema(fields)
+        content_field_name, mapping = super(CustomElasticsearchBackend, self).build_schema(fields)
         
         # modify the results to allow us to use our own DEFAULT_ANALYZER
         for field_name, field_class in fields.items():
@@ -80,5 +80,5 @@ class ADAGEElasticBackend(ElasticsearchSearchBackend):
             mapping.update({field_class.index_fieldname: field_mapping})
         return (content_field_name, mapping)
 
-class ADAGEElasticsearchSearchEngine(ElasticsearchSearchEngine):
-    backend = ADAGEElasticBackend
+class CustomElasticsearchEngine(ElasticsearchSearchEngine):
+    backend = CustomElasticsearchBackend
