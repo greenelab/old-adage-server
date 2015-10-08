@@ -65,8 +65,8 @@ ELASTICSEARCH_INDEX_SETTINGS = {
                     "tokenizer": "standard",
                     "filter": [
                         "standard",
-                        "lowercase",
                         "word_delimiter",
+                        "lowercase",
                         "stop",
                         "snowball"
                     ]
