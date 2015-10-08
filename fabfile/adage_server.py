@@ -14,7 +14,8 @@ CONFIG_DIR = os.path.join(BASE_DIR, 'adage', 'adage')
 if CONFIG_DIR not in sys.path:
     sys.path.append(CONFIG_DIR)
 import config
-CONFIG = config.TEST_CONFIG
+# CONFIG = config.TEST_CONFIG
+CONFIG = config.DEV_CONFIG
 
 # increase logging level for more detail during debugging
 # logging.basicConfig(level=logging.INFO)
@@ -86,14 +87,16 @@ def push():
     local('hg push')
 
 @task
-def pull():
-    """ pull code changes from bitbucket to server """
+def pull(hgopts=''):
+    """ pull code changes from repo (bitbucket, by default) to server """
     # config.py has aws keys in it, so we transfer only the settings we need for 
     # deployment to the server
     run('echo "CONFIG = {0}" > /home/adage/adage-server/adage/adage/config.py'.format( \
         pprint.PrettyPrinter().pformat(CONFIG) ))
+    if hgopts:
+        hgopts = ' ' + hgopts
     with cd('/home/adage/adage-server'):
-        run('hg pull')
+        run('hg pull' + hgopts)
 
 def _install_django_requirements():
     """ install updates from requirements.txt on server """
