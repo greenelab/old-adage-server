@@ -25,7 +25,24 @@ def merge_dicts(a, b):
 class CustomElasticsearchBackend(ElasticsearchSearchBackend):
     """
     Subclass ElasticsearchSearchBackend so we can make our own adjustments to 
-    the settings
+    the settings. To make use of these features, set one or more of the 
+    following variables in your settings.py:
+    
+    ELASTICSEARCH_INDEX_SETTINGS: settings supplied here will be used to 
+    augment or replace those in the DEFAULT_SETTINGS instance variable 
+    on ElasticsearchSearchBackend. This adjusts the "configurable registry" 
+    referred to in the Elasticsearch index analysis module:
+    <https://www.elastic.co/guide/en/elasticsearch/reference/1.4/analysis.html>
+    
+    ELASTICSEARCH_DEFAULT_ANALYZER: supplied analyzer name will override the 
+    hard-coded "snowball" analyzer default in ElasticsearchSearchBackend. This
+    can refer to a custom analyzer supplied in ELASTICSEARCH_INDEX_SETTINGS.
+    
+    ELASTICSEARCH_DEFAULT_KWARGS: settings supplied here will augment or 
+    override those kwargs that are passed from haystack to elasticsearch with 
+    each search. This adjusts the request body that Haystack will send to the 
+    Elasticsearch server:
+    <https://www.elastic.co/guide/en/elasticsearch/reference/1.4/search-request-body.html>
     """
     
     DEFAULT_ANALYZER = "snowball"
@@ -34,15 +51,15 @@ class CustomElasticsearchBackend(ElasticsearchSearchBackend):
         super(CustomElasticsearchBackend, self).__init__(
             connection_alias, **connection_options
         )
-        user_settings = getattr(settings, 'ELASTICSEARCH_INDEX_SETTINGS', {})
-        if user_settings:
+        custom_index_settings = getattr(settings, 'ELASTICSEARCH_INDEX_SETTINGS', {})
+        if custom_index_settings:
             es_defaults = getattr(self, 'DEFAULT_SETTINGS')
-            es_defaults = merge_dicts(es_defaults, user_settings)
+            es_defaults = merge_dicts(es_defaults, custom_index_settings)
             setattr(self, 'DEFAULT_SETTINGS', es_defaults)
-        user_analyzer = getattr(settings, 'ELASTICSEARCH_DEFAULT_ANALYZER', "")
-        if user_analyzer:
-            setattr(self, 'DEFAULT_ANALYZER', user_analyzer)
-        user_kwargs = getattr(settings, 'ELASTICSEARCH_DEFAULT_KWARGS', "")
+        custom_analyzer = getattr(settings, 'ELASTICSEARCH_DEFAULT_ANALYZER', "")
+        if custom_analyzer:
+            setattr(self, 'DEFAULT_ANALYZER', custom_analyzer)
+        custom_kwargs = getattr(settings, 'ELASTICSEARCH_DEFAULT_KWARGS', "")
     
     def build_search_kwargs(self, query_string, sort_by=None, start_offset=0, end_offset=None,
                             fields='', highlight=False, facets=None,
@@ -61,8 +78,8 @@ class CustomElasticsearchBackend(ElasticsearchSearchBackend):
                             models, limit_to_registered_models,
                             result_class)
         # modify the results with our additions before returning
-        if user_kwargs:
-            kwargs = merge_dicts(kwargs, user_kwargs)
+        if custom_kwargs:
+            kwargs = merge_dicts(kwargs, custom_kwargs)
         return kwargs
     
     def build_schema(self, fields):
