@@ -59,7 +59,7 @@ class CustomElasticsearchBackend(ElasticsearchSearchBackend):
         custom_analyzer = getattr(settings, 'ELASTICSEARCH_DEFAULT_ANALYZER', "")
         if custom_analyzer:
             setattr(self, 'DEFAULT_ANALYZER', custom_analyzer)
-        custom_kwargs = getattr(settings, 'ELASTICSEARCH_DEFAULT_KWARGS', "")
+        self.custom_kwargs = getattr(settings, 'ELASTICSEARCH_DEFAULT_KWARGS', "")
     
     def build_search_kwargs(self, query_string, sort_by=None, start_offset=0, end_offset=None,
                             fields='', highlight=False, facets=None,
@@ -78,8 +78,8 @@ class CustomElasticsearchBackend(ElasticsearchSearchBackend):
                             models, limit_to_registered_models,
                             result_class)
         # modify the results with our additions before returning
-        if custom_kwargs:
-            kwargs = merge_dicts(kwargs, custom_kwargs)
+        if self.custom_kwargs:
+            kwargs = merge_dicts(kwargs, self.custom_kwargs)
         return kwargs
     
     def build_schema(self, fields):
