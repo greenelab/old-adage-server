@@ -17,10 +17,12 @@ from django.conf.urls import include, url
 from django.views.generic import TemplateView
 from django.contrib import admin
 from tastypie.api import Api
-from analyze.api import ExperimentResource
+from analyze.api import SearchResource, ExperimentResource, SampleResource
 
 v0_api = Api(api_name='v0')
+v0_api.register(SearchResource())
 v0_api.register(ExperimentResource())
+v0_api.register(SampleResource())
 
 urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name="index.html"), name='home'),

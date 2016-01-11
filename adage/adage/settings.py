@@ -47,9 +47,12 @@ INSTALLED_APPS = (
 # NOTE: to get tastypie to play nicely with Django 1.8, need to install using 
 # > pip install -e git+https://github.com/django-tastypie/django-tastypie#egg=TastyPie
 # see <https://github.com/django-tastypie/django-tastypie/issues/1290> for details
+API_LIMIT_PER_PAGE = 50
+TASTYPIE_FULL_DEBUG = True
 
 HAYSTACK_CONNECTIONS = CONFIG['haystack']
-HAYSTACK_DEFAULT_OPERATOR = 'OR'
+# HAYSTACK_DEFAULT_OPERATOR = 'OR'
+# TODO what is HAYSTACK_SEARCH_RESULTS_PER_PAGE doing for us?
 HAYSTACK_SEARCH_RESULTS_PER_PAGE = 10
 
 # define and activate an Elasticsearch Custom Analyzer that mimics Snowball 

@@ -1,0 +1,3 @@
+{{ object.sample }}
+{{ object.description }}
+{{ object.additional_notes }}
