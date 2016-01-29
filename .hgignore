@@ -7,3 +7,4 @@ build/
 bin/
 node_modules/
 vendor/
+adage/adage/config.py
