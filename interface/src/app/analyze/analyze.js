@@ -23,11 +23,20 @@ angular.module( 'adage.analyze', [
   $resourceProvider.defaults.stripTrailingSlashes = false;
 }])
 
-.factory( 'ExperimentSearch', ['$resource', '$http', function($resource, $http) {
-  return $resource('/api/v0/experiment/search/');
+.factory( 'Search', ['$resource', '$http', function($resource, $http) {
+  return $resource(
+    '/api/v0/search/',
+    // TODO need to add logic for handling pagination of results.
+    // then, can change "limit" below to something sensible
+    { q: '', limit: 0 },
+    // Angular expects a query service to give only a list but our Tastypie
+    // interface wraps the response list with pagination so we tell Angular to
+    // expect an object instead via isArray: false
+    { 'query': { method: 'GET', isArray: false } }
+  );
 }])
 
-.controller( 'AnalyzeCtrl', function AnalyzeCtrl( $scope, ExperimentSearch ) {
+.controller( 'AnalyzeCtrl', function AnalyzeCtrl( $scope, Search ) {
   $scope.query = {
     text: "",
     results: [],
@@ -42,13 +51,14 @@ angular.module( 'adage.analyze', [
       return;
     }
     $scope.query.status = "Searching for: " + $scope.query.text + "...";
-    ExperimentSearch.query({ q: $scope.query.text },
-      function(object_list, responseHeaders) {
+    Search.query({ q: $scope.query.text },
+      function(response_object, responseHeaders) {
+        object_list = response_object.objects;
         $scope.query.status = "Found " + object_list.length + " matches.";
         $scope.query.results = object_list;
       },
-      function(object_list, responseHeaders) {
-        console.log('Query errored with: ' + object_list);
+      function(response_object, responseHeaders) {
+        console.log('Query errored with: ' + response_object);
         $scope.query.status = "Query failed.";
       }
     );

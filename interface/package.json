@@ -1,7 +1,7 @@
 {
   "author": "Matt Huyck",
   "name": "adage",
-  "version": "0.0.1",
+  "version": "0.1.0a",
   "homepage": "http://adage.greenelab.com",
   "licenses": {
     "type": "MIT",
@@ -10,7 +10,7 @@
   "bugs": "mailto:mhuyck@fgtech.com",
   "repository": {
     "type": "hg",
-    "url": ""
+    "url": "https://bitbucket.org/greenelab/adage-server"
   },
   "dependencies": {},
   "devDependencies": {
