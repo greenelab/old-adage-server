@@ -1,7 +1,7 @@
 # coding: utf-8 (see https://www.python.org/dev/peps/pep-0263/)
 
 from django.db import models
-from django.contrib.auth.models import User
+
 
 class Experiment(models.Model):
     accession = models.CharField(max_length=48, primary_key=True)
@@ -11,7 +11,8 @@ class Experiment(models.Model):
     def __unicode__(self):
         return self.accession
 
-# TODO: implement absolute urls for Experiments. see https://docs.djangoproject.com/en/1.8/ref/models/instances/#get-absolute-url
+# TODO: implement absolute urls for Experiments. see
+#  https://docs.djangoproject.com/en/1.8/ref/models/instances/#get-absolute-url
 # TODO: implement a model for samples uploaded by users
 
 
@@ -32,7 +33,7 @@ class SampleAnnotation(models.Model):
         Sample,
         on_delete=models.PROTECT,
         primary_key=True)
-
+    
     cel_file = models.CharField(
         "CEL file",
         max_length=120,
@@ -67,7 +68,7 @@ class SampleAnnotation(models.Model):
         blank=True)
     # biotic_interactor_level_2 = models.CharField(
     biotic_int_lv_2 = models.CharField(
-        "biotic interactor level 2 (Lung, epithelial cells, Staphylococcus "\
+        "biotic interactor level 2 (Lung, epithelial cells, Staphylococcus "
             "aureus, …)",
         max_length=80,
         blank=True)
@@ -76,7 +77,7 @@ class SampleAnnotation(models.Model):
         max_length=40,
         blank=True)
     growth_setting_2 = models.CharField(
-        "growth setting (For planktonic - aerated, static) (For biofilms - "\
+        "growth setting (For planktonic - aerated, static) (For biofilms - "
             "flow cell, static, …)",
         max_length=70,
         blank=True)

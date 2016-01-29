@@ -2,7 +2,8 @@
 """
 
 from __future__ import with_statement
-import os, sys
+import os
+import sys
 import logging
 import pprint
 from fabric.api import env, local, run, settings, hide, abort, task, runs_once
@@ -29,13 +30,13 @@ def setup_ec2_conn(use_config=None):
         logging.info("setup_ec2_conn: reverting to default CONFIG")
         use_config = CONFIG
     
-    # If no host was provided on the command line, set the default as we 
+    # If no host was provided on the command line, set the default as we
     # would like it to be
     # if (not env.hosts) or override_hosts:
     # env.hosts = [ use_config['default_host'] ]
-    env.hosts = [ '{user}@{host}'.format(**use_config['ec2_conn']) ]
+    env.hosts = ['{user}@{host}'.format(**use_config['ec2_conn'])]
     
-    logging.info('setup_ec2_conn using keyfile: ' + 
+    logging.info('setup_ec2_conn using keyfile: ' +
             use_config['ec2_conn']['keyfile'])
     with settings(hide('running'), warn_only=True):
         if local("test -e %s" % use_config['ec2_conn']['keyfile']).succeeded:
@@ -51,19 +52,20 @@ def setup_ec2_conn(use_config=None):
 @task
 def capture_django_requirements():
     """
-    perform a pip freeze from within the virtual environment to 
+    perform a pip freeze from within the virtual environment to
     generate requirements.txt
     """
     if 'VIRTUAL_ENV' not in os.environ:
         abort('Please run this command from your local virtual environment')
     local('pip freeze > requirements.txt')
 
+
 def _ensure_checkin():
     """ make sure all code is checked in -- fail if it's not """
     # TODO: make error reporting a bit more friendly and descriptive here
-    # local('hg status | egrep -v "^(\?)"')
-    ## this will fail if we don't have a clean status for all tracked hg files
+    # this will fail if we don't have a clean status for all tracked hg files
     local('test -z "`hg status | egrep -v \"^(\?)\"`"')
+
 
 @task
 def test():
@@ -74,14 +76,16 @@ def test():
     """
     pass
 
+
 @task
 def push():
     """
-    make sure our changes are checked in and pushed to bitbucket before 
-    we proceed 
+    make sure our changes are checked in and pushed to bitbucket before
+    we proceed
     """
     _ensure_checkin()
     local('hg push')
+
 
 @task
 def pull(hgopts=''):
@@ -89,20 +93,22 @@ def pull(hgopts=''):
     # config.py has aws keys in it, so we transfer only the settings we need
     # for deployment to the server
     run('echo "CONFIG = {0}" > /home/adage/adage-server/adage/adage/config.py'.\
-            format( pprint.PrettyPrinter().pformat(CONFIG) ))
+            format(pprint.PrettyPrinter().pformat(CONFIG)))
     if hgopts:
         hgopts = ' ' + hgopts
     with cd('/home/adage/adage-server'):
         run('hg pull' + hgopts)
 
+
 def _install_django_requirements():
     """ install updates from requirements.txt on server """
     run('pip install -q -r requirements.txt')
 
+
 def _check_env():
     """
     Ensure that this is an existing deployment that we are updating.
-
+    
     Pass in directory via env.dir.
     """
     if not env.dir:
@@ -114,16 +120,18 @@ def _check_env():
             run('python {0}/manage.py check'.format(env.dir))
             print('Environment seems to exist - good!')
 
+
 def _install_interface_requirements():
     """ run through bower installation """
     run('npm install')
     run('bower install --config.interactive=false')
 
+
 @task
 def init_setup_and_check():
     """
     Setup initial needs for server.
-
+    
     This command executes an initial pip install from the production
     environment and then checks the current environment to make sure that
     there is an existing django project.
@@ -134,15 +142,17 @@ def init_setup_and_check():
         _install_django_requirements()
         # _make_static()
         _check_env()
-    with cd(CONFIG['interface_dir']), 
+    with cd(CONFIG['interface_dir']),
             prefix('source {0}/bin/activate'.format(env.virt_env)):
         _install_interface_requirements()
+
 
 def bootstrap_database():
     """
     Run a migrate to bootstrap the database
     """
     run('python manage.py migrate')
+
 
 def create_admin_user():
     """
@@ -152,6 +162,7 @@ def create_admin_user():
     run('python manage.py createsuperuser --username=adage '\
             '--email=mhuyck@fgtech.com --noinput')
 
+
 @task
 def rebuild_search_index():
     """
@@ -159,15 +170,17 @@ def rebuild_search_index():
     """
     run('python manage.py rebuild_index --noinput')
 
+
 @task
 def load_experiments_and_index():
     """
-    invoke import_experiments.py, which manually links to the get_pseudo_sdrf.py 
+    invoke import_experiments.py, which manually links to the get_pseudo_sdrf.py
     file extracted from the get_pseudomonas repository
     """
     run('python manage.py import_data '\
             '"../data/Pseudomonas Annotation_complete-20151203-withCEL"')
     rebuild_search_index()
+
 
 @task(alias='idb')
 def init_instance():
@@ -179,21 +192,24 @@ def init_instance():
         create_admin_user()
         load_experiments_and_index()
 
+
 @task
 def build_interface():
     """
     have grunt perform a deployment build for us
     """
     #make static
-    with cd(CONFIG['interface_dir']), 
+    with cd(CONFIG['interface_dir']),
             prefix('source {0}/bin/activate'.format(CONFIG['virt_env'])):
         # FIXME: is there a way to get grunt to skip the failing firefox launch?
         run('grunt --force')
+
 
 @task(alias='bounce')
 def reload_django():
     """ after code has changed, restart gunicorn """
     sudo('supervisorctl restart adage')
+
 
 @task(default=True)
 def update():
@@ -207,8 +223,9 @@ def update():
     with cd(env.dir), prefix('source {0}/bin/activate'.format(env.virt_env)):
         _check_env()
         rebuild_search_index()
-    build_interface()    
+    build_interface()
     reload_django()
+
 
 @task
 def deploy():

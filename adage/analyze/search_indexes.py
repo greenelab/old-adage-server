@@ -1,6 +1,6 @@
-import datetime
 from haystack import indexes
 from analyze.models import Experiment, SampleAnnotation
+
 
 class ExperimentIndex(indexes.SearchIndex, indexes.Indexable):
     """ This object exposes the parts of the model for Haystack to index """
@@ -19,8 +19,8 @@ class ExperimentIndex(indexes.SearchIndex, indexes.Indexable):
 class SampleIndex(indexes.SearchIndex, indexes.Indexable):
     """
     This object exposes a model interface for Haystack to index
-    Note that SampleIndex combines Sample and SampleAnnotation. The distinction 
-    between the two is not made at the presentation layer, so we reflect that 
+    Note that SampleIndex combines Sample and SampleAnnotation. The distinction
+    between the two is not made at the presentation layer, so we reflect that
     in the index.
     """
     text = indexes.CharField(document=True, use_template=True)

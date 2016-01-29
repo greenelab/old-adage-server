@@ -3,15 +3,17 @@ from models import Experiment, Sample, SampleAnnotation
 from tastypie import fields
 from tastypie.resources import Resource, ModelResource
 from tastypie.utils import trailing_slash
-from tastypie.paginator import Paginator
 from tastypie.bundle import Bundle
 from haystack.query import SearchQuerySet
 from haystack.inputs import AutoQuery
 
-# credit to: https://michalcodes4life.wordpress.com/2013/11/26/custom-tastypie-resource-from-multiple-django-models/
+# Many helpful hints for this implementation came from:
+# https://michalcodes4life.wordpress.com/2013/11/26/custom-tastypie-resource-from-multiple-django-models/
+
 
 class SearchItemObject(object):
     pass
+
 
 class SearchResource(Resource):
     item_type = fields.CharField(attribute='item_type')
@@ -92,6 +94,7 @@ class SearchResource(Resource):
         #     return s.experiments
         # return bundle.obj.related_items
 
+
 class ExperimentResource(ModelResource):
     sample_set = fields.ManyToManyField(
             'analyze.api.SampleResource', 'sample_set')
@@ -102,7 +105,8 @@ class ExperimentResource(ModelResource):
     
     def prepend_urls(self):
         return [
-            url(r'^(?P<resource_name>%s)/search%s$' % (self._meta.resource_name, trailing_slash()),
+            url(r'^(?P<resource_name>%s)/search%s$' % \
+                    (self._meta.resource_name, trailing_slash()),
                 self.wrap_view('get_search'), name='api_get_search'),
         ]
     
@@ -141,13 +145,15 @@ class ExperimentResource(ModelResource):
             # This is they way whoosh returns highlighted results
             # snippet = { 'snippet': result.highlighted['text'][0] }
             # This is the way elasticsearch returns highlighted results
-            snippet = { 'snippet': ' ...'.join(result.highlighted) }
-            bundle = self.build_bundle(obj=result.object, data=snippet, request=request)
+            snippet = {'snippet': ' ...'.join(result.highlighted)}
+            bundle = self.build_bundle(
+                    obj=result.object, data=snippet, request=request)
             bundle = self.full_dehydrate(bundle)
             objects.append(bundle)
         
         self.log_throttled_access(request)
         return self.create_response(request, objects)
+
 
 class SampleResource(ModelResource):
     class Meta:
@@ -155,17 +161,18 @@ class SampleResource(ModelResource):
         allowed_methods = ['get']
     
     def prepend_urls(self):
-        # FIXME this <pk> regex is not tested
+        # FIXME this <pk> regex is not thoroughly tested
         return [
-            url(r'^(?P<resource_name>%s)/(?P<pk>[A-Za-z0-9 ]+)/get_experiments%s$' % \
+            url((r'^(?P<resource_name>%s)/'
+                 r'(?P<pk>[A-Za-z0-9 ]+)/get_experiments%s$') % \
                     (self._meta.resource_name, trailing_slash()),
-                    self.wrap_view('get_experiments'), name='api_get_experiments'),
+                    self.wrap_view('get_experiments'),
+                    name='api_get_experiments'),
         ]
     
     def get_experiments(self, request, pk=None, **kwargs):
         if pk:
             sample_obj = SampleAnnotation.objects.get(pk=pk)
-        # print("sample_obj.get_experiments() = %s" % sample_obj.get_experiments())
         objects = []
         # TODO move this method to ExperimentResource and try again
         er = ExperimentResource()

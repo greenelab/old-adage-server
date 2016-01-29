@@ -14,7 +14,8 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-# Any deployment configuration settings (including all secrets) come from config.py
+# Any deployment configuration settings (including all secrets)
+# come from config.py
 import config
 CONFIG = config.CONFIG
 
@@ -44,9 +45,11 @@ INSTALLED_APPS = (
     'tastypie',
     'analyze',
 )
-# NOTE: to get tastypie to play nicely with Django 1.8, need to install using 
-# > pip install -e git+https://github.com/django-tastypie/django-tastypie#egg=TastyPie
-# see <https://github.com/django-tastypie/django-tastypie/issues/1290> for details
+# NOTE: to get tastypie to play nicely with Django 1.8, need to install using
+# > pip install -e
+#   git+https://github.com/django-tastypie/django-tastypie#egg=TastyPie
+# see <https://github.com/django-tastypie/django-tastypie/issues/1290>
+# for details
 API_LIMIT_PER_PAGE = 50
 TASTYPIE_FULL_DEBUG = True
 
@@ -55,8 +58,8 @@ HAYSTACK_CONNECTIONS = CONFIG['haystack']
 # TODO what is HAYSTACK_SEARCH_RESULTS_PER_PAGE doing for us?
 HAYSTACK_SEARCH_RESULTS_PER_PAGE = 10
 
-# define and activate an Elasticsearch Custom Analyzer that mimics Snowball 
-# but adds a word_delimiter token filter where we want it (fixes bitbucket 
+# define and activate an Elasticsearch Custom Analyzer that mimics Snowball
+# but adds a word_delimiter token filter where we want it (fixes bitbucket
 # issue #1: "search on PA14 does not find E-GEOD-24262")
 ELASTICSEARCH_DEFAULT_ANALYZER = "adage_snowball"
 ELASTICSEARCH_INDEX_SETTINGS = {
