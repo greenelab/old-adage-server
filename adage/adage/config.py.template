@@ -6,6 +6,7 @@
 # To find all paramaters you need to specify, search on regex: <config[^>]*>
 # and replace with values tailored to your deployment.
 
+# AWS credentials and configuration
 AWS_CONFIG = {
     'aws_access_key_id':        '<config-secret>',
     'aws_secret_access_key':    '<config-secret>',
@@ -32,13 +33,29 @@ AWS_CONFIG = {
                      }
 }
 
+# os-level configuration
+OS_CONFIG = {
+    'home_dir':      '/home/<configure:default=adage>/',
+}
+
+# data for bootstrapping the database and testing
+DATA_CONFIG = {
+    'data_dir':      OS_CONFIG['home_dir'] + 'adage-server/data/',
+}
+DATA_CONFIG.update({
+    'annotation_file':  DATA_CONFIG['data_dir'] +
+                        'Pseudomonas Annotation_complete-20151203-withCEL.txt',
+})
+
+# test server deployment credentials and configuration (maybe on AWS)
 TEST_CONFIG = {
     'ec2_conn':      AWS_CONFIG['ec2_conn'].copy(),
-    'home_dir':      '/home/adage',
-    'virt_env':      '/home/adage/.virtualenvs/adage',
-    'django_dir':    '/home/adage/adage-server/adage',
+    'virt_env':      OS_CONFIG['home_dir'] + '.virtualenvs/adage',
+    'django_dir':    OS_CONFIG['home_dir'] + 'adage-server/adage',
     'django_key':    '<config-secret>',
-    'interface_dir': '/home/adage/adage-server/interface',
+    'django_super':  '<configure:desc=superuser>',
+    'django_email':  '<configure:desc=superuser_email>',
+    'interface_dir': OS_CONFIG['home_dir'] + 'adage-server/interface',
     'databases':     {'default': {
                         'ENGINE': 'django.db.backends.postgresql_psycopg2',
                         # database name and user cannot have upper case letters
@@ -67,6 +84,7 @@ DEPLOY_TEST_CONFIG.update({
     'dbmaster':      AWS_CONFIG['rds_conn'],
 })
 
+# development server deployment credentials and configuration (maybe on VMware)
 DEV_CONFIG = TEST_CONFIG.copy()
 DEV_CONFIG.update({
     'databases':     {'default': {
