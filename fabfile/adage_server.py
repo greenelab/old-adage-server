@@ -1,5 +1,4 @@
-"""Fab tasks to deploy an Adage server build
-"""
+""" Fab tasks to deploy an Adage server build """
 
 from __future__ import with_statement
 import os
@@ -7,14 +6,13 @@ import sys
 import logging
 import pprint
 from fabric.api import env, local, run, settings, hide, abort, task, runs_once
-from fabric.api import cd, prefix, sudo, put
-from fabric.contrib.console import confirm
+from fabric.api import cd, prefix, sudo
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG_DIR = os.path.join(BASE_DIR, 'adage', 'adage')
 if CONFIG_DIR not in sys.path:
     sys.path.append(CONFIG_DIR)
-from config import DEV_CONFIG as CONFIG
+from config import DATA_CONFIG, DEV_CONFIG as CONFIG
 
 # increase logging level for more detail during debugging
 # logging.basicConfig(level=logging.INFO)
@@ -29,13 +27,13 @@ def setup_ec2_conn(use_config=None):
     if use_config is None:
         logging.info("setup_ec2_conn: reverting to default CONFIG")
         use_config = CONFIG
-    
+
     # If no host was provided on the command line, set the default as we
     # would like it to be
     # if (not env.hosts) or override_hosts:
     # env.hosts = [ use_config['default_host'] ]
     env.hosts = ['{user}@{host}'.format(**use_config['ec2_conn'])]
-    
+
     logging.info('setup_ec2_conn using keyfile: ' +
             use_config['ec2_conn']['keyfile'])
     with settings(hide('running'), warn_only=True):
@@ -108,7 +106,7 @@ def _install_django_requirements():
 def _check_env():
     """
     Ensure that this is an existing deployment that we are updating.
-    
+
     Pass in directory via env.dir.
     """
     if not env.dir:
@@ -131,7 +129,7 @@ def _install_interface_requirements():
 def init_setup_and_check():
     """
     Setup initial needs for server.
-    
+
     This command executes an initial pip install from the production
     environment and then checks the current environment to make sure that
     there is an existing django project.
@@ -142,43 +140,37 @@ def init_setup_and_check():
         _install_django_requirements()
         # _make_static()
         _check_env()
-    with cd(CONFIG['interface_dir']),
+    with cd(CONFIG['interface_dir']), \
             prefix('source {0}/bin/activate'.format(env.virt_env)):
         _install_interface_requirements()
 
 
 def bootstrap_database():
-    """
-    Run a migrate to bootstrap the database
-    """
+    """ Run a migrate to bootstrap the database """
     run('python manage.py migrate')
 
 
 def create_admin_user():
-    """
-    Create a default django administrator for the site
-    """
+    """ Create a default django administrator for the site """
     # FIXME: need to figure out how to set a default password non-interactively
-    run('python manage.py createsuperuser --username=adage '\
-            '--email=mhuyck@fgtech.com --noinput')
+    run(('python manage.py createsuperuser '\
+            '--username={django_super} '\
+            '--email={django_email} --noinput').format(**CONFIG))
 
 
 @task
 def rebuild_search_index():
-    """
-    Rebuild the haystack search index
-    """
+    """ Rebuild the haystack search index """
     run('python manage.py rebuild_index --noinput')
 
 
 @task
-def load_experiments_and_index():
+def import_data_and_index():
     """
-    invoke import_experiments.py, which manually links to the get_pseudo_sdrf.py
+    invoke import_data, which manually links to the get_pseudo_sdrf.py
     file extracted from the get_pseudomonas repository
     """
-    run('python manage.py import_data '\
-            '"../data/Pseudomonas Annotation_complete-20151203-withCEL"')
+    run('python manage.py import_data "%s"' % DATA_CONFIG['annotation_file'])
     rebuild_search_index()
 
 
@@ -190,16 +182,14 @@ def init_instance():
     with cd(env.dir), prefix('source {0}/bin/activate'.format(env.virt_env)):
         bootstrap_database()
         create_admin_user()
-        load_experiments_and_index()
+        import_data_and_index()
 
 
 @task
 def build_interface():
-    """
-    have grunt perform a deployment build for us
-    """
+    """ have grunt perform a deployment build for us """
     #make static
-    with cd(CONFIG['interface_dir']),
+    with cd(CONFIG['interface_dir']), \
             prefix('source {0}/bin/activate'.format(CONFIG['virt_env'])):
         # FIXME: is there a way to get grunt to skip the failing firefox launch?
         run('grunt --force')
@@ -234,7 +224,8 @@ def deploy():
     """
     # capture_django_requirements() # don't clobber what we've added from server
     # test()
-    # push() # it's hazardous to push, then pull immediately as there is a lag before the pull command can get the new code
+    # push() # it's hazardous to push, then pull immediately as there is a lag
+             # before the pull command can get the new code
     print("beginning adage-server deploy")
     pull()
     init_setup_and_check()

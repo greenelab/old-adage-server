@@ -7,10 +7,10 @@ class ExperimentIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.CharField(document=True, use_template=True)
     accession = indexes.CharField(model_attr='accession')
     name = indexes.CharField(model_attr='name')
-    
+
     def get_model(self):
         return Experiment
-    
+
     def index_queryset(self, using=None):
         """ Used when the entire index for model is updated. """
         return self.get_model().objects
@@ -26,7 +26,7 @@ class SampleIndex(indexes.SearchIndex, indexes.Indexable):
     text = indexes.CharField(document=True, use_template=True)
     sample = indexes.CharField(model_attr='sample__sample')
     experiments = indexes.CharField(model_attr='get_experiments')
-    
+
     cel_file = indexes.CharField(model_attr='cel_file')
     strain = indexes.CharField(model_attr='strain')
     genotype = indexes.CharField(model_attr='genotype')
@@ -41,9 +41,9 @@ class SampleIndex(indexes.SearchIndex, indexes.Indexable):
     nucleic_acid = indexes.CharField(model_attr='nucleic_acid')
     temperature = indexes.CharField(model_attr='temperature')
     od = indexes.CharField(model_attr='od')
-    
+
     def get_model(self):
         return SampleAnnotation
-    
+
     def index_queryset(self, using=None):
         return self.get_model().objects

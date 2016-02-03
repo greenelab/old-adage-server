@@ -14,13 +14,12 @@ from analyze.management.commands.import_data import \
 from datetime import datetime
 from tastypie.test import ResourceTestCase
 
-sys.path.append(os.path.abspath('../../ADAGE/'))
+sys.path.append(os.path.abspath('../../'))
 import get_pseudo_sdrf as gp
 import logging
 logger = logging.getLogger(__name__)
 
-DATA_DIR = os.path.abspath('../data')
-ANNOTATION_FILE_NAME = "Pseudomonas Annotation_complete-20151203-withCEL.txt"
+from adage.config import DATA_CONFIG
 
 
 class ModelsTestCase(TestCase):
@@ -47,30 +46,30 @@ class ModelsTestCase(TestCase):
                 '(PMID: 21518885); 2) isolates from a group of newly '
                 'infected children as described in ref (PMID: 20406284).'
     }
-    
+
     sample_list = [
         'GSM774085 1',
     ]
-    
+
     @staticmethod
     def create_test_experiment(experiment_data=None):
         """Create an experiment record to use for tests"""
         if experiment_data is None:
             experiment_data = ModelsTestCase.experiment_data
         return Experiment.objects.create(**experiment_data)
-    
+
     def test_create_experiment(self):
         """Experiment is persisted in the database without errors"""
         self.create_test_experiment()
         obj = Experiment.objects.get(pk=self.experiment_data['accession'])
         self.assertEqual(obj.name, self.experiment_data['name'])
-    
+
     def test_create_sample_solo(self):
         """Sample is persisted in the database without errors"""
         Sample.objects.create(sample=self.sample_list[0])
         obj = Sample.objects.get(pk=self.sample_list[0])
         self.assertEqual(obj.sample, self.sample_list[0])
-    
+
     def test_create_sample_linked(self):
         """
         Sample is persisted in the database and linked to an Experiment without
@@ -103,18 +102,17 @@ class BootstrapDBTestCase(TestCase):
         Bootstrap a test database using a real database initialization
         """
         super(BootstrapDBTestCase, self).setUpClass()
-        self.cache_dir_name = os.path.join(DATA_DIR,
+        self.cache_dir_name = os.path.join(DATA_CONFIG['data_dir'],
                 "bootstrap_cache_{:%Y%m%d}".format(datetime.now()))
         # n.b. we need a plain bytestream for use with unicodecsv, so this
         # open() call is correct even though we are opening a Unicode file.
-        with open(os.path.join(DATA_DIR, ANNOTATION_FILE_NAME),
-                mode='rb') as anno_fh:
+        with open(DATA_CONFIG['annotation_file'], mode='rb') as anno_fh:
             try:
                 bootstrap_database(anno_fh, dir_name=self.cache_dir_name)
                 logger.info("bootstrap_database succeeded.")
             except Exception:
                 logger.warn("bootstrap_database threw an exception", exc_info=1)
-    
+
     def test_example_experiment(
             self,
             test_experiment=ModelsTestCase.experiment_data):
@@ -126,7 +124,7 @@ class BootstrapDBTestCase(TestCase):
         self.assertEqual(e.accession, test_experiment['accession'])
         self.assertEqual(e.name, test_experiment['name'])
         self.assertEqual(e.description, test_experiment['description'])
-    
+
     def test_arrayexpress_metadata(self):
         """
         Ensure that `name` and `description` for each Experiment match what we
@@ -141,7 +139,7 @@ class BootstrapDBTestCase(TestCase):
         for e in ae_experiments:
             if Experiment.objects.filter(pk=e['accession']).exists():
                 self.test_example_experiment(test_experiment=e)
-    
+
     @unittest.skip("annotations are inconsistent")
     def test_annotations_import_export_match(self):
         """
@@ -152,13 +150,13 @@ class BootstrapDBTestCase(TestCase):
         # then minimally process the lines so we can compare our results with
         # the database export
         db_import = []
-        with codecs.open(os.path.join(DATA_DIR, ANNOTATION_FILE_NAME),
+        with codecs.open(DATA_CONFIG['annotation_file'],
                 mode='rb', encoding='utf-8') as anno_fh:
             last_col = re.compile(ur'\t[^\t]*$', flags=re.UNICODE)
             for line in anno_fh:
                 line = last_col.sub(u'', line)   # strip off last column
                 db_import.append(line)
-        
+
         db_export = []
         for e in Experiment.objects.all():
             for s in e.sample_set.all():
@@ -179,22 +177,22 @@ class APIResourceTestCase(ResourceTestCase):
     # API tests:
     # For all of our interfaces, we should be able to GET, but every other
     # REST API should fail: POST, PUT, PATCH, DELETE
-    
+
     baseURI = '/api/v0/'
-    
+
     def setUp(self):
         super(APIResourceTestCase, self).setUp()
-        
+
         # create a test experiment to retrive with the API
         self.test_experiment = ModelsTestCase.experiment_data
         ModelsTestCase.create_test_experiment(
                 experiment_data=self.test_experiment)
         self.experimentURI = (self.baseURI +
                 'experiment/{accession}/'.format(**self.test_experiment))
-        
+
         # create some test samples to retrieve with the API
         # TODO stopped here
-    
+
     def test_experiment_get(self):
         """
         We should be able to GET data from our test experiment via the API
@@ -211,7 +209,7 @@ class APIResourceTestCase(ResourceTestCase):
         self.assertEqual(e['description'], self.test_experiment['description'])
         # this line doesn't work because we have only a small test database
         # self.assertEqual(len(e[sample_set]), 78)
-    
+
     def test_experiment_non_get(self):
         """
         We should not be able to POST, PUT, PATCH or DELETE
@@ -226,13 +224,13 @@ class APIResourceTestCase(ResourceTestCase):
         resp = self.api_client.delete(
                 self.experimentURI, data={'format': 'json'})
         self.assertHttpMethodNotAllowed(resp)
-    
+
     def test_sample_get(self):
         """
         We should be able to GET data from our test sample via the API
         """
         pass
-    
+
     # def test_search_api(self):
     #     """
     #     Basic test using bootstrapped data that the search API works

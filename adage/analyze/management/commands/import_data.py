@@ -12,12 +12,16 @@ import logging
 logger = logging.getLogger(__name__)
 
 # import Django environment
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "adage.settings")
 from analyze.models import Experiment, Sample, SampleAnnotation
 
 # import ADAGE utilities
 # we've stashed a copy of get_pseudo_sdrf here for deployment (see fabfile.py)
-sys.path.append(os.path.abspath('../../ADAGE/'))
+# FIXME: Importing this way is fragile. We need to (a) move the code we need
+#        from `get_pseudo_sdrf` and `gen_spreadsheets` in the `ADAGE`
+#        repository into `adage-server` or (b) make the code we need into a
+#        pip-installable utility package that gets imported by both the `ADAGE`
+#        project and the `adage-server` project.
+sys.path.append(os.path.abspath('../../'))
 import get_pseudo_sdrf as gp
 import gen_spreadsheets as gs
 
@@ -32,10 +36,10 @@ def main():
 class Command(BaseCommand):
     help = 'Imports data to initialize the database with Experiment, Sample '\
             'and SampleAnnotation records.'
-    
+
     def add_arguments(self, parser):
         parser.add_argument('annotation_file', type=argparse.FileType('r'))
-    
+
     def handle(self, **options):
         try:
             bootstrap_database(options['annotation_file'])
@@ -53,19 +57,19 @@ def bootstrap_database(annotation_fh, dir_name=None):
     ADAGE database. Assumes we are starting with an empty database, so this
     will fail if any existing data are found that conflict with what is being
     imported.
-    
+
     `annotation_fh`: a file handle open to the beginning of a UTF-8 plain text
     format of the annotated spreadsheet data (including a .CEL file column).
     File format is expected to match what is exported by
     gen_spreadsheets.gen_spreadsheets().
-    
+
     `dir_name`: a directory for storing .sdrf.txt files to be downloaded by
     get_pseudo_sdrf.download_sdrf_to_dir(). If no `dir_name` is supplied, the
     current working directory will be used. This collection of files constitutes
     an authoritative reference for what samples comprise each experiment. In
     addition, a cache containing a record of the JSON data retrieved from
     ArrayExpress will be saved here.
-    
+
     This function will raise errors if it is unable to complete successfully,
     and it will exit with no error if it succeeds in initializing the database.
     """
@@ -74,7 +78,7 @@ def bootstrap_database(annotation_fh, dir_name=None):
         os.mkdir(dir_name)
     ss = gs.Spreadsheet()
     ss.parse_txt_file(annotation_fh)
-    
+
     # download all experiment attributes from ArrayExpress and create an
     # Experiment in the database for each matching experiment found in the
     # annotation spreadsheet. Raise an error if any annotated experiment
@@ -96,7 +100,7 @@ def bootstrap_database(annotation_fh, dir_name=None):
     for e in ae_experiments:
         if e['accession'] in annotated_experiments:
             Experiment.objects.create(**e)
-    
+
     # now that we have database records for every Experiment, we walk through
     # the annotation spreadsheet and create records for Samples, linking each
     # to one or more Experiment(s) and creating a SampleAnnotation for each
@@ -120,7 +124,6 @@ def bootstrap_database(annotation_fh, dir_name=None):
                 ('accession', 'sample', 'expt_summary'))
         if created:
             # a new sample was created so we need new annotations for it
-            # row_sample_annotation = row_sample.sampleannotation.create(
             row_sample_annotation = SampleAnnotation(
                 sample=row_sample,
                 **annotations)

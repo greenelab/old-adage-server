@@ -7,7 +7,7 @@ class Experiment(models.Model):
     accession = models.CharField(max_length=48, primary_key=True)
     name = models.CharField(max_length=1000)
     description = models.TextField()
-    
+
     def __unicode__(self):
         return self.accession
 
@@ -23,7 +23,7 @@ class Sample(models.Model):
         max_length=80,
         primary_key=True,
         blank=False)
-    
+
     def __unicode__(self):
         return "<Sample %s>" % self.sample
 
@@ -33,7 +33,7 @@ class SampleAnnotation(models.Model):
         Sample,
         on_delete=models.PROTECT,
         primary_key=True)
-    
+
     cel_file = models.CharField(
         "CEL file",
         max_length=120,
@@ -99,9 +99,9 @@ class SampleAnnotation(models.Model):
     description = models.TextField(
         "description (strain, replicates, and a brief glimpse of the exp.)",
         blank=False)
-    
+
     def __unicode__(self):
         return "<SampleAnnotation %s>" % self.sample.sample
-    
+
     def get_experiments(self):
         return self.sample.experiments.all()
