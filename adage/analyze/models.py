@@ -25,7 +25,7 @@ class Sample(models.Model):
         blank=False)
     
     def __unicode__(self):
-        return self.sample
+        return "<Sample %s>" % self.sample
 
 
 class SampleAnnotation(models.Model):
@@ -101,7 +101,7 @@ class SampleAnnotation(models.Model):
         blank=False)
     
     def __unicode__(self):
-        return self.sample.sample
+        return "<SampleAnnotation %s>" % self.sample.sample
     
     def get_experiments(self):
         return self.sample.experiments.all()
