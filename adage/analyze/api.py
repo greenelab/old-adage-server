@@ -97,6 +97,7 @@ class SampleResource(ModelResource):
     class Meta:
         queryset = SampleAnnotation.objects.all()
         allowed_methods = ['get']
+        experiments_allowed_methods = ['get']
     
     def prepend_urls(self):
         # FIXME this <pk> regex is not thoroughly tested
@@ -104,9 +105,12 @@ class SampleResource(ModelResource):
             url((r'^(?P<resource_name>%s)/'
                  r'(?P<pk>[A-Za-z0-9 ]+)/get_experiments%s$') % \
                     (self._meta.resource_name, trailing_slash()),
-                    self.wrap_view('get_experiments'),
+                    self.wrap_view('dispatch_experiments'),
                     name='api_get_experiments'),
         ]
+    
+    def dispatch_experiments(self, request, **kwargs):
+        return self.dispatch('experiments', request, **kwargs)
     
     def get_experiments(self, request, pk=None, **kwargs):
         if pk:
