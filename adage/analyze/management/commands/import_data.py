@@ -108,15 +108,6 @@ def bootstrap_database(annotation_fh, dir_name=None):
     mismatches = {}  # mismatches indexed by sample and experiment ids
     for r in ss.rows():
         row_experiment = Experiment.objects.get(pk=r.accession)
-        # FIXME: filter out experiments with repeat samples for testing
-        skip_experiments = ['E-GEOD-16970', 'E-GEOD-22684', 'E-GEOD-24036',
-                'E-GEOD-24038', 'E-GEOD-25128', 'E-GEOD-25130', 'E-GEOD-28953',
-                'E-GEOD-33241', 'E-GEOD-33244', 'E-GEOD-33245', 'E-GEOD-35286',
-                'E-GEOD-65869', 'E-GEOD-65870', 'E-GEOD-65882']
-        if row_experiment.accession in skip_experiments:
-            logger.warn(("Skipping {sample} (experiment {accession}) for "
-                    "testing.").format(**r._asdict()))
-            continue
         row_sample, created = Sample.objects.get_or_create(sample=r.sample)
         row_experiment.sample_set.add(row_sample)
         annotations = dict((k, v)

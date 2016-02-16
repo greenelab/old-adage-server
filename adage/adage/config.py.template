@@ -44,7 +44,7 @@ DATA_CONFIG = {
 }
 DATA_CONFIG.update({
     'annotation_file':  DATA_CONFIG['data_dir'] +
-                        'Pseudomonas Annotation_complete-20151203-withCEL.txt',
+                        'Pseudomonas Annotation-20160210.txt',
 })
 
 # test server deployment credentials and configuration (maybe on AWS)
