@@ -1,6 +1,7 @@
 # coding: utf-8 (see https://www.python.org/dev/peps/pep-0263/)
 
 from __future__ import unicode_literals
+from __future__ import print_function
 import os
 import re
 import sys
@@ -20,6 +21,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 from adage.config import DATA_CONFIG
+from analyze.api import SampleResource
 
 
 class ModelsTestCase(TestCase):
@@ -157,18 +159,8 @@ class BootstrapDBTestCase(TestCase):
                 line = last_col.sub(u'', line)   # strip off last column
                 db_import.append(line)
 
-        db_export = []
-        for e in Experiment.objects.all():
-            for s in e.sample_set.all():
-                sa = s.sampleannotation
-                db_export.append(u'\t'.join([e.accession, s.sample, sa.cel_file,
-                        sa.strain, sa.genotype, sa.abx_marker,
-                        sa.variant_phenotype, sa.medium, sa.treatment,
-                        sa.biotic_int_lv_1,
-                        sa.biotic_int_lv_2, sa.growth_setting_1,
-                        sa.growth_setting_2, sa.nucleic_acid, sa.temperature,
-                        sa.od, sa.additional_notes, sa.description,
-                ]))
+        db_export = SampleResource.get_annotations()
+
         self.maxDiff = None     # report all diffs to be most helpful
         self.assertItemsEqual(db_export, db_import)
 

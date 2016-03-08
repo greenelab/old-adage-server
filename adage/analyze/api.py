@@ -21,17 +21,17 @@ class SearchResource(Resource):
     description = fields.CharField(attribute='description')
     snippet = fields.CharField(attribute='snippet')
     related_items = fields.ListField(attribute='related_items')
-    
+
     class Meta:
         resource_name = 'search'
         allowed_methods = ['get']
         object_class = SearchItemObject
-    
+
     def resource_uri_kwargs(self, bundle_or_obj):
         kwargs = {
             'resource_name': self._meta.resource_name,
         }
-        
+
         if self._meta.api_name is not None:
             kwargs['api_name'] = self._meta.api_name
         if bundle_or_obj is not None:
@@ -41,28 +41,28 @@ class SearchResource(Resource):
                 obj = bundle_or_obj
             kwargs['resource_name'] = obj.item_type
             kwargs['pk'] = obj.pk
-        
+
         return kwargs
-    
+
     def obj_get_list(self, request=None, **kwargs):
         if not request:
             request = kwargs['bundle'].request
         return self.get_object_list(request)
-    
+
     def get_object_list(self, request):
         # unpack the query string from the request headers
         query_str = request.GET.get('q', '')
-        
+
         # restrict our search to the Experiment and SampleAnnotation models
         sqs = SearchQuerySet().models(Experiment, SampleAnnotation)
-        
+
         # run the query and specify we want highlighted results
         sqs = sqs.filter(content=AutoQuery(query_str)).load_all().highlight()
-        
+
         object_list = []
         for result in sqs:
             new_obj = SearchItemObject()
-            
+
             new_obj.pk = result.pk
             if result.model_name == 'experiment':
                 new_obj.item_type = result.model_name
@@ -80,14 +80,14 @@ class SearchResource(Resource):
                 new_obj.related_items = []
             new_obj.snippet = ' ...'.join(result.highlighted)
             object_list.append(new_obj)
-        
+
         return object_list
 
 
 class ExperimentResource(ModelResource):
     sample_set = fields.ManyToManyField(
             'analyze.api.SampleResource', 'sample_set')
-    
+
     class Meta:
         queryset = Experiment.objects.all()
         allowed_methods = ['get']
@@ -97,8 +97,9 @@ class SampleResource(ModelResource):
     class Meta:
         queryset = SampleAnnotation.objects.all()
         allowed_methods = ['get']
-        experiments_allowed_methods = ['get']
-    
+        experiments_allowed_methods = allowed_methods
+        annotations_allowed_methods = allowed_methods
+
     def prepend_urls(self):
         # FIXME this <pk> regex is not thoroughly tested
         return [
@@ -107,20 +108,55 @@ class SampleResource(ModelResource):
                     (self._meta.resource_name, trailing_slash()),
                     self.wrap_view('dispatch_experiments'),
                     name='api_get_experiments'),
+            url((r'^(?P<resource_name>%s)/'
+                 r'get_annotations%s$') % \
+                    (self._meta.resource_name, trailing_slash()),
+                    self.wrap_view('dispatch_annotations'),
+                    name='api_get_annotations'),
         ]
-    
+
     def dispatch_experiments(self, request, **kwargs):
         return self.dispatch('experiments', request, **kwargs)
-    
+
     def get_experiments(self, request, pk=None, **kwargs):
         if pk:
             sample_obj = SampleAnnotation.objects.get(pk=pk)
         objects = []
-        # TODO move this method to ExperimentResource and try again
         er = ExperimentResource()
         for e in sample_obj.get_experiments():
             bundle = er.build_bundle(obj=e, request=request)
             bundle = er.full_dehydrate(bundle)
             objects.append(bundle)
-        
+
         return self.create_response(request, objects)
+
+    def dispatch_annotations(self, request, **kwargs):
+        return self.dispatch('annotations', request, **kwargs)
+
+    @staticmethod
+    def get_annotations():
+        """
+        return a tab-delimited file containing annotations for all samples
+        """
+        rows = []
+        # include a header as the first row
+        rows.append(u'\t'.join(
+                ['experiment', 'sample', 'cel_file', 'strain', 'genotype',
+                'abx_marker', 'variant_phenotype', 'medium', 'treatment',
+                'biotic_int_lv_1', 'biotic_int_lv_2', 'growth_setting_1',
+                'growth_setting_2', 'nucleic_acid', 'temperature',
+                'od', 'additional_notes', 'description',
+                ])
+        )
+        for e in Experiment.objects.all():
+            for s in e.sample_set.all():
+                sa = s.sampleannotation
+                rows.append(u'\t'.join([e.accession, s.sample, sa.cel_file,
+                        sa.strain, sa.genotype, sa.abx_marker,
+                        sa.variant_phenotype, sa.medium, sa.treatment,
+                        sa.biotic_int_lv_1,
+                        sa.biotic_int_lv_2, sa.growth_setting_1,
+                        sa.growth_setting_2, sa.nucleic_acid, sa.temperature,
+                        sa.od, sa.additional_notes, sa.description,
+                ]))
+        return rows
