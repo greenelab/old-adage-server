@@ -24,10 +24,10 @@ class SampleIndex(indexes.SearchIndex, indexes.Indexable):
     in the index.
     """
     text = indexes.CharField(document=True, use_template=True)
-    sample = indexes.CharField(model_attr='sample__sample')
+    name = indexes.CharField(model_attr='sample__name')
     experiments = indexes.CharField(model_attr='get_experiments')
 
-    cel_file = indexes.CharField(model_attr='cel_file')
+    ml_data_source = indexes.CharField(model_attr='sample__ml_data_source')
     strain = indexes.CharField(model_attr='strain')
     genotype = indexes.CharField(model_attr='genotype')
     abx_marker = indexes.CharField(model_attr='abx_marker')

@@ -44,7 +44,7 @@ class Command(BaseCommand):
         try:
             bootstrap_database(options['annotation_file'])
             self.stdout.write(
-                    self.style.SUCCESS("Data import succeeded"))
+                    self.style.NOTICE("Data import succeeded"))
         except Exception as e:
             raise CommandError(
                     "Data import encountered an error: bootstrap_database "
@@ -108,11 +108,12 @@ def bootstrap_database(annotation_fh, dir_name=None):
     mismatches = {}  # mismatches indexed by sample and experiment ids
     for r in ss.rows():
         row_experiment = Experiment.objects.get(pk=r.accession)
-        row_sample, created = Sample.objects.get_or_create(sample=r.sample)
+        row_sample, created = Sample.objects.get_or_create(
+                name=r.sample, ml_data_source=r.cel_file)
         row_experiment.sample_set.add(row_sample)
         annotations = dict((k, v)
             for k, v in r._asdict().items() if k not in \
-                ('accession', 'sample', 'expt_summary'))
+                ('accession', 'sample', 'cel_file', 'expt_summary'))
         if created:
             # a new sample was created so we need new annotations for it
             row_sample_annotation = SampleAnnotation(
@@ -121,7 +122,8 @@ def bootstrap_database(annotation_fh, dir_name=None):
             row_sample_annotation.save()
         else:
             # sample was already present, so check if our annotations match
-            existing_annotation = SampleAnnotation.objects.get(sample=r.sample)
+            existing_annotation = SampleAnnotation.objects.get(
+                    sample=row_sample)
             existing_annotation_dict = existing_annotation.__dict__
             existing_annotation_changed = False
             for k, v in annotations.iteritems():

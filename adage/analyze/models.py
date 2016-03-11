@@ -17,15 +17,18 @@ class Experiment(models.Model):
 
 
 class Sample(models.Model):
-    experiments = models.ManyToManyField(Experiment)
-    sample = models.CharField(
-        "sample source",
+    name = models.CharField(
+        "sample name",
         max_length=80,
-        primary_key=True,
         blank=False)
+    ml_data_source = models.CharField(
+        "Machine Learning data used for modeling, e.g. CEL file",
+        max_length=120,
+        blank=True)
+    experiments = models.ManyToManyField(Experiment)
 
     def __unicode__(self):
-        return "<Sample %s>" % self.sample
+        return "<Sample %d (%s)>" % (self.id, self.name)
 
 
 class SampleAnnotation(models.Model):
@@ -34,10 +37,6 @@ class SampleAnnotation(models.Model):
         on_delete=models.PROTECT,
         primary_key=True)
 
-    cel_file = models.CharField(
-        "CEL file",
-        max_length=120,
-        blank=True)
     strain = models.CharField(
         "strain",
         max_length=60,
@@ -101,7 +100,7 @@ class SampleAnnotation(models.Model):
         blank=False)
 
     def __unicode__(self):
-        return "<SampleAnnotation %s>" % self.sample.sample
+        return "<SampleAnnotation %d (%s)>" % (self.sample.id, self.sample.name)
 
     def get_experiments(self):
         return self.sample.experiments.all()

@@ -50,7 +50,10 @@ class ModelsTestCase(TestCase):
     }
 
     sample_list = [
-        'GSM774085 1',
+        {
+            'name': 'GSM774085 1',
+            'ml_data_source': 'GSM774085_CF30-1979a.CEL',
+        }
     ]
 
     @staticmethod
@@ -68,9 +71,11 @@ class ModelsTestCase(TestCase):
 
     def test_create_sample_solo(self):
         """Sample is persisted in the database without errors"""
-        Sample.objects.create(sample=self.sample_list[0])
-        obj = Sample.objects.get(pk=self.sample_list[0])
-        self.assertEqual(obj.sample, self.sample_list[0])
+        Sample.objects.create(**self.sample_list[0])
+        obj = Sample.objects.get(name=self.sample_list[0]['name'])
+        self.assertEqual(obj.name, self.sample_list[0]['name'])
+        self.assertEqual(
+                obj.ml_data_source, self.sample_list[0]['ml_data_source'])
 
     def test_create_sample_linked(self):
         """
@@ -78,11 +83,12 @@ class ModelsTestCase(TestCase):
         errors
         """
         exp_obj = self.create_test_experiment()
-        exp_obj.sample_set.create(sample=self.sample_list[0])
-        # obj = Sample.objects.create(sample=self.sample_list[0])
+        exp_obj.sample_set.create(**self.sample_list[0])
+        # obj = Sample.objects.create(**self.sample_list[0])
         # obj.experiments.add(exp_obj)
-        obj2 = Sample.objects.get(pk=self.sample_list[0])
-        self.assertEqual(obj2.sample, self.sample_list[0])
+        # FIXME need a uniqueness constraint on name? better way to get below?
+        obj2 = Sample.objects.get(name=self.sample_list[0]['name'])
+        self.assertEqual(obj2.name, self.sample_list[0]['name'])
         self.assertEqual(obj2.experiments.all()[0].accession, 'E-GEOD-31227')
 
 
@@ -142,7 +148,9 @@ class BootstrapDBTestCase(TestCase):
             if Experiment.objects.filter(pk=e['accession']).exists():
                 self.test_example_experiment(test_experiment=e)
 
-    @unittest.skip("annotations are inconsistent")
+    # FIXME make this test work again by educating it about meaningless diffs
+    @unittest.skip("inconsistent annotations are auto-resolved, but this test "\
+            "still flags those diffs")
     def test_annotations_import_export_match(self):
         """
         Ensure that exported data match what we imported with bootstrap_database
@@ -160,6 +168,10 @@ class BootstrapDBTestCase(TestCase):
                 db_import.append(line)
 
         db_export = SampleResource.get_annotations()
+        with codecs.open(
+                DATA_CONFIG['data_dir'] + "annotation-export-20160214.txt",
+                mode='wb', encoding='utf-8') as annexp_fh:
+            print(u'\n'.join(db_export), file=annexp_fh)
 
         self.maxDiff = None     # report all diffs to be most helpful
         self.assertItemsEqual(db_export, db_import)

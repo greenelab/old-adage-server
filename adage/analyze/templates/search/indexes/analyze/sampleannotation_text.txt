@@ -1,3 +1,4 @@
-{{ object.sample }}
+{{ object.name }}
+{{ object.ml_data_source }}
 {{ object.description }}
 {{ object.additional_notes }}

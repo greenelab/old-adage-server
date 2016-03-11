@@ -121,6 +121,7 @@ class SampleResource(ModelResource):
     def get_experiments(self, request, pk=None, **kwargs):
         if pk:
             sample_obj = SampleAnnotation.objects.get(pk=pk)
+        # FIXME what happens if pk is None?? default sample_obj somehow?
         objects = []
         er = ExperimentResource()
         for e in sample_obj.get_experiments():
@@ -141,17 +142,17 @@ class SampleResource(ModelResource):
         rows = []
         # include a header as the first row
         rows.append(u'\t'.join(
-                ['experiment', 'sample', 'cel_file', 'strain', 'genotype',
-                'abx_marker', 'variant_phenotype', 'medium', 'treatment',
-                'biotic_int_lv_1', 'biotic_int_lv_2', 'growth_setting_1',
-                'growth_setting_2', 'nucleic_acid', 'temperature',
-                'od', 'additional_notes', 'description',
+                ['experiment', 'sample_name', 'ml_data_source', 'strain',
+                'genotype', 'abx_marker', 'variant_phenotype', 'medium',
+                'treatment', 'biotic_int_lv_1', 'biotic_int_lv_2',
+                'growth_setting_1', 'growth_setting_2', 'nucleic_acid',
+                'temperature', 'od', 'additional_notes', 'description',
                 ])
         )
         for e in Experiment.objects.all():
             for s in e.sample_set.all():
                 sa = s.sampleannotation
-                rows.append(u'\t'.join([e.accession, s.sample, sa.cel_file,
+                rows.append(u'\t'.join([e.accession, s.name, s.ml_data_source,
                         sa.strain, sa.genotype, sa.abx_marker,
                         sa.variant_phenotype, sa.medium, sa.treatment,
                         sa.biotic_int_lv_1,
