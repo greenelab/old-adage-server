@@ -1,11 +1,12 @@
 from django.conf.urls import url
-from models import Experiment, Sample, SampleAnnotation
-from tastypie import fields
+from django.core.exceptions import ObjectDoesNotExist
+from tastypie import fields, http
 from tastypie.resources import Resource, ModelResource
 from tastypie.utils import trailing_slash
 from tastypie.bundle import Bundle
 from haystack.query import SearchQuerySet
 from haystack.inputs import AutoQuery
+from models import Experiment, Sample, SampleAnnotation
 
 # Many helpful hints for this implementation came from:
 # https://michalcodes4life.wordpress.com/2013/11/26/custom-tastypie-resource-from-multiple-django-models/
@@ -101,10 +102,9 @@ class SampleResource(ModelResource):
         annotations_allowed_methods = allowed_methods
 
     def prepend_urls(self):
-        # FIXME this <pk> regex is not thoroughly tested
         return [
             url((r'^(?P<resource_name>%s)/'
-                 r'(?P<pk>[A-Za-z0-9 ]+)/get_experiments%s$') % \
+                 r'(?P<pk>[0-9]+)/get_experiments%s$') % \
                     (self._meta.resource_name, trailing_slash()),
                     self.wrap_view('dispatch_experiments'),
                     name='api_get_experiments'),
@@ -116,12 +116,24 @@ class SampleResource(ModelResource):
         ]
 
     def dispatch_experiments(self, request, **kwargs):
+        """
+        This handler takes a URL request (see above) and dispatches it to the
+        get_experiments method via Tastypie's built-in ModelResource.dispatch()
+        (inherited from Resource). We do this in order to take advantage of the
+        Tastypie-supplied dispatcher, which properly checks if a method is
+        allowed, does request throttling and authentication (if required). See
+        Resource.dispatch() for details.
+        """
         return self.dispatch('experiments', request, **kwargs)
 
     def get_experiments(self, request, pk=None, **kwargs):
         if pk:
-            sample_obj = SampleAnnotation.objects.get(pk=pk)
-        # FIXME what happens if pk is None?? default sample_obj somehow?
+            try:
+                sample_obj = SampleAnnotation.objects.get(pk=pk)
+            except ObjectDoesNotExist:
+                return http.HttpNotFound()
+        else:
+            return http.HttpNotFound()
         objects = []
         er = ExperimentResource()
         for e in sample_obj.get_experiments():
@@ -132,6 +144,14 @@ class SampleResource(ModelResource):
         return self.create_response(request, objects)
 
     def dispatch_annotations(self, request, **kwargs):
+        """
+        This handler takes a URL request (see above) and dispatches it to the
+        get_annotations method via Tastypie's built-in ModelResource.dispatch()
+        (inherited from Resource). We do this in order to take advantage of the
+        Tastypie-supplied dispatcher, which properly checks if a method is
+        allowed, does request throttling and authentication (if required). See
+        Resource.dispatch() for details.
+        """
         return self.dispatch('annotations', request, **kwargs)
 
     @staticmethod
