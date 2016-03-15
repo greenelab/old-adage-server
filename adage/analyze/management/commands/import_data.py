@@ -108,8 +108,11 @@ def bootstrap_database(annotation_fh, dir_name=None):
     mismatches = {}  # mismatches indexed by sample and experiment ids
     for r in ss.rows():
         row_experiment = Experiment.objects.get(pk=r.accession)
+        ml_data_source = r.cel_file
+        if ml_data_source == '':
+            ml_data_source = None
         row_sample, created = Sample.objects.get_or_create(
-                name=r.sample, ml_data_source=r.cel_file)
+                name=r.sample, ml_data_source=ml_data_source)
         row_experiment.sample_set.add(row_sample)
         annotations = dict((k, v)
             for k, v in r._asdict().items() if k not in \

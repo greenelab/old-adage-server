@@ -27,7 +27,8 @@ class SampleIndex(indexes.SearchIndex, indexes.Indexable):
     name = indexes.CharField(model_attr='sample__name')
     experiments = indexes.CharField(model_attr='get_experiments')
 
-    ml_data_source = indexes.CharField(model_attr='sample__ml_data_source')
+    ml_data_source = indexes.CharField(
+            model_attr='sample__ml_data_source', null=True)
     strain = indexes.CharField(model_attr='strain')
     genotype = indexes.CharField(model_attr='genotype')
     abx_marker = indexes.CharField(model_attr='abx_marker')

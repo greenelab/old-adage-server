@@ -24,11 +24,13 @@ class Sample(models.Model):
     ml_data_source = models.CharField(
         "Machine Learning data used for modeling, e.g. CEL file",
         max_length=120,
+        null=True,
+        unique=True,
         blank=True)
     experiments = models.ManyToManyField(Experiment)
 
     def __unicode__(self):
-        return "<Sample %d (%s)>" % (self.id, self.name)
+        return "%d (%s)" % (self.id, self.name)
 
 
 class SampleAnnotation(models.Model):
@@ -100,7 +102,7 @@ class SampleAnnotation(models.Model):
         blank=False)
 
     def __unicode__(self):
-        return "<SampleAnnotation %d (%s)>" % (self.sample.id, self.sample.name)
+        return "%d (%s)" % (self.sample.id, self.sample.name)
 
     def get_experiments(self):
         return self.sample.experiments.all()

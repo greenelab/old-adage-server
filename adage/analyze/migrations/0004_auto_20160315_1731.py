@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('name', models.CharField(max_length=80, verbose_name=b'sample name')),
-                ('ml_data_source', models.CharField(max_length=120, verbose_name=b'Machine Learning data used for modeling, e.g. CEL file', blank=True)),
+                ('ml_data_source', models.CharField(max_length=120, unique=True, null=True, verbose_name=b'Machine Learning data used for modeling, e.g. CEL file', blank=True)),
             ],
         ),
         migrations.CreateModel(
