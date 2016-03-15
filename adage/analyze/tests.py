@@ -168,10 +168,6 @@ class BootstrapDBTestCase(TestCase):
                 db_import.append(line)
 
         db_export = SampleResource.get_annotations()
-        with codecs.open(
-                DATA_CONFIG['data_dir'] + "annotation-export-20160214.txt",
-                mode='wb', encoding='utf-8') as annexp_fh:
-            print(u'\n'.join(db_export), file=annexp_fh)
 
         self.maxDiff = None     # report all diffs to be most helpful
         self.assertItemsEqual(db_export, db_import)
