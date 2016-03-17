@@ -15,9 +15,20 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Any deployment configuration settings (including all secrets)
-# come from config.py
-import config
-CONFIG = config.CONFIG
+# come from config.py, which is never checked into source control. If we're
+# running under Codeship we build a CONFIG on the fly using config.py.template
+if os.environ.get('CODESHIP_SETTINGS') == 'YES':
+    with open(os.path.join(BASE_DIR, 'adage', 'config.py.template')) as f:
+        exec f
+    CONFIG = CI_CONFIG
+    pg_user = os.environ.get('PG_USER')
+    pg_pass = os.environ.get('PG_PASSWORD')
+    CONFIG['dbmaster']['USER'] = pg_user
+    CONFIG['dbmaster']['PASSWORD'] = pg_pass
+    CONFIG['databases']['default']['USER'] = pg_user
+    CONFIG['databases']['default']['PASSWORD'] = pg_pass
+else:
+    from config import CONFIG
 
 # Quick-start development settings - unsuitable for production
 # TODO: review Django deployment checklist
