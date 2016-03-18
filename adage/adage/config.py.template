@@ -120,7 +120,7 @@ CI_CONFIG.update({
                         'USER': '<configure>',
                         'PASSWORD': '<config-secret>',
                         'HOST': '127.0.0.1',
-                        'PORT': '5434', # v. 9.4
+                        'PORT': '5434',  # v. 9.4
                         }
                      },
     'dbmaster':      {
@@ -128,13 +128,13 @@ CI_CONFIG.update({
                         'USER': '<configure>',
                         'PASSWORD': '<config-secret>',
                         'HOST': '127.0.0.1',
-                        'PORT': '5434', # v. 9.4
+                        'PORT': '5434',  # v. 9.4
                      },
     'data':          {
                         'data_dir': '/home/rof/clone/data/',
                         'annotation_file':
                             '/home/rof/clone/data/PseudomonasAnnotation.tsv',
                      },
-}
+})
 
 CONFIG = TEST_CONFIG
