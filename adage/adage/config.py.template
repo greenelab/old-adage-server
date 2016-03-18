@@ -50,6 +50,7 @@ DATA_CONFIG.update({
 
 # test server deployment credentials and configuration (maybe on AWS)
 TEST_CONFIG = {
+    'data':          DATA_CONFIG,
     'ec2_conn':      AWS_CONFIG['ec2_conn'].copy(),
     'virt_env':      OS_CONFIG['home_dir'] + '.virtualenvs/adage',
     'django_dir':    OS_CONFIG['home_dir'] + 'adage-server/adage',
@@ -115,7 +116,7 @@ CI_CONFIG.update({
     'databases':     {'default': {
                         'ENGINE': 'django.db.backends.postgresql_psycopg2',
                         # database name and user cannot have upper case letters
-                        'NAME': 'adagemhuyck',
+                        'NAME': 'adageci',
                         'USER': '<configure>',
                         'PASSWORD': '<config-secret>',
                         'HOST': '127.0.0.1',
@@ -129,6 +130,11 @@ CI_CONFIG.update({
                         'HOST': '127.0.0.1',
                         'PORT': '5434', # v. 9.4
                      },
-})
+    'data':          {
+                        'data_dir': '/home/rof/clone/data/',
+                        'annotation_file':
+                            '/home/rof/clone/data/PseudomonasAnnotation.tsv',
+                     },
+}
 
 CONFIG = TEST_CONFIG
