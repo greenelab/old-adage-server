@@ -1,13 +1,14 @@
-Django==1.8.2
-django-haystack==2.3.1
--e git+https://github.com/django-tastypie/django-tastypie@256ebe1de9a78dfb5d4d6e938b813cf4c5c4ac1b#egg=django_tastypie-master
-python-dateutil==2.4.2
-python-mimeparse==0.1.4
-six==1.9.0
 argparse==1.2.1
-gunicorn==19.3.0
-wsgiref==0.1.2
+Django==1.8.11
+django-fixtureless==1.4.3.3
+django-haystack==2.4.1
+django-tastypie==0.13.3
+elasticsearch==1.9.0
+gunicorn==19.4.5
 psycopg2==2.6.1
-elasticsearch==1.6.0
-urllib3==1.10.4
+python-dateutil==2.5.0
+python-mimeparse==1.5.1
+six==1.10.0
 unicodecsv==0.14.1
+urllib3==1.14
+wsgiref==0.1.2
