@@ -20,7 +20,7 @@ import get_pseudo_sdrf as gp
 import logging
 logger = logging.getLogger(__name__)
 
-from adage.config import DATA_CONFIG
+from adage.settings import CONFIG
 from analyze.api import SampleResource
 
 
@@ -110,11 +110,11 @@ class BootstrapDBTestCase(TestCase):
         Bootstrap a test database using a real database initialization
         """
         super(BootstrapDBTestCase, self).setUpClass()
-        self.cache_dir_name = os.path.join(DATA_CONFIG['data_dir'],
+        self.cache_dir_name = os.path.join(CONFIG['data']['data_dir'],
                 "bootstrap_cache_{:%Y%m%d}".format(datetime.now()))
         # n.b. we need a plain bytestream for use with unicodecsv, so this
         # open() call is correct even though we are opening a Unicode file.
-        with open(DATA_CONFIG['annotation_file'], mode='rb') as anno_fh:
+        with open(CONFIG['data']['annotation_file'], mode='rb') as anno_fh:
             try:
                 bootstrap_database(anno_fh, dir_name=self.cache_dir_name)
                 logger.info("bootstrap_database succeeded.")
@@ -160,7 +160,7 @@ class BootstrapDBTestCase(TestCase):
         # then minimally process the lines so we can compare our results with
         # the database export
         db_import = []
-        with codecs.open(DATA_CONFIG['annotation_file'],
+        with codecs.open(CONFIG['data']['annotation_file'],
                 mode='rb', encoding='utf-8') as anno_fh:
             last_col = re.compile(ur'\t[^\t]*$', flags=re.UNICODE)
             for line in anno_fh:

@@ -12,7 +12,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG_DIR = os.path.join(BASE_DIR, 'adage', 'adage')
 if CONFIG_DIR not in sys.path:
     sys.path.append(CONFIG_DIR)
-from config import DATA_CONFIG, DEV_CONFIG as CONFIG
+from config import DEV_CONFIG as CONFIG
 
 # increase logging level for more detail during debugging
 # logging.basicConfig(level=logging.INFO)
@@ -170,7 +170,7 @@ def import_data_and_index():
     invoke import_data, which manually links to the get_pseudo_sdrf.py
     file extracted from the get_pseudomonas repository
     """
-    run('python manage.py import_data "%s"' % DATA_CONFIG['annotation_file'])
+    run('python manage.py import_data "%s"' % CONFIG['data']['annotation_file'])
     rebuild_search_index()
 
 

@@ -5,6 +5,7 @@
 #
 # To find all paramaters you need to specify, search on regex: <config[^>]*>
 # and replace with values tailored to your deployment.
+import random
 
 # AWS credentials and configuration
 AWS_CONFIG = {
@@ -49,6 +50,7 @@ DATA_CONFIG.update({
 
 # test server deployment credentials and configuration (maybe on AWS)
 TEST_CONFIG = {
+    'data':          DATA_CONFIG,
     'ec2_conn':      AWS_CONFIG['ec2_conn'].copy(),
     'virt_env':      OS_CONFIG['home_dir'] + '.virtualenvs/adage',
     'django_dir':    OS_CONFIG['home_dir'] + 'adage-server/adage',
@@ -103,6 +105,35 @@ DEV_CONFIG.update({
                         'PASSWORD': '<config-secret>',
                         'HOST': '<configure>',
                         'PORT': '5432',
+                     },
+})
+
+# Codeship server deployment credentials and configuration
+CI_CONFIG = DEV_CONFIG.copy()
+CI_CONFIG.update({
+    'django_key':    str(random.randint(0, 1000000)),
+    # see https://codeship.com/documentation/databases/postgresql/
+    'databases':     {'default': {
+                        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+                        # database name and user cannot have upper case letters
+                        'NAME': 'adageci',
+                        'USER': '<configure>',
+                        'PASSWORD': '<config-secret>',
+                        'HOST': '127.0.0.1',
+                        'PORT': '5434',  # v. 9.4
+                        }
+                     },
+    'dbmaster':      {
+                        'NAME': 'development',
+                        'USER': '<configure>',
+                        'PASSWORD': '<config-secret>',
+                        'HOST': '127.0.0.1',
+                        'PORT': '5434',  # v. 9.4
+                     },
+    'data':          {
+                        'data_dir': '/home/rof/clone/data/',
+                        'annotation_file':
+                            '/home/rof/clone/data/PseudomonasAnnotation.tsv',
                      },
 })
 
