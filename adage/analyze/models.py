@@ -1,6 +1,21 @@
 # coding: utf-8 (see https://www.python.org/dev/peps/pep-0263/)
 
+import re
 from django.db import models
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
+
+
+def validate_pyname(value):
+    """
+    Raise a ValidationError if value is not a valid Python name. See Python docs
+    at: https://docs.python.org/2/reference/lexical_analysis.html#identifiers
+    for full specification.
+    """
+    if not re.match(r'[A-Za-z_][A-Za-z0-9_]*', value):
+        raise ValidationError(
+            "%(value)s is not a valid Python identifier",
+            params={'value': value},
+        )
 
 
 class Experiment(models.Model):
@@ -32,77 +47,86 @@ class Sample(models.Model):
     def __unicode__(self):
         return "%d (%s)" % (self.id, self.name)
 
+    # TODO update API to get experiments via Sample
+    def get_experiments(self):
+        return self.experiments.all()
 
-class SampleAnnotation(models.Model):
-    sample = models.OneToOneField(
-        Sample,
-        on_delete=models.PROTECT,
-        primary_key=True)
 
-    strain = models.CharField(
-        "strain",
-        max_length=60,
-        blank=True)
-    genotype = models.CharField(
-        "genotype",
-        max_length=130,
-        blank=True)
-    abx_marker = models.CharField(
-        "abx marker, auxotrophy",
-        max_length=20,
-        blank=True)
-    variant_phenotype = models.CharField(
-        "variant phenotype (QS defective, mucoid, SCV, …)",
-        max_length=60,
-        blank=True)
-    medium = models.TextField(
-        "medium (biosynthesis/energy)",
-        blank=True)
-    treatment = models.CharField(
-        "treatment (drug/small molecule)",
-        max_length=200,
-        blank=True)
-    # biotic_interactor_level_1 = models.CharField(
-    biotic_int_lv_1 = models.CharField(
-        "biotic interactor level 1 (Plant, Human, Bacteria, …)",
-        max_length=70,
-        blank=True)
-    # biotic_interactor_level_2 = models.CharField(
-    biotic_int_lv_2 = models.CharField(
-        "biotic interactor level 2 (Lung, epithelial cells, Staphylococcus "
-            "aureus, …)",
-        max_length=80,
-        blank=True)
-    growth_setting_1 = models.CharField(
-        "growth setting (planktonic, colony, biofilm, …)",
+class AnnotationTypeManager(models.Manager):
+    def create(self, typename, description=''):
+        ann_type = AnnotationType(
+            typename=typename,
+            description=description,
+        )
+        ann_type.full_clean()
+        ann_type.save()
+        return ann_type
+
+    def get_or_create(self, typename, description=''):
+        try:
+            ann_type = self.get(typename=typename)
+            created = False
+        except ObjectDoesNotExist:
+            ann_type = self.create(
+                typename=typename,
+                description=description)
+            created = True
+        return (ann_type, created)
+
+
+class AnnotationType(models.Model):
+    typename = models.CharField(
+        "name for this AnnotationType (usable as a Python identifier)",
         max_length=40,
+        unique=True,
+        blank=False,
+        validators=[validate_pyname])
+    description = models.CharField(
+        max_length=140,
         blank=True)
-    growth_setting_2 = models.CharField(
-        "growth setting (For planktonic - aerated, static) (For biofilms - "
-            "flow cell, static, …)",
-        max_length=70,
-        blank=True)
-    nucleic_acid = models.CharField(
-        "nucleic Acid",
-        max_length=10,
-        blank=True)
-    temperature = models.CharField(
-        "temperature",
-        max_length=10,
-        blank=True)
-    od = models.CharField(
-        "OD",
-        max_length=40,
-        blank=True)
-    additional_notes = models.TextField(
-        "additional notes (markers)",
-        blank=True)
-    description = models.TextField(
-        "description (strain, replicates, and a brief glimpse of the exp.)",
-        blank=False)
+
+    objects = AnnotationTypeManager()
 
     def __unicode__(self):
-        return "%d (%s)" % (self.sample.id, self.sample.name)
+        return "%d (%s)" % (self.id, self.typename)
 
-    def get_experiments(self):
-        return self.sample.experiments.all()
+
+class SampleAnnotationManager(models.Manager):
+    def create_from_dict(self, sample, ann_dict):
+        for k, v in ann_dict.iteritems():
+            if not v:
+                continue
+            ann_type, created = AnnotationType.objects.get_or_create(k)
+            sa = SampleAnnotation(
+                sample=sample,
+                annotation_type=ann_type,
+                text=v,
+            )
+            sa.save()
+
+    def get_as_dict(self, sample):
+        annotations_for_sample = self.get_queryset().filter(sample=sample)
+        result = {sa.annotation_type.typename: sa.text
+                for sa in annotations_for_sample}
+        result['_sample'] = sample
+        return result
+
+
+class SampleAnnotation(models.Model):
+    annotation_type = models.ForeignKey(
+        AnnotationType,
+        on_delete=models.PROTECT)
+    sample = models.ForeignKey(
+        Sample,
+        on_delete=models.CASCADE)
+    text = models.TextField(
+        "annotation text",
+        blank=True)
+
+    objects = SampleAnnotationManager()
+
+    class Meta:
+        unique_together = (("annotation_type", "sample"),)
+
+    def __unicode__(self):
+        return "%d: (%s for %s)" % (self.id, self.annotation_type, self.sample)

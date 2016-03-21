@@ -171,13 +171,16 @@ class SampleResource(ModelResource):
         )
         for e in Experiment.objects.all():
             for s in e.sample_set.all():
-                sa = s.sampleannotation
-                rows.append(u'\t'.join([e.accession, s.name, s.ml_data_source,
-                        sa.strain, sa.genotype, sa.abx_marker,
-                        sa.variant_phenotype, sa.medium, sa.treatment,
-                        sa.biotic_int_lv_1,
-                        sa.biotic_int_lv_2, sa.growth_setting_1,
-                        sa.growth_setting_2, sa.nucleic_acid, sa.temperature,
-                        sa.od, sa.additional_notes, sa.description,
+                sa = SampleAnnotation.objects.get_as_dict(s)
+                get_sa = lambda k: sa.get(k, '')
+                ml_data_source = s.ml_data_source if s.ml_data_source else ''
+                rows.append(u'\t'.join([e.accession, s.name, ml_data_source,
+                    get_sa('strain'), get_sa('genotype'), get_sa('abx_marker'),
+                    get_sa('variant_phenotype'), get_sa('medium'),
+                    get_sa('treatment'), get_sa('biotic_int_lv_1'),
+                    get_sa('biotic_int_lv_2'), get_sa('growth_setting_1'),
+                    get_sa('growth_setting_2'), get_sa('nucleic_acid'),
+                    get_sa('temperature'), get_sa('od'),
+                    get_sa('additional_notes'), get_sa('description'),
                 ]))
         return rows
