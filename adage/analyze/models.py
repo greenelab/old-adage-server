@@ -47,9 +47,11 @@ class Sample(models.Model):
     def __unicode__(self):
         return "%d (%s)" % (self.id, self.name)
 
-    # TODO update API to get experiments via Sample
-    def get_experiments(self):
-        return self.experiments.all()
+    def get_annotation_dict(self):
+        return SampleAnnotation.objects.get_as_dict(self)
+
+    def get_annotation_items(self):
+        return SampleAnnotation.objects.get_as_dict(self).iteritems()
 
 
 class AnnotationTypeManager(models.Manager):
@@ -106,9 +108,8 @@ class SampleAnnotationManager(models.Manager):
 
     def get_as_dict(self, sample):
         annotations_for_sample = self.get_queryset().filter(sample=sample)
-        result = {sa.annotation_type.typename: sa.text
+        result = {sa.annotation_type.typename: sa.text \
                 for sa in annotations_for_sample}
-        result['_sample'] = sample
         return result
 
 
@@ -129,4 +130,5 @@ class SampleAnnotation(models.Model):
         unique_together = (("annotation_type", "sample"),)
 
     def __unicode__(self):
-        return "%d: (%s for %s)" % (self.id, self.annotation_type, self.sample)
+        return "%d: (%s for %s)" % \
+            (self.id, self.annotation_type.typename, self.sample.name)

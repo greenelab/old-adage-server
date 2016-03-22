@@ -54,8 +54,8 @@ class SearchResource(Resource):
         # unpack the query string from the request headers
         query_str = request.GET.get('q', '')
 
-        # restrict our search to the Experiment and SampleAnnotation models
-        sqs = SearchQuerySet().models(Experiment, SampleAnnotation)
+        # restrict our search to the Experiment and Sample models
+        sqs = SearchQuerySet().models(Experiment, Sample)
 
         # run the query and specify we want highlighted results
         sqs = sqs.filter(content=AutoQuery(query_str)).load_all().highlight()
@@ -70,9 +70,9 @@ class SearchResource(Resource):
                 new_obj.description = result.object.name
                 e = Experiment.objects.get(pk=result.pk)
                 new_obj.related_items = [s.pk for s in e.sample_set.all()]
-            elif result.model_name == 'sampleannotation':
-                new_obj.item_type = 'sample'
-                new_obj.description = result.object.description
+            elif result.model_name == 'sample':
+                new_obj.item_type = result.model_name
+                new_obj.description = result.object.name
                 s = Sample.objects.get(pk=result.pk)
                 new_obj.related_items = [e.pk for e in s.experiments.all()]
             else:
@@ -95,8 +95,10 @@ class ExperimentResource(ModelResource):
 
 
 class SampleResource(ModelResource):
+    annotations = fields.DictField(attribute='get_annotation_dict')
+
     class Meta:
-        queryset = SampleAnnotation.objects.all()
+        queryset = Sample.objects.all()
         allowed_methods = ['get']
         experiments_allowed_methods = allowed_methods
         annotations_allowed_methods = allowed_methods
@@ -129,14 +131,14 @@ class SampleResource(ModelResource):
     def get_experiments(self, request, pk=None, **kwargs):
         if pk:
             try:
-                sample_obj = SampleAnnotation.objects.get(pk=pk)
+                sample_obj = Sample.objects.get(pk=pk)
             except ObjectDoesNotExist:
                 return http.HttpNotFound()
         else:
             return http.HttpNotFound()
         objects = []
         er = ExperimentResource()
-        for e in sample_obj.get_experiments():
+        for e in sample_obj.experiments.all():
             bundle = er.build_bundle(obj=e, request=request)
             bundle = er.full_dehydrate(bundle)
             objects.append(bundle)
