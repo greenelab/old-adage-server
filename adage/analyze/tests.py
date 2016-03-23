@@ -210,7 +210,7 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         There are various ways to get a random object from a table. See:
         http://stackoverflow.com/questions/9354127/how-to-grab-one-random-item-from-a-database-in-django-postgresql
         Since the tables created by the tests here are small, either approach
-        listed in the above link will be okay. (We use an appraoch that seems
+        listed in the above link will be okay. (We use an approach that seems
         to be the easiest to understand.)
         """
         return random.choice(ModelName.objects.all())
