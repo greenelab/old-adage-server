@@ -132,7 +132,7 @@ def valid_activity(file_handler, ml_model_name):
 
 def import_activity(file_handler, ml_model_name):
     '''
-    Read the data in activity sheet into different tables.
+    Read the data in activity sheet into the database.
 
     This function first checks whether input ml_model_name is blank; if not,
     it will call valid_activity() to check whether the input file is in valid
