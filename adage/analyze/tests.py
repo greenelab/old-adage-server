@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 from __future__ import print_function
 import os
+import random
 import re
 import sys
 import codecs
@@ -10,18 +11,22 @@ import unittest
 
 from django.test import TestCase
 from analyze.models import Experiment, Sample, SampleAnnotation
-from analyze.management.commands.import_data import \
-        bootstrap_database, JSON_CACHE_FILE_NAME
+from analyze.models import MLModel, Node, Activity
+from analyze.management.commands.import_data import bootstrap_database, \
+    JSON_CACHE_FILE_NAME
 from datetime import datetime
-from tastypie.test import ResourceTestCase
+from tastypie.test import ResourceTestCaseMixin
+from fixtureless import Factory
 
 sys.path.append(os.path.abspath('../../'))
 import get_pseudo_sdrf as gp
 import logging
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+factory = Factory()
 
 from adage.settings import CONFIG
-from analyze.api import SampleResource
+from analyze.api import SampleResource, NodeResource, ActivityResource
 
 
 class ModelsTestCase(TestCase):
@@ -90,6 +95,25 @@ class ModelsTestCase(TestCase):
         obj2 = Sample.objects.get(name=self.sample_list[0]['name'])
         self.assertEqual(obj2.name, self.sample_list[0]['name'])
         self.assertEqual(obj2.experiments.all()[0].accession, 'E-GEOD-31227')
+
+    def test_activity(self):
+        # 1 ML model record
+        ml_model = MLModel.objects.create(title="test model")
+        # 2 node records
+        node1 = Node.objects.create(name="node #1", mlmodel=ml_model)
+        Node.objects.create(name="node #2", mlmodel=ml_model)
+        # 5 sample records
+        sample_counter = 5
+        factory.create(Sample, sample_counter)
+        # 2 * 5 = 10 activity records
+        for s in Sample.objects.all():
+            for n in Node.objects.all():
+                Activity.objects.create(sample=s, node=n,
+                                        value=random.random())
+        # Check activities on node1
+        node1_activities = Activity.objects.filter(node=node1)
+        self.assertEqual(node1_activities.count(), sample_counter)
+        self.assertEqual(node1_activities[0].node.name, node1.name)
 
 
 # @unittest.skip("focus on other tests for now")
@@ -173,25 +197,97 @@ class BootstrapDBTestCase(TestCase):
         self.assertItemsEqual(db_export, db_import)
 
 
-class APIResourceTestCase(ResourceTestCase):
+class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
     # API tests:
     # For all of our interfaces, we should be able to GET, but every other
     # REST API should fail: POST, PUT, PATCH, DELETE
 
     baseURI = '/api/v0/'
 
+    @staticmethod
+    def random_object(ModelName):
+        """
+        There are various ways to get a random object from a table. See:
+        http://stackoverflow.com/questions/9354127/how-to-grab-one-random-item-from-a-database-in-django-postgresql
+        Since the table created by the tests here are small, either approach
+        listed in the above link will be okay. (We use an appraoch that seems
+        to the easiest to understand.)
+        """
+        return random.choice(ModelName.objects.all())
+
     def setUp(self):
         super(APIResourceTestCase, self).setUp()
-
         # create a test experiment to retrive with the API
         self.test_experiment = ModelsTestCase.experiment_data
         ModelsTestCase.create_test_experiment(
-                experiment_data=self.test_experiment)
-        self.experimentURI = (self.baseURI +
-                'experiment/{accession}/'.format(**self.test_experiment))
+            experiment_data=self.test_experiment)
+        self.experimentURI = (self.baseURI + 'experiment/{accession}/'.format(
+            **self.test_experiment))
 
-        # create some test samples to retrieve with the API
-        # TODO stopped here
+        # Create some test samples to retrieve with the API
+        self.sa_counter = 5
+        factory.create(SampleAnnotation, self.sa_counter)
+        self.sampleURI = self.baseURI + 'sample/' + str(
+            self.random_object(SampleAnnotation).sample.id) + '/'
+
+        # Create relationships between Sample and Experiment
+        for sa in SampleAnnotation.objects.all():
+            sa.sample.experiments.add(Experiment.objects.all()[0])
+        self.get_experiment_URI = self.baseURI + 'sample/' + \
+            str(self.random_object(SampleAnnotation).sample.id) + \
+            '/get_experiments/'
+
+        # Create activity records
+        self.node_counter = 4
+        self.create_activities(self.node_counter)
+
+        self.activityURI = self.baseURI + "activity/" + \
+            str(self.random_object(Activity).id) + "/"
+        self.activity_sample_URI = self.baseURI + "activity/sample/" + \
+            str(self.random_object(Sample).id) + "/"
+
+    @staticmethod
+    def create_activities(node_counter):
+        """
+        Create activity related records. "node_counter" is the number of
+        records that will be created in Node table.
+        Note that "factory.create(ModelName, n)" in fixtureless module is not
+        used here because it does NOT gurantee unique_together constraint.
+        """
+        ml_model = MLModel.objects.create(title="test model")
+        for i in xrange(node_counter):
+            node_name = "node " + str(i + 1)
+            Node.objects.create(name=node_name, mlmodel=ml_model)
+
+        for s in Sample.objects.all():
+            for n in Node.objects.all():
+                Activity.objects.create(sample=s, node=n,
+                                        value=random.random())
+
+    def call_get_API(self, uri):
+        '''
+        Helper method: asserts that GET method is allowed via input URI.
+        '''
+        resp = self.api_client.get(uri, data={'format': 'json'})
+        self.assertValidJSONResponse(resp)
+
+    def call_non_get_API(self, uri):
+        '''
+        Helper method: assert that the methods of POST, PUT, PATCH and DELETE
+        are NOT allowed via input URI.
+        '''
+        # POST
+        resp = self.api_client.post(uri, data={'format': 'json'})
+        self.assertHttpMethodNotAllowed(resp)
+        # PUT
+        resp = self.api_client.put(uri, data={'format': 'json'})
+        self.assertHttpMethodNotAllowed(resp)
+        # PATCH
+        resp = self.api_client.patch(uri, data={'format': 'json'})
+        self.assertHttpMethodNotAllowed(resp)
+        # DELETE
+        resp = self.api_client.delete(uri, data={'format': 'json'})
+        self.assertHttpMethodNotAllowed(resp)
 
     def test_experiment_get(self):
         """
@@ -212,24 +308,71 @@ class APIResourceTestCase(ResourceTestCase):
 
     def test_experiment_non_get(self):
         """
-        We should not be able to POST, PUT, PATCH or DELETE
+        Test POST, PUT, PATCH and DELETE methods via 'experiment/<pk>/' API.
         """
-        resp = self.api_client.post(self.experimentURI, data={'format': 'json'})
-        self.assertHttpMethodNotAllowed(resp)
-        resp = self.api_client.put(self.experimentURI, data={'format': 'json'})
-        self.assertHttpMethodNotAllowed(resp)
-        resp = self.api_client.patch(
-                self.experimentURI, data={'format': 'json'})
-        self.assertHttpMethodNotAllowed(resp)
-        resp = self.api_client.delete(
-                self.experimentURI, data={'format': 'json'})
-        self.assertHttpMethodNotAllowed(resp)
+        self.call_non_get_API(self.experimentURI)
 
     def test_sample_get(self):
         """
-        We should be able to GET data from our test sample via the API
+        Test GET method via 'sample/<pk>/' API.
         """
-        pass
+        # Make sure SampleAnnotation table is not empty.
+        self.assertEqual(SampleAnnotation.objects.count(), self.sa_counter)
+        # Test GET method.
+        self.call_get_API(self.sampleURI)
+
+    def test_sample_non_get(self):
+        """
+        Test POST, PUT, PATCH and DELETE methods via 'sample/<pk>/' API.
+        """
+        # Make sure SampleAnnotation table is not empty.
+        self.assertEqual(SampleAnnotation.objects.count(), self.sa_counter)
+        # Test non-GET methods.
+        self.call_non_get_API(self.sampleURI)
+
+    def test_get_experiment_get(self):
+        """
+        Test GET method via 'sample/<pk>/get_experiments/' API.
+        """
+        self.call_get_API(self.get_experiment_URI)
+
+    def test_get_experiment_non_get(self):
+        """
+        Test POST, PUT, PATCH and DELETE methods via
+        'sample/<pk>/get_experiments/' API.
+        """
+        self.call_non_get_API(self.get_experiment_URI)
+
+    def test_activity_get(self):
+        """
+        Test GET method via 'activity/<pk>/' API.
+        """
+        self.call_get_API(self.activityURI)
+
+    def test_activity_non_get(self):
+        """
+        Test POST, PUT, PATCH and DELETE methods via 'activity/<pk>/' API.
+        """
+        self.call_non_get_API(self.activityURI)
+
+    def test_activity_sample_get(self):
+        """
+        Test GET method via "activity/sample/<sample_pk>/" API.
+        """
+        resp = self.api_client.get(self.activity_sample_URI,
+                                   data={'format': 'json'})
+        self.assertValidJSONResponse(resp)
+        activities = self.deserialize(resp)
+        # Assert that the number of matched activities is correct.
+        self.assertEqual(len(activities), self.node_counter)
+
+    def test_activity_sample_non_get(self):
+        """
+        Test POST, PUT, PATCH and DELETE methods via
+        "activity/sample/<sample_pk>/" API.
+        """
+        self.call_non_get_API(self.activity_sample_URI)
+
 
     # def test_search_api(self):
     #     """

@@ -106,3 +106,36 @@ class SampleAnnotation(models.Model):
 
     def get_experiments(self):
         return self.sample.experiments.all()
+
+
+class MLModel(models.Model):
+    title = models.CharField(max_length=1000, unique=True)
+
+    def __unicode__(self):
+        return "MLModel %s" % self.title
+
+
+class Node(models.Model):
+    name = models.CharField(max_length=100, blank=False)
+    mlmodel = models.ForeignKey(MLModel, on_delete=models.PROTECT)
+    samples = models.ManyToManyField(Sample, through='Activity')
+
+    def __unicode__(self):
+        return "Node %s of Model %s" % (self.name, self.mlmodel.title)
+
+    class Meta:
+        unique_together = ('name', 'mlmodel')
+
+
+class Activity(models.Model):
+    sample = models.ForeignKey(Sample, on_delete=models.PROTECT)
+    node = models.ForeignKey(Node, on_delete=models.PROTECT)
+    value = models.FloatField()
+
+    def __unicode__(self):
+        return "Sample %s at Node %s with value %f" % (self.sample.sample,
+                                                       self.node.name,
+                                                       self.value)
+
+    class Meta:
+        unique_together = ('sample', 'node')
