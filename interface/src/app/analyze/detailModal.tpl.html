@@ -1,0 +1,20 @@
+<div class="modal-header">
+  <button type="button" class="close" ng-click="close()">&times;</button>
+  <p class="modal-title">Detail</p>
+</div>
+<div class="modal-body">
+  <h1>Search Item</h1>
+  <pre>
+pk: {{ detail.search_item.pk }}
+type: {{ detail.search_item.item_type }}
+description: {{ detail.search_item.description }}
+related: {{ detail.search_item.related_items }}
+  </pre>
+  <h1>Detail Status</h1>
+  <p ng-bind="detail.status"></p>
+  <h1>Details</h1>
+  <pre ng-bind="detail.results"></pre>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-primary" ng-click="close()">Close</button>
+</div>
