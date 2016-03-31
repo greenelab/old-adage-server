@@ -26,7 +26,7 @@ logger = logging.getLogger(__name__)
 factory = Factory()
 
 from adage.settings import CONFIG
-from analyze.api import SampleResource, NodeResource, ActivityResource
+from analyze.api import SampleResource
 
 
 class ModelsTestCase(TestCase):
@@ -225,7 +225,7 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
             **self.test_experiment))
 
         # Create some test samples to retrieve with the API
-        self.sa_counter = 5
+        self.sa_counter = 29
         factory.create(SampleAnnotation, self.sa_counter)
         self.sampleURI = self.baseURI + 'sample/' + str(
             self.random_object(SampleAnnotation).sample.id) + '/'
@@ -238,13 +238,13 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
             '/get_experiments/'
 
         # Create activity records
-        self.node_counter = 4
+        self.node_counter = 53
         self.create_activities(self.node_counter)
 
         self.activityURI = self.baseURI + "activity/" + \
             str(self.random_object(Activity).id) + "/"
-        self.activity_sample_URI = self.baseURI + "activity/sample/" + \
-            str(self.random_object(Sample).id) + "/"
+        self.activity_sample_URI = self.baseURI + "activity/?sample=" + \
+            str(self.random_object(Sample).id)
 
     @staticmethod
     def create_activities(node_counter):
@@ -259,9 +259,9 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
             node_name = "node " + str(i + 1)
             Node.objects.create(name=node_name, mlmodel=ml_model)
 
-        for s in Sample.objects.all():
+        for sa in SampleAnnotation.objects.all():
             for n in Node.objects.all():
-                Activity.objects.create(sample=s, node=n,
+                Activity.objects.create(sample=sa.sample, node=n,
                                         value=random.random())
 
     def call_get_API(self, uri):
@@ -357,19 +357,14 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
 
     def test_activity_sample_get(self):
         """
-        Test GET method via "activity/sample/<sample_pk>/" API.
+        Test GET method via "activity/?sample=<id>&format=json" API.
         """
-        resp = self.api_client.get(self.activity_sample_URI,
-                                   data={'format': 'json'})
-        self.assertValidJSONResponse(resp)
-        activities = self.deserialize(resp)
-        # Assert that the number of matched activities is correct.
-        self.assertEqual(len(activities), self.node_counter)
+        self.call_get_API(self.activity_sample_URI)
 
     def test_activity_sample_non_get(self):
         """
         Test POST, PUT, PATCH and DELETE methods via
-        "activity/sample/<sample_pk>/" API.
+        "activity/?sample=<id>&format=json" API.
         """
         self.call_non_get_API(self.activity_sample_URI)
 
