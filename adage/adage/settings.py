@@ -44,7 +44,6 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
-
 INSTALLED_APPS = (
     'django.contrib.admin',
     'django.contrib.auth',
@@ -57,11 +56,7 @@ INSTALLED_APPS = (
     'analyze',
 )
 
-# NOTE: to get tastypie to play nicely with Django 1.8, need to install using
-# > pip install -e
-#   git+https://github.com/django-tastypie/django-tastypie#egg=TastyPie
-# see <https://github.com/django-tastypie/django-tastypie/issues/1290>
-# for details
+# Tastypie options
 API_LIMIT_PER_PAGE = 50
 TASTYPIE_FULL_DEBUG = True
 
