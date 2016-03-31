@@ -191,46 +191,17 @@ class NodeResource(ModelResource):
 
 
 class ActivityResource(ModelResource):
-    node = fields.ForeignKey(NodeResource, 'node')
-    sample = fields.ForeignKey(SampleResource, 'sample')
+    sample = fields.IntegerField(attribute='sample_id', null=False)
+    node = fields.IntegerField(attribute='node_id', null=False)
 
     class Meta:
         queryset = Activity.objects.all()
         resource_name = 'activity'
         allowed_methods = ['get']
-        sample_activities_allowed_methods = ['get']
-
-    def prepend_urls(self):
-        return [url((r'^(?P<resource_name>%s)/sample/'
-                     r'(?P<sample_id>[0-9]+)%s$') %
-                    (self._meta.resource_name, trailing_slash()),
-                    self.wrap_view('dispatch_sample_activities'),
-                    name='api_get_sample_activities'), ]
-
-    def dispatch_sample_activities(self, request, **kwargs):
-        """
-        This handler takes a URL request (see above) and dispatches it to the
-        get_sample_activities() method via Tastypie's built-in
-        ModelResource.dispatch() (inherited from Resource). We do this in order
-        to take advantage of the Tastypie-supplied dispatcher, which properly
-        checks if a method is allowed, does request throttling and
-        authentication (if required). See Resource.dispatch() for details.
-        """
-        return self.dispatch('sample_activities', request, **kwargs)
-
-    def get_sample_activities(self, request, sample_id=None, **kwargs):
-        if sample_id:
-            activities = Activity.objects.filter(sample=sample_id)
-            if not activities:
-                return http.HttpNotFound()
-        else:
-            return http.HttpNotFound()
-
-        activity_list = []
-        ar = ActivityResource()
-        for a in activities:
-            bundle = ar.build_bundle(obj=a, request=request)
-            bundle = ar.full_dehydrate(bundle)
-            activity_list.append(bundle)
-
-        return self.create_response(request, activity_list)
+        include_resource_uri = False
+        limit = 0      # Disable pagination
+        max_limit = 0  # Disable pagination
+        filtering = {
+            'sample': ('exact', 'in'),
+            'node': ('exact', 'in', ),
+        }
