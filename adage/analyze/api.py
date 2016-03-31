@@ -202,6 +202,6 @@ class ActivityResource(ModelResource):
         limit = 0      # Disable pagination
         max_limit = 0  # Disable pagination
         filtering = {
-            'sample': ('exact', 'in'),
+            'sample': ('exact', 'in', ),
             'node': ('exact', 'in', ),
         }
