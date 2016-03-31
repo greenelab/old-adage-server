@@ -56,6 +56,7 @@ INSTALLED_APPS = (
     'tastypie',
     'analyze',
 )
+
 # NOTE: to get tastypie to play nicely with Django 1.8, need to install using
 # > pip install -e
 #   git+https://github.com/django-tastypie/django-tastypie#egg=TastyPie
@@ -144,7 +145,7 @@ DATABASES = CONFIG['databases']
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'America/New_York'
 
 USE_I18N = True
 
