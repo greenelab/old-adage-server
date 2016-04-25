@@ -225,16 +225,16 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
             **self.test_experiment))
 
         # Create some test samples to retrieve with the API
-        self.sa_counter = 29
-        factory.create(SampleAnnotation, self.sa_counter)
+        self.s_counter = 29
+        factory.create(Sample, self.s_counter)
         self.sampleURI = self.baseURI + 'sample/' + str(
-            self.random_object(SampleAnnotation).sample.id) + '/'
+            self.random_object(Sample).id) + '/'
 
         # Create relationships between Sample and Experiment
-        for sa in SampleAnnotation.objects.all():
-            sa.sample.experiments.add(Experiment.objects.all()[0])
+        for s in Sample.objects.all():
+            s.experiments.add(Experiment.objects.all()[0])
         self.get_experiment_URI = self.baseURI + 'sample/' + \
-            str(self.random_object(SampleAnnotation).sample.id) + \
+            str(self.random_object(Sample).id) + \
             '/get_experiments/'
 
         # Create activity records
@@ -259,9 +259,9 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
             node_name = "node " + str(i + 1)
             Node.objects.create(name=node_name, mlmodel=ml_model)
 
-        for sa in SampleAnnotation.objects.all():
+        for s in Sample.objects.all():
             for n in Node.objects.all():
-                Activity.objects.create(sample=sa.sample, node=n,
+                Activity.objects.create(sample=s, node=n,
                                         value=random.random())
 
     def call_get_API(self, uri):
@@ -316,8 +316,8 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         """
         Test GET method via 'sample/<pk>/' API.
         """
-        # Make sure SampleAnnotation table is not empty.
-        self.assertEqual(SampleAnnotation.objects.count(), self.sa_counter)
+        # Make sure Sample table is not empty.
+        self.assertEqual(Sample.objects.count(), self.s_counter)
         # Test GET method.
         self.call_get_API(self.sampleURI)
 
@@ -325,8 +325,8 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         """
         Test POST, PUT, PATCH and DELETE methods via 'sample/<pk>/' API.
         """
-        # Make sure SampleAnnotation table is not empty.
-        self.assertEqual(SampleAnnotation.objects.count(), self.sa_counter)
+        # Make sure Sample table is not empty.
+        self.assertEqual(Sample.objects.count(), self.s_counter)
         # Test non-GET methods.
         self.call_non_get_API(self.sampleURI)
 

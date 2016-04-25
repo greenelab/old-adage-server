@@ -1,0 +1,4 @@
+{{ object.name }}
+{{ object.ml_data_source }}
+{% for k, v in object.get_annotation_items %}<em>{{ k }}:</em> {{ v }}
+{% endfor %}
