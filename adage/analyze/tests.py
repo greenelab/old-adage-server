@@ -10,7 +10,7 @@ import codecs
 import unittest
 
 from django.test import TestCase
-from analyze.models import Experiment, Sample, SampleAnnotation
+from analyze.models import Experiment, Sample, AnnotationType, SampleAnnotation
 from analyze.models import MLModel, Node, Activity
 from analyze.management.commands.import_data import bootstrap_database, \
     JSON_CACHE_FILE_NAME
@@ -95,6 +95,34 @@ class ModelsTestCase(TestCase):
         obj2 = Sample.objects.get(name=self.sample_list[0]['name'])
         self.assertEqual(obj2.name, self.sample_list[0]['name'])
         self.assertEqual(obj2.experiments.all()[0].accession, 'E-GEOD-31227')
+
+    def test_annotations(self):
+        """
+        AnnotationTypes and Annotations are persisted in the database without 
+        errors
+        """
+        # need a few samples to annotate
+        sample_count = 5
+        factory.create(Sample, sample_count)
+        # ensure that we actually created all sample_count samples
+        self.assertEqual(Sample.objects.count(), sample_count)
+
+        # also need a collection of annotation types to use
+        annotation_type_count = 8
+        factory.create(AnnotationType, annotation_type_count)
+        # check that we have all annotation_type_count AnnotationTypes
+        self.assertEqual(AnnotationType.objects.count(), annotation_type_count)
+
+        # now fill in a random subset of annotation types for each sample
+        for s in Sample.objects.all():
+            samp_size = random.randint(1, annotation_type_count)
+            for at in random.sample(AnnotationType.objects.all(), samp_size):
+                factory.create(SampleAnnotation, {
+                    'annotation_type': at,
+                    'sample': s,
+                })
+            # check that we got the expected number of annotations
+            self.assertEqual(len(s.get_annotation_dict()), samp_size)
 
     def test_activity(self):
         # 1 ML model record
@@ -195,6 +223,10 @@ class BootstrapDBTestCase(TestCase):
 
         self.maxDiff = None     # report all diffs to be most helpful
         self.assertItemsEqual(db_export, db_import)
+
+    # TODO Enhance tests to take advantage of bootstrapped data
+    # test Elasticsearch (build index, check that we find what we want)
+    # test search API
 
 
 class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
@@ -367,9 +399,3 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         "activity/?sample=<id>&format=json" API.
         """
         self.call_non_get_API(self.activity_sample_URI)
-
-
-    # def test_search_api(self):
-    #     """
-    #     Basic test using bootstrapped data that the search API works
-    #     """
