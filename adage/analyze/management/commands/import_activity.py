@@ -59,9 +59,8 @@ def valid_node_names(nodes, ml_model_name):
                          index + 2)
             return False
         elif name in node_set:
-            logger.error(
-                "Input file line #1 column #%d: %s is NOT unique",
-                index + 2, name)
+            logger.error("Input file line #1 column #%d: %s is NOT unique",
+                         index + 2, name)
             return False
         elif Node.objects.filter(name=name,
                                  mlmodel__title=ml_model_name).exists():
