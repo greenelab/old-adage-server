@@ -12,3 +12,4 @@ six==1.10.0
 unicodecsv==0.14.1
 urllib3==1.14
 wsgiref==0.1.2
+django-genes
