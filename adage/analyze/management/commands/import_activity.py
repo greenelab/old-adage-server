@@ -55,9 +55,8 @@ def valid_node_names(nodes, ml_model_name):
     node_set = set()
     for index, name in enumerate(nodes):
         if not name or name.isspace():
-            logger.error(
-                "Input file line #1 column #%d: blank node name",
-                index + 2)
+            logger.error("Input file line #1 column #%d: blank node name",
+                         index + 2)
             return False
         elif name in node_set:
             logger.error(
@@ -66,9 +65,8 @@ def valid_node_names(nodes, ml_model_name):
             return False
         elif Node.objects.filter(name=name,
                                  mlmodel__title=ml_model_name).exists():
-            logger.error(
-                "Input file line #1 column #%d: Node name already "
-                "exists in Node table: %s", index + 2, name)
+            logger.error("Input file line #1 column #%d: Node name already "
+                         "exists in Node table: %s", index + 2, name)
             return False
         else:
             node_set.add(name)
@@ -88,22 +86,21 @@ def valid_data_line(line_num, data_line):
 
     data_source = data_line[0]
     if not data_source or data_source.isspace():
-        logger.error(
-            "Input file line #%d: data_source is blank)", line_num)
+        logger.error("Input file line #%d: data_source is blank", line_num)
         return False
 
     if not Sample.objects.filter(ml_data_source=data_source).exists():
         logger.warn(
-            "Input file line #%d: data_source value not found in "
-            "database: %s", line_num, data_source)
+            "Input file line #%d: data_source value not found in database: %s",
+            line_num, data_source)
     values = data_line[1:]
     for index, value in enumerate(values):
         try:
             float(value)
         except ValueError:
-            logger.error(
-                "Input file line #%d column #%d: %s can not be "
-                "converted into floating type", line_num, index + 2, value)
+            logger.error("Input file line #%d column #%d: %s can not be "
+                         "converted into floating type", line_num, index + 2,
+                         value)
             return False
     return True
 
@@ -126,9 +123,8 @@ def valid_activity(file_handler, ml_model_name):
                 return False
             col_num = len(fields)
         elif len(fields) != col_num:
-            logger.error(
-                "Input file line #%d: Number of fields is not %d",
-                line_index + 1, col_num)
+            logger.error("Input file line #%d: Number of fields is not %d",
+                         line_index + 1, col_num)
             return False
         elif not valid_data_line(line_index + 1, fields):
             return False
