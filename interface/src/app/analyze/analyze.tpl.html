@@ -1,0 +1,38 @@
+<div>
+  <h1 class="page-header">
+    <img style="float:right" ph-img="100x60" />
+    Analyze
+  </h1>
+  <p>
+    In this area, users will be able to search for an experiment or set of 
+    samples to analyze, define analysis groups and generate a DA heatmap to 
+    review ADAGE node intensities for each sample.
+  </p>
+  <form class="form-inline" role="form">
+    <label for="query_text">Search Experiments and Samples</label>
+    <input name="query_text" id="query_text" ng-model="query.text" 
+           type="search" class="form-control" placeholder="query text">
+    <button type="submit" ng-click="get_search()" class="btn-default">
+      Search
+    </button>
+  </form>
+  <p ng-bind="query.status"></p>
+  <ul class="search-results">
+    <li ng-repeat="search_item in query.results" 
+        ng-class="search_item.item_type">
+      <img ng-if="search_item.item_type == 'experiment'" 
+          ph-img="20x20" alt="[e]" />
+      <img ng-if="search_item.item_type == 'sample'"
+          ph-img="20x20" alt="[s]" />
+      <!-- TODO: this <a> tag is left over from when search results only 
+        returned experiments. Next step is to build detail views for samples 
+        and link to them properly here depending upon whether the item is an
+        experiment or sample -->
+      <a href="http://www.ebi.ac.uk/arrayexpress/experiments/{{ 
+               search_item.pk }}/">
+        {{ search_item.description }}</a><br>
+        {{ search_item.pk }}:
+        ...<span ng-bind-html="search_item.snippet"></span>...
+    </li>
+  </ul>
+</div>
