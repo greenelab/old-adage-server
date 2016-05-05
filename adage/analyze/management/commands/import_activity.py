@@ -18,12 +18,7 @@ from analyze.models import Sample, MLModel, Node, Activity
 
 import logging
 logger = logging.getLogger(__name__)
-logger.addHandler(logging.StreamHandler())  # Use generic log handler
-
-
-def main():
-    logger.error("This script is now a manage.py command. "
-                 "Please invoke it that way.")
+logger.addHandler(logging.NullHandler())
 
 
 class Command(BaseCommand):
@@ -61,18 +56,18 @@ def valid_node_names(nodes, ml_model_name):
     for index, name in enumerate(nodes):
         if not name or name.isspace():
             logger.error(
-                "Error on input file line #1 column #%d: blank node name",
+                "Input file line #1 column #%d: blank node name",
                 index + 2)
             return False
         elif name in node_set:
             logger.error(
-                "Error on input file line #1 column #%d: %s is NOT unique",
+                "Input file line #1 column #%d: %s is NOT unique",
                 index + 2, name)
             return False
         elif Node.objects.filter(name=name,
                                  mlmodel__title=ml_model_name).exists():
             logger.error(
-                "Error on input file line #1 column #%d: Node name already "
+                "Input file line #1 column #%d: Node name already "
                 "exists in Node table: %s", index + 2, name)
             return False
         else:
@@ -94,12 +89,12 @@ def valid_data_line(line_num, data_line):
     data_source = data_line[0]
     if not data_source or data_source.isspace():
         logger.error(
-            "Error on input file line #%d: data_source is blank)", line_num)
+            "Input file line #%d: data_source is blank)", line_num)
         return False
 
     if not Sample.objects.filter(ml_data_source=data_source).exists():
         logger.warn(
-            "Warning on input file line #%d: data_source value not found in "
+            "Input file line #%d: data_source value not found in "
             "database: %s", line_num, data_source)
     values = data_line[1:]
     for index, value in enumerate(values):
@@ -107,7 +102,7 @@ def valid_data_line(line_num, data_line):
             float(value)
         except ValueError:
             logger.error(
-                "Error on input file line #%d column #%d: %s can not be "
+                "Input file line #%d column #%d: %s can not be "
                 "converted into floating type", line_num, index + 2, value)
             return False
     return True
@@ -132,7 +127,7 @@ def valid_activity(file_handler, ml_model_name):
             col_num = len(fields)
         elif len(fields) != col_num:
             logger.error(
-                "Error on input file line #%d: Number of fields is not %d",
+                "Input file line #%d: Number of fields is not %d",
                 line_index + 1, col_num)
             return False
         elif not valid_data_line(line_index + 1, fields):
@@ -198,7 +193,3 @@ def import_activity_line(node_names, data_line):
         node = Node.objects.get(name=node_name)
         records.append(Activity(sample=sample, node=node, value=float(value)))
     Activity.objects.bulk_create(records)
-
-
-if __name__ == '__main__':
-    main()
