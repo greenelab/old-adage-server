@@ -10,6 +10,7 @@ import os
 from operator import itemgetter
 import logging
 logger = logging.getLogger(__name__)
+logger.addHandler(logging.NullHandler())
 
 # import Django environment
 from analyze.models import Experiment, Sample, SampleAnnotation, AnnotationType
@@ -26,11 +27,6 @@ import get_pseudo_sdrf as gp
 import gen_spreadsheets as gs
 
 JSON_CACHE_FILE_NAME = 'json_cache.p'
-
-
-def main():
-    logger.error("This script is now a manage.py command. "
-            "Please invoke it that way.")
 
 
 class Command(BaseCommand):
@@ -207,7 +203,3 @@ def bootstrap_database(annotation_fh, dir_name=None):
         raise(RuntimeError(('Annotation mismatches found. Total: {} samples '\
                 '(see warnings).').format(len(mismatches))
         ))
-
-
-if __name__ == '__main__':
-    main()
