@@ -1,12 +1,14 @@
 from django.conf.urls import url
 from django.core.exceptions import ObjectDoesNotExist
+from django.http import HttpResponse
 from tastypie import fields, http
 from tastypie.resources import Resource, ModelResource
 from tastypie.utils import trailing_slash
 from tastypie.bundle import Bundle
 from haystack.query import SearchQuerySet
 from haystack.inputs import AutoQuery
-from models import Experiment, Sample, SampleAnnotation, Node, Activity
+from models import Experiment, Sample, SampleAnnotation, AnnotationType,\
+        Node, Activity
 
 # Many helpful hints for this implementation came from:
 # https://michalcodes4life.wordpress.com/2013/11/26/custom-tastypie-resource-from-multiple-django-models/
@@ -94,6 +96,12 @@ class ExperimentResource(ModelResource):
         allowed_methods = ['get']
 
 
+class AnnotationTypeResource(ModelResource):
+    class Meta:
+        queryset = AnnotationType.objects.all()
+        allowed_methods = ['get']
+
+
 class SampleResource(ModelResource):
     annotations = fields.DictField(attribute='get_annotation_dict')
 
@@ -157,35 +165,42 @@ class SampleResource(ModelResource):
         return self.dispatch('annotations', request, **kwargs)
 
     @staticmethod
-    def get_annotations():
+    def get_annotations(request=None, **kwargs):
         """
-        return a tab-delimited file containing annotations for all samples
+        Return a tab-delimited file containing all samples for every Experiment
+        with Sample properties for each and all annotations (by default) or, if
+        `annotation_types` is specified, return only those annotation types for
+        each sample, and do so in the order specified.
         """
+        if 'annotation_types' in kwargs:
+            # an explicitly-passed annotation_types param takes precedence
+            annotation_types = kwargs['annotation_types']
+        elif request and 'annotation_types' in request.GET:
+            # process the comma-separated list of typenames
+            annotation_types = request.GET['annotation_types'].split(",")
+        else:
+            # default: supply all AnnotationTypes in alphabetical order
+            annotation_types = [
+                at.typename
+                for at in AnnotationType.objects.order_by('typename')
+            ]
         rows = []
         # include a header as the first row
-        rows.append(u'\t'.join(
-                ['experiment', 'sample_name', 'ml_data_source', 'strain',
-                'genotype', 'abx_marker', 'variant_phenotype', 'medium',
-                'treatment', 'biotic_int_lv_1', 'biotic_int_lv_2',
-                'growth_setting_1', 'growth_setting_2', 'nucleic_acid',
-                'temperature', 'od', 'additional_notes', 'description',
-                ])
-        )
+        headers = ['experiment', 'sample_name', 'ml_data_source']
+        headers.extend(annotation_types)
+        rows.append(u'\t'.join(headers) + u'\n')
         for e in Experiment.objects.all():
             for s in e.sample_set.all():
                 sa = SampleAnnotation.objects.get_as_dict(s)
-                get_sa = lambda k: sa.get(k, '')
                 ml_data_source = s.ml_data_source if s.ml_data_source else ''
-                rows.append(u'\t'.join([e.accession, s.name, ml_data_source,
-                    get_sa('strain'), get_sa('genotype'), get_sa('abx_marker'),
-                    get_sa('variant_phenotype'), get_sa('medium'),
-                    get_sa('treatment'), get_sa('biotic_int_lv_1'),
-                    get_sa('biotic_int_lv_2'), get_sa('growth_setting_1'),
-                    get_sa('growth_setting_2'), get_sa('nucleic_acid'),
-                    get_sa('temperature'), get_sa('od'),
-                    get_sa('additional_notes'), get_sa('description'),
-                ]))
-        return rows
+                sa_cols = [e.accession, s.name, ml_data_source, ]
+                for at in annotation_types:
+                    sa_cols.append(sa.get(at, ''))
+                rows.append(u'\t'.join(sa_cols) + u'\n')
+        response = HttpResponse(rows, content_type='text/tab-separated-values')
+        response['Content-Disposition'] = \
+                'attachment; filename="sample_annotations.tsv"'
+        return response
 
 
 class NodeResource(ModelResource):
