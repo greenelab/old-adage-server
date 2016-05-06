@@ -179,7 +179,7 @@ LOGGING = {
             'format': '%(levelname)s: %(message)s'
         },
     },
-    # Handdlers
+    # Handlers
     'handlers': {
         'console': {
             'level': 'DEBUG',
