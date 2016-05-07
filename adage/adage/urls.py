@@ -17,12 +17,13 @@ from django.conf.urls import include, url
 from django.views.generic import TemplateView
 from django.contrib import admin
 from tastypie.api import Api
-from analyze.api import SearchResource, ExperimentResource, SampleResource
-from analyze.api import NodeResource, ActivityResource
+from analyze.api import SearchResource, ExperimentResource,\
+    AnnotationTypeResource, SampleResource, NodeResource, ActivityResource
 
 v0_api = Api(api_name='v0')
 v0_api.register(SearchResource())
 v0_api.register(ExperimentResource())
+v0_api.register(AnnotationTypeResource())
 v0_api.register(SampleResource())
 v0_api.register(NodeResource())
 v0_api.register(ActivityResource())

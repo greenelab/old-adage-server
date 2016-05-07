@@ -10,9 +10,10 @@ import os
 from operator import itemgetter
 import logging
 logger = logging.getLogger(__name__)
+logger.addHandler(logging.NullHandler())
 
 # import Django environment
-from analyze.models import Experiment, Sample, SampleAnnotation
+from analyze.models import Experiment, Sample, SampleAnnotation, AnnotationType
 
 # import ADAGE utilities
 # we've stashed a copy of get_pseudo_sdrf here for deployment (see fabfile.py)
@@ -26,11 +27,6 @@ import get_pseudo_sdrf as gp
 import gen_spreadsheets as gs
 
 JSON_CACHE_FILE_NAME = 'json_cache.p'
-
-
-def main():
-    logger.error("This script is now a manage.py command. "
-            "Please invoke it that way.")
 
 
 class Command(BaseCommand):
@@ -103,8 +99,8 @@ def bootstrap_database(annotation_fh, dir_name=None):
 
     # now that we have database records for every Experiment, we walk through
     # the annotation spreadsheet and create records for Samples, linking each
-    # to one or more Experiment(s) and creating a SampleAnnotation for each
-    # as we go.
+    # to one or more Experiment(s) and creating a set of SampleAnnotations for
+    # each as we go.
     mismatches = {}  # mismatches indexed by sample and experiment ids
     for r in ss.rows():
         row_experiment = Experiment.objects.get(pk=r.accession)
@@ -119,25 +115,32 @@ def bootstrap_database(annotation_fh, dir_name=None):
                 ('accession', 'sample', 'cel_file', 'expt_summary'))
         if created:
             # a new sample was created so we need new annotations for it
-            row_sample_annotation = SampleAnnotation(
-                sample=row_sample,
-                **annotations)
-            row_sample_annotation.save()
+            SampleAnnotation.objects.create_from_dict(row_sample, annotations)
         else:
             # sample was already present, so check if our annotations match
-            existing_annotation = SampleAnnotation.objects.get(
+            existing_annotation_dict = SampleAnnotation.objects.get_as_dict(
                     sample=row_sample)
-            existing_annotation_dict = existing_annotation.__dict__
-            existing_annotation_changed = False
             for k, v in annotations.iteritems():
+                if not v:
+                    # there is nothing to do if our value is blank
+                    continue
+                if k not in existing_annotation_dict:
+                    # add a blank value to existing_annotation_dict to signal
+                    # that this annotation needs to be added
+                    existing_annotation_dict[k] = ""
                 if existing_annotation_dict[k] != v:
                     # In this section, we automatically handle several minor
                     # data inconsistencies in the manually-generated annotation
                     # spreadsheet and report the rest for follow-up
                     if existing_annotation_dict[k] == "" and v != "":
                         # data trump emptiness: update the existing annotation
-                        setattr(existing_annotation, k, v)
-                        existing_annotation_changed = True
+                        k_type, _ = AnnotationType.objects.get_or_create(
+                                typename=k)
+                        existing_annotation, _ = \
+                                SampleAnnotation.objects.get_or_create(
+                                    annotation_type=k_type, sample=row_sample)
+                        existing_annotation.text = v
+                        existing_annotation.save()
                         continue
                     elif existing_annotation_dict[k] != "" and v == "":
                         # all okay here: nothing new to add.
@@ -154,14 +157,17 @@ def bootstrap_database(annotation_fh, dir_name=None):
                             existing_annotation_dict[k].lower()):
                         # let's take the longer explanation (new annotation is
                         # a strict superset of what was provided already)
-                        setattr(existing_annotation, k, v)
-                        existing_annotation_changed = True
+                        k_type = AnnotationType.objects.get(typename=k)
+                        existing_annotation = SampleAnnotation.objects.get(
+                                annotation_type=k_type, sample=row_sample)
+                        existing_annotation.text = v
+                        existing_annotation.save()
                         continue
                     # We organize our lists of mismatched fields by `sample`
                     # and the pair of experiments with conflicting annotations
                     # so we can report them at the end.  Build the err_key as:
                     # (sample, experiment, existing_experiment)
-                    existing_experiment = existing_annotation.sample.\
+                    existing_experiment = row_sample.\
                             experiments.exclude(accession=r.accession)[0]
                     err_key = (
                         r.sample,
@@ -170,8 +176,6 @@ def bootstrap_database(annotation_fh, dir_name=None):
                     )
                     if err_key not in mismatches: mismatches[err_key] = []
                     mismatches[err_key].append(k)
-            if existing_annotation_changed:
-                existing_annotation.save()
     if mismatches:
         # sort err_keys to match original spreadsheet order
         sorted_err_keys = sorted(mismatches.keys(), key=itemgetter(2, 0))
@@ -199,7 +203,3 @@ def bootstrap_database(annotation_fh, dir_name=None):
         raise(RuntimeError(('Annotation mismatches found. Total: {} samples '\
                 '(see warnings).').format(len(mismatches))
         ))
-
-
-if __name__ == '__main__':
-    main()

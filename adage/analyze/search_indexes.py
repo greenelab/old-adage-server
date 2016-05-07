@@ -1,5 +1,5 @@
 from haystack import indexes
-from analyze.models import Experiment, SampleAnnotation
+from analyze.models import Experiment, Sample
 
 
 class ExperimentIndex(indexes.SearchIndex, indexes.Indexable):
@@ -24,27 +24,12 @@ class SampleIndex(indexes.SearchIndex, indexes.Indexable):
     in the index.
     """
     text = indexes.CharField(document=True, use_template=True)
-    name = indexes.CharField(model_attr='sample__name')
-    experiments = indexes.CharField(model_attr='get_experiments')
-
-    ml_data_source = indexes.CharField(
-            model_attr='sample__ml_data_source', null=True)
-    strain = indexes.CharField(model_attr='strain')
-    genotype = indexes.CharField(model_attr='genotype')
-    abx_marker = indexes.CharField(model_attr='abx_marker')
-    variant_phenotype = indexes.CharField(model_attr='variant_phenotype')
-    medium = indexes.CharField(model_attr='medium')
-    treatment = indexes.CharField(model_attr='treatment')
-    biotic_int_lv_1 = indexes.CharField(model_attr='biotic_int_lv_1')
-    biotic_int_lv_2 = indexes.CharField(model_attr='biotic_int_lv_2')
-    growth_setting_1 = indexes.CharField(model_attr='growth_setting_1')
-    growth_setting_2 = indexes.CharField(model_attr='growth_setting_2')
-    nucleic_acid = indexes.CharField(model_attr='nucleic_acid')
-    temperature = indexes.CharField(model_attr='temperature')
-    od = indexes.CharField(model_attr='od')
+    name = indexes.CharField(model_attr='name')
+    experiments = indexes.CharField(model_attr='experiments__all')
+    ml_data_source = indexes.CharField(model_attr='ml_data_source', null=True)
 
     def get_model(self):
-        return SampleAnnotation
+        return Sample
 
     def index_queryset(self, using=None):
         return self.get_model().objects

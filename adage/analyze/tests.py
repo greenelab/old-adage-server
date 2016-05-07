@@ -10,7 +10,7 @@ import codecs
 import unittest
 
 from django.test import TestCase
-from analyze.models import Experiment, Sample, SampleAnnotation
+from analyze.models import Experiment, Sample, AnnotationType, SampleAnnotation
 from analyze.models import MLModel, Node, Activity
 from analyze.management.commands.import_data import bootstrap_database, \
     JSON_CACHE_FILE_NAME
@@ -95,6 +95,34 @@ class ModelsTestCase(TestCase):
         obj2 = Sample.objects.get(name=self.sample_list[0]['name'])
         self.assertEqual(obj2.name, self.sample_list[0]['name'])
         self.assertEqual(obj2.experiments.all()[0].accession, 'E-GEOD-31227')
+
+    def test_annotations(self):
+        """
+        AnnotationTypes and Annotations are persisted in the database without 
+        errors
+        """
+        # need a few samples to annotate
+        sample_count = 5
+        factory.create(Sample, sample_count)
+        # ensure that we actually created all sample_count samples
+        self.assertEqual(Sample.objects.count(), sample_count)
+
+        # also need a collection of annotation types to use
+        annotation_type_count = 8
+        factory.create(AnnotationType, annotation_type_count)
+        # check that we have all annotation_type_count AnnotationTypes
+        self.assertEqual(AnnotationType.objects.count(), annotation_type_count)
+
+        # now fill in a random subset of annotation types for each sample
+        for s in Sample.objects.all():
+            samp_size = random.randint(1, annotation_type_count)
+            for at in random.sample(AnnotationType.objects.all(), samp_size):
+                factory.create(SampleAnnotation, {
+                    'annotation_type': at,
+                    'sample': s,
+                })
+            # check that we got the expected number of annotations
+            self.assertEqual(len(s.get_annotation_dict()), samp_size)
 
     def test_activity(self):
         # 1 ML model record
@@ -191,10 +219,21 @@ class BootstrapDBTestCase(TestCase):
                 line = last_col.sub(u'', line)   # strip off last column
                 db_import.append(line)
 
-        db_export = SampleResource.get_annotations()
+        raw_export = SampleResource.get_annotations(annotation_types=[
+                'strain', 'genotype', 'abx_marker', 'variant_phenotype',
+                'medium', 'treatment', 'biotic_int_lv_1', 'biotic_int_lv_2',
+                'growth_setting_1', 'growth_setting_2', 'nucleic_acid',
+                'temperature', 'od', 'additional_notes', 'description',
+            ]
+        )
+        db_export = raw_export.content.decode(raw_export.charset).splitlines()
 
         self.maxDiff = None     # report all diffs to be most helpful
         self.assertItemsEqual(db_export, db_import)
+
+    # TODO Enhance tests to take advantage of bootstrapped data
+    # test Elasticsearch (build index, check that we find what we want)
+    # test search API
 
 
 class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
@@ -224,17 +263,24 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         self.experimentURI = (self.baseURI + 'experiment/{accession}/'.format(
             **self.test_experiment))
 
+        # Create a few annotation types to retrieve with the API
+        self.at_count = 10
+        factory.create(AnnotationType, self.at_count)
+        self.annotationtype_listURI = self.baseURI + 'annotationtype/'
+        self.annotationtypeURI = self.annotationtype_listURI + str(
+            self.random_object(AnnotationType).id) + '/'
+
         # Create some test samples to retrieve with the API
-        self.sa_counter = 29
-        factory.create(SampleAnnotation, self.sa_counter)
+        self.s_counter = 29
+        factory.create(Sample, self.s_counter)
         self.sampleURI = self.baseURI + 'sample/' + str(
-            self.random_object(SampleAnnotation).sample.id) + '/'
+            self.random_object(Sample).id) + '/'
 
         # Create relationships between Sample and Experiment
-        for sa in SampleAnnotation.objects.all():
-            sa.sample.experiments.add(Experiment.objects.all()[0])
+        for s in Sample.objects.all():
+            s.experiments.add(Experiment.objects.all()[0])
         self.get_experiment_URI = self.baseURI + 'sample/' + \
-            str(self.random_object(SampleAnnotation).sample.id) + \
+            str(self.random_object(Sample).id) + \
             '/get_experiments/'
 
         # Create activity records
@@ -259,9 +305,9 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
             node_name = "node " + str(i + 1)
             Node.objects.create(name=node_name, mlmodel=ml_model)
 
-        for sa in SampleAnnotation.objects.all():
+        for s in Sample.objects.all():
             for n in Node.objects.all():
-                Activity.objects.create(sample=sa.sample, node=n,
+                Activity.objects.create(sample=s, node=n,
                                         value=random.random())
 
     def call_get_API(self, uri):
@@ -312,12 +358,45 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         """
         self.call_non_get_API(self.experimentURI)
 
+    def test_annotationtype_get(self):
+        """
+        Test GET method via 'annotationtype/<pk>/' API.
+        """
+        # Test GET method.
+        self.call_get_API(self.annotationtypeURI)
+
+    def test_annotationtype_non_get(self):
+        """
+        Test POST, PUT, PATCH and DELETE methods via 'annotationtype/<pk>/' API.
+        """
+        self.call_non_get_API(self.annotationtypeURI)
+
+    def test_annotationtype_list(self):
+        """
+        Test GET method via 'annotationtype/' API to list all AnnotationTypes.
+        """
+        # Make sure AnnotationTypes were created as expected
+        self.assertEqual(AnnotationType.objects.count(), self.at_count)
+        # Test GET method and ensure we get all records back
+        resp = self.api_client.get(
+                self.annotationtype_listURI,
+                data={'format': 'json', 'limit': 0})
+        self.assertValidJSONResponse(resp)
+        atresp = self.deserialize(resp)
+        self.assertEqual(len(atresp['objects']), self.at_count)
+
+    def test_annotationtype_list_non_get(self):
+        """
+        Test POST, PUT, PATCH and DELETE methods via 'annotationtype/' API.
+        """
+        self.call_non_get_API(self.annotationtype_listURI)
+
     def test_sample_get(self):
         """
         Test GET method via 'sample/<pk>/' API.
         """
-        # Make sure SampleAnnotation table is not empty.
-        self.assertEqual(SampleAnnotation.objects.count(), self.sa_counter)
+        # Make sure Sample table is not empty.
+        self.assertEqual(Sample.objects.count(), self.s_counter)
         # Test GET method.
         self.call_get_API(self.sampleURI)
 
@@ -325,8 +404,8 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         """
         Test POST, PUT, PATCH and DELETE methods via 'sample/<pk>/' API.
         """
-        # Make sure SampleAnnotation table is not empty.
-        self.assertEqual(SampleAnnotation.objects.count(), self.sa_counter)
+        # Make sure Sample table is not empty.
+        self.assertEqual(Sample.objects.count(), self.s_counter)
         # Test non-GET methods.
         self.call_non_get_API(self.sampleURI)
 
@@ -342,6 +421,63 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         'sample/<pk>/get_experiments/' API.
         """
         self.call_non_get_API(self.get_experiment_URI)
+
+    def check_annotations_param(self, resp, atypes):
+        rows = resp.content.decode(resp.charset).splitlines()
+
+        # we should get back a row for each sample we've created (+1 = header)
+        self.assertEqual(len(rows), self.s_counter + 1)
+        # we should also only get the columns we wanted in the same order
+        self.assertEqual(rows[0].split(u'\t')[3:], atypes)
+
+    def test_get_annotations_direct_param(self):
+        """
+        Test calling get_annotations directly with a parameter passed
+        """
+        atypes = [at.typename
+                for at in random.sample(AnnotationType.objects.all(), 3)]
+        resp = SampleResource.get_annotations(annotation_types=atypes)
+        self.check_annotations_param(resp, atypes)
+
+    def test_get_annotations_get_param(self):
+        """
+        Test GET method via 'sample/get_annotations' API with parameter
+        """
+        atypes = [at.typename
+                for at in random.sample(AnnotationType.objects.all(), 3)]
+        atstr = ','.join(atypes)
+        resp = self.api_client.get(
+                self.baseURI + 'sample/get_annotations/?annotation_types=' +
+                atstr)
+        self.check_annotations_param(resp, atypes)
+
+    def check_annotations_default(self, resp):
+        rows = resp.content.decode(resp.charset).splitlines()
+
+        # we should get back a row for each sample we've created (+1 = header)
+        self.assertEqual(len(rows), self.s_counter + 1)
+        # we should also get all of the columns in alphabetical order
+        cols = rows[0].split(u'\t')[3:]
+        self.assertEqual(len(cols), AnnotationType.objects.count())
+        self.assertEqual(cols, [
+                at.typename
+                for at in AnnotationType.objects.order_by('typename')
+            ])
+
+    def test_get_annotations_direct_default(self):
+        """
+        Test calling get_annotations directly with no parameters
+        """
+        resp = SampleResource.get_annotations()
+        self.check_annotations_default(resp)
+
+    def test_get_annotations_get_default(self):
+        """
+        Test GET method via 'sample/get_annotations/' API.
+        """
+        resp = self.api_client.get(
+                self.baseURI + 'sample/get_annotations/')
+        self.check_annotations_default(resp)
 
     def test_activity_get(self):
         """
@@ -367,9 +503,3 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         "activity/?sample=<id>&format=json" API.
         """
         self.call_non_get_API(self.activity_sample_URI)
-
-
-    # def test_search_api(self):
-    #     """
-    #     Basic test using bootstrapped data that the search API works
-    #     """
