@@ -36,7 +36,6 @@ angular.module( 'adage.analyze', [
   );
 }])
 .factory( 'Sample', ['$resource', '$http', function($resource, $http) {
-  console.log('About to try a get for sample @id');
   return $resource(
     '/api/v0/sample/:id/',
     // TODO need to add logic for handling pagination of results.
@@ -49,7 +48,6 @@ angular.module( 'adage.analyze', [
   );
 }])
 .factory( 'Experiment', ['$resource', '$http', function($resource, $http) {
-  console.log('About to try a get for experiment @id');
   return $resource(
     '/api/v0/experiment/:accession/',
     // TODO need to add logic for handling pagination of results.
@@ -62,7 +60,7 @@ angular.module( 'adage.analyze', [
   );
 }])
 
-.controller( 'AnalyzeCtrl', function AnalyzeCtrl( $scope, $modal, $log, Search ) {
+.controller( 'AnalyzeCtrl', function AnalyzeCtrl( $scope, $uibModal, $log, Search ) {
   $scope.query = {
     text: "",
     results: [],
@@ -100,10 +98,11 @@ angular.module( 'adage.analyze', [
   };
   $scope.show_detail = function( search_item ) {
     $scope.detail.search_item = search_item;
-    var modalInstance = $modal.open({
-      animation: false,
+    var modalInstance = $uibModal.open({
+      animation: true,
       templateUrl: 'analyze/detailModal.tpl.html',
       controller: 'DetailModalCtrl',
+      size: 'lg',
       resolve: {
         detail: function() {
           return $scope.detail;
@@ -130,7 +129,7 @@ angular.module( 'adage.analyze', [
     }
   };
   $scope.show_analysis = function( ) {
-    var modalInstance = $modal.open({
+    var modalInstance = $uibModal.open({
       animation: false,
       templateUrl: 'analyze/analysisModal.tpl.html',
       controller: 'AnalysisModalCtrl',
@@ -148,10 +147,10 @@ angular.module( 'adage.analyze', [
   };
 })
 
-.controller('DetailModalCtrl', function($scope, $modalInstance, $log, detail, Sample, Experiment) {
+.controller('DetailModalCtrl', function($scope, $uibModalInstance, $log, detail, Sample, Experiment) {
   $scope.detail = detail;
   $scope.close = function() {
-    $modalInstance.dismiss('close');
+    $uibModalInstance.dismiss('close');
   };
   if (detail.search_item.item_type == 'sample') {
     Sample.get({ id: detail.search_item.pk },
@@ -181,10 +180,10 @@ angular.module( 'adage.analyze', [
     );
   }
 })
-.controller('AnalysisModalCtrl', function($scope, $modalInstance, analysis) {
+.controller('AnalysisModalCtrl', function($scope, $uibModalInstance, analysis) {
   $scope.analysis = analysis;
   $scope.close = function() {
-    $modalInstance.dismiss('close');
+    $uibModalInstance.dismiss('close');
   };
 })
 ;
