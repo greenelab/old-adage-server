@@ -3,6 +3,8 @@
 import re
 from django.db import models
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
+from organisms.models import Organism
+from genes.models import Gene
 
 
 def validate_pyname(value):
@@ -139,6 +141,7 @@ class SampleAnnotation(models.Model):
 
 class MLModel(models.Model):
     title = models.CharField(max_length=1000, unique=True)
+    organism = models.ForeignKey(Organism, on_delete=models.PROTECT)
 
     def __unicode__(self):
         return "MLModel %s" % self.title
@@ -148,6 +151,7 @@ class Node(models.Model):
     name = models.CharField(max_length=100, blank=False)
     mlmodel = models.ForeignKey(MLModel, on_delete=models.PROTECT)
     samples = models.ManyToManyField(Sample, through='Activity')
+    genes = models.ManyToManyField(Gene)
 
     def __unicode__(self):
         return "Node %s of Model %s" % (self.name, self.mlmodel.title)
@@ -168,3 +172,21 @@ class Activity(models.Model):
 
     class Meta:
         unique_together = ('sample', 'node')
+
+
+class Edge(models.Model):
+    mlmodel = models.ForeignKey(MLModel, on_delete=models.PROTECT)
+    gene1 = models.ForeignKey(Gene, related_name="edge_src",
+                              on_delete=models.PROTECT)
+    gene2 = models.ForeignKey(Gene, related_name="edge_dest",
+                              on_delete=models.PROTECT)
+    weight = models.FloatField()
+
+    def __unicode__(self):
+        return "%s: %s vs. %s, weight is %f" % (self.mlmodel.title,
+                                                self.gene1.entrezid,
+                                                self.gene2.entrezid,
+                                                self.weight)
+
+    class Meta:
+        unique_together = ('mlmodel', 'gene1', 'gene2')
