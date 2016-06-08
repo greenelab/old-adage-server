@@ -3,10 +3,16 @@
   <p class="modal-title">Analysis</p>
 </div>
 <div class="modal-body">
-  <pre>
-    list: {{ analysis.sample_list }}
-  </pre>
+  <h1>Samples</h1>
+  <ul class="list-group">
+    <li ng-repeat="id in analysis.sample_list" class="list-group-item">
+      {{analysis.sample_objects[id].name}}
+      ({{analysis.sample_objects[id].ml_data_source}})
+    </li>
+  </ul>
 </div>
 <div class="modal-footer">
-  <button type="button" class="btn btn-primary" ng-click="close()">Close</button>
+  <button type="button" class="btn btn-primary" ng-click="close()">
+    Close
+  </button>
 </div>

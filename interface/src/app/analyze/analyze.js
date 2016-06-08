@@ -2,6 +2,7 @@ angular.module( 'adage.analyze', [
   'ui.router',
   'placeholders',
   'ui.bootstrap',
+  'ngAnimate',
   'ngResource',
   'ngSanitize'
 ])
@@ -59,131 +60,233 @@ angular.module( 'adage.analyze', [
     { 'get': { method: 'GET', isArray: false } }
   );
 }])
+.run(['$anchorScroll', function($anchorScroll) {
+  $anchorScroll.yOffset = 80;
+}])
+.controller( 'AnalyzeCtrl', ['$scope', '$uibModal', '$log', '$location',
+  '$anchorScroll', '$timeout', 'Search', 'Sample', 'Experiment',
+  function AnalyzeCtrl( $scope, $uibModal, $log, $location, $anchorScroll,
+      $timeout, Search, Sample, Experiment ) {
+    $scope.query = {
+      text: "",
+      results: [],
+      status: ""
+    };
+    $scope.get_search = function( query ) {
+      $scope.query.results = [];
+      $scope.query.status = "";
+      if (!$scope.query.text) {
+        console.log('Query text is empty, so skipping search.');
+        return;
+      }
+      $scope.query.status = "Searching for: " + $scope.query.text + "...";
+      Search.query({ q: $scope.query.text },
+        function(response_object, responseHeaders) {
+          object_list = response_object.objects;
+          if (object_list.length == 1) {
+            noun = " match.";
+          } else {
+            noun = " matches.";
+          }
+          $scope.query.status = "Found " + object_list.length + noun;
+          $scope.query.results = object_list;
+        },
+        function(response_object, responseHeaders) {
+          console.log('Query errored with: ' + response_object);
+          $scope.query.status = "Query failed.";
+        }
+      );
+    };
+    $scope.search_item_style = function(search_item) {
+      // Determine which CSS classes should apply to this search_item.
+      // We want Experiments and Samples to look different. Also, if we are
+      // looking at detail on this search_item, it should be highlighted.
+      var classList = search_item.item_type;
+      if ($scope.detail.showing &&
+          search_item.pk==$scope.detail.search_item.pk) {
+        classList += ' active';
+      }
+      return classList;
+    };
 
-.controller( 'AnalyzeCtrl', function AnalyzeCtrl( $scope, $uibModal, $log, Search ) {
-  $scope.query = {
-    text: "",
-    results: [],
-    status: ""
-  };
-  // $scope.query.results = [];
-  $scope.get_search = function( query ) {
-    $scope.query.results = [];
-    $scope.query.status = "";
-    if (!$scope.query.text) {
-      console.log('Query text is empty, so skipping search.');
-      return;
-    }
-    $scope.query.status = "Searching for: " + $scope.query.text + "...";
-    Search.query({ q: $scope.query.text },
-      function(response_object, responseHeaders) {
-        object_list = response_object.objects;
-        if (object_list.length == 1) {
-          noun = " match.";
+    $scope.scroll_to_id = function(id) {
+      $location.hash(id);
+      $anchorScroll();
+    };
+
+    $scope.detail = {
+      // The detail object contains all of the information needed for 
+      // displaying the detail page for search_item and includes convenience
+      // methods for managing that information.
+      showing: false,
+      search_item: null,
+      status: "retrieving...",
+      related_items: [],
+
+      show: function( search_item ) {
+        $scope.detail.search_item = search_item;
+        $scope.detail.showing = true;
+        if (search_item.item_type == 'sample') {
+          Sample.get({ id: search_item.pk },
+            function(response_object, responseHeaders) {
+              if (response_object) {
+                $scope.detail.status = "";
+                $scope.detail.results = response_object;
+              }
+            },
+            function(response_object, responseHeaders) {
+              $log.warn('Query errored with: ' + response_object);
+              $scope.detail.status = "Query failed.";
+            }
+          );
+        } else if (search_item.item_type == 'experiment') {
+          $scope.detail.related_items = [];
+          var getSampleDetails = function(pk) {
+            Sample.get({id: pk},
+              function(response_object, responseHeaders) {
+                if (response_object) {
+                  $scope.detail.status = "";
+                  $scope.detail.related_items.push(response_object);
+                }
+              },
+              function(response_object, responseHeaders) {
+                $log.warn('Query errored with: ' + response_object);
+                $scope.detail.status = "Query failed.";
+              }
+            );
+          };
+          Experiment.get({ accession: search_item.pk },
+            function(response_object, responseHeaders) {
+              if (response_object) {
+                $scope.detail.results = response_object;
+                $scope.detail.status = "Retrieving sample details...";
+                for (var i=0; i< search_item.related_items.length; i++) {
+                  getSampleDetails(search_item.related_items[i]);
+                }
+              }
+            },
+            function(response_object, responseHeaders) {
+              $log.warn('Query errored with: ' + response_object);
+              $scope.detail.status = "Query failed.";
+            }
+          );
+        }
+        $timeout(function() {
+          // if we inititate the scroll too early, the search results list
+          // hasn't finished compressing width and it doesn't work right, so this
+          // timeout waits until the transition has finished before scrolling
+          $scope.scroll_to_id(search_item.pk);
+        }, 500);
+      },
+
+      clear: function() {
+        $scope.detail.showing = false;
+        $scope.detail.status = null;
+      },
+
+      make_ml_data_source_href: function(experimentId, mlDataSource) {
+        /*
+          TODO find a place where this URL template belongs
+        */
+        return ("http://www.ebi.ac.uk/arrayexpress/files/{expId}/" +
+          "{expId}.raw.1.zip/{mlDataSource}")
+          .replace(/{expId}/g, experimentId)
+          .replace(/{mlDataSource}/g, mlDataSource);
+      }
+    };
+  
+    $scope.analysis = {
+      sample_list: [],
+      sample_objects: {},
+
+      add_sample: function(sample_id) {
+        if (this.sample_list.indexOf(+sample_id) != -1) {
+          // quietly ignore the double-add
+          $log.warn('analysis.add_sample: ' + sample_id + 
+              ' already in the sample list; ignoring.');
         } else {
-          noun = " matches.";
+          this.sample_list.push(+sample_id);
         }
-        $scope.query.status = "Found " + object_list.length + noun;
-        $scope.query.results = object_list;
       },
-      function(response_object, responseHeaders) {
-        console.log('Query errored with: ' + response_object);
-        $scope.query.status = "Query failed.";
-      }
-    );
-  };
-  
-  $scope.detail = {
-    search_item: {}
-  };
-  $scope.show_detail = function( search_item ) {
-    $scope.detail.search_item = search_item;
-    var modalInstance = $uibModal.open({
-      animation: true,
-      templateUrl: 'analyze/detailModal.tpl.html',
-      controller: 'DetailModalCtrl',
-      size: 'lg',
-      resolve: {
-        detail: function() {
-          return $scope.detail;
-        }
-      }
-    });
-    modalInstance.result.then(function (selectedItem) {
-      $log.info('Modal dismissed with selectedItem at: ' + new Date());
-    }, function () {
-      $log.info('Modal dismissed at: ' + new Date());
-    });
-  };
-  
-  $scope.analysis = {
-    sample_list: []
-  };
-  $scope.add_item = function( search_item ) {
-    $log.info('add_item: ' + search_item.item_type);
-    if (search_item.item_type == 'sample') {
-      $scope.analysis.sample_list.push(+search_item.pk);
-    } else if (search_item.item_type == 'experiment') {
-      $scope.analysis.sample_list = 
-        $scope.analysis.sample_list.concat(search_item.related_items);
-    }
-  };
-  $scope.show_analysis = function( ) {
-    var modalInstance = $uibModal.open({
-      animation: false,
-      templateUrl: 'analyze/analysisModal.tpl.html',
-      controller: 'AnalysisModalCtrl',
-      resolve: {
-        analysis: function() {
-          return $scope.analysis;
-        }
-      }
-    });
-    modalInstance.result.then(function (selectedItem) {
-      $log.info('Modal dismissed with selectedItem at: ' + new Date());
-    }, function () {
-      $log.info('Modal dismissed at: ' + new Date());
-    });
-  };
-})
 
-.controller('DetailModalCtrl', function($scope, $uibModalInstance, $log, detail, Sample, Experiment) {
-  $scope.detail = detail;
-  $scope.close = function() {
-    $uibModalInstance.dismiss('close');
-  };
-  if (detail.search_item.item_type == 'sample') {
-    Sample.get({ id: detail.search_item.pk },
-      function(response_object, responseHeaders) {
-        if (response_object) {
-          $scope.detail.status = "Found a match.";
-          $scope.detail.results = JSON.stringify(response_object, null, 4);
+      add_experiment: function(sample_id_list) {
+        for (var i = 0; i < sample_id_list.length; i++) {
+          this.add_sample(sample_id_list[i]);
         }
       },
-      function(response_object, responseHeaders) {
-        console.log('Query errored with: ' + response_object);
-        $scope.detail.status = "Query failed.";
-      }
-    );
-  } else if (detail.search_item.item_type == 'experiment') {
-    Experiment.get({ accession: detail.search_item.pk },
-      function(response_object, responseHeaders) {
-        if (response_object) {
-          $scope.detail.status = "Found a match.";
-          $scope.detail.results = JSON.stringify(response_object, null, 4);
+
+      add_item: function(search_item) {
+        $log.info('add_item: ' + search_item.item_type);
+        if (search_item.item_type == 'sample') {
+          $scope.analysis.add_sample(search_item.pk);
+        } else if (search_item.item_type == 'experiment') {
+          $scope.analysis.add_experiment(search_item.related_items);
         }
       },
-      function(response_object, responseHeaders) {
-        console.log('Query errored with: ' + response_object);
-        $scope.detail.status = "Query failed.";
+
+      has_item: function(search_item) {
+        if (search_item.item_type == 'sample') {
+          if (this.sample_list.indexOf(+search_item.pk) != -1) {
+            return true;
+          } else {
+            return false;
+          }
+        } else if (search_item.item_type == 'experiment') {
+          // what we want to know, in the case of an experiment, is 'are
+          // all of the samples from this experiment already added?'
+          for (var i = 0; i < search_item.related_items.length; i++) {
+            if (this.sample_list.indexOf(+search_item.related_items[i]) == -1) {
+              return false;
+            }
+          }
+          return true;
+        }
+      },
+      
+      show: function() {
+        var modalInstance = $uibModal.open({
+          animation: true,
+          templateUrl: 'analyze/analysisModal.tpl.html',
+          controller: 'AnalysisModalCtrl',
+          size: 'lg',
+          resolve: {
+            analysis: function() {
+              return $scope.analysis;
+            }
+          }
+        });
+        modalInstance.result.then(function (selectedItem) {
+        //   $log.info('Modal dismissed with selectedItem at: ' + new Date());
+        // }, function () {
+        //   $log.info('Modal dismissed at: ' + new Date());
+        });
+      },
+
+      getSampleDetails: function(pk) {
+        Sample.get({id: pk},
+          function(response_object, responseHeaders) {
+            if (response_object) {
+              $scope.analysis.sample_objects[pk] = response_object;
+            }
+          },
+          function(response_object, responseHeaders) {
+            $log.warn('Query for sample ' + pk + 
+                ' errored with: ' + response_object);
+          }
+        );
       }
-    );
-  }
-})
+    };
+}])
+
 .controller('AnalysisModalCtrl', function($scope, $uibModalInstance, analysis) {
   $scope.analysis = analysis;
   $scope.close = function() {
     $uibModalInstance.dismiss('close');
   };
+  
+  // populate sample details
+  for (var i=0; i < $scope.analysis.sample_list.length; i++) {
+    analysis.getSampleDetails($scope.analysis.sample_list[i]);
+  }
 })
 ;
