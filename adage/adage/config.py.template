@@ -1,0 +1,140 @@
+# This file contains all deploy-time configuration parameters, including
+# passwords. DO NOT check in your changes when deploying! The deployment
+# scripts (see fabfile.adage-server.pull) will extract just the section needed
+# for deployment and upload that to the server.
+#
+# To find all paramaters you need to specify, search on regex: <config[^>]*>
+# and replace with values tailored to your deployment.
+import random
+
+# AWS credentials and configuration
+AWS_CONFIG = {
+    'aws_access_key_id':        '<config-secret>',
+    'aws_secret_access_key':    '<config-secret>',
+    'region_name':              'us-east-1',
+    'rds_conn':      {
+                         'NAME': 'adage_db',
+                         'USER': 'adage_db',
+                         'PASSWORD': '<config-secret>',
+                         'HOST': '<configure>',
+                         'PORT': '5432',
+                     },
+    'ec2_params':    {
+                         # 'DryRun': True,
+                         'ImageId': 'ami-d05e75b8',
+                         'MinCount': 1, 'MaxCount': 1,
+                         'KeyName': '<configure>',
+                         'SecurityGroups':  ['<configure>'],
+                         'InstanceType': 't2.micro',
+                     },
+    'ec2_conn':      {
+                         'host': '<configure>',  # <-- our elastic IP address
+                         'user': 'ubuntu',
+                         'keyfile': '<configure>',
+                     }
+}
+
+# os-level configuration
+OS_CONFIG = {
+    'home_dir':      '/home/<configure:default=adage>/',
+}
+
+# data for bootstrapping the database and testing
+DATA_CONFIG = {
+    'data_dir':      OS_CONFIG['home_dir'] + 'adage-server/data/',
+}
+DATA_CONFIG.update({
+    'annotation_file':  DATA_CONFIG['data_dir'] +
+                        'PseudomonasAnnotation.tsv',
+})
+
+# test server deployment credentials and configuration (maybe on AWS)
+TEST_CONFIG = {
+    'data':          DATA_CONFIG,
+    'ec2_conn':      AWS_CONFIG['ec2_conn'].copy(),
+    'virt_env':      OS_CONFIG['home_dir'] + '.virtualenvs/adage',
+    'django_dir':    OS_CONFIG['home_dir'] + 'adage-server/adage',
+    'django_key':    '<config-secret>',
+    'django_super':  '<configure:desc=superuser>',
+    'django_email':  '<configure:desc=superuser_email>',
+    'interface_dir': OS_CONFIG['home_dir'] + 'adage-server/interface',
+    'databases':     {'default': {
+                        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+                        # database name and user cannot have upper case letters
+                        'NAME': '<configure>',
+                        'USER': '<configure>',
+                        'PASSWORD': '<config-secret>',
+                        'HOST': AWS_CONFIG['rds_conn']['HOST'],
+                        'PORT': AWS_CONFIG['rds_conn']['PORT'],
+                        }
+                     },
+    'haystack':      {'default': {
+                        'ENGINE':
+                            'adage.search_backend.CustomElasticsearchEngine',
+                        'URL': 'http://127.0.0.1:9200/',
+                        'INDEX_NAME': 'haystack',
+                        },
+                     },
+}
+TEST_CONFIG['ec2_conn'].update({
+    'user':     'adage',
+    'keyfile':  '<configure>',
+})
+DEPLOY_TEST_CONFIG = TEST_CONFIG.copy()
+DEPLOY_TEST_CONFIG.update({
+    'ec2_conn':      AWS_CONFIG['ec2_conn'],
+    'dbmaster':      AWS_CONFIG['rds_conn'],
+})
+
+# development server deployment credentials and configuration (maybe on VMware)
+DEV_CONFIG = TEST_CONFIG.copy()
+DEV_CONFIG.update({
+    'databases':     {'default': {
+                        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+                        # database name and user cannot have upper case letters
+                        'NAME': '<configure>',
+                        'USER': '<configure>',
+                        'PASSWORD': '<config-secret>',
+                        'HOST': '<configure>',
+                        'PORT': '5432',
+                        }
+                     },
+    'dbmaster':      {
+                        'NAME': '<configure>',
+                        'USER': '<configure>',
+                        'PASSWORD': '<config-secret>',
+                        'HOST': '<configure>',
+                        'PORT': '5432',
+                     },
+})
+
+# Codeship server deployment credentials and configuration
+CI_CONFIG = DEV_CONFIG.copy()
+CI_CONFIG.update({
+    'django_key':    str(random.randint(0, 1000000)),
+    # see https://codeship.com/documentation/databases/postgresql/
+    'databases':     {'default': {
+                        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+                        # database name and user cannot have upper case letters
+                        'NAME': 'adageci',
+                        'USER': '<configure>',
+                        'PASSWORD': '<config-secret>',
+                        'HOST': '127.0.0.1',
+                        'PORT': '5434',  # v. 9.4
+                        }
+                     },
+    'dbmaster':      {
+                        'NAME': 'development',
+                        'USER': '<configure>',
+                        'PASSWORD': '<config-secret>',
+                        'HOST': '127.0.0.1',
+                        'PORT': '5434',  # v. 9.4
+                     },
+    'data':          {
+                        'data_dir': '/home/rof/clone/data/',
+                        'annotation_file':
+                            '/home/rof/clone/data/PseudomonasAnnotation.tsv',
+                     },
+})
+
+CONFIG = TEST_CONFIG
