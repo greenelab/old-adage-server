@@ -1,10 +1,209 @@
-.search-results {
-  list-style: none;
+#sample-bin {
+  position: fixed;
+  top: 15px;
+  right: 20px;
+  z-index: 1031;
+  background-color: #f8f8f8;
+  border: 1px solid #e7e7e7;
+  border-radius: 4px;
+  font-size: 30px;
+  fill:#e7e7e7;
+  text {
+    fill: #333;
+  }
+}
+
+#search ul {
+  .media-list;
+  .li-media-left() {
+    .media-left;
+    min-width: 50px;
+    text-align: center;
+    padding: 9px 10px;
+    background-size: 30px 30px;
+    background-repeat: no-repeat;
+    background-position: 50% 5px;
+  }
   li {
-    padding: 0.3em 0.3em;
-    margin: 2px 0px;
+    .media;
+    margin-top: 0px;
+    .btn {
+      float: right;
+      color: #333;
+      background-color: inherit;
+    }
+    .btn:hover {
+      background-color: #f8f8f8;
+    }
+    .btn.disabled {
+      opacity: .25;
+    }
+  }
+  a:hover {
+    text-decoration: none;
   }
   .experiment {
     background-color: #f6f6ff;
   }
+  .experiment .media-left {
+    background: url('/static/assets/testtube-expt2.svg');
+    .li-media-left;
+  }
+  .sample .media-left {
+    background: url('/static/assets/testtube.svg');
+    .li-media-left;
+  }
+  .list-group-item:hover {
+    background-color: #f5f5f5;
+  }
+  .list-group-item.active {
+    background-color: #e7e7e7;
+    border-color: #ddd;
+  }
+  .list-group-item-text {
+    color: #333;
+  }
+}
+
+.badge {
+  color: #000;
+  background-color: #fff;
+  border: 1px solid #000;
+}
+
+// Credit to Daniel Eden's Animate.css for the following animations:
+// SlideInRight
+// https://github.com/daneden/animate.css
+@-webkit-keyframes slideInRight {
+  from {
+    -webkit-transform: translate3d(100%, 0, 0);
+    transform: translate3d(100%, 0, 0);
+    visibility: visible;
+  }
+  to {
+    -webkit-transform: translate3d(0,0,0);
+    transform: translate3d(0,0,0);
+  }
+}
+
+@-moz-keyframes slideInRight {
+  from {
+    -webkit-transform: translate3d(100%, 0, 0);
+    transform: translate3d(100%, 0, 0);
+    visibility: visible;
+  }
+  to {
+    -webkit-transform: translate3d(0,0,0);
+    transform: translate3d(0,0,0);
+  }
+}
+
+@-o-keyframes slideInRight {
+  from {
+    -webkit-transform: translate3d(100%, 0, 0);
+    transform: translate3d(100%, 0, 0);
+    visibility: visible;
+  }
+  to {
+    -webkit-transform: translate3d(0,0,0);
+    transform: translate3d(0,0,0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    -webkit-transform: translate3d(100%, 0, 0);
+    transform: translate3d(100%, 0, 0);
+    visibility: visible;
+  }
+  to {
+    -webkit-transform: translate3d(0,0,0);
+    transform: translate3d(0,0,0);
+  }
+}
+
+@-webkit-keyframes compressWidth {
+  from {
+    width: 83.33333%;
+  }
+  to {
+    width: 33.33333%;
+  }
+}
+
+@keyframes compressWidth {
+  from {
+    width: 91.66667%;
+  }
+  to {
+    width: 50%;
+  }
+}
+
+#search.with-detail, #search.with-detail-remove {
+  width: 50%;
+}
+
+#search.with-detail-add-active {
+  -webkit-animation-name: compressWidth;
+  animation-name: compressWidth;
+  -webkit-animation-timing-function: ease-in;
+  animation-timing-function: ease-in;
+  -webkit-animation-duration: 100ms;
+  animation-duration: 100ms;
+}
+
+#search.with-detail-remove-active {
+  -webkit-animation-name: compressWidth;
+  animation-name: compressWidth;
+  -webkit-animation-timing-function: ease-in;
+  animation-timing-function: ease-in;
+  -webkit-animation-direction: reverse;
+  animation-direction: reverse;
+  -webkit-animation-delay: 400ms;
+  animation-delay: 400ms;
+  -webkit-animation-duration: 100ms;
+  animation-duration: 100ms;
+}
+
+#item-detail {
+  position: fixed;
+  top: 0px;
+  right: 0px;
+  height: 100%;
+  overflow: scroll;
+  z-index: 1025;
+  background-color: #fff;
+}
+
+#item-detail::before {
+  content: "";
+  display: block;
+  height: 70px;
+}
+
+#item-detail.ng-hide-remove {
+  // this prevents a visible flicker when starting the animation
+  -webkit-transform: translate3d(100%, 0, 0);
+  transform: translate3d(100%, 0, 0);
+}
+
+#item-detail.ng-hide-remove-active {
+  -webkit-animation-name: slideInRight;
+  animation-name: slideInRight;
+  -webkit-animation-timing-function: ease-in;
+  animation-timing-function: ease-in;
+  -webkit-animation-duration: 500ms;
+  animation-duration: 500ms;
+}
+
+#item-detail.ng-hide-add-active {
+  -webkit-animation-name: slideInRight;
+  animation-name: slideInRight;
+  -webkit-animation-timing-function: ease-in;
+  animation-timing-function: ease-in;
+  -webkit-animation-direction: reverse;
+  animation-direction: reverse;
+  -webkit-animation-duration: 500ms;
+  animation-duration: 500ms;
 }
