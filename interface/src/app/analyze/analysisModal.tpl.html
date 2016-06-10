@@ -5,7 +5,8 @@
 <div class="modal-body">
   <h1>Samples <small>(drag to reorder)</small></h1>
   <ul as-sortable ng-model="analysis.sample_list" class="list-group">
-    <li ng-repeat="id in analysis.sample_list" as-sortable-item class="list-group-item">
+    <li ng-repeat="id in analysis.sample_list" 
+        as-sortable-item class="list-group-item">
       <div as-sortable-item-handle>
       {{analysis.sample_objects[id].name}}
       ({{analysis.sample_objects[id].ml_data_source}})
