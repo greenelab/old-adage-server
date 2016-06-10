@@ -1,0 +1,18 @@
+      <div class="page-header">
+        <h1>Experiment
+          <small><a href="http://www.ebi.ac.uk/arrayexpress/experiments/{{
+              detail.search_item.pk}}/" target="_new">
+            {{detail.search_item.pk}}</a>
+          </small>
+        </h1>
+        <h2>{{detail.results.name}}</h2>
+      </div>
+      <p ng-if="detail.status" class="alert" role="alert">
+        Status: {{detail.status}}</p>
+      <p>{{detail.results.description}}</p>
+      <h3>Samples</h3>
+      <ul class="list-group">
+        <li ng-repeat="s in detail.related_items"
+            class="list-group-item">{{s.name}} ({{s.ml_data_source}})</li>
+      </ul>
+    </div>

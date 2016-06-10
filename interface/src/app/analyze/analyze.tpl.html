@@ -69,44 +69,7 @@
       <button style="float: right;" type="button" class="close"
           ng-click="detail.clear()" aria-label="Close">
           <i class="fa fa-times" aria-hidden="true"></i></button>
-      <div class="page-header">
-        <h1 ng-switch-when="sample">Sample
-          <small>{{detail.search_item.description}}</small></h1>
-        <h1 ng-switch-when="experiment">Experiment
-          <small><a href="http://www.ebi.ac.uk/arrayexpress/experiments/{{
-              detail.search_item.pk}}/" target="_new">
-            {{detail.search_item.pk}}</a>
-          </small>
-        </h1>
-        <h2 ng-switch-when="experiment">{{detail.results.name}}</h2>
-      </div>
-      <p ng-if="detail.status" class="alert" role="alert">
-        Status: {{detail.status}}</p>
-<!--
-  TODO okay to make a direct link to ArrayExpress here?
--->
-      <h3 ng-switch-when="sample">Data Source
-        <small><a href="{{
-          detail.make_ml_data_source_href(
-            detail.search_item.related_items[0], detail.results.ml_data_source)
-          }}">{{detail.results.ml_data_source}}</a></small>
-      </h3>
-      <table ng-switch-when="sample" class="table">
-        <tr ng-repeat="(type, text) in detail.results.annotations">
-          <th>{{type}}</th><td>{{text}}</td>
-        </tr>
-      </table>
-      <h3 ng-switch-when="sample">Related Experiments</h3>
-      <ul ng-switch-when="sample" class="list-group">
-        <li ng-repeat="e in detail.search_item.related_items"
-            class="list-group-item"><a ng-click="scroll_to_id(e)">{{e}}</a></li>
-      </ul>
-      <p ng-switch-when="experiment">{{detail.results.description}}</p>
-      <h3 ng-switch-when="experiment">Samples</h3>
-      <ul ng-switch-when="experiment" class="list-group">
-        <li ng-repeat="s in detail.related_items"
-            class="list-group-item">{{s.name}} ({{s.ml_data_source}})</li>
-      </ul>
-    </div>
+      <adage-sample-detail ng-switch-when="sample"></adage-sample-detail>
+      <adage-experiment-detail ng-switch-when="experiment"></adage-experiment-detail>
   </div>
 </div>

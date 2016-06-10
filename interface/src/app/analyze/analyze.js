@@ -2,6 +2,7 @@ angular.module( 'adage.analyze', [
   'ui.router',
   'placeholders',
   'ui.bootstrap',
+  'as.sortable',
   'ngAnimate',
   'ngResource',
   'ngSanitize'
@@ -277,7 +278,18 @@ angular.module( 'adage.analyze', [
       }
     };
 }])
-
+.directive('adageSampleDetail', function() {
+  return {
+    restrict: 'E',
+    templateUrl: 'analyze/adageSampleDetail.tpl.html'
+  };
+})
+.directive('adageExperimentDetail', function() {
+  return {
+    restrict: 'E',
+    templateUrl: 'analyze/adageExperimentDetail.tpl.html'
+  };
+})
 .controller('AnalysisModalCtrl', function($scope, $uibModalInstance, analysis) {
   $scope.analysis = analysis;
   $scope.close = function() {
