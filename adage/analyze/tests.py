@@ -10,6 +10,7 @@ import codecs
 import unittest
 
 from django.test import TestCase
+from organisms.models import Organism
 from analyze.models import Experiment, Sample, AnnotationType, SampleAnnotation
 from analyze.models import MLModel, Node, Activity
 from analyze.management.commands.import_data import bootstrap_database, \
@@ -80,7 +81,7 @@ class ModelsTestCase(TestCase):
         obj = Sample.objects.get(name=self.sample_list[0]['name'])
         self.assertEqual(obj.name, self.sample_list[0]['name'])
         self.assertEqual(
-                obj.ml_data_source, self.sample_list[0]['ml_data_source'])
+            obj.ml_data_source, self.sample_list[0]['ml_data_source'])
 
     def test_create_sample_linked(self):
         """
@@ -98,7 +99,7 @@ class ModelsTestCase(TestCase):
 
     def test_annotations(self):
         """
-        AnnotationTypes and Annotations are persisted in the database without 
+        AnnotationTypes and Annotations are persisted in the database without
         errors
         """
         # need a few samples to annotate
@@ -125,8 +126,11 @@ class ModelsTestCase(TestCase):
             self.assertEqual(len(s.get_annotation_dict()), samp_size)
 
     def test_activity(self):
+        # 1 Organism record
+        organism = factory.create(Organism)
         # 1 ML model record
-        ml_model = MLModel.objects.create(title="test model")
+        ml_model = MLModel.objects.create(title="test model",
+                                          organism=organism)
         # 2 node records
         node1 = Node.objects.create(name="node #1", mlmodel=ml_model)
         Node.objects.create(name="node #2", mlmodel=ml_model)
@@ -163,7 +167,8 @@ class BootstrapDBTestCase(TestCase):
         """
         super(BootstrapDBTestCase, self).setUpClass()
         self.cache_dir_name = os.path.join(CONFIG['data']['data_dir'],
-                "bootstrap_cache_{:%Y%m%d}".format(datetime.now()))
+                                           "bootstrap_cache_{:%Y%m%d}".format(
+                                               datetime.now()))
         # n.b. we need a plain bytestream for use with unicodecsv, so this
         # open() call is correct even though we are opening a Unicode file.
         with open(CONFIG['data']['annotation_file'], mode='rb') as anno_fh:
@@ -171,7 +176,8 @@ class BootstrapDBTestCase(TestCase):
                 bootstrap_database(anno_fh, dir_name=self.cache_dir_name)
                 logger.info("bootstrap_database succeeded.")
             except Exception:
-                logger.warn("bootstrap_database threw an exception", exc_info=1)
+                logger.warn("bootstrap_database threw an exception",
+                            exc_info=1)
 
     def test_example_experiment(
             self,
@@ -187,25 +193,26 @@ class BootstrapDBTestCase(TestCase):
 
     def test_arrayexpress_metadata(self):
         """
-        Ensure that `name` and `description` for each Experiment match what we
-        retrieved from ArrayExpress by peeking at the JSON cache we saved during
-        bootstrap_database()
+        Ensure that `name` and `description` for each Experiment match
+        what we retrieved from ArrayExpress by peeking at the JSON cache
+        we saved during bootstrap_database().
         """
         ae_experiments = gp.AERetriever(
-                ae_url=gp._AEURL_EXPERIMENTS,
-                cache_file_name=os.path.join(self.cache_dir_name,
-                                             JSON_CACHE_FILE_NAME)
-                ).ae_json_to_experiment_text()
+            ae_url=gp._AEURL_EXPERIMENTS,
+            cache_file_name=os.path.join(self.cache_dir_name,
+                                         JSON_CACHE_FILE_NAME)
+        ).ae_json_to_experiment_text()
         for e in ae_experiments:
             if Experiment.objects.filter(pk=e['accession']).exists():
                 self.test_example_experiment(test_experiment=e)
 
     # FIXME make this test work again by educating it about meaningless diffs
-    @unittest.skip("inconsistent annotations are auto-resolved, but this test "\
-            "still flags those diffs")
+    @unittest.skip("inconsistent annotations are auto-resolved, but this test "
+                   "still flags those diffs")
     def test_annotations_import_export_match(self):
         """
-        Ensure that exported data match what we imported with bootstrap_database
+        Ensure that exported data match what we imported with
+        bootstrap_database.
         """
         # for our test, we need to independently confirm that the import worked
         # so we now re-open the file with the matching 'utf-8' encoding and
@@ -213,18 +220,18 @@ class BootstrapDBTestCase(TestCase):
         # the database export
         db_import = []
         with codecs.open(CONFIG['data']['annotation_file'],
-                mode='rb', encoding='utf-8') as anno_fh:
+                         mode='rb', encoding='utf-8') as anno_fh:
             last_col = re.compile(ur'\t[^\t]*$', flags=re.UNICODE)
             for line in anno_fh:
                 line = last_col.sub(u'', line)   # strip off last column
                 db_import.append(line)
 
         raw_export = SampleResource.get_annotations(annotation_types=[
-                'strain', 'genotype', 'abx_marker', 'variant_phenotype',
-                'medium', 'treatment', 'biotic_int_lv_1', 'biotic_int_lv_2',
-                'growth_setting_1', 'growth_setting_2', 'nucleic_acid',
-                'temperature', 'od', 'additional_notes', 'description',
-            ]
+            'strain', 'genotype', 'abx_marker', 'variant_phenotype',
+            'medium', 'treatment', 'biotic_int_lv_1', 'biotic_int_lv_2',
+            'growth_setting_1', 'growth_setting_2', 'nucleic_acid',
+            'temperature', 'od', 'additional_notes', 'description',
+        ]
         )
         db_export = raw_export.content.decode(raw_export.charset).splitlines()
 
@@ -300,7 +307,9 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         Note that "factory.create(ModelName, n)" in fixtureless module is not
         used here because it does NOT gurantee unique_together constraint.
         """
-        ml_model = MLModel.objects.create(title="test model")
+        organism = factory.create(Organism)
+        ml_model = MLModel.objects.create(title="test model",
+                                          organism=organism)
         for i in xrange(node_counter):
             node_name = "node " + str(i + 1)
             Node.objects.create(name=node_name, mlmodel=ml_model)
@@ -337,7 +346,7 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
 
     def test_experiment_get(self):
         """
-        We should be able to GET data from our test experiment via the API
+        We should be able to GET data from our test experiment via the API.
         """
         # TODO is there a good way to run this method on a bootstrapped db?
         # print(self.experimentURI)
@@ -367,7 +376,8 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
 
     def test_annotationtype_non_get(self):
         """
-        Test POST, PUT, PATCH and DELETE methods via 'annotationtype/<pk>/' API.
+        Test POST, PUT, PATCH and DELETE methods via
+        'annotationtype/<pk>/' API.
         """
         self.call_non_get_API(self.annotationtypeURI)
 
@@ -378,9 +388,8 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         # Make sure AnnotationTypes were created as expected
         self.assertEqual(AnnotationType.objects.count(), self.at_count)
         # Test GET method and ensure we get all records back
-        resp = self.api_client.get(
-                self.annotationtype_listURI,
-                data={'format': 'json', 'limit': 0})
+        resp = self.api_client.get(self.annotationtype_listURI,
+                                   data={'format': 'json', 'limit': 0})
         self.assertValidJSONResponse(resp)
         atresp = self.deserialize(resp)
         self.assertEqual(len(atresp['objects']), self.at_count)
@@ -435,7 +444,7 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         Test calling get_annotations directly with a parameter passed
         """
         atypes = [at.typename
-                for at in random.sample(AnnotationType.objects.all(), 3)]
+                  for at in random.sample(AnnotationType.objects.all(), 3)]
         resp = SampleResource.get_annotations(annotation_types=atypes)
         self.check_annotations_param(resp, atypes)
 
@@ -444,11 +453,10 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         Test GET method via 'sample/get_annotations' API with parameter
         """
         atypes = [at.typename
-                for at in random.sample(AnnotationType.objects.all(), 3)]
+                  for at in random.sample(AnnotationType.objects.all(), 3)]
         atstr = ','.join(atypes)
         resp = self.api_client.get(
-                self.baseURI + 'sample/get_annotations/?annotation_types=' +
-                atstr)
+            self.baseURI + 'sample/get_annotations/?annotation_types=' + atstr)
         self.check_annotations_param(resp, atypes)
 
     def check_annotations_default(self, resp):
@@ -460,9 +468,9 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         cols = rows[0].split(u'\t')[3:]
         self.assertEqual(len(cols), AnnotationType.objects.count())
         self.assertEqual(cols, [
-                at.typename
-                for at in AnnotationType.objects.order_by('typename')
-            ])
+            at.typename
+            for at in AnnotationType.objects.order_by('typename')
+        ])
 
     def test_get_annotations_direct_default(self):
         """
@@ -476,7 +484,7 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         Test GET method via 'sample/get_annotations/' API.
         """
         resp = self.api_client.get(
-                self.baseURI + 'sample/get_annotations/')
+            self.baseURI + 'sample/get_annotations/')
         self.check_annotations_default(resp)
 
     def test_activity_get(self):
