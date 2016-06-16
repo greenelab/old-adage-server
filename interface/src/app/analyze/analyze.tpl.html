@@ -11,29 +11,29 @@
   </svg>
   <div id="search" ng-class="detail.showing ? 'with-detail':''">
     <h1 class="page-header">
-    Analyze
-  </h1>
-  <p>
-    In this area, users will be able to search for an experiment or set of 
-    samples to analyze, define analysis groups and generate a DA heatmap to 
-    review ADAGE node intensities for each sample.
-  </p>
+      Analyze
+    </h1>
+    <p>
+      In this area, users will be able to search for an experiment or set of 
+      samples to analyze, define analysis groups and generate a DA heatmap to 
+      review ADAGE node intensities for each sample.
+    </p>
     <div id="search-results" class="col-sm-11">
-  <form class="form-inline" role="form">
-    <label for="query_text">Search Experiments and Samples</label>
+      <form class="form-inline" role="form">
+        <label for="query_text">Search Experiments and Samples</label>
         <div class="input-group">
-    <input name="query_text" id="query_text" ng-model="query.text" 
-           type="search" class="form-control" placeholder="query text">
+          <input name="query_text" id="query_text" ng-model="query.text" 
+              type="search" class="form-control" placeholder="query text">
           <span class="input-group-btn">
             <button type="submit" ng-click="get_search()"
               class="btn btn-default">
               <i class="fa fa-search" aria-hidden="true"></i>
-      Search
-    </button>
+              Search
+            </button>
           </span>
         </div>
-  </form>
-  <p ng-bind="query.status"></p>
+      </form>
+      <p ng-bind="query.status"></p>
       <ul class="list-group">
         <li ng-switch="search_item.item_type"
             ng-repeat="search_item in query.results"
@@ -60,9 +60,9 @@
               </p>
             </div>
           </a>
-    </li>
-  </ul>
-</div>
+        </li>
+      </ul>
+    </div>
   </div>
   <div id="item-detail" ng-show="detail.showing" class="col-sm-6">
     <div ng-switch="detail.search_item.item_type">
@@ -72,5 +72,6 @@
       <adage-sample-detail ng-switch-when="sample"></adage-sample-detail>
       <adage-experiment-detail ng-switch-when="experiment">
       </adage-experiment-detail>
+    </div>
   </div>
 </div>

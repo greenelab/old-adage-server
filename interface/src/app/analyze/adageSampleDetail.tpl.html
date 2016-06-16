@@ -1,26 +1,25 @@
-      <div class="page-header">
-        <h1>Sample
-          <small>{{detail.search_item.description}}</small></h1>
-      </div>
-      <p ng-if="detail.status" class="alert" role="alert">
-        Status: {{detail.status}}</p>
+<div class="page-header">
+  <h1>Sample
+    <small>{{detail.search_item.description}}</small></h1>
+</div>
+<p ng-if="detail.status" class="alert" role="alert">
+  Status: {{detail.status}}</p>
 <!--
   TODO okay to make a direct link to ArrayExpress here?
 -->
-      <h3>Data Source
-        <small><a href="{{
-          detail.make_ml_data_source_href(
-            detail.search_item.related_items[0], detail.results.ml_data_source)
-          }}">{{detail.results.ml_data_source}}</a></small>
-      </h3>
-      <table class="table">
-        <tr ng-repeat="(type, text) in detail.results.annotations">
-          <th>{{type}}</th><td>{{text}}</td>
-        </tr>
-      </table>
-      <h3>Related Experiments</h3>
-      <ul class="list-group">
-        <li ng-repeat="e in detail.search_item.related_items"
-            class="list-group-item"><a ng-click="scroll_to_id(e)">{{e}}</a></li>
-      </ul>
-    </div>
+<h3>Data Source
+  <small><a href="{{
+    detail.make_ml_data_source_href(
+      detail.search_item.related_items[0], detail.results.ml_data_source)
+    }}">{{detail.results.ml_data_source}}</a></small>
+</h3>
+<table class="table">
+  <tr ng-repeat="(type, text) in detail.results.annotations">
+    <th>{{type}}</th><td>{{text}}</td>
+  </tr>
+</table>
+<h3>Related Experiments</h3>
+<ul class="list-group">
+  <li ng-repeat="e in detail.search_item.related_items"
+      class="list-group-item"><a ng-click="scroll_to_id(e)">{{e}}</a></li>
+</ul>
