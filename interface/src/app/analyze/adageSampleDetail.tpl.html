@@ -2,8 +2,10 @@
   <h1>Sample
     <small>{{detail.search_item.description}}</small></h1>
 </div>
-<p ng-if="detail.status" class="alert" role="alert">
-  Status: {{detail.status}}</p>
+<p ng-if="detail.status" class="alert alert-warning" role="alert">
+  Status: {{detail.status}}<br>
+  If this message persists, please try refreshing your browser.
+</p>
 <!--
   TODO okay to make a direct link to ArrayExpress here?
 -->
@@ -20,6 +22,6 @@
 </table>
 <h3>Related Experiments</h3>
 <ul class="list-group">
-  <li ng-repeat="e in detail.search_item.related_items"
-      class="list-group-item"><a ng-click="scroll_to_id(e)">{{e}}</a></li>
+  <li ng-repeat="expt in detail.search_item.related_items"
+      class="list-group-item"><a ng-click="scroll_to_id(expt)">{{expt}}</a></li>
 </ul>
