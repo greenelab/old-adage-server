@@ -3,10 +3,10 @@ This management command will read an input gene-gene network file and
 populate the "Edge" table in the database.  A valid input file must be
 tab-delimited and each line should include 4 columns:
 
-  (1) System name of "from" gene;
-  (2) System name of "to" gene;
+  (1) Systematic name of "from" gene;
+  (2) Systematic name of "to" gene;
   (3) Weight of correlation between "from" and "to" genes;
-  (4) Sign of the weight (either "+" or "-");
+  (4) Sign of the weight (either "+" or "-").
 
 The file's first line will be ignored because it only has column names.
 Here is an example input file:
@@ -53,28 +53,28 @@ class Command(BaseCommand):
                 "Gene-gene network data imported successfully"))
         except Exception as e:
             raise CommandError(
-                "Gene-gene network data import encountered an error: %s" % e)
+                "Failed to import gene-gene network data: %s" % e)
 
 
 def import_network(file_handle, ml_model_name):
     """
-    This function takes care of network data importing.  It first
-    validates input ml_model_name, then read each valid data line in the
-    input file into the database.  If any error is detected, it will
-    throw an exception. The whole reading/importing process is enclosed
-    in a transaction context manager so that any exception thrown during
-    this process will roll back the database.  More details can be found
-    at:
+    This function tries to import gene-gene network data in the database.
+    It first validates input ml_model_name, then reads each valid data
+    line in the input file into the database.  The whole reading/importing
+    process is enclosed by a transaction context manager so that any
+    exception thrown inside the manager due to the error detected in
+    file_handle will terminate the transaction and roll back the database.
+    More details can be found at:
     https://docs.djangoproject.com/en/dev/topics/db/transactions/#controlling-transactions-explicitly
     """
 
-    # Check whether ml_model_name exists in the database's "MLModel" table.
+    # Throw an exception if ml_model_name does not exist in the database.
     try:
         ml_model = MLModel.objects.get(title=ml_model_name)
     except MLModel.DoesNotExist:
         raise Exception("%s does NOT exist in the database" % ml_model_name)
 
-    # Put reading process in a transaction.
+    # Enclose reading/importing process in a transaction.
     with transaction.atomic():
         check_and_import(file_handle, ml_model)
 
@@ -82,7 +82,7 @@ def import_network(file_handle, ml_model_name):
 def check_and_import(file_handle, ml_model):
     """
     Read valid data lines into the database.  An exception will be thrown
-    for any errors detected in file_handle.
+    if any errors are detected in file_handle.
     """
     gene_pairs_in_file = set()
     for line_index, line in enumerate(file_handle):
@@ -91,7 +91,7 @@ def check_and_import(file_handle, ml_model):
             continue
 
         # Check the number of columns in the line.
-        tokens = line.rstrip('\n').split('\t')
+        tokens = line.rstrip('\r\n').split('\t')
         if len(tokens) != NUM_COLUMNS:
             raise Exception("Input file line #%d: number of fields is not "
                             "%d" % (line_index + 1, NUM_COLUMNS))
@@ -105,95 +105,95 @@ def check_and_import(file_handle, ml_model):
                             "into floating point value"
                             % (line_index + 1, tokens[3] + tokens[2]))
 
-        # Check whether the converted floating point value in the range
+        # Check whether the converted floating point value is in the range
         # of [-1.0, 1.0].
         if weight < -1.0 or weight > 1.0:
             raise Exception("Input file line #%d: %s is not a floating point "
-                            "value in [-1.0, 1.0]" % (line_index + 1,
-                                                      tokens[3] + tokens[2]))
+                            "value in [-1.0, 1.0]" %
+                            (line_index + 1, tokens[3] + tokens[2]))
 
         # Check whether the pair of (column #1, column #2) is duplicate
         # in the file.
         pair01 = tokens[0] + '\t' + tokens[1]
         if pair01 in gene_pairs_in_file:
             raise Exception("Input file line #%d: The pair of (%s, %s) is "
-                            "duplicate inside the file"
-                            % (line_index + 1, tokens[0], tokens[1]))
-        # Check whether the pair of (column #1, column #2) is duplicate
-        # in the file.
-        pair10 = tokens[1] + '\t' + tokens[0]
-        if pair10 in gene_pairs_in_file:
-            raise Exception("Input file line #%d: The pair of (%s, %s) is "
-                            "duplicate inside the file"
-                            % (line_index + 1, tokens[1], tokens[0]))
+                            "duplicate inside the file" %
+                            (line_index + 1, tokens[0], tokens[1]))
+        # If the edges in ml_model are not directed, also check whether
+        # the pair of (column #2, column #1) is duplicate in the file.
+        if not ml_model.directed_g2g_edge:
+            pair10 = tokens[1] + '\t' + tokens[0]
+            if pair10 in gene_pairs_in_file:
+                raise Exception("Input file line #%d: The pair of (%s, %s) is "
+                                "duplicate inside the file" %
+                                (line_index + 1, tokens[1], tokens[0]))
 
         # Keep track of all pairs of (column #1, column #2) that we have
         # processed so that we can check the duplicate in the file later.
         gene_pairs_in_file.add(pair01)
 
-        # If token[0] does not match one and only one gene's
-        # systematic_name field in the database, skip the line.
-        gene1 = find_gene(line_index + 1, tokens[0])
-        if not gene1:
+        # If tokens[0] does not match one and only one gene's
+        # systematic_name in the database, skip the line.
+        try:
+            gene1 = find_gene(tokens[0])
+        except Exception as e:
+            logger.warning("Input file line #%d will be skipped: %s",
+                           line_index + 1, e)
             continue
 
-        # If token[1] does not match one and only one gene's
-        # systematic_name field in the database, skip the line.
-        gene2 = find_gene(line_index + 1, tokens[1])
-        if not gene2:
+        # If tokens[1] does not match one and only one gene's
+        # systematic_name in the database, skip the line.
+        try:
+            gene2 = find_gene(tokens[1])
+        except Exception as e:
+            logger.warning("Input file line #%d will be skipped: %s",
+                           line_index + 1, e)
             continue
 
         # Check whether the triplet (ml_model, gene1, gene2) is unique.
         if not unique_together(ml_model, gene1, gene2):
-            raise Exception("Input file line #%d: (%s, %s, %s) is not unique-"
-                            "together in the database" % (line_index + 1,
-                                                          tokens[0], tokens[1],
-                                                          ml_model.title))
+            raise Exception("Input file line #%d: (%s, %s, %s) is not unique "
+                            "together in the database" %
+                            (line_index + 1,
+                             tokens[0], tokens[1], ml_model.title))
 
         # Import the valid data line into the database.
         Edge.objects.create(mlmodel=ml_model, gene1=gene1, gene2=gene2,
                             weight=weight)
 
 
-def find_gene(line_num, systematic_name):
+def find_gene(systematic_name):
     """
-    This function returns the gene record in the database whose
-    systematic_name matches the input "systematci_name".  If no gene is
-    found or multiple genes exist in the database, it will generate a
-    warning and return None.
+    Return the gene in database whose systematic_name matches input
+    "systematci_name".  An exception will be thrown if no gene is found
+    or multiple genes exist in the database.
     """
     try:
         gene = Gene.objects.get(systematic_name=systematic_name)
     except Gene.DoesNotExist:
-        logger.warning("Input file line #%d will be skipped: gene name %s "
-                       "does not exist in the database"
-                       % (line_num, systematic_name))
-        return None
+        raise Exception("gene name %s does not exist in the database"
+                        % systematic_name)
     except Gene.MultipleObjectsReturned:
-        logger.warning("Input file line #%d will be skipped: gene name %s "
-                       "matches multiple genes in the database"
-                       % (line_num, systematic_name))
-        return None
-
+        raise Exception("gene name %s matches multiple genes in the database"
+                        % systematic_name)
     return gene
 
 
 def unique_together(ml_model, gene1, gene2):
     """
-    Check whether the triplet of (ml_model, gene1, gene2) or
-    (ml_model, gene2, gene1) already exists in the database.  Although
-    this "unique together" constraint has been enforced at database
-    level, it is still checked explicitly here so that the invalid
-    line's number in input file will be reported too.
+    Check whether the triplet of (ml_model, gene1, gene2) already exists
+    in the database.  If ml_model has directed gene-gene relationship
+    edge, check the triplet of (ml_model, gene2, gene1) too.
+    Although this "unique together" constraint has been enforced at
+    database level, it is still checked explicitly here so that the
+    invalid line's number in input file will be reported.
     """
-    # Because of the database's "unique together" constraint, the two
-    # get() methods inside "try" blocks will never throw
-    # MultipleObjectsReturned exception.
     try:
         Edge.objects.get(mlmodel=ml_model, gene1=gene1, gene2=gene2)
         return False
     except Edge.DoesNotExist:
-        pass
+        if ml_model.directed_g2g_edge:  # Check is done if edges are directed.
+            return True
 
     try:
         Edge.objects.get(mlmodel=ml_model, gene1=gene2, gene2=gene1)
