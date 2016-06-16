@@ -9,8 +9,9 @@ from genes.models import Gene
 
 def validate_pyname(value):
     """
-    Raise a ValidationError if value is not a valid Python name. See Python docs
-    at: https://docs.python.org/2/reference/lexical_analysis.html#identifiers
+    Raise a ValidationError if value is not a valid Python name. See Python
+    docs at:
+    https://docs.python.org/2/reference/lexical_analysis.html#identifiers
     for full specification.
     """
     if not re.match(r'[A-Za-z_][A-Za-z0-9_]*', value):
@@ -110,8 +111,8 @@ class SampleAnnotationManager(models.Manager):
 
     def get_as_dict(self, sample):
         annotations_for_sample = self.get_queryset().filter(sample=sample)
-        result = {sa.annotation_type.typename: sa.text \
-                for sa in annotations_for_sample}
+        result = {sa.annotation_type.typename: sa.text
+                  for sa in annotations_for_sample}
         return result
 
 
@@ -142,9 +143,12 @@ class SampleAnnotation(models.Model):
 class MLModel(models.Model):
     title = models.CharField(max_length=1000, unique=True)
     organism = models.ForeignKey(Organism, on_delete=models.PROTECT)
+    directed_g2g_edge = models.BooleanField(default=False)
 
     def __unicode__(self):
-        return "MLModel %s" % self.title
+        edge_info = "directed" if self.directed_g2g_edge else "undirected"
+        return ("MLModel %s of organism %s with %s gene-gene edges" %
+                (self.title, self.organism.common_name, edge_info))
 
 
 class Node(models.Model):
@@ -176,9 +180,9 @@ class Activity(models.Model):
 
 class Edge(models.Model):
     mlmodel = models.ForeignKey(MLModel, on_delete=models.PROTECT)
-    gene1 = models.ForeignKey(Gene, related_name="edge_src",
+    gene1 = models.ForeignKey(Gene, related_name="gene1",
                               on_delete=models.PROTECT)
-    gene2 = models.ForeignKey(Gene, related_name="edge_dest",
+    gene2 = models.ForeignKey(Gene, related_name="gene2",
                               on_delete=models.PROTECT)
     weight = models.FloatField()
 
