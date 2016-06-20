@@ -62,13 +62,13 @@ def import_network(file_handle, ml_model_name):
     It first validates input ml_model_name, then reads each valid data
     line in the input file into the database.  The whole reading/importing
     process is enclosed by a transaction context manager so that any
-    exception thrown inside the manager due to the error detected in
+    exception raised inside the manager due to the error detected in
     file_handle will terminate the transaction and roll back the database.
     More details can be found at:
     https://docs.djangoproject.com/en/dev/topics/db/transactions/#controlling-transactions-explicitly
     """
 
-    # Throw an exception if ml_model_name does not exist in the database.
+    # Raise an exception if ml_model_name does not exist in the database.
     try:
         ml_model = MLModel.objects.get(title=ml_model_name)
     except MLModel.DoesNotExist:
@@ -81,7 +81,7 @@ def import_network(file_handle, ml_model_name):
 
 def check_and_import(file_handle, ml_model):
     """
-    Read valid data lines into the database.  An exception will be thrown
+    Read valid data lines into the database.  An exception will be raised
     if any errors are detected in file_handle.
     """
     gene_pairs_in_file = set()
@@ -165,7 +165,7 @@ def check_and_import(file_handle, ml_model):
 def find_gene(systematic_name):
     """
     Return the gene in database whose systematic_name matches input
-    "systematci_name".  An exception will be thrown if no gene is found
+    "systematci_name".  An exception will be raised if no gene is found
     or multiple genes exist in the database.
     """
     try:

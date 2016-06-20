@@ -57,11 +57,13 @@ class Command(BaseCommand):
 
 
 def add_ml_model(ml_model_name, organism_tax_id, directed_edge):
-    # Throw an exception if ml_model_name on the command line is "" or "  ".
+    # Raise an exception if ml_model_name on the command line is "" or
+    # "  ".
     if not ml_model_name or ml_model_name.isspace():
         raise Exception("Input ml_model_name is blank")
 
-    # Throw an exception if organism_tax_id does not exist in Organism table.
+    # Raise an exception if organism_tax_id does not exist in Organism
+    # table.
     try:
         organism = Organism.objects.get(taxonomy_id=organism_tax_id)
     except Organism.DoesNotExist:

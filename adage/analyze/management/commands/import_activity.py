@@ -54,7 +54,7 @@ def import_activity(file_handle, ml_model_name):
     populate "Node" and "Activity" tables in the database.
     """
 
-    # Throw an exception if ml_model_name doesn't exist in the database.
+    # Raise an exception if ml_model_name doesn't exist in the database.
     try:
         mlmodel = MLModel.objects.get(title=ml_model_name)
     except MLModel.DoesNotExist:
@@ -62,7 +62,7 @@ def import_activity(file_handle, ml_model_name):
                         % ml_model_name)
 
     # Enclose reading/importing process in a transaction context
-    # manager.  Any exception thrown inside the manager will
+    # manager.  Any exception raised inside the manager will
     # terminate the transaction and roll back the database.
     with transaction.atomic():
         nodes = []
@@ -79,7 +79,7 @@ def import_node_line(nodes, mlmodel):
     """
     Load input nodes into "Node" table in the database.
 
-    This function will throw an exception if any of the following errors
+    This function will raise an exception if any of the following errors
     are detected:
       * Node name is blank (null or consists of space characters only);
       * Node name is duplicate;
@@ -107,7 +107,7 @@ def import_activity_line(line_num, nodes, tokens, mlmodel):
     """
     Load numerical values in input tokens into "Activity" table.
 
-    This function will throw an exception if any of the following errors
+    This function will raise an exception if any of the following errors
     are detected on the data line:
       * The number of columns on this line is not equal to the number of
         nodes plus 1.
@@ -128,7 +128,7 @@ def import_activity_line(line_num, nodes, tokens, mlmodel):
         sample = Sample.objects.get(ml_data_source=data_source)
     except Sample.DoesNotExist:
         # If data_source on the line is not found in Sample table, then
-        # instead of throwing an exception, generate a warning message
+        # instead of raising an exception, generate a warning message
         # and skip this activity data line.
         logger.warn(
             "Input file line #%d: data_source in column #1 is not found in "
