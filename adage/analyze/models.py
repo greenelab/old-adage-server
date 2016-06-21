@@ -143,6 +143,10 @@ class SampleAnnotation(models.Model):
 class MLModel(models.Model):
     title = models.CharField(max_length=1000, unique=True)
     organism = models.ForeignKey(Organism, on_delete=models.PROTECT)
+
+    # A boolean flag that indicates whether gene-to-gene relationship
+    # edges (see "Edge" model below) are directed or not. Default is
+    # False (not directed).
     directed_g2g_edge = models.BooleanField(default=False)
 
     def __unicode__(self):

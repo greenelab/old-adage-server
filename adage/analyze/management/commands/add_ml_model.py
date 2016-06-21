@@ -12,16 +12,16 @@ The two required arguments are:
   (1) ml_model_name: machine learning model name;
   (2) organism_tax_id: taxonomy ID of the organism of ml_model_name.
 
-"--directed_edge" is an optional argument.  If it is available, the
-edges in gene-gene relationship table will be directed; otherwise the
-edges in gene-gene relationship table will be undirected.
+"--directed_edge" is an optional argument.  If it is specified, the
+edges in the gene-gene relationship table will be directed; otherwise
+the edges in the gene-gene relationship table will be undirected.
 
 IMPORTANT:
 Before running this command, please make sure that organism_tax_id
 already exists in the database's "Organism" table, whose model is
 bundled in "django-organisms" package.  If organism_tax_id is not in the
 database yet, you can use "organisms_create_or_update.py" management
-command in this package to add it.
+command in that package to add it.
 """
 
 from __future__ import print_function
@@ -31,7 +31,7 @@ from analyze.models import MLModel
 
 
 class Command(BaseCommand):
-    help = ("Add a new machine learning model into the database.")
+    help = "Add a new machine learning model to the database."
 
     def add_arguments(self, parser):
         parser.add_argument('ml_model_name', type=str)
@@ -53,7 +53,7 @@ class Command(BaseCommand):
         except Exception as e:
             raise CommandError(
                 "Failed to add a new machine learning model: add_ml_model "
-                "threw an exception:\n%s" % e)
+                "raised an exception:\n%s" % e)
 
 
 def add_ml_model(ml_model_name, organism_tax_id, directed_edge):

@@ -13,7 +13,7 @@ Here is an example input file:
   adage-server/adage/data/eADAGE_net300_allNodes_ADAGEnet_PAID_corCutoff0.4.txt
 
 The command requires two arguments:
-  (1) gene_network_file;
+  (1) gene_network_file: the name of input gene-gene network file;
   (2) ml_model_name: the name of machine learning model that corresponds
       to gene_network_file.
 
@@ -96,6 +96,14 @@ def check_and_import(file_handle, ml_model):
             raise Exception("Input file line #%d: number of fields is not "
                             "%d" % (line_index + 1, NUM_COLUMNS))
 
+        # Check whether the gene in column #1 is identical to the gene
+        # in column #2.
+        if tokens[0] == tokens[1]:
+            print("Error!")
+            raise Exception("Input file line #%d: the gene in column #1 "
+                            "is identical to the gene in column #2"
+                            % (line_index + 1))
+
         # Check whether we can convert the combination of column #4 and
         # #3 to a floating point value.
         try:
@@ -153,9 +161,10 @@ def check_and_import(file_handle, ml_model):
         # Check whether the triplet (ml_model, gene1, gene2) is unique.
         if not unique_together(ml_model, gene1, gene2):
             raise Exception("Input file line #%d: (%s, %s, %s) is not unique "
-                            "together in the database" %
-                            (line_index + 1,
-                             tokens[0], tokens[1], ml_model.title))
+                            "in the database" % (line_index + 1,
+                                                 tokens[0],
+                                                 tokens[1],
+                                                 ml_model.title))
 
         # Import the valid data line into the database.
         Edge.objects.create(mlmodel=ml_model, gene1=gene1, gene2=gene2,
@@ -165,7 +174,7 @@ def check_and_import(file_handle, ml_model):
 def find_gene(systematic_name):
     """
     Return the gene in database whose systematic_name matches input
-    "systematci_name".  An exception will be raised if no gene is found
+    "systematic_name".  An exception will be raised if no gene is found
     or multiple genes exist in the database.
     """
     try:

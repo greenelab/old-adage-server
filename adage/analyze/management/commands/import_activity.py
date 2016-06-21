@@ -42,7 +42,7 @@ class Command(BaseCommand):
                 "Imported activity data successfully"))
         except Exception as e:
             raise CommandError(
-                "Failed to import activity data: import_activity threw "
+                "Failed to import activity data: import_activity raised "
                 "an exception:\n%s" % e)
 
 
