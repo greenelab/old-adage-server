@@ -64,22 +64,23 @@ angular.module( 'adage.analyze', [
 .run(['$anchorScroll', function($anchorScroll) {
   $anchorScroll.yOffset = 80;
 }])
-.controller( 'AnalyzeCtrl', ['$scope', '$uibModal', '$log', '$location',
-  '$anchorScroll', '$timeout', 'Search', 'Sample', 'Experiment',
-  function AnalyzeCtrl( $scope, $uibModal, $log, $location, $anchorScroll,
-      $timeout, Search, Sample, Experiment ) {
+.controller( 'AnalyzeCtrl', ['$scope', '$uibModal', '$log', '$state',
+  '$location', '$anchorScroll', '$timeout', 'Search', 'Sample', 'Experiment',
+  function AnalyzeCtrl( $scope, $uibModal, $log, $state, $location,
+    $anchorScroll, $timeout, Search, Sample, Experiment ) {
   $scope.query = {
     text: "",
     results: [],
     status: ""
   };
-  $scope.get_search = function( query ) {
+  $scope.get_search = function() {
     $scope.query.results = [];
     $scope.query.status = "";
     if (!$scope.query.text) {
       console.log('Query text is empty, so skipping search.');
       return;
     }
+    $location.search('q', $scope.query.text);
     $scope.query.status = "Searching for: " + $scope.query.text + "...";
     Search.query({ q: $scope.query.text },
       function(response_object, responseHeaders) {
@@ -91,6 +92,14 @@ angular.module( 'adage.analyze', [
           }
           $scope.query.status = "Found " + object_list.length + noun;
         $scope.query.results = object_list;
+        
+        // also check for hash in location field and scroll, if present
+        if ($location.hash()) {
+          $log.info("$location.hash() is: " + $location.hash());
+          $timeout(function() {
+            $scope.scroll_to_id($location.hash());
+          }, 500);
+        }
       },
       function(response_object, responseHeaders) {
         console.log('Query errored with: ' + response_object);
@@ -111,6 +120,7 @@ angular.module( 'adage.analyze', [
     };
 
     $scope.scroll_to_id = function(id) {
+      $log.info("scroll_to_id called with: " + id);
       $location.hash(id);
       $anchorScroll();
     };
@@ -183,6 +193,12 @@ angular.module( 'adage.analyze', [
       clear: function() {
         $scope.detail.showing = false;
         $scope.detail.status = null;
+        // also check for hash in location field and scroll, if present
+        if ($location.hash()) {
+          $timeout(function() {
+            $scope.scroll_to_id($location.hash());
+          }, 500);
+        }
       },
 
       make_ml_data_source_href: function(experimentId, mlDataSource) {
@@ -195,7 +211,14 @@ angular.module( 'adage.analyze', [
           .replace(/{mlDataSource}/g, mlDataSource);
       }
     };
-  
+
+    // check for search text in location field and load, if present
+    var params = $location.search();
+    if ('q' in params) {
+      $scope.query.text = params['q'];
+      $scope.get_search();
+    }
+
     $scope.analysis = {
       sample_list: [],
       sample_objects: {},
