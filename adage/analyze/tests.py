@@ -11,8 +11,9 @@ import unittest
 
 from django.test import TestCase
 from organisms.models import Organism
+from genes.models import Gene
 from analyze.models import Experiment, Sample, AnnotationType, SampleAnnotation
-from analyze.models import MLModel, Node, Activity
+from analyze.models import MLModel, Node, Activity, Edge
 from analyze.management.commands.import_data import bootstrap_database, \
     JSON_CACHE_FILE_NAME
 from datetime import datetime
@@ -146,6 +147,41 @@ class ModelsTestCase(TestCase):
         node1_activities = Activity.objects.filter(node=node1)
         self.assertEqual(node1_activities.count(), sample_counter)
         self.assertEqual(node1_activities[0].node.name, node1.name)
+
+    @staticmethod
+    def create_edge():
+        # 1 Organism record
+        organism = factory.create(Organism)
+        # 2 ML model records
+        model1 = MLModel.objects.create(title="model #1 for edge",
+                                        organism=organism)
+        model2 = MLModel.objects.create(title="model #2 for edge",
+                                        organism=organism)
+        num_genes = 100
+        for i in range(num_genes):  # Create 100 genes
+            Gene.objects.create(entrezid=(i + 1),
+                                systematic_name="sys_name #" + str(i + 1),
+                                standard_name="sys_name #" + str(i + 1),
+                                organism=organism)
+        gene1_list = Gene.objects.all()[:10]
+        gene2_list = Gene.objects.all()[num_genes - 10:]
+        for gene1 in gene1_list:
+            for i, gene2 in enumerate(gene2_list):
+                # One half the edges use model #1, the other half use model #2.
+                tmp_model = model1 if i % 2 == 0 else model2
+                Edge.objects.create(gene1=gene1, gene2=gene2,
+                                    mlmodel=tmp_model, weight=random.random())
+
+    def test_edge(self):
+        """ Test records in Edge table. """
+        self.create_edge()
+        gene1_list = Gene.objects.all()[:10]  # Test the first 10 genes
+        model1 = MLModel.objects.get(title="model #1 for edge")
+        for gene1 in gene1_list:
+            edges = Edge.objects.filter(gene1=gene1)
+            self.assertEqual(edges.count(), 10)
+            edges = edges.filter(mlmodel=model1)
+            self.assertEqual(edges.count(), 5)
 
 
 # @unittest.skip("focus on other tests for now")
@@ -298,6 +334,11 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
             str(self.random_object(Activity).id) + "/"
         self.activity_sample_URI = self.baseURI + "activity/?sample=" + \
             str(self.random_object(Sample).id)
+
+        # Create Edge records
+        ModelsTestCase.create_edge()
+        self.edgeURI = self.baseURI + "edge/" + str(
+            self.random_object(Edge).id) + "/"
 
     @staticmethod
     def create_activities(node_counter):
@@ -511,3 +552,15 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         "activity/?sample=<id>&format=json" API.
         """
         self.call_non_get_API(self.activity_sample_URI)
+
+    def test_edge_get(self):
+        """
+        Test GET method via 'edge/<pk>/' API.
+        """
+        self.call_get_API(self.edgeURI)
+
+    def test_edge_non_get(self):
+        """
+        Test POST, PUT, PATCH and DELETE methods via 'edge/<pk>/' API.
+        """
+        self.call_non_get_API(self.edgeURI)
