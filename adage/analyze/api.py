@@ -1,5 +1,6 @@
 from django.conf.urls import url
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
 from django.http import HttpResponse
 from tastypie import fields, http
 from tastypie.resources import Resource, ModelResource
@@ -8,7 +9,7 @@ from tastypie.bundle import Bundle
 from haystack.query import SearchQuerySet
 from haystack.inputs import AutoQuery
 from models import Experiment, Sample, SampleAnnotation, AnnotationType,\
-        Node, Activity
+    Node, Activity, Edge
 
 # Many helpful hints for this implementation came from:
 # https://michalcodes4life.wordpress.com/2013/11/26/custom-tastypie-resource-from-multiple-django-models/
@@ -89,7 +90,7 @@ class SearchResource(Resource):
 
 class ExperimentResource(ModelResource):
     sample_set = fields.ManyToManyField(
-            'analyze.api.SampleResource', 'sample_set')
+        'analyze.api.SampleResource', 'sample_set')
 
     class Meta:
         queryset = Experiment.objects.all()
@@ -114,15 +115,15 @@ class SampleResource(ModelResource):
     def prepend_urls(self):
         return [
             url((r'^(?P<resource_name>%s)/'
-                 r'(?P<pk>[0-9]+)/get_experiments%s$') % \
-                    (self._meta.resource_name, trailing_slash()),
-                    self.wrap_view('dispatch_experiments'),
-                    name='api_get_experiments'),
+                 r'(?P<pk>[0-9]+)/get_experiments%s$') %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('dispatch_experiments'),
+                name='api_get_experiments'),
             url((r'^(?P<resource_name>%s)/'
-                 r'get_annotations%s$') % \
-                    (self._meta.resource_name, trailing_slash()),
-                    self.wrap_view('dispatch_annotations'),
-                    name='api_get_annotations'),
+                 r'get_annotations%s$') %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('dispatch_annotations'),
+                name='api_get_annotations'),
         ]
 
     def dispatch_experiments(self, request, **kwargs):
@@ -198,8 +199,8 @@ class SampleResource(ModelResource):
                     sa_cols.append(sa.get(at, ''))
                 rows.append(u'\t'.join(sa_cols) + u'\n')
         response = HttpResponse(rows, content_type='text/tab-separated-values')
-        response['Content-Disposition'] = \
-                'attachment; filename="sample_annotations.tsv"'
+        response['Content-Disposition'] = (
+            'attachment; filename="sample_annotations.tsv"')
         return response
 
 
@@ -225,3 +226,40 @@ class ActivityResource(ModelResource):
             'sample': ('exact', 'in', ),
             'node': ('exact', 'in', ),
         }
+
+
+class EdgeResource(ModelResource):
+    gene1 = fields.IntegerField(attribute='gene1_id', null=False)
+    gene2 = fields.IntegerField(attribute='gene2_id', null=False)
+    mlmodel = fields.IntegerField(attribute='mlmodel_id', null=False)
+
+    class Meta:
+        queryset = Edge.objects.all()
+        resource_name = 'edge'
+        allowed_methods = ['get']
+        ordering = ['weight']  # Allow ordering by weight
+        include_resource_uri = False
+        limit = 0      # Disable default pagination
+        max_limit = 0  # Disable default pagination
+        filtering = {
+            'gene1': ('exact', 'in', ),
+            'gene2': ('exact', 'in', ),
+            'mlmodel': ('exact', 'in', ),
+            'genes': ('exact', ),  # New filter, see apply_filters().
+        }
+
+    def apply_filters(self, request, applicable_filters):
+        """
+        Instead of overriding prepend_url() method, we added a new
+        filter "genes" to retrieve the edges whose "gene1" or "gene2"
+        field is on the list of genes in a URL like this:
+          api/v0/edge/?genes=id1,id2,...&mlmodel=...&...
+        """
+        object_list = super(EdgeResource, self).apply_filters(
+            request, applicable_filters)
+        genes = request.GET.get('genes', None)
+        if genes:
+            ids = [int(id) for id in genes.split(',')]
+            qset = Q(gene1__in=ids) | Q(gene2__in=ids)
+            object_list = object_list.filter(qset).distinct()
+        return object_list
