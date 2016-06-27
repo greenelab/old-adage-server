@@ -253,7 +253,7 @@ class EdgeResource(ModelResource):
         Instead of overriding prepend_url() method, we added a new
         filter "genes" to retrieve the edges whose "gene1" or "gene2"
         field is on the list of genes in a URL like this:
-          api/v0/edge/?genes=id1,id2,...&mlmodel=...&...
+          api/v0/edge/?genes=id1,id2,...&...
         """
         object_list = super(EdgeResource, self).apply_filters(
             request, applicable_filters)
