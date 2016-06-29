@@ -237,7 +237,6 @@ class EdgeResource(ModelResource):
         queryset = Edge.objects.all()
         resource_name = 'edge'
         allowed_methods = ['get']
-        ordering = ['weight']  # Allow ordering by weight
         include_resource_uri = False
         limit = 0      # Disable default pagination
         max_limit = 0  # Disable default pagination
@@ -247,6 +246,15 @@ class EdgeResource(ModelResource):
             'mlmodel': ('exact', 'in', ),
             'genes': ('exact', ),  # New filter, see apply_filters().
         }
+        # Allow ordering by weight.
+        # The following URL will sort the edges in ascending order of
+        # weight:
+        #   "api/v0/edge/?field=value&order_by=weight&format=json"
+        # The following URL will sort the edges in descending order of
+        # weight:
+        #   "api/v0/edge/?field=value&order_by=-weight&format=json"
+        # (Note the extra "-" character before "weight".)
+        ordering = ['weight']
 
     def apply_filters(self, request, applicable_filters):
         """
@@ -259,7 +267,10 @@ class EdgeResource(ModelResource):
             request, applicable_filters)
         genes = request.GET.get('genes', None)
         if genes:
-            ids = [int(id) for id in genes.split(',')]
+            # Convert genes to a set of integers so that the duplicate(s)
+            # will be removed implicitly.
+            # ("in" operator in Django supports both list and set.)
+            ids = {int(id) for id in genes.split(',')}
             qset = Q(gene1__in=ids) | Q(gene2__in=ids)
             object_list = object_list.filter(qset).distinct()
         return object_list

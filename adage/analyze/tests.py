@@ -9,6 +9,7 @@ import sys
 import codecs
 import unittest
 
+from django.db.models import Q
 from django.test import TestCase
 from organisms.models import Organism
 from genes.models import Gene
@@ -149,39 +150,54 @@ class ModelsTestCase(TestCase):
         self.assertEqual(node1_activities[0].node.name, node1.name)
 
     @staticmethod
-    def create_edge():
-        # 1 Organism record
-        organism = factory.create(Organism)
-        # 2 ML model records
-        model1 = MLModel.objects.create(title="model #1 for edge",
-                                        organism=organism)
-        model2 = MLModel.objects.create(title="model #2 for edge",
-                                        organism=organism)
-        num_genes = 100
-        for i in range(num_genes):  # Create 100 genes
+    def create_edges(gene_counter, num_gene1, num_gene2):
+        if Organism.objects.exists():
+            organism = Organism.objects.first()
+        else:
+            organism = factory.create(Organism)
+
+        if MLModel.objects.exists():
+            ml_model = MLModel.objects.first()
+        else:
+            ml_model = factory.create(MLModel)
+
+        # Create genes:
+        for i in range(gene_counter):
             Gene.objects.create(entrezid=(i + 1),
                                 systematic_name="sys_name #" + str(i + 1),
                                 standard_name="sys_name #" + str(i + 1),
                                 organism=organism)
-        gene1_list = Gene.objects.all()[:10]
-        gene2_list = Gene.objects.all()[num_genes - 10:]
-        for gene1 in gene1_list:
-            for i, gene2 in enumerate(gene2_list):
-                # One half the edges use model #1, the other half use model #2.
-                tmp_model = model1 if i % 2 == 0 else model2
-                Edge.objects.create(gene1=gene1, gene2=gene2,
-                                    mlmodel=tmp_model, weight=random.random())
 
-    def test_edge(self):
+        # Select the first "num_gene1" genes as gene1.
+        gene1_list = Gene.objects.all()[:num_gene1]
+        # Select the last "num_gene2" genes as gene2.
+        gene2_list = Gene.objects.all()[gene_counter - num_gene2:]
+        for gene1 in gene1_list:
+            edges = []
+            for gene2 in gene2_list:
+                new_edge = Edge(gene1=gene1, gene2=gene2, mlmodel=ml_model,
+                                weight=random.random())
+                edges.append(new_edge)
+            # Create edges in bulk for each gene1
+            Edge.objects.bulk_create(edges)
+
+    def test_edges(self):
         """ Test records in Edge table. """
-        self.create_edge()
-        gene1_list = Gene.objects.all()[:10]  # Test the first 10 genes
-        model1 = MLModel.objects.get(title="model #1 for edge")
+        gene_counter = 1000  # Total number of genes
+        num_gene1 = 100      # Number of unique genes in "gene1" field
+        num_gene2 = 100      # Number of unique genes in "gene2" field
+        self.create_edges(gene_counter, num_gene1, num_gene2)
+
+        gene1_list = Gene.objects.all()[:num_gene1]
         for gene1 in gene1_list:
             edges = Edge.objects.filter(gene1=gene1)
-            self.assertEqual(edges.count(), 10)
-            edges = edges.filter(mlmodel=model1)
-            self.assertEqual(edges.count(), 5)
+            self.assertEqual(edges.count(), num_gene2)
+
+        # The number of edges whose "gene2" field is the last gene
+        # should be num_gene1.
+        last_gene = Gene.objects.all()[gene_counter - 1]
+        edges = Edge.objects.filter(gene2=last_gene)
+        self.assertEqual(edges.count(), num_gene1)
 
 
 # @unittest.skip("focus on other tests for now")
@@ -335,10 +351,16 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         self.activity_sample_URI = self.baseURI + "activity/?sample=" + \
             str(self.random_object(Sample).id)
 
-        # Create Edge records
-        ModelsTestCase.create_edge()
-        self.edgeURI = self.baseURI + "edge/" + str(
-            self.random_object(Edge).id) + "/"
+        # Depending on the numbers of genes and edges we want to create
+        # in the test, ModelsTestCase.create_edges() may take a few
+        # seconds (or longer time) to create these records.  Since not
+        # every test case needs them, ModelsTestCase.create_edges()
+        # will be called ONLY in the tests where they are needed,
+        # instead of being called in setUp(), which will be invoked at
+        # the beginning of EVERY test case.
+        self.gene_counter = 1000
+        self.num_gene1 = 100
+        self.num_gene2 = 100
 
     @staticmethod
     def create_activities(node_counter):
@@ -553,14 +575,130 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         """
         self.call_non_get_API(self.activity_sample_URI)
 
-    def test_edge_get(self):
+    def test_one_edge(self):
         """
-        Test GET method via 'edge/<pk>/' API.
+        Test GET, POST, PUT, PATCH and DELETE methods via
+        'api/v0/edge/<pk>/' API.
         """
-        self.call_get_API(self.edgeURI)
+        ModelsTestCase.create_edges(self.gene_counter, self.num_gene1,
+                                    self.num_gene2)
+        uri = self.baseURI + "edge/" + str(self.random_object(Edge).id) + "/"
+        self.call_get_API(uri)
+        self.call_non_get_API(uri)
 
-    def test_edge_non_get(self):
+    def test_edge_union(self):
         """
-        Test POST, PUT, PATCH and DELETE methods via 'edge/<pk>/' API.
+        Test edge unions via
+        'api/v0/edge/?genes=<id1,id2,...>&format=json' API.
         """
-        self.call_non_get_API(self.edgeURI)
+        ModelsTestCase.create_edges(self.gene_counter, self.num_gene1,
+                                    self.num_gene2)
+
+        id1 = Gene.objects.first().id  # The first gene
+        id2 = Gene.objects.last().id   # The last gene
+
+        # The number of edges in the union of the first and last genes
+        # should be: num_gene1 + num_gene2 - 1, "-1" is due to double
+        # counting of the edge between the first and last genes.
+        uri = "%sedge/?genes=%s,%s&%s" % (self.baseURI, id1, id2,
+                                          "format=json")
+        resp = self.api_client.get(uri)
+        resp = self.deserialize(resp)
+        api_result = len(resp['objects'])
+        self.assertEqual(api_result, self.num_gene1 + self.num_gene2 - 1)
+
+        # Also confirm that api_result matches the Django query result.
+        qset = Q(gene1__in=[id1, id2]) | Q(gene2__in=[id1, id2])
+        query_result = Edge.objects.filter(qset).distinct().count()
+        self.assertEqual(api_result, query_result)
+
+        # Confirm the union of edges that involve 100 randomly selected
+        # genes.
+        random_genes = random.sample(Gene.objects.all(), 100)
+        ids_str = ",".join([str(gene.id) for gene in random_genes])
+        uri = "%sedge/?genes=%s&%s" % (self.baseURI, ids_str, "format=json")
+        resp = self.api_client.get(uri)
+        resp = self.deserialize(resp)
+        api_result = len(resp['objects'])
+
+        qset = Q(gene1__in=random_genes) | Q(gene2__in=random_genes)
+        query_result = Edge.objects.filter(qset).distinct().count()
+        self.assertEqual(api_result, query_result)
+
+    def test_edge_intersection(self):
+        """
+        Test edge intersections via:
+        'api/v0/edge/?gene1__in=id1,id2,...&gene2__in=id1,id2,...&format=json'
+        API.
+        """
+        ModelsTestCase.create_edges(self.gene_counter, self.num_gene1,
+                                    self.num_gene2)
+
+        # Confirm that an edge exists between the first and last genes.
+        id1 = Gene.objects.first().id  # First gene
+        id2 = Gene.objects.last().id   # Last gene
+        ids_str = str(id1) + "," + str(id2)
+        uri = "%sedge/?gene1__in=%s&gene2__in=%s&%s" % (self.baseURI,
+                                                        ids_str, ids_str,
+                                                        "format=json")
+        resp = self.api_client.get(uri)
+        resp = self.deserialize(resp)
+        api_result = len(resp['objects'])
+        self.assertEqual(api_result, 1)
+
+        # Confirm the intersection of edges that involve 100 randomly
+        # selected genes.
+        random_genes = random.sample(Gene.objects.all(), 100)
+        ids_str = ",".join([str(gene.id) for gene in random_genes])
+        uri = "%sedge/?gene1__in=%s&gene2__in=%s&%s" % (self.baseURI,
+                                                        ids_str, ids_str,
+                                                        "format=json")
+        resp = self.api_client.get(uri)
+        resp = self.deserialize(resp)
+        api_result = len(resp['objects'])
+        query_result = Edge.objects.filter(
+            gene1__in=random_genes, gene2__in=random_genes).distinct().count()
+        self.assertEqual(api_result, query_result)
+
+    def test_edge_ordering(self):
+        """
+        Test acending order of edges via:
+        'api/v0/edge/?<field>=<value>&order_by=weight&format=json'
+        and descending order of edges via:
+        'api/v0/edge/?<field>=<value>&order_by=-weight&format=json'
+        """
+        ModelsTestCase.create_edges(self.gene_counter, self.num_gene1,
+                                    self.num_gene2)
+
+        # Test edges from the first gene.
+        id1 = Gene.objects.first().id  # The first gene
+        uri = "%sedge/?gene1=%s&%s&%s" % (self.baseURI, id1,
+                                          "order_by=weight", "format=json")
+        resp = self.api_client.get(uri)
+        resp = self.deserialize(resp)
+        edges = resp['objects']
+        num_edges = len(edges)
+        # Confirm the number of edges from the first gene is num_gene2.
+        self.assertEqual(num_edges, self.num_gene2)
+
+        # Confirm the edges are sorted in ascending order.
+        ascending_order = all(edges[i]['weight'] <= edges[i + 1]['weight']
+                              for i in xrange(num_edges - 1))
+        self.assertEqual(ascending_order, True)
+
+        # Test edges to the last gene.
+        id2 = Gene.objects.last().id
+        uri = "%sedge/?gene2=%s&%s&%s" % (self.baseURI, id2,
+                                          "order_by=-weight", "format=json")
+
+        resp = self.api_client.get(uri)
+        resp = self.deserialize(resp)
+        edges = resp['objects']
+        num_edges = len(edges)
+        # Confirm the number of edges to the last gene is num_gene1.
+        self.assertEqual(num_edges, self.num_gene1)
+
+        # Confirm the edges are sorted in descending order.
+        descending_order = all(edges[i]['weight'] >= edges[i + 1]['weight']
+                               for i in xrange(num_edges - 1))
+        self.assertEqual(descending_order, True)
