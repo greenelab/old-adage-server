@@ -5,12 +5,12 @@
       {{detail.search_item.pk}}</a>
     </small>
   </h1>
+  <p ng-if="detail.status" class="alert alert-warning" role="alert">
+    Status: {{detail.status}}<br>
+    If this message persists, please try refreshing your browser.
+  </p>
   <h2>{{detail.results.name}}</h2>
 </div>
-<p ng-if="detail.status" class="alert alert-warning" role="alert">
-  Status: {{detail.status}}<br>
-  If this message persists, please try refreshing your browser.
-</p>
 <p>{{detail.results.description}}</p>
 <h3>Samples</h3>
 <ul class="list-group">
@@ -18,3 +18,4 @@
     {{sample.name}} ({{sample.ml_data_source}})
   </li>
 </ul>
+<pre>{{detail.results | json}}</pre>

@@ -166,7 +166,7 @@
   animation-duration: 100ms;
 }
 
-#item-detail {
+#search-detail {
   position: fixed;
   top: 0px;
   right: 0px;
@@ -176,19 +176,19 @@
   background-color: #fff;
 }
 
-#item-detail::before {
+#search-detail::before {
   content: "";
   display: block;
   height: 70px;
 }
 
-#item-detail.ng-hide-remove {
+#search-detail.ng-hide-remove {
   // this prevents a visible flicker when starting the animation
   -webkit-transform: translate3d(100%, 0, 0);
   transform: translate3d(100%, 0, 0);
 }
 
-#item-detail.ng-hide-remove-active {
+#search-detail.ng-hide-remove-active {
   -webkit-animation-name: slideInRight;
   animation-name: slideInRight;
   -webkit-animation-timing-function: ease-in;
@@ -197,7 +197,7 @@
   animation-duration: 500ms;
 }
 
-#item-detail.ng-hide-add-active {
+#search-detail.ng-hide-add-active {
   -webkit-animation-name: slideInRight;
   animation-name: slideInRight;
   -webkit-animation-timing-function: ease-in;

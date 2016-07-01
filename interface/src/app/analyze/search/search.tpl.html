@@ -1,0 +1,15 @@
+<form class="form-inline" role="form">
+  <label for="query_text">Search Experiments and Samples</label>
+  <div class="input-group">
+    <input name="query_text" id="query_text" ng-model="search.query.text" 
+        type="search" class="form-control" placeholder="{{placeholder}}">
+    <span class="input-group-btn">
+      <button type="submit" ng-click="search.get()"
+        class="btn btn-default">
+        <i class="fa fa-search" aria-hidden="true"></i>
+        Search
+      </button>
+    </span>
+  </div>
+</form>
+<p ng-bind="search.query.status"></p>

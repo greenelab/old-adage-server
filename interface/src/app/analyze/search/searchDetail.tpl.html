@@ -1,0 +1,10 @@
+<div ng-switch="detail.search_item.item_type">
+  <button style="float: right;" type="button" class="close"
+  ng-click="detail.clear()" aria-label="Close">
+    <i class="fa fa-times" aria-hidden="true"></i>
+  </button>
+  <sample-detail ng-switch-when="sample" id="detail.search_item.pk">
+  </sample-detail>
+  <experiment-detail ng-switch-when="experiment" id="detail.search_item.pk">
+  </experiment-detail>
+</div>
