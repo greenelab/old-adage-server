@@ -21,39 +21,40 @@ angular.module( 'adage.analyze.experiment', [
 .controller( 'ExperimentCtrl', ['$scope', '$log', '$location', 'Sample',
   'Experiment',
   function ExperimentCtrl($scope, $log, $location, Sample, Experiment) {
-    /*
-      TODO Continue refactoring here (need to get Sample by URI)
-    */
-    $scope.detail.related_items = [];
-    var getSampleDetails = function(pk) {
-      Sample.get({id: pk},
+    var queryError = function(responseObject, responseHeaders) {
+      $log.warn('Query errored with: ' + responseObject);
+      $scope.experiment.status = "Query failed.";
+    };
+    
+    $scope.show = function(id) {
+      $scope.experiment = {
+        status: "retrieving...",
+        related_samples: []
+      };
+      var getSampleDetails = function(uri) {
+        Sample.getUri(uri).then(
+          function(responseObject) {
+            if (responseObject) {
+              $scope.experiment.status = "";
+              $scope.experiment.related_samples.push(responseObject.data);
+            }
+          },
+          queryError
+        );
+      };
+      Experiment.get({ accession: id },
         function(responseObject, responseHeaders) {
           if (responseObject) {
-            $scope.detail.status = "";
-            $scope.detail.related_items.push(responseObject);
+            $scope.experiment.results = responseObject;
+            $scope.experiment.status = "Retrieving sample details...";
+            for (var i=0; i< responseObject.sample_set.length; i++) {
+              getSampleDetails(responseObject.sample_set[i]);
+            }
           }
         },
-        function(responseObject, responseHeaders) {
-          $log.warn('Query errored with: ' + responseObject);
-          $scope.detail.status = "Query failed.";
-        }
+        queryError
       );
     };
-    Experiment.get({ accession: search_item.pk },
-      function(responseObject, responseHeaders) {
-        if (responseObject) {
-          $scope.detail.results = responseObject;
-          $scope.detail.status = "Retrieving sample details...";
-          for (var i=0; i< search_item.related_items.length; i++) {
-            getSampleDetails(search_item.related_items[i]);
-          }
-        }
-      },
-      function(responseObject, responseHeaders) {
-        $log.warn('Query errored with: ' + responseObject);
-        $scope.detail.status = "Query failed.";
-      }
-    );
   }
 ])
 .directive('experimentDetail', function() {

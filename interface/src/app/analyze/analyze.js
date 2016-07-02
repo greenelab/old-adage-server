@@ -8,7 +8,6 @@ angular.module( 'adage.analyze', [
   'ngAnimate',
   'ngSanitize'
 ])
-
 .config(function config($stateProvider) {
   $stateProvider.state( 'analyze', {
     url: '/analyze',
@@ -100,7 +99,7 @@ angular.module( 'adage.analyze', [
           return true;
         }
       },
-      
+
       show: function() {
         var modalInstance = $uibModal.open({
           animation: true,
@@ -136,7 +135,7 @@ angular.module( 'adage.analyze', [
   $scope.close = function() {
     $uibModalInstance.dismiss('close');
   };
-  
+
   // populate sample details
   for (var i=0; i < $scope.analysis.sample_list.length; i++) {
     analysis.getSampleDetails($scope.analysis.sample_list[i]);

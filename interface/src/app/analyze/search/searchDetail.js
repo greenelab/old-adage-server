@@ -18,51 +18,6 @@ angular.module( 'adage.analyze.detail', [
       show: function( search_item ) {
         $scope.detail.search_item = search_item;
         $scope.detail.showing = true;
-        if (search_item.item_type == 'sample') {
-          // Sample.get({ id: search_item.pk },
-          //   function(responseObject, responseHeaders) {
-          //     if (responseObject) {
-          //       $scope.detail.status = "";
-          //       $scope.detail.results = responseObject;
-          //     }
-          //   },
-          //   function(responseObject, responseHeaders) {
-          //     $log.warn('Query errored with: ' + responseObject);
-          //     $scope.detail.status = "Query failed.";
-          //   }
-          // );
-        } else if (search_item.item_type == 'experiment') {
-          $scope.detail.related_items = [];
-          var getSampleDetails = function(pk) {
-            Sample.get({id: pk},
-              function(responseObject, responseHeaders) {
-                if (responseObject) {
-                  $scope.detail.status = "";
-                  $scope.detail.related_items.push(responseObject);
-                }
-              },
-              function(responseObject, responseHeaders) {
-                $log.warn('Query errored with: ' + responseObject);
-                $scope.detail.status = "Query failed.";
-              }
-            );
-          };
-          Experiment.get({ accession: search_item.pk },
-            function(responseObject, responseHeaders) {
-              if (responseObject) {
-                $scope.detail.results = responseObject;
-                $scope.detail.status = "Retrieving sample details...";
-                for (var i=0; i< search_item.related_items.length; i++) {
-                  getSampleDetails(search_item.related_items[i]);
-                }
-              }
-            },
-            function(responseObject, responseHeaders) {
-              $log.warn('Query errored with: ' + responseObject);
-              $scope.detail.status = "Query failed.";
-            }
-          );
-        }
         $timeout(function() {
           // if we inititate the scroll too early, the search results list
           // hasn't finished compressing width and it doesn't work right,
@@ -85,15 +40,6 @@ angular.module( 'adage.analyze.detail', [
         }
       }
     };
-
-    /*
-      TODO more refactoring to come below...
-    */
-    //////////////////////////
-    // Sample-related stuff here
-
-    //////////////////////////
-    // Experiment-related stuff here
 
 }])
 .directive('searchDetail', function() {
