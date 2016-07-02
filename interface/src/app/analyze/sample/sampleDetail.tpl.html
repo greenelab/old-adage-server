@@ -6,10 +6,9 @@
   TODO okay to make a direct link to ArrayExpress here?
 -->
 <h3>Data Source
-  <small><a href="{{
-    make_ml_data_source_href(
-      sample.related_experiments[0].accession, sample.results.ml_data_source)
-    }}">{{sample.results.ml_data_source}}</a></small>
+  <small><a href="{{makeHref.mlDataSource(
+    sample.related_experiments[0].accession, sample.results.ml_data_source)
+  }}">{{sample.results.ml_data_source}}</a></small>
 </h3>
 <p ng-if="sample.status" class="alert alert-warning" role="alert">
   Status: {{sample.status}}<br>

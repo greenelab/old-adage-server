@@ -7,7 +7,7 @@ angular.module( 'adage.analyze.experiment', [
   $resourceProvider.defaults.stripTrailingSlashes = false;
 }])
 .factory( 'Experiment', ['$resource', function($resource) {
-  return $resource(
+  Experiment = $resource(
     '/api/v0/experiment/:accession/',
     // TODO need to add logic for handling pagination of results.
     // then, can change "limit" below to something sensible
@@ -17,10 +17,29 @@ angular.module( 'adage.analyze.experiment', [
     // expect an object instead via isArray: false
     { 'get': { method: 'GET', isArray: false } }
   );
+  Experiment.makeHref = {
+    // These functions create formatted URLs for direct linking to source 
+    // material on ArrayExpress. They are attached to the Experiment factory
+    // so they can be made available in the same places that Experiment data
+    // are shown.
+    mlDataSource: function(experimentId, mlDataSource) {
+      return ("http://www.ebi.ac.uk/arrayexpress/files/{expId}/" +
+        "{expId}.raw.1.zip/{mlDataSource}")
+        .replace(/{expId}/g, experimentId)
+        .replace(/{mlDataSource}/g, mlDataSource);
+    },
+    arrExpExperiment: function(experimentId) {
+      return ("http://www.ebi.ac.uk/arrayexpress/experiments/{id}/")
+        .replace(/{id}/g, experimentId);
+    }
+  };
+  return Experiment;
 }])
 .controller( 'ExperimentCtrl', ['$scope', '$log', '$location', 'Sample',
   'Experiment',
   function ExperimentCtrl($scope, $log, $location, Sample, Experiment) {
+    $scope.makeHref = Experiment.makeHref;
+    
     var queryError = function(responseObject, responseHeaders) {
       $log.warn('Query errored with: ' + responseObject);
       $scope.experiment.status = "Query failed.";

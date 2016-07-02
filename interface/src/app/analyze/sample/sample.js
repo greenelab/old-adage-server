@@ -33,16 +33,9 @@ angular.module( 'adage.analyze.sample', ['ngResource'])
   return Sample;
 }])
 .controller( 'SampleCtrl', ['$scope', '$log', '$location', 'Sample',
-  function SampleCtrl($scope, $log, $location, Sample) {
-    $scope.make_ml_data_source_href = function(experimentId, mlDataSource) {
-      /*
-        TODO find a place where this URL template belongs
-      */
-      return ("http://www.ebi.ac.uk/arrayexpress/files/{expId}/" +
-        "{expId}.raw.1.zip/{mlDataSource}")
-        .replace(/{expId}/g, experimentId)
-        .replace(/{mlDataSource}/g, mlDataSource);
-    };
+  'Experiment',
+  function SampleCtrl($scope, $log, $location, Sample, Experiment) {
+    $scope.makeHref = Experiment.makeHref;
     
     var queryError = function(responseObject, responseHeaders) {
       $log.warn('Query errored with: ' + responseObject);
