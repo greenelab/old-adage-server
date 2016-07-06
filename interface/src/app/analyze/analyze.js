@@ -8,6 +8,7 @@ angular.module( 'adage.analyze', [
   'ngAnimate',
   'ngSanitize'
 ])
+
 .config(function config($stateProvider) {
   $stateProvider.state( 'analyze', {
     url: '/analyze',
@@ -20,9 +21,11 @@ angular.module( 'adage.analyze', [
     data: { pageTitle: 'Analyze' }
   });
 })
+
 .run(['$anchorScroll', function($anchorScroll) {
   $anchorScroll.yOffset = 80;
 }])
+
 .controller( 'AnalyzeCtrl', ['$scope', '$uibModal', '$log', '$location',
   '$anchorScroll', 'Sample',
   function AnalyzeCtrl($scope, $uibModal, $log, $location, $anchorScroll,
@@ -130,6 +133,7 @@ angular.module( 'adage.analyze', [
     };
 
 }])
+
 .controller('AnalysisModalCtrl', function($scope, $uibModalInstance, analysis) {
   $scope.analysis = analysis;
   $scope.close = function() {

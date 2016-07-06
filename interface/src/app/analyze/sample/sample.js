@@ -1,11 +1,13 @@
 angular.module( 'adage.analyze.sample', ['ngResource'])
+
 .config(['$resourceProvider', function($resourceProvider) {
   // Don't strip trailing slashes from calculated URLs
   $resourceProvider.defaults.stripTrailingSlashes = false;
 }])
+
 .factory( 'Sample', ['$resource', '$http', '$log', 
-  function($resource, $http, $log) {
-  Sample = $resource(
+function($resource, $http, $log) {
+  var Sample = $resource(
     '/api/v0/sample/:id/',
     // TODO need to add logic for handling pagination of results.
     // then, can change "limit" below to something sensible
@@ -32,6 +34,7 @@ angular.module( 'adage.analyze.sample', ['ngResource'])
   };
   return Sample;
 }])
+
 .controller( 'SampleCtrl', ['$scope', '$log', '$location', 'Sample',
   'Experiment',
   function SampleCtrl($scope, $log, $location, Sample, Experiment) {
@@ -67,6 +70,7 @@ angular.module( 'adage.analyze.sample', ['ngResource'])
     };
   }
 ])
+
 .directive('sampleDetail', function() {
   return {
     restrict: 'E',

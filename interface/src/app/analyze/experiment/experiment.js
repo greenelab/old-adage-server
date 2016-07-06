@@ -2,12 +2,14 @@ angular.module( 'adage.analyze.experiment', [
   'adage.analyze.sample',
   'ngResource'
 ])
+
 .config(['$resourceProvider', function($resourceProvider) {
   // Don't strip trailing slashes from calculated URLs
   $resourceProvider.defaults.stripTrailingSlashes = false;
 }])
+
 .factory( 'Experiment', ['$resource', function($resource) {
-  Experiment = $resource(
+  var Experiment = $resource(
     '/api/v0/experiment/:accession/',
     // TODO need to add logic for handling pagination of results.
     // then, can change "limit" below to something sensible
@@ -35,6 +37,7 @@ angular.module( 'adage.analyze.experiment', [
   };
   return Experiment;
 }])
+
 .controller( 'ExperimentCtrl', ['$scope', '$log', '$location', 'Sample',
   'Experiment',
   function ExperimentCtrl($scope, $log, $location, Sample, Experiment) {
@@ -76,6 +79,7 @@ angular.module( 'adage.analyze.experiment', [
     };
   }
 ])
+
 .directive('experimentDetail', function() {
   return {
     restrict: 'E',

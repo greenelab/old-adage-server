@@ -1,8 +1,10 @@
 angular.module( 'adage.analyze.search', ['ngResource'])
+
 .config(['$resourceProvider', function($resourceProvider) {
   // Don't strip trailing slashes from calculated URLs
   $resourceProvider.defaults.stripTrailingSlashes = false;
 }])
+
 .factory( 'Search', ['$resource', function($resource) {
   return $resource(
     '/api/v0/search/',
@@ -15,6 +17,7 @@ angular.module( 'adage.analyze.search', ['ngResource'])
     { 'query': { method: 'GET', isArray: false } }
   );
 }])
+
 .controller( 'SearchCtrl', ['$scope', '$log', '$location', 'Search',
   function SearchCtrl( $scope, $log, $location, Search ) {
     $scope.results = [];
@@ -61,6 +64,7 @@ angular.module( 'adage.analyze.search', ['ngResource'])
       $scope.search.get();
     }
 }])
+
 .directive('search', function() {
   return {
     restrict: 'E',

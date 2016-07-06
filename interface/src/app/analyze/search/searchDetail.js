@@ -2,6 +2,7 @@ angular.module( 'adage.analyze.detail', [
   'adage.analyze.sample',
   'adage.analyze.experiment'
 ])
+
 .controller( 'SearchDetailCtrl', ['$scope', '$log', '$location', 
   '$timeout', 'Sample', 'Experiment',
   function SearchDetailCtrl( $scope, $log, $location,
@@ -40,8 +41,8 @@ angular.module( 'adage.analyze.detail', [
         }
       }
     };
-
 }])
+
 .directive('searchDetail', function() {
   return {
     restrict: 'E',
