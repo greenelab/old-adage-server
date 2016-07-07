@@ -63,11 +63,12 @@ module.exports = {
   vendor_files: {
     js: [
       'vendor/angular/angular.js',
+      'vendor/angular-animate/angular-animate.js',
       'vendor/angular-bootstrap/ui-bootstrap-tpls.min.js',
       'vendor/angular-resource/angular-resource.js',
       'vendor/angular-sanitize/angular-sanitize.js',
       'vendor/angular-ui-router/release/angular-ui-router.js',
-      // 'vendor/angular-ui-utils/modules/route/route.js',
+      'vendor/ng-sortable/dist/ng-sortable.min.js',
       'vendor/placeholders/angular-placeholders-0.0.1-SNAPSHOT.min.js'
     ],
     css: [
