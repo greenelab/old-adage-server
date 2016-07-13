@@ -1,0 +1,29 @@
+<div class="page-header">
+  <h1>Sample
+    <small>{{sample.results.name}}</small></h1>
+</div>
+<!--
+  TODO okay to make a direct link to ArrayExpress here?
+-->
+<h3>Data Source
+  <small><a href="{{makeHref.mlDataSource(
+    sample.related_experiments[0].accession, sample.results.ml_data_source)
+  }}">{{sample.results.ml_data_source}}</a></small>
+</h3>
+<p ng-if="sample.status" class="alert alert-warning" role="alert">
+  Status: {{sample.status}}<br>
+  If this message persists, please try refreshing your browser.
+</p>
+<table class="table">
+  <tr ng-repeat="(type, text) in sample.results.annotations">
+    <th>{{type}}</th><td>{{text}}</td>
+  </tr>
+</table>
+<h3>Related Experiments</h3>
+<ul class="list-group">
+  <li ng-repeat="expt in sample.related_experiments" 
+    class="list-group-item">
+    <a ng-click="analyze.scroll_to_id(expt.accession)">{{expt.accession}}</a>:
+    {{expt.name}}
+  </li>
+</ul>
