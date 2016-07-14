@@ -10,7 +10,7 @@ tab-delimited and each line should include 4 columns:
 
 The file's first line will be ignored because it only has column names.
 Here is an example input file:
-  adage-server/adage/data/eADAGE_net300_allNodes_ADAGEnet_PAID_corCutoff0.4.txt
+  adage-server/data/eADAGE_net300_allNodes_ADAGEnet_PAID_corCutoff0.4.txt
 
 The command requires two arguments:
   (1) gene_network_file: the name of input gene-gene network file;
@@ -21,8 +21,10 @@ For example, to import the data lines in an input file "eADAGE.txt" whose
 machine leaning model is "Ensemble ADAGE 300", we will type:
   python manage.py import_gene_network /path/of/eADAGE.txt "Ensemble ADAGE 300"
 
-IMPORTANT: Before running this command, please make sure that ml_model_name
-already exists in "MLModel" table of the database.
+IMPORTANT:
+Before running this command, please make sure that ml_model_name already
+exists in the database.  If it doesn't, you can use the management
+command "add_ml_model.py" to add it into the database.
 """
 
 from __future__ import print_function
@@ -99,7 +101,6 @@ def check_and_import(file_handle, ml_model):
         # Check whether the gene in column #1 is identical to the gene
         # in column #2.
         if tokens[0] == tokens[1]:
-            print("Error!")
             raise Exception("Input file line #%d: the gene in column #1 "
                             "is identical to the gene in column #2"
                             % (line_index + 1))
