@@ -159,7 +159,6 @@ class Node(models.Model):
     name = models.CharField(max_length=100, blank=False)
     mlmodel = models.ForeignKey(MLModel, on_delete=models.PROTECT)
     samples = models.ManyToManyField(Sample, through='Activity')
-    genes = models.ManyToManyField(Gene)
 
     def __unicode__(self):
         return "Node %s of Model %s" % (self.name, self.mlmodel.title)
@@ -198,3 +197,16 @@ class Edge(models.Model):
 
     class Meta:
         unique_together = ('mlmodel', 'gene1', 'gene2')
+
+
+class Participation(models.Model):
+    node = models.ForeignKey(Node, on_delete=models.PROTECT)
+    gene = models.ForeignKey(Gene, on_delete=models.PROTECT)
+
+    def __unicode__(self):
+        return "Model: %s, Node: %s, Gene: %s" % (self.node.mlmodel.title,
+                                                  self.node.name,
+                                                  self.gene.entrezid)
+
+    class Meta:
+        unique_together = ('node', 'gene')
