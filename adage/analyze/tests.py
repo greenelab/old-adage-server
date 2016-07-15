@@ -14,7 +14,7 @@ from django.test import TestCase
 from organisms.models import Organism
 from genes.models import Gene
 from analyze.models import Experiment, Sample, AnnotationType, SampleAnnotation
-from analyze.models import MLModel, Node, Activity, Edge
+from analyze.models import MLModel, Node, Activity, Edge, Participation
 from analyze.management.commands.import_data import bootstrap_database, \
     JSON_CACHE_FILE_NAME
 from datetime import datetime
@@ -199,6 +199,40 @@ class ModelsTestCase(TestCase):
         edges = Edge.objects.filter(gene2=last_gene)
         self.assertEqual(edges.count(), num_gene1)
 
+
+    @staticmethod
+    def create_participations(num_nodes, num_genes):
+        """
+        Static method that builds Participation table based on the input
+        number of nodes and number of genes.
+        """
+        factory.create(Node, num_nodes)
+        # Create genes manually.  factory.create(Gene, num_genes) does
+        # NOT work due to the contraint that standard_name and
+        # systematic_name can not be both empty.
+        if Organism.objects.exists():
+            organism = Organism.objects.first()
+        else:
+            organism = factory.create(Organism)
+        for i in range(num_genes):
+            Gene.objects.create(entrezid=(i + 1),
+                                systematic_name="sys_name #" + str(i + 1),
+                                standard_name="sys_name #" + str(i + 1),
+                                organism=organism)
+        # Build a complete node-gene network.
+        for node in Node.objects.all():
+            for gene in Gene.objects.all():
+                Participation.objects.create(node=node, gene=gene)
+
+    def test_participations(self):
+        num_nodes = 23
+        num_genes = 17
+        self.create_participations(num_nodes, num_genes)
+        self.assertEqual(Participation.objects.all().count(),
+                         num_nodes * num_genes)
+        for node in Node.objects.all():
+            self.assertEqual(Participation.objects.filter(node=node).count(),
+                             num_genes)
 
 # @unittest.skip("focus on other tests for now")
 class BootstrapDBTestCase(TestCase):
@@ -702,3 +736,14 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         descending_order = all(edges[i]['weight'] >= edges[i + 1]['weight']
                                for i in xrange(num_edges - 1))
         self.assertEqual(descending_order, True)
+
+    def test_participation(self):
+        """
+        Test GET, POST, PUT, PATCH and DELETE methods via
+        'api/v0/participation/<pk>/' API.
+        """
+        ModelsTestCase.create_participations(13, 29)
+        uri = self.baseURI + "participation/" + str(
+            self.random_object(Participation).id) + "/"
+        self.call_get_API(uri)
+        self.call_non_get_API(uri)
