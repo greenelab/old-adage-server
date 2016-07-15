@@ -9,7 +9,7 @@ from tastypie.bundle import Bundle
 from haystack.query import SearchQuerySet
 from haystack.inputs import AutoQuery
 from models import Experiment, Sample, SampleAnnotation, AnnotationType,\
-    Node, Activity, Edge
+    Node, Activity, Edge, Participation
 
 # Many helpful hints for this implementation came from:
 # https://michalcodes4life.wordpress.com/2013/11/26/custom-tastypie-resource-from-multiple-django-models/
@@ -274,3 +274,19 @@ class EdgeResource(ModelResource):
             qset = Q(gene1__in=ids) | Q(gene2__in=ids)
             object_list = object_list.filter(qset).distinct()
         return object_list
+
+
+class ParticipationResource(ModelResource):
+    node = fields.IntegerField(attribute='node_id', null=False)
+    gene = fields.IntegerField(attribute='gene_id', null=False)
+
+    class Meta:
+        queryset = Participation.objects.all()
+        allowed_methods = ['get']
+        include_resource_uri = False
+        limit = 0      # Disable default pagination
+        max_limit = 0  # Disable default pagination
+        filtering = {
+            'node': ('exact', 'in', ),
+            'gene': ('exact', 'in', ),
+        }
