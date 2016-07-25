@@ -234,6 +234,7 @@ class ModelsTestCase(TestCase):
             self.assertEqual(Participation.objects.filter(node=node).count(),
                              num_genes)
 
+
 # @unittest.skip("focus on other tests for now")
 class BootstrapDBTestCase(TestCase):
     """
@@ -377,7 +378,7 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
             '/get_experiments/'
 
         # Create activity records
-        self.node_counter = 53
+        self.node_counter = 50
         self.create_activities(self.node_counter)
 
         self.activityURI = self.baseURI + "activity/" + \
@@ -405,11 +406,14 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         used here because it does NOT gurantee unique_together constraint.
         """
         organism = factory.create(Organism)
-        ml_model = MLModel.objects.create(title="test model",
-                                          organism=organism)
-        for i in xrange(node_counter):
+        ml_model_1 = MLModel.objects.create(title="test model #1",
+                                            organism=organism)
+        ml_model_2 = MLModel.objects.create(title="test model #2",
+                                            organism=organism)
+        for i in xrange(node_counter // 2):
             node_name = "node " + str(i + 1)
-            Node.objects.create(name=node_name, mlmodel=ml_model)
+            Node.objects.create(name=node_name, mlmodel=ml_model_1)
+            Node.objects.create(name=node_name, mlmodel=ml_model_2)
 
         for s in Sample.objects.all():
             for n in Node.objects.all():
@@ -608,6 +612,24 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         "activity/?sample=<id>&format=json" API.
         """
         self.call_non_get_API(self.activity_sample_URI)
+
+    def test_activity_mlmodel_filter(self):
+        """
+        Test "activity/?sample=<id>&mlmodel=<ml_id>&format=json" API.
+        """
+        uri = (self.baseURI + "activity/?sample=" +
+               str(self.random_object(Sample).id) + "&mlmodel=" +
+               str(self.random_object(MLModel).id) + "&fromat=json")
+        # Test GET method
+        resp = self.api_client.get(uri)
+        self.assertValidJSONResponse(resp)
+
+        # Confirm the number of records returned.
+        records = self.deserialize(resp)
+        self.assertEqual(len(records['objects']), self.node_counter // 2)
+
+        # Test non-GET methods
+        self.call_non_get_API(uri)
 
     def test_one_edge(self):
         """
