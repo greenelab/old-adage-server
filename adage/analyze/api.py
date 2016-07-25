@@ -225,7 +225,23 @@ class ActivityResource(ModelResource):
         filtering = {
             'sample': ('exact', 'in', ),
             'node': ('exact', 'in', ),
+            'mlmodel': ('exact', ),  # See apply_filters()
         }
+
+    def apply_filters(self, request, applicable_filters):
+        """
+        Instead of overriding prepend_url() method, we added a new
+        filter "mlmodel" to retrieve the activity records of a specific
+        mlmodel ID:
+          api/v0/activity/?mlmodel=<mlmodel_id>&...
+        """
+        object_list = super(ActivityResource, self).apply_filters(
+            request, applicable_filters)
+        mlmodel = request.GET.get('mlmodel', None)
+        if mlmodel:
+            mlmodel_id = int(mlmodel)
+            object_list = object_list.filter(node__mlmodel=mlmodel_id)
+        return object_list
 
 
 class EdgeResource(ModelResource):
