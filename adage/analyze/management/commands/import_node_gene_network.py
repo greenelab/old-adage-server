@@ -1,7 +1,7 @@
 """
 This management command will read an input node-gene network file and
 populate the "Participation" table in the database.  A valid input file
-must be tab-delimited and each line starts with a valid node name,
+must be tab-delimited and each line must start with a valid node name,
 followed by systematic names of genes that are related to this node.
 
 Here is an example input file:
@@ -85,7 +85,7 @@ def check_and_import(file_handle, ml_model):
     """
     nodes_in_file = set()
     for line_index, line in enumerate(file_handle):
-        tokens = line.rstrip("\r\n").split("\t")
+        tokens = line.rstrip("\t\r\n").split("\t")
         # Skip a line if it is blank or has only one field.
         if len(tokens) < 2:
             continue
