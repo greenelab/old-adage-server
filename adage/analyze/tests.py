@@ -228,8 +228,7 @@ class ModelsTestCase(TestCase):
         num_nodes = 23
         num_genes = 17
         self.create_participations(num_nodes, num_genes)
-        self.assertEqual(Participation.objects.all().count(),
-                         num_nodes * num_genes)
+        self.assertEqual(Participation.objects.count(), num_nodes * num_genes)
         for node in Node.objects.all():
             self.assertEqual(Participation.objects.filter(node=node).count(),
                              num_genes)
@@ -615,11 +614,11 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
 
     def test_activity_mlmodel_filter(self):
         """
-        Test "activity/?sample=<id>&mlmodel=<ml_id>&format=json" API.
+        Test "activity/?sample=<id>&mlmodel=<ml_id>" API.
         """
         uri = (self.baseURI + "activity/?sample=" +
                str(self.random_object(Sample).id) + "&mlmodel=" +
-               str(self.random_object(MLModel).id) + "&fromat=json")
+               str(self.random_object(MLModel).id))
         # Test GET method
         resp = self.api_client.get(uri)
         self.assertValidJSONResponse(resp)
