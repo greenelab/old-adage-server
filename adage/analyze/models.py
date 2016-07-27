@@ -200,13 +200,21 @@ class Edge(models.Model):
 
 
 class Participation(models.Model):
+    """
+    This class models the many-to-many relationship between Node and
+    Gene.  It shows which genes are related to which nodes and vice
+    versa.  Although this relationship can be modeled implicitly because
+    it doesn't include any other fields, we create the model explicitly
+    so that the corresponding API ("ParticipationResource" in api.py)
+    will be easier to handle.
+    """
     node = models.ForeignKey(Node, on_delete=models.PROTECT)
     gene = models.ForeignKey(Gene, on_delete=models.PROTECT)
+
+    class Meta:
+        unique_together = ('node', 'gene')
 
     def __unicode__(self):
         return "Model: %s, Node: %s, Gene: %s" % (self.node.mlmodel.title,
                                                   self.node.name,
                                                   self.gene.entrezid)
-
-    class Meta:
-        unique_together = ('node', 'gene')
