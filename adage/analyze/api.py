@@ -6,10 +6,13 @@ from tastypie import fields, http
 from tastypie.resources import Resource, ModelResource
 from tastypie.utils import trailing_slash
 from tastypie.bundle import Bundle
+from tastypie.exceptions import BadRequest
 from haystack.query import SearchQuerySet
 from haystack.inputs import AutoQuery
-from models import Experiment, Sample, SampleAnnotation, AnnotationType,\
-    Node, Activity, Edge, Participation
+from models import (
+    Experiment, Sample, SampleAnnotation, AnnotationType, Node, Activity, Edge,
+    Participation
+)
 
 # Many helpful hints for this implementation came from:
 # https://michalcodes4life.wordpress.com/2013/11/26/custom-tastypie-resource-from-multiple-django-models/
@@ -239,7 +242,14 @@ class ActivityResource(ModelResource):
             request, applicable_filters)
         mlmodel = request.GET.get('mlmodel', None)
         if mlmodel:
-            mlmodel_id = int(mlmodel)
+            # Instead of relying on tastypie/resources.py to catch the
+            # ValueError exception that may be raised in this function,
+            # we catch the one that may be raised by int() below and
+            # raise a customized BadRequest exception with more details.
+            try:
+                mlmodel_id = int(mlmodel)
+            except ValueError:
+                raise BadRequest("Invalid mlmodel ID: %s" % mlmodel)
             object_list = object_list.filter(node__mlmodel=mlmodel_id)
         return object_list
 
@@ -283,10 +293,17 @@ class EdgeResource(ModelResource):
             request, applicable_filters)
         genes = request.GET.get('genes', None)
         if genes:
-            # Convert genes to a set of integers so that the duplicate(s)
-            # will be removed implicitly.
-            # ("in" operator in Django supports both list and set.)
-            ids = {int(id) for id in genes.split(',')}
+            # Instead of relying on tastypie/resources.py to catch the
+            # ValueError exception that may be raised in this function,
+            # we catch the one that may be raised by int() below and
+            # raise a customized BadRequest exception with more details.
+            try:
+                # Convert genes to a set of integers so that the
+                # duplicate(s) will be removed implicitly.
+                ids = {int(id) for id in genes.split(',')}
+            except ValueError:
+                raise BadRequest("Invalid gene IDs: %s" % genes)
+            # "in" operator in Django supports both list and set.
             qset = Q(gene1__in=ids) | Q(gene2__in=ids)
             object_list = object_list.filter(qset).distinct()
         return object_list
