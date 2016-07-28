@@ -1,0 +1,31 @@
+<!--
+  TODO need to be able to delete samples
+  TODO each sample in the table should be built using a directive that can be reused elsewhere
+-->
+<h1>Samples <small>(drag to reorder)</small></h1>
+<!-- TODO tool to select and order annotation columns goes here -->
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <td>ML Data Source</td>
+      <td>Sample Name</td>
+      <td ng-repeat="at in [{'typename': 'genotype'}, {'typename': 'medium'}, {'typename': 'strain'}]">{{
+        at.typename
+      }}</td>
+    </tr>
+  </thead>
+  <tbody ng-model="analysis.sample_list" as-sortable="sortableOptions">
+    <tr ng-repeat="id in analysis.sample_list" as-sortable-item>
+      <td as-sortable-item-handle>{{
+        analysis.sample_objects[id].ml_data_source
+      }}</td>
+      <td>{{analysis.sample_objects[id].name}}</td>
+      <td ng-repeat="at in [{'typename': 'genotype'}, {'typename': 'medium'}, {'typename': 'strain'}]">{{
+        analysis.sample_objects[id].annotations[at.typename]
+      }}</td>
+    </tr>
+  </tbody>
+</table>
+<div vega spec="heatmapSpec" vega-data="testData" vega-renderer="'svg'"></div>
+<pre>{{ annotationTypes | json }}</pre>
+<pre>{{ analysis | json }}</pre>

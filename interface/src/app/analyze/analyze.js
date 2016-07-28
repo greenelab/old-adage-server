@@ -1,6 +1,7 @@
 angular.module( 'adage.analyze', [
   'adage.analyze.search',
   'adage.analyze.detail',
+  'adage.analyze.analysis',
   'ui.router',
   'placeholders',
   'ui.bootstrap',
