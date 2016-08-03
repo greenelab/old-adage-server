@@ -96,8 +96,7 @@ def import_node_line(nodes, mlmodel):
                             (index + 2, name))
         elif Node.objects.filter(name=name, mlmodel=mlmodel).exists():
             raise Exception("Input file line #1 column #%d: Node name %s "
-                            "already exists in Node table: %s" %
-                            (index + 2, name))
+                            "already exists in Node table" % (index + 2, name))
         else:
             node_set.add(name)
             Node.objects.create(name=name, mlmodel=mlmodel)
