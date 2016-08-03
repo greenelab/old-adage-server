@@ -206,14 +206,24 @@ class ModelsTestCase(TestCase):
         Static method that builds Participation table based on the input
         number of nodes and number of genes.
         """
-        factory.create(Node, num_nodes)
-        # Create genes manually.  factory.create(Gene, num_genes) does
-        # NOT work due to the contraint that standard_name and
-        # systematic_name can not be both empty.
         if Organism.objects.exists():
             organism = Organism.objects.first()
         else:
             organism = factory.create(Organism)
+
+        if MLModel.objects.exists():
+            ml_model = MLModel.objects.first()
+        else:
+            ml_model = factory.create(MLModel)
+
+        # Create nodes manually instead of calling factory.create(),
+        # because the latter does not respect database constraint.
+        for i in range(num_nodes):
+            Node.objects.create(name=("node_%s" % (i + 1)), mlmodel=ml_model)
+
+        # Create genes manually.  factory.create(Gene, num_genes) does
+        # NOT work due to the contraint that standard_name and
+        # systematic_name can not be both empty.
         for i in range(num_genes):
             Gene.objects.create(entrezid=(i + 1),
                                 systematic_name="sys_name #" + str(i + 1),
