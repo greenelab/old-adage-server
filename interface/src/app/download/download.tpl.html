@@ -2,12 +2,17 @@
   <h1>ADAGE: Download Sample Annotations Selectively</h1>
   <p class="lead">
     <ul>
-      <li>Three fields (<b>experiment</b>, <b>sample_name</b> and <b>ml_data_source</b>)
-        will be always included, the others are optional.</li>
-      <li>To exclude a field, click <i class="fa fa-minus-square fa-lg" ara-hidden="true"></i>
-        in front of the field, or drag and drop from left to right.</li>
-      <li>To add a field back, click <i class="fa fa-plus-square fa-lg" ara-hidden="true"></i>
-        in front of the field, or drag and drop from right to left.</li>
+      <li>Three fields (<b>experiment</b>, <b>sample_name</b> and
+        <b>ml_data_source</b>) will be always included, the others are optional.
+      </li>
+      <li>To exclude a field, click <i class="fa fa-minus-square fa-lg"
+                                       ara-hidden="true"></i>
+        in front of the field, or drag and drop from left to right.
+      </li>
+      <li>To add a field back, click <i class="fa fa-plus-square fa-lg"
+                                        ara-hidden="true"></i>
+        in front of the field, or drag and drop from right to left.
+      </li>
       <li>To reorder a field in either box, drag and drop inside the box.</li>
       <li>When you are ready:
         <button type="button" class="btn btn-primary" ng-click="start_download()">
@@ -44,7 +49,9 @@
         <li ng-repeat="item in annotations.included_types" as-sortable-item
             class="list-group-item list-group-item-success">
           <div as-sortable-item-handle>
-            <i class="fa fa-minus-square fa-lg" ara-hidden="true" ng-click="del_type($index)"></i>
+            <i class="fa fa-minus-square fa-lg" ara-hidden="true"
+               ng-click="del_type($index)">
+            </i>
             {{$index + 4}}: <b>{{item.typename}}</b>
           </div>
         </li>
@@ -53,12 +60,16 @@
 
     <!-- Excluded types -->
     <div class="col-xs-6">
-      <h4 class="text-center"><b><font color="red">Excluded Annotation Fields:</font></b></center></h4>
+      <h4 class="text-center"><b><font color="red">
+            Excluded Annotation Fields:
+      </font></b></center>
+      </h4>
       <ul as-sortable ng-model="annotations.excluded_types" class="list-group">
         <li ng-repeat="item in annotations.excluded_types" as-sortable-item
             class="list-group-item list-group-item-warning">
           <div as-sortable-item-handle>
-            <i class="fa fa-plus-square fa-lg" ara-hidden="true" ng-click="add_type($index)"></i>
+            <i class="fa fa-plus-square fa-lg" ara-hidden="true"
+               ng-click="add_type($index)"></i>
             {{$index + 1}}: <b>{{item.typename}}</b>
           </div>
         </li>
