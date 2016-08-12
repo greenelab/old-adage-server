@@ -1,6 +1,6 @@
 /**
- * "download" module, whicdh will download sample annotations of given
- * annotation typenames.
+ * "download" module, which will download sample annotations of given annotation
+ * typenames.
  */
 
 angular.module('adage.download', [
