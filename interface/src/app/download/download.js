@@ -43,9 +43,7 @@ angular.module('adage.download', [
     AnnotationTypes.query(
       { q: ''},
       function(responseObject, responseHeaders) {
-        for (var index in responseObject.objects) {
-          $scope.annotations.included_types = responseObject.objects;
-        }
+        $scope.annotations.included_types = responseObject.objects;
       },
       function(responseObject, responseHeaders) {
         $log.info('Query errored with: ' + responseObject);
@@ -70,12 +68,12 @@ angular.module('adage.download', [
     $scope.start_download = function() {
       var num_types = $scope.annotations.included_types.length;
       var uri = "/api/v0/sample/get_annotations/?annotation_types=";
-      for (var idx = 0; idx < num_types; ++idx) {
+      for (var idx = 0; idx < num_types - 1; ++idx) {
         uri += $scope.annotations.included_types[idx].typename + ",";
       }
-      // If uri has a trailing "," character, remove it.
-      if (uri.endsWith(",")) {
-        uri = uri.substr(0, uri.length - 1);
+      // Add the last type without trailing "," character.
+      if (num_types > 0) {
+        uri += $scope.annotations.included_types[idx].typename[num_types - 1];
       }
       $window.location.href = uri;  // Call compiled downloading API.
     };
