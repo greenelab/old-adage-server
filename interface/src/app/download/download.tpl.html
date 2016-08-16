@@ -6,7 +6,7 @@
         <b>ml_data_source</b>) will be always included, the others are optional.
       </li>
       <li>To exclude a field, click
-        <i class="fa fa-trash-o fa-lg" aria-hidden="true"></i>
+        <i class="fa fa-trash fa-lg" aria-hidden="true"></i>
         in front of the field, or drag and drop from left to right.
       </li>
       <li>To add a field back, click
@@ -49,7 +49,7 @@
         <li ng-repeat="item in annotations.included_types" as-sortable-item
             class="list-group-item">
           <div as-sortable-item-handle>
-            <i class="fa fa-trash-o fa-lg" aria-hidden="true"
+            <i class="fa fa-trash fa-lg" aria-hidden="true"
                ng-click="del_type($index)"></i>
             {{$index + 4}}: <b>{{item.typename}}</b>
           </div>
