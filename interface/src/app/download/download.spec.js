@@ -1,13 +1,22 @@
 /**
- * Tests sit right alongside the file they are testing, which is more intuitive
- * and portable than separating `src` and `test` directories. Additionally, the
- * build process will exclude all `.spec.js` files from the build
- * automatically.
+ * Unit tests.
  */
-describe( 'download section', function() {
-  beforeEach( module( 'adage.download' ) );
 
-  it( 'should have a dummy test', inject( function() {
-    expect( true ).toBeTruthy();
-  }));
+describe('DownloadCtrl', function() {
+  describe('isCurrentUrl', function() {
+    var DownloadCtrl, $location, $scope;
+
+    beforeEach(module('adage'));
+
+    beforeEach(inject(function($controller, _$location_, $rootScope) {
+      $location = _$location_;
+      $scope = $rootScope.$new();
+      DownloadCtrl = $controller('DownloadCtrl',
+                                 {$location: $location, $scope: $scope});
+    }));
+
+    it('validates DownloadCtrl controller', inject(function() {
+      expect(DownloadCtrl).toBeTruthy();
+    }));
+  });
 });
