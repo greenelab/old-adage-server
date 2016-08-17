@@ -1,5 +1,9 @@
-<div>
-  <h1>ADAGE: Download Sample Annotations Selectively</h1>
+<h1>ADAGE: Download Sample Annotations Selectively</h1>
+
+<!-- If annotations.query_message is not null, the query either is in progress
+     or fails, so the download interface won't be shown.
+  -->
+<div ng-hide="annotations.query_message">
   <p class="lead">
     <ul>
       <li>Three fields (<b>experiment</b>, <b>sample_name</b> and
@@ -15,63 +19,62 @@
       </li>
       <li>To reorder a field in either box, drag and drop inside the box.</li>
       <li>When you are ready:
-        <button type="button" class="btn btn-primary" ng-click="start_download()">
+        <button type="button" class="btn btn-primary"
+                ng-click="start_download()">
           Download
         </button>
       </li>
     </ul>
   </p>
-</div>
 
-<!-- Included types -->
-<div class="container">
-  <div class="row">
-    <div class="col-xs-6">
-      <h4 class="text-center"><b>Included Annotation Fields:</b></h4>
-      <ul as-sortable ng-model="annotations.included_types" class="list-group">
-        <!-- Three mandatory fields -->
-        <li class="list-group-item disabled">
-          <div>
+  <div class="container">
+    <div class="row">
+      <!-- Included types -->
+      <div class="col-xs-6">
+        <h4 class="text-center"><b>Included Annotation Fields:</b></h4>
+        <ul as-sortable ng-model="annotations.included_types"
+            class="list-group">
+          <!-- Three mandatory fields -->
+          <li class="list-group-item disabled">
             1: <b>experiment</b>
-          </div>
-        </li>
-        <li class="list-group-item disabled">
-          <div>
+          </li>
+          <li class="list-group-item disabled">
             2: <b>sample_name</b>
-          </div>
-        </li>
-        <li class="list-group-item disabled">
-          <div>
+          </li>
+          <li class="list-group-item disabled">
             3: <b>ml_data_source</b>
-          </div>
-        </li>
-        <!-- Optional fields -->
-        <li ng-repeat="item in annotations.included_types" as-sortable-item
-            class="list-group-item">
-          <div as-sortable-item-handle>
-            <i class="fa fa-trash fa-lg" aria-hidden="true"
-               ng-click="del_type($index)"></i>
-            {{$index + 4}}: <b>{{item.typename}}</b>
-          </div>
-        </li>
-      </ul>
-    </div>
+          </li>
+          <!-- Optional fields -->
+          <li ng-repeat="item in annotations.included_types" as-sortable-item
+              class="list-group-item">
+            <div as-sortable-item-handle>
+              <i class="fa fa-trash fa-lg" aria-hidden="true"
+                 ng-click="del_type($index)"></i>
+              {{$index + 4}}: <b>{{item}}</b>
+            </div>
+          </li>
+        </ul>
+      </div>
 
-    <!-- Excluded types -->
-    <div class="col-xs-6">
-      <h4 class="text-center">
-        <b><font color="red">Excluded Annotation Fields:</font></b>
-      </h4>
-      <ul as-sortable ng-model="annotations.excluded_types" class="list-group">
-        <li ng-repeat="item in annotations.excluded_types" as-sortable-item
-            class="list-group-item">
-          <div as-sortable-item-handle>
-            <i class="fa fa-undo fa-lg" ara-hidden="true"
-               ng-click="add_type($index)"></i>
-            {{$index + 1}}: <b>{{item.typename}}</b>
-          </div>
-        </li>
-      </ul>
+      <!-- Excluded types -->
+      <div class="col-xs-6">
+        <h4 class="text-center">
+          <b><font color="red">Excluded Annotation Fields:</font></b>
+        </h4>
+        <ul as-sortable ng-model="annotations.excluded_types"
+            class="list-group">
+          <li ng-repeat="item in annotations.excluded_types" as-sortable-item
+              class="list-group-item">
+            <div as-sortable-item-handle>
+              <i class="fa fa-undo fa-lg" ara-hidden="true"
+                 ng-click="add_type($index)"></i>
+              {{$index + 1}}: <b>{{item}}</b>
+            </div>
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 </div>
+
+<p ng-bind="annotations.query_message"></p>

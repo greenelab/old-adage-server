@@ -1,6 +1,6 @@
 /**
- * "download" module, which will download sample annotations of given annotation
- * typenames.
+ * "download" module, which will download sample annotations of given
+ * annotation typenames.
  */
 
 angular.module('adage.download', [
@@ -19,11 +19,12 @@ angular.module('adage.download', [
         templateUrl: 'download/download.tpl.html'
       }
     },
-    data: { pageTitle: 'Download' }
+    data: {pageTitle: 'Download'}
   });
 })
 
-// New service: "AnnotationTypes"
+// "AnnotationTypes" is a service that retrieves a list of available
+// annotation columns, from which the user can select for download.
 .factory('AnnotationTypes', ['$resource', function($resource) {
   return $resource(
     '/api/v0/annotationtype/',
@@ -32,21 +33,26 @@ angular.module('adage.download', [
   );
 }])
 
-// Controller
 .controller('DownloadCtrl', ['$scope', '$window', 'AnnotationTypes',
-  function DownloadController( $scope, $window, AnnotationTypes ) {
+  function DownloadController($scope, $window, AnnotationTypes) {
     $scope.annotations = {
+      query_message: "Connecting to the server ...",
       included_types: [],
       excluded_types: []
     };
 
     AnnotationTypes.query(
-      { q: ''},
+      {q: ''},
       function(responseObject, responseHeaders) {
-        $scope.annotations.included_types = responseObject.objects;
+        for (var i = 0; i < responseObject.objects.length; ++i) {
+          $scope.annotations.included_types.push(
+            responseObject.objects[i].typename);
+        }
+        $scope.annotations.query_message = "";
       },
       function(responseObject, responseHeaders) {
-        $log.info('Query errored with: ' + responseObject);
+        $log.error('Query errored with: ' + responseObject);
+        $scope.annotations.query_message = "Connection to server failed";
       }
     );
 
@@ -64,17 +70,10 @@ angular.module('adage.download', [
       $scope.annotations.included_types.push(current_item);
     };
 
-    // "Download" button.
+    // Handler of "Download" button click event.
     $scope.start_download = function() {
-      var num_types = $scope.annotations.included_types.length;
       var uri = "/api/v0/sample/get_annotations/?annotation_types=";
-      for (var idx = 0; idx < num_types - 1; ++idx) {
-        uri += $scope.annotations.included_types[idx].typename + ",";
-      }
-      // Add the last type without trailing "," character.
-      if (num_types > 0) {
-        uri += $scope.annotations.included_types[idx].typename[num_types - 1];
-      }
+      uri += $scope.annotations.included_types.join();
       $window.location.href = uri;  // Call compiled downloading API.
     };
 
