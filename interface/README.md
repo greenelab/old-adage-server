@@ -11,7 +11,7 @@ Install Node.js and then:
 ```sh
 $ git clone git://github.com/joshdmiller/ng-boilerplate
 $ cd ng-boilerplate
-$ sudo npm -g install grunt-cli karma bower
+$ sudo npm -g install grunt-cli karma-cli bower
 $ npm install
 $ bower install
 $ grunt watch
@@ -138,7 +138,7 @@ for the build system to find it, so they must be installed independently. Once
 you have Node.js installed, you can simply use `npm` to make it all happen:
 
 ```sh
-$ npm -g install grunt-cli karma bower
+$ npm -g install grunt-cli karma-cli bower
 ```
 
 If you're on Linux (like I am) then throw `sudo` in front of that command.  If
