@@ -1,0 +1,19 @@
+<div class="page-header">
+  <h1>Experiment
+    <small><a href="{{makeHref.arrExpExperiment(id)}}"
+      target="_blank">{{id}}</a>
+    </small>
+  </h1>
+  <p ng-if="experiment.status" class="alert alert-warning" role="alert">
+    Status: {{experiment.status}}<br>
+    If this message persists, please try refreshing your browser.
+  </p>
+  <h2>{{experiment.results.name}}</h2>
+</div>
+<p>{{experiment.results.description}}</p>
+<h3>Samples</h3>
+<ul class="list-group">
+  <li ng-repeat="sample in experiment.related_samples" class="list-group-item">
+    {{sample.name}} ({{sample.ml_data_source}})
+  </li>
+</ul>

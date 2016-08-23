@@ -1,0 +1,16 @@
+argparse==1.2.1
+Django==1.8.11
+django-fixtureless==1.4.3.3
+django-haystack==2.4.1
+django-tastypie==0.13.3
+elasticsearch==1.9.0
+gunicorn==19.4.5
+psycopg2==2.6.1
+python-dateutil==2.5.0
+python-mimeparse==1.5.1
+six==1.10.0
+unicodecsv==0.14.1
+urllib3==1.14
+wsgiref==0.1.2
+django-organisms>=0.3
+django-genes>=0.3
