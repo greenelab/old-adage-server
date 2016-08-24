@@ -303,7 +303,7 @@ module.exports = function ( grunt ) {
         boss: true,
         eqnull: true
       },
-      globals: {}
+      // globals: {}  // Commented out to disable a warning message.
     },
 
     /**
@@ -361,11 +361,11 @@ module.exports = function ( grunt ) {
       options: {
         configFile: '<%= build_dir %>/karma-unit.js'
       },
-      unit: {
+      watch: {
         port: 9019,
         background: true
       },
-      continuous: {  // Run all unit tests once.
+      unit: {
         singleRun: true
       }
     },
@@ -478,7 +478,7 @@ module.exports = function ( grunt ) {
         files: [
           '<%= app_files.js %>'
         ],
-        tasks: [ 'jshint:src', 'karma:unit:run', 'copy:build_appjs' ]
+        tasks: [ 'jshint:src', 'karma:watch:run', 'copy:build_appjs' ]
       },
 
       /**
@@ -489,7 +489,7 @@ module.exports = function ( grunt ) {
         files: [
           '<%= app_files.coffee %>'
         ],
-        tasks: [ 'coffeelint:src', 'coffee:source', 'karma:unit:run',
+        tasks: [ 'coffeelint:src', 'coffee:source', 'karma:watch:run',
                  'copy:build_appjs' ]
       },
 
@@ -539,7 +539,7 @@ module.exports = function ( grunt ) {
         files: [
           '<%= app_files.jsunit %>'
         ],
-        tasks: [ 'jshint:test', 'karma:unit:run' ],
+        tasks: [ 'jshint:test', 'karma:watch:run' ],
         options: {
           livereload: false
         }
@@ -553,7 +553,7 @@ module.exports = function ( grunt ) {
         files: [
           '<%= app_files.coffeeunit %>'
         ],
-        tasks: [ 'coffeelint:test', 'karma:unit:run' ],
+        tasks: [ 'coffeelint:test', 'karma:watch:run' ],
         options: {
           livereload: false
         }
@@ -564,19 +564,22 @@ module.exports = function ( grunt ) {
   grunt.initConfig( grunt.util._.extend( taskConfig, userConfig ) );
 
   /**
-   * In order to make it safe to just compile or copy *only* what was changed,
-   * we need to ensure we are starting from a clean, fresh build. So we rename
-   * the `watch` task to `delta` (that's why the configuration var above is
-   * `delta`) and then add a new task called `watch` that does a clean build
-   * before watching for changes.
+   * Unit test (run by Karma).
+   * This task definition enables "grunt test:unit" command.
    */
-  grunt.renameTask( 'watch', 'delta' );
-  grunt.registerTask( 'watch', [ 'build', 'karma:unit', 'delta' ] );
+  grunt.registerTask( 'test:unit', [ 'karmaconfig', 'karma:unit' ] );
 
   /**
-   * The default task is to build and compile.
+   * End-to-End (e2e) test (run by Protractor).
+   * This task definition enables "grunt test:e2e" command.
    */
-  grunt.registerTask( 'default', [ 'build', 'compile', 'test' ] );
+  grunt.registerTask( 'test:e2e', [ 'protractor' ] );
+
+  /**
+   * Both unit and e2e tests.
+   * This task definition enables "grunt test" command.
+   */
+  grunt.registerTask( 'test', [ 'test:unit', 'test:e2e' ] );
 
   /**
    * The `build` task gets your app ready to run for development and testing.
@@ -598,11 +601,20 @@ module.exports = function ( grunt ) {
   ]);
 
   /**
-   * The `test` task takes care of Karma unit tests and Protractor E2E tests.
+   * In order to make it safe to just compile or copy *only* what was changed,
+   * we need to ensure we are starting from a clean, fresh build. So we rename
+   * the `watch` task to `delta` (that's why the configuration var above is
+   * `delta`) and then add a new task called `watch` that does a clean build
+   * before watching for changes.
    */
-  grunt.registerTask( 'test', [
-    'karmaconfig', 'karma:continuous', 'protractor',
-  ]);
+  grunt.renameTask( 'watch', 'delta' );
+  grunt.registerTask( 'watch', [ 'build', 'test:unit', 'karma:watch', 'delta' ] );
+
+  /**
+   * The `default` task is to build, compile and test.
+   * This task can be launched by either "grunt default" or "grunt" command.
+   */
+  grunt.registerTask( 'default', [ 'build', 'compile', 'test' ] );
 
   /**
    * A utility function to get all app JavaScript sources.
