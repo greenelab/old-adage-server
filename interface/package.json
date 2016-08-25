@@ -28,15 +28,18 @@
     "grunt-karma": "^2.0.0",
     "grunt-ng-annotate": "^2.0.2",
     "grunt-protractor-runner": "^3.2.0",
+    "grunt-protractor-webdriver": "^0.2.5",
     "jasmine-core": "^2.4.1",
     "karma": "^1.2.0",
+    "karma-chrome-launcher": "^2.0.0",
     "karma-coffee-preprocessor": "^1.0.1",
     "karma-firefox-launcher": "^1.0.0",
     "karma-jasmine": "^1.0.2",
     "karma-phantomjs-launcher": "^1.0.1",
-    "karma-safari-launcher": "^1.0.0"
+    "karma-safari-launcher": "^1.0.0",
+    "protractor": "^4.0.4"
   },
   "scripts": {
-    "postinstall": "node_modules/grunt-protractor-runner/scripts/webdriver-manager-update"
+    "postinstall": "node_modules/protractor/bin/webdriver-manager update"
   }
 }

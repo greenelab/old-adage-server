@@ -19,6 +19,7 @@ module.exports = function ( grunt ) {
   grunt.loadNpmTasks('grunt-ng-annotate');
   grunt.loadNpmTasks('grunt-html2js');
   grunt.loadNpmTasks('grunt-protractor-runner');
+  grunt.loadNpmTasks('grunt-protractor-webdriver');
 
   /**
    * Load in our build configuration file.
@@ -371,7 +372,19 @@ module.exports = function ( grunt ) {
     },
 
     /**
-     * Protractor configurations.
+     * "protractor_webdriver" task (defined by grunt-protractor-webdriver).
+     */
+    protractor_webdriver: {
+      start: {
+        options: {
+          path: './node_modules/protractor/bin/',
+          command: 'webdriver-manager start'
+        }
+      }
+    },
+
+    /**
+     * "protractor" task (defined by by grunt-protractor-runner).
      */
     protractor: {
       options: {
@@ -573,7 +586,7 @@ module.exports = function ( grunt ) {
    * End-to-End (e2e) test (run by Protractor).
    * This task definition enables "grunt test:e2e" command.
    */
-  grunt.registerTask( 'test:e2e', [ 'protractor' ] );
+  grunt.registerTask( 'test:e2e', [ 'protractor_webdriver', 'protractor' ] );
 
   /**
    * Both unit and e2e tests.
@@ -608,7 +621,7 @@ module.exports = function ( grunt ) {
    * before watching for changes.
    */
   grunt.renameTask( 'watch', 'delta' );
-  grunt.registerTask( 'watch', [ 'build', 'test:unit', 'karma:watch', 'delta' ] );
+  grunt.registerTask('watch', ['build', 'test:unit', 'karma:watch', 'delta']);
 
   /**
    * The `default` task is to build, compile and test.
