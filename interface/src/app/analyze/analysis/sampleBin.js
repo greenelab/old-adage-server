@@ -10,59 +10,31 @@ angular.module( 'adage.analyze.sampleBin', [
   return Activity;
 }])
 
-.factory( 'SampleBin', ['$log', 'Activity',
-function($log, Activity) {
+.factory( 'SampleBin', ['$log', 'Sample', 'Activity',
+function($log, Sample, Activity) {
   var SampleBin = {
     samples: [],
-    heatmapData: {}
-  };
-  
-  SampleBin.getActivityForSampleList = function(respObj, successFn, failFn) {
-    // retrieve activity data for heatmap to display
-    $log.info("getting activity for samples: " + this.samples.join());
-    respObj.queryStatus = "Retrieving sample activity...";
-    Activity.get({sample__in: this.samples.join()}, successFn, failFn);
-  };
-  
-  return SampleBin;
-}])
+    heatmapData: {},
+    sampleData: {},
 
-.controller('SampleBinCtrl', ['$scope', '$log', '$uibModal', 'Sample',
-'SampleBin',
-function SampleBinCtrl($scope, $log, $uibModal, Sample, SampleBin) {
-
-  // give our templates a way to access the SampleBin service
-  $scope.sb = SampleBin;
-
-  //////////////////////////
-  // Analysis-related (heatmap) stuff here
-  $scope.analysis = {
-    // samples: [],
-    sample_objects: {},
-
-    add_sample: function(sample_id) {
-      if (SampleBin.samples.indexOf(+sample_id) != -1) {
+    add_sample: function(id) {
+      if (SampleBin.samples.indexOf(+id) != -1) {
         // quietly ignore the double-add
-        $log.warn('analysis.add_sample: ' + sample_id + 
+        $log.warn('SampleBin.add_sample: ' + id + 
             ' already in the sample list; ignoring.');
       } else {
-        SampleBin.samples.push(+sample_id);
+        SampleBin.samples.push(+id);
       }
     },
-  
-    remove_sample: function(sample_id) {
-      var pos = SampleBin.samples.indexOf(sample_id);
+
+    remove_sample: function(id) {
+      var pos = SampleBin.samples.indexOf(+id);
       SampleBin.samples.splice(pos, 1);
-      // this.getActivityForSampleList(this.samples);
-      // FIXME: scope hierarchy kerfuffle here...
-      SampleBin.getActivityForSampleList($scope.analysis,
+      // TODO need to report query progress and errors somehow
+      Activity.get({sample__in: SampleBin.samples.join()},
         // success callback
         function(responseObject, responseHeaders) {
           if (responseObject) {
-            $log.info('activity recs: ' + responseObject.meta.total_count);
-            $scope.analysis.queryStatus = "";
-            // $scope.analysis.vegaData.activity = responseObject.objects;
-            // SampleBin.heatmapData = $scope.analysis.vegaData;
             SampleBin.heatmapData.activity = responseObject.objects;
             // TODO need to find & report (list) samples that return no results
           }
@@ -70,24 +42,21 @@ function SampleBinCtrl($scope, $log, $uibModal, Sample, SampleBin) {
         // failure callback
         function(responseObject, responseHeaders) {
           $log.error('Query errored with: ' + responseObject);
-          // TODO need a unit test to prove this works
-          $scope.analysis.queryStatus = "Query for activity failed.";
         }
       );
     },
 
     add_experiment: function(sample_id_list) {
       for (var i = 0; i < sample_id_list.length; i++) {
-        this.add_sample(sample_id_list[i]);
+        SampleBin.add_sample(sample_id_list[i]);
       }
     },
 
     add_item: function(search_item) {
-      $log.info('add_item: ' + search_item.item_type);
       if (search_item.item_type == 'sample') {
-        $scope.analysis.add_sample(search_item.pk);
+        SampleBin.add_sample(search_item.pk);
       } else if (search_item.item_type == 'experiment') {
-        $scope.analysis.add_experiment(search_item.related_items);
+        SampleBin.add_experiment(search_item.related_items);
       }
     },
 
@@ -110,41 +79,27 @@ function SampleBinCtrl($scope, $log, $uibModal, Sample, SampleBin) {
       }
     },
 
-    show: function() {
-      var modalInstance = $uibModal.open({
-        animation: true,
-        templateUrl: 'analyze/analysis/analysisModal.tpl.html',
-        controller: 'AnalysisModalCtrl',
-        size: 'lg',
-        resolve: {
-          analysis: function() {
-            return $scope.analysis;
-          }
-        }
+    getSampleData: function(id) {
+      return SampleBin.sampleData[id];
+    },
+    setSampleData: function(id, obj) {
+      SampleBin.sampleData[id] = obj;
+    },
+    
+    getSampleObjects: function() {
+      return SampleBin.samples.map(function(val, i, arr) {
+        return SampleBin.getSampleData(val) || {id: val};
       });
     },
 
     getSampleDetails: function(pk) {
+      // TODO need to report query progress and errors somehow
       Sample.get({id: pk},
         // success callback
         function(responseObject, responseHeaders) {
           if (responseObject) {
-            $scope.analysis.sample_objects[pk] = responseObject;
-            $scope.analysis.waitingForSampleDetails--;
-          
-            if ($scope.analysis.waitingForSampleDetails < 1) {
-              // we've loaded the last of the sample_objects, so
-              // convert anaysis.sample_objects to a list for vegaData
-              $scope.analysis.vegaData = $scope.analysis.vegaData || {};
-              // $log.info('about to set sample_objects');
-              $scope.analysis.vegaData.sample_objects = Object.keys(
-                $scope.analysis.sample_objects
-              ).map(function(key) {
-                return $scope.analysis.sample_objects[key];
-              });
-              // $log.info('okay, I set sample_objects');
-              $scope.analysis.queryStatus = "";
-            }
+            SampleBin.setSampleData(pk, responseObject);
+            // TODO need a trigger to update heatmapData?
           } else {
             $log.warn('Query for sample ' + pk + ' returned nothing.');
             // TODO user error reporting
@@ -152,13 +107,41 @@ function SampleBinCtrl($scope, $log, $uibModal, Sample, SampleBin) {
         },
         // error callback
         function(responseObject, responseHeaders) {
-          // TODO user error reporting (test)
-          $scope.analysis.queryStatus = 'Query for sample ' + pk + 
-              ' errored with: ' + responseObject;
+          // TODO user error reporting
           $log.error($scope.analysis.queryStatus);
         }
       );
+    },
+
+    getActivityForSampleList: function(respObj, successFn, failFn) {
+      // retrieve activity data for heatmap to display
+      respObj.queryStatus = "Retrieving sample activity...";
+      Activity.get({sample__in: this.samples.join()}, successFn, failFn);
     }
+  };
+  
+  return SampleBin;
+}])
+
+.controller('SampleBinCtrl', ['$scope', '$log', '$uibModal', 'Sample',
+'SampleBin',
+function SampleBinCtrl($scope, $log, $uibModal, Sample, SampleBin) {
+
+  // give our templates a way to access the SampleBin service
+  $scope.sb = SampleBin;
+
+  $scope.show = function() {
+    var modalInstance = $uibModal.open({
+      animation: true,
+      templateUrl: 'analyze/analysis/analysisModal.tpl.html',
+      controller: 'AnalysisModalCtrl',
+      size: 'lg',
+      resolve: {
+        analysis: function() {
+          return $scope.analysis;
+        }
+      }
+    });
   };
 }])
 

@@ -43,14 +43,14 @@ function AnalysisCtrl($scope, $log, $location, Sample, Activity, AnnotationType,
 
     "data": [
       { 
-        // data are loaded dynamically by ng-vega, but this declares a name
+        // this dataset "streamed" in via ngVega from heatmapData
         "name": "activity",
         "transform": [
           // we want to show "activity level" so ignore sign on values
           {"type": "formula", "field": "normval", "expr": "abs(datum.value)"}
         ]
       }, {
-        // data are loaded dynamically by ng-vega, but this declares a name
+        // this dataset "streamed" in via ngVega from heatmapData
         "name": "sample_objects"
       }, {
         // compute minimum normalized value for each node (across samples)
@@ -176,24 +176,25 @@ function AnalysisCtrl($scope, $log, $location, Sample, Activity, AnnotationType,
 
   // TODO these exampleCols are temporarily hard-coded until a column chooser
   // feature can be added
-  $scope.analysis.exampleCols =
-    [{'typename': 'genotype'}, {'typename': 'medium'}, {'typename': 'strain'}];
+  $scope.analysis = {
+    exampleCols: [
+      {'typename': 'genotype'},
+      {'typename': 'medium'},
+      {'typename': 'strain'}
+    ]
+  };
 
   // populate sample details
-  $scope.analysis.waitingForSampleDetails = SampleBin.samples.length;
   for (var i=0; i < SampleBin.samples.length; i++) {
-    $scope.analysis.getSampleDetails(SampleBin.samples[i]);
+    SampleBin.getSampleDetails(SampleBin.samples[i]);
   }
 
   SampleBin.getActivityForSampleList($scope.analysis,
     // success callback
     function(responseObject, responseHeaders) {
       if (responseObject) {
-        $log.info('activity retrieved: ' + responseObject.meta.total_count);
         $scope.analysis.queryStatus = "";
-        // FIXME data belong in a cache inside sampleBin service
-        // $scope.analysis.vegaData.activity = responseObject.objects;
-        // SampleBin.heatmapData = $scope.analysis.vegaData;
+        // FIXME retrieved data belong in a cache inside sampleBin service
         SampleBin.heatmapData.activity = responseObject.objects;
         // TODO need to find & report (list) samples that return no results
       }
