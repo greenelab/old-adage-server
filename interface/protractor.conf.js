@@ -20,7 +20,7 @@ exports.config = {
   // module, we will not need "grunt-protractor-webdriver" any more.
 
 
-  // Location(s) of the spec file (may include glob patterns).
+  // Location(s) of the E2E test file (may include glob patterns).
   specs: [ 'src/test_e2e/**/*.js', 'src/**/*.e2e.js' ],
 
   // Jasmine related options.

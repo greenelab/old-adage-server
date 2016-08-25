@@ -21,9 +21,12 @@ module.exports = function ( karma ) {
       'src/**/*.e2e.js',
     ],
     frameworks: [ 'jasmine' ],
-    plugins: [ 'karma-jasmine', 'karma-chrome-launcher',
-               'karma-firefox-launcher', 'karma-phantomjs-launcher',
-               'karma-coffee-preprocessor' ],
+    plugins: [ 'karma-coffee-preprocessor', 'karma-jasmine',
+               'karma-chrome-launcher',
+               'karma-firefox-launcher',
+               'karma-phantomjs-launcher',
+               'karma-safari-launcher',
+             ],
     preprocessors: {
       '**/*.coffee': 'coffee',
     },
@@ -62,7 +65,9 @@ module.exports = function ( karma ) {
      * you save.
      */
     browsers: [
-      'Chrome', 'Firefox', 'PhantomJS',
+      'Chrome',
+      'Firefox',
+      'PhantomJS',
       // Add other bowsers here, such as 'Safari'
     ],
   });
