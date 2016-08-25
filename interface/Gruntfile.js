@@ -384,7 +384,7 @@ module.exports = function ( grunt ) {
     },
 
     /**
-     * "protractor" task (defined by by grunt-protractor-runner).
+     * "protractor" task (defined by grunt-protractor-runner).
      */
     protractor: {
       options: {
