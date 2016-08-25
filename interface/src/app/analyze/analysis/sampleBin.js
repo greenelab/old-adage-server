@@ -20,7 +20,7 @@ function($log, Sample, Activity) {
     add_sample: function(id) {
       if (SampleBin.samples.indexOf(+id) != -1) {
         // quietly ignore the double-add
-        $log.warn('SampleBin.add_sample: ' + id + 
+        $log.warn('SampleBin.add_sample: ' + id +
             ' already in the sample list; ignoring.');
       } else {
         SampleBin.samples.push(+id);
@@ -85,7 +85,7 @@ function($log, Sample, Activity) {
     setSampleData: function(id, obj) {
       SampleBin.sampleData[id] = obj;
     },
-    
+
     getSampleObjects: function() {
       return SampleBin.samples.map(function(val, i, arr) {
         return SampleBin.getSampleData(val) || {id: val};
@@ -119,7 +119,7 @@ function($log, Sample, Activity) {
       Activity.get({sample__in: this.samples.join()}, successFn, failFn);
     }
   };
-  
+
   return SampleBin;
 }])
 

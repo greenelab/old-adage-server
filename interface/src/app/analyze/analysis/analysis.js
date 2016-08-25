@@ -20,10 +20,10 @@ angular.module( 'adage.analyze.analysis', [
 .controller( 'AnalysisCtrl', ['$scope', '$log', '$location', 'Sample',
 'Activity', 'AnnotationType', 'SampleBin',
 function AnalysisCtrl($scope, $log, $location, Sample, Activity, AnnotationType, SampleBin) {
-  
+
   // give our templates a way to access the SampleBin service
   $scope.sb = SampleBin;
-  
+
   // these options are important for making ngSortable work with tables
   $scope.sortableOptions = {
     containerPositioning: 'relative',
@@ -32,7 +32,7 @@ function AnalysisCtrl($scope, $log, $location, Sample, Activity, AnnotationType,
     // orderChanged: function(event) {
     // }
   };
-  
+
   // Vega objects
   $scope.heatmapSpec = {
     // TODO compute these constants: w=numNodes*4, h=numSamples*12
@@ -42,7 +42,7 @@ function AnalysisCtrl($scope, $log, $location, Sample, Activity, AnnotationType,
     "viewport": [868, 250],
 
     "data": [
-      { 
+      {
         // this dataset "streamed" in via ngVega from heatmapData
         "name": "activity",
         "transform": [
@@ -144,7 +144,7 @@ function AnalysisCtrl($scope, $log, $location, Sample, Activity, AnnotationType,
 
     // FIXME the legend is broken due to malformed SVG output
     // "legends": [{"fill": "s", "values": [0.0, 0.5, 1.0]}],
-  
+
     "marks": [
       {
         "type": "text",
