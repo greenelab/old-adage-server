@@ -1,11 +1,12 @@
 {
   "author": "Matt Huyck",
   "name": "adage",
-  "version": "0.1.0a",
+  "version": "0.2.0a",
   "homepage": "http://adage.greenelab.com",
   "licenses": {
     "type": "MIT",
-    "url": "https://raw.github.com/ngbp/ngbp/master/LICENSE"
+    "url": "https://raw.github.com/ngbp/ngbp/master/LICENSE",
+    "type": "BSD-3-Clause"
   },
   "bugs": "mailto:mhuyck@fgtech.com",
   "repository": {

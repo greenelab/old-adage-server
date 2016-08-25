@@ -1,6 +1,13 @@
 {
   "name": "adage",
-  "version": "0.0.1",
+  "version": "0.2.0a",
+  "homepage": "http://adage.greenelab.com",
+  "authors": [
+    "Matt Huyck (http://www.greenelab.com/staff)",
+    "Dongbo Hu (http://www.greenelab.com/staff)",
+    "René Zelaya (http://www.greenelab.com/staff)"
+  ],
+  "license": "BSD-3-Clause",
   "devDependencies": {
     "angular": "~1.5.5",
     "angular-mocks": "~1.5.5",
