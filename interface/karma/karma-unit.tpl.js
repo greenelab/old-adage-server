@@ -21,7 +21,8 @@ module.exports = function ( karma ) {
       'src/**/*.e2e.js',
     ],
     frameworks: [ 'jasmine' ],
-    plugins: [ 'karma-jasmine', 'karma-phantomjs-launcher',
+    plugins: [ 'karma-jasmine', 'karma-chrome-launcher',
+               'karma-firefox-launcher', 'karma-phantomjs-launcher',
                'karma-coffee-preprocessor' ],
     preprocessors: {
       '**/*.coffee': 'coffee',
@@ -60,6 +61,9 @@ module.exports = function ( karma ) {
      * This has the aesthetic advantage of not launching a browser every time
      * you save.
      */
-    browsers: [ 'PhantomJS' ]
+    browsers: [
+      'Chrome', 'Firefox', 'PhantomJS',
+      // Add other bowsers here, such as 'Safari'
+    ],
   });
 };
