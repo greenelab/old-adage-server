@@ -1,6 +1,8 @@
 angular.module( 'adage.analyze', [
   'adage.analyze.search',
   'adage.analyze.detail',
+  'adage.analyze.analysis', // for sample-bin
+  // 'adage.analyze.sampleBin',
   'ui.router',
   'placeholders',
   'ui.bootstrap',
@@ -26,9 +28,9 @@ angular.module( 'adage.analyze', [
   $anchorScroll.yOffset = 80;
 }])
 
-.controller( 'AnalyzeCtrl', ['$scope', '$uibModal', '$log', '$location',
+.controller( 'AnalyzeCtrl', ['$scope', '$log', '$location',
   '$anchorScroll', 'Sample',
-  function AnalyzeCtrl($scope, $uibModal, $log, $location, $anchorScroll,
+  function AnalyzeCtrl($scope, $log, $location, $anchorScroll,
     Sample) {
 
     //////////////////////////
@@ -52,97 +54,5 @@ angular.module( 'adage.analyze', [
         $anchorScroll();
       }
     };
-
-    //////////////////////////
-    // Analysis-related (heatmap) stuff here
-    $scope.analysis = {
-      sample_list: [],
-      sample_objects: {},
-
-      add_sample: function(sample_id) {
-        if (this.sample_list.indexOf(+sample_id) != -1) {
-          // quietly ignore the double-add
-          $log.warn('analysis.add_sample: ' + sample_id + 
-              ' already in the sample list; ignoring.');
-        } else {
-          this.sample_list.push(+sample_id);
-        }
-      },
-
-      add_experiment: function(sample_id_list) {
-        for (var i = 0; i < sample_id_list.length; i++) {
-          this.add_sample(sample_id_list[i]);
-        }
-      },
-
-      add_item: function(search_item) {
-        $log.info('add_item: ' + search_item.item_type);
-        if (search_item.item_type == 'sample') {
-          $scope.analysis.add_sample(search_item.pk);
-        } else if (search_item.item_type == 'experiment') {
-          $scope.analysis.add_experiment(search_item.related_items);
-        }
-      },
-
-      has_item: function(search_item) {
-        if (search_item.item_type == 'sample') {
-          if (this.sample_list.indexOf(+search_item.pk) != -1) {
-            return true;
-          } else {
-            return false;
-          }
-        } else if (search_item.item_type == 'experiment') {
-          // what we want to know, in the case of an experiment, is 'are
-          // all of the samples from this experiment already added?'
-          for (var i = 0; i < search_item.related_items.length; i++) {
-            if (this.sample_list.indexOf(+search_item.related_items[i]) == -1) {
-              return false;
-            }
-          }
-          return true;
-        }
-      },
-
-      show: function() {
-        var modalInstance = $uibModal.open({
-          animation: true,
-          templateUrl: 'analyze/analysisModal.tpl.html',
-          controller: 'AnalysisModalCtrl',
-          size: 'lg',
-          resolve: {
-            analysis: function() {
-              return $scope.analysis;
-            }
-          }
-        });
-      },
-
-      getSampleDetails: function(pk) {
-        Sample.get({id: pk},
-          function(responseObject, responseHeaders) {
-            if (responseObject) {
-              $scope.analysis.sample_objects[pk] = responseObject;
-            }
-          },
-          function(responseObject, responseHeaders) {
-            $log.warn('Query for sample ' + pk + 
-                ' errored with: ' + responseObject);
-          }
-        );
-      }
-    };
-
 }])
-
-.controller('AnalysisModalCtrl', function($scope, $uibModalInstance, analysis) {
-  $scope.analysis = analysis;
-  $scope.close = function() {
-    $uibModalInstance.dismiss('close');
-  };
-
-  // populate sample details
-  for (var i=0; i < $scope.analysis.sample_list.length; i++) {
-    analysis.getSampleDetails($scope.analysis.sample_list[i]);
-  }
-})
 ;
