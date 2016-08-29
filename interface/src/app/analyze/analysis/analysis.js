@@ -11,10 +11,7 @@ angular.module( 'adage.analyze.analysis', [
 }])
 
 .factory( 'AnnotationType', ['$resource', function($resource) {
-  var AnnotationType = $resource(
-    '/api/v0/annotationtype/'
-  );
-  return AnnotationType;
+  return $resource('/api/v0/annotationtype/');
 }])
 
 .controller( 'AnalysisCtrl', ['$scope', '$log', '$location', 'Sample',
@@ -185,7 +182,7 @@ function AnalysisCtrl($scope, $log, $location, Sample, Activity, AnnotationType,
   };
 
   // populate sample details
-  for (var i=0; i < SampleBin.samples.length; i++) {
+  for (var i = 0; i < SampleBin.samples.length; i++) {
     SampleBin.getSampleDetails(SampleBin.samples[i]);
   }
 

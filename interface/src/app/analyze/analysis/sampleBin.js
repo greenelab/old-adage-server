@@ -4,10 +4,7 @@ angular.module( 'adage.analyze.sampleBin', [
 ])
 
 .factory( 'Activity', ['$resource', function($resource) {
-  var Activity = $resource(
-    '/api/v0/activity/'
-  );
-  return Activity;
+  return $resource('/api/v0/activity/');
 }])
 
 .factory( 'SampleBin', ['$log', 'Sample', 'Activity',
