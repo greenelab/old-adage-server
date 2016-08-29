@@ -12,6 +12,9 @@
     "type": "hg",
     "url": "https://bitbucket.org/greenelab/adage-server"
   },
+  "engines": {
+    "node" : ">=4.0"
+  },
   "dependencies": {},
   "devDependencies": {
     "grunt": "~0.4.1",
