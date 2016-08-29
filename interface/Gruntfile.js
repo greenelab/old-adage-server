@@ -49,7 +49,7 @@ module.exports = function ( grunt ) {
         ' * <%= pkg.homepage %>\n' +
         ' *\n' +
         ' * Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author %>\n' +
-        ' * Licensed <%= pkg.license %> <<%= pkg.licenses_url %>>\n' +
+        ' * Licensed <%= pkg.license %> <<%= pkg.license_url %>>\n' +
         ' */\n'
     },
 
