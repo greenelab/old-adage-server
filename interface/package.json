@@ -5,8 +5,7 @@
   "homepage": "http://adage.greenelab.com",
   "licenses": {
     "type": "MIT",
-    "url": "https://raw.github.com/ngbp/ngbp/master/LICENSE",
-    "type": "BSD-3-Clause"
+    "url": "https://raw.github.com/ngbp/ngbp/master/LICENSE"
   },
   "bugs": "mailto:mhuyck@fgtech.com",
   "repository": {
