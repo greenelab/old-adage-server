@@ -4,7 +4,8 @@
   "version": "0.1.0a",
   "description": "Adage Web Server",
   "homepage": "http://adage.greenelab.com",
-  "license": "BSD-3-Clause",
+  "license": "(MIT AND BSD-3-Clause)",
+  "license_url": "https://raw.github.com/ngbp/ngbp/master/LICENSE",
   "bugs": "mailto:mhuyck@fgtech.com",
   "repository": {
     "type": "hg",

@@ -49,7 +49,7 @@ module.exports = function ( grunt ) {
         ' * <%= pkg.homepage %>\n' +
         ' *\n' +
         ' * Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author %>\n' +
-        ' * Licensed <%= pkg.license %>\n' +
+        ' * Licensed <%= pkg.license %> <<%= pkg.licenses_url %>>\n' +
         ' */\n'
     },
 
@@ -304,7 +304,7 @@ module.exports = function ( grunt ) {
         boss: true,
         eqnull: true
       },
-      // globals: {}  // Commented out to disable a warning message.
+      globals: {}  // Commented out to disable a warning message.
     },
 
     /**
