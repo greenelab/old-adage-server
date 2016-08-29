@@ -3,11 +3,6 @@ angular.module( 'adage.analyze.experiment', [
   'ngResource'
 ])
 
-.config(['$resourceProvider', function($resourceProvider) {
-  // Don't strip trailing slashes from calculated URLs
-  $resourceProvider.defaults.stripTrailingSlashes = false;
-}])
-
 .factory( 'Experiment', ['$resource', function($resource) {
   var Experiment = $resource(
     '/api/v0/experiment/:accession/',
@@ -69,7 +64,7 @@ angular.module( 'adage.analyze.experiment', [
           if (responseObject) {
             $scope.experiment.results = responseObject;
             $scope.experiment.status = "Retrieving sample details...";
-            for (var i=0; i< responseObject.sample_set.length; i++) {
+            for (var i = 0; i < responseObject.sample_set.length; i++) {
               getSampleDetails(responseObject.sample_set[i]);
             }
           }

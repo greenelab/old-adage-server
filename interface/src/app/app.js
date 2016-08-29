@@ -5,12 +5,19 @@ angular.module( 'adage', [
   'adage.about',
   'adage.analyze',
   'adage.download',
-  'ui.router'
+  'ui.router',
+  'ngResource'
 ])
 
 .config( function myAppConfig ( $stateProvider, $urlRouterProvider ) {
   $urlRouterProvider.otherwise( '/home' );
 })
+
+// This configuration is required for all REST calls to the back end
+.config(['$resourceProvider', function($resourceProvider) {
+  // Don't strip trailing slashes from calculated URLs
+  $resourceProvider.defaults.stripTrailingSlashes = false;
+}])
 
 .run( function run () {
 })

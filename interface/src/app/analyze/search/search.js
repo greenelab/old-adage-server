@@ -1,10 +1,5 @@
 angular.module( 'adage.analyze.search', ['ngResource'])
 
-.config(['$resourceProvider', function($resourceProvider) {
-  // Don't strip trailing slashes from calculated URLs
-  $resourceProvider.defaults.stripTrailingSlashes = false;
-}])
-
 .factory( 'Search', ['$resource', function($resource) {
   return $resource(
     '/api/v0/search/',
@@ -39,13 +34,14 @@ angular.module( 'adage.analyze.search', ['ngResource'])
           "Searching for: " + $scope.search.query.text + "...";
         Search.query({ q: $scope.search.query.text },
           function(responseObject, responseHeaders) {
-            objectList = responseObject.objects;
-              if (objectList.length == 1) {
-                noun = " match.";
-              } else {
-                noun = " matches.";
-              }
-              $scope.search.query.status = "Found " + objectList.length + noun;
+            var objectList = responseObject.objects;
+            var noun = "";
+            if (objectList.length === 1) {
+              noun = " match.";
+            } else {
+              noun = " matches.";
+            }
+            $scope.search.query.status = "Found " + objectList.length + noun;
             $scope.results = objectList;
           },
           function(responseObject, responseHeaders) {

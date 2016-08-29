@@ -63,7 +63,10 @@ module.exports = {
    */
   vendor_files: {
     js: [
+      'vendor/d3/d3.js',
+      'vendor/vega/vega.js',
       'vendor/angular/angular.js',
+      'vendor/ng-vega/dist/ng-vega.js',
       'vendor/angular-animate/angular-animate.js',
       'vendor/angular-bootstrap/ui-bootstrap-tpls.min.js',
       'vendor/angular-resource/angular-resource.js',
