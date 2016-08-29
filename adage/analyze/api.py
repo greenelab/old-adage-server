@@ -1,14 +1,18 @@
 from django.conf.urls import url
 from django.core.exceptions import ObjectDoesNotExist
+from django.db.models import Q
 from django.http import HttpResponse
 from tastypie import fields, http
 from tastypie.resources import Resource, ModelResource
 from tastypie.utils import trailing_slash
 from tastypie.bundle import Bundle
+from tastypie.exceptions import BadRequest
 from haystack.query import SearchQuerySet
 from haystack.inputs import AutoQuery
-from models import Experiment, Sample, SampleAnnotation, AnnotationType,\
-        Node, Activity
+from models import (
+    Experiment, Sample, SampleAnnotation, AnnotationType, Node, Activity, Edge,
+    Participation
+)
 
 # Many helpful hints for this implementation came from:
 # https://michalcodes4life.wordpress.com/2013/11/26/custom-tastypie-resource-from-multiple-django-models/
@@ -89,7 +93,7 @@ class SearchResource(Resource):
 
 class ExperimentResource(ModelResource):
     sample_set = fields.ManyToManyField(
-            'analyze.api.SampleResource', 'sample_set')
+        'analyze.api.SampleResource', 'sample_set')
 
     class Meta:
         queryset = Experiment.objects.all()
@@ -114,15 +118,15 @@ class SampleResource(ModelResource):
     def prepend_urls(self):
         return [
             url((r'^(?P<resource_name>%s)/'
-                 r'(?P<pk>[0-9]+)/get_experiments%s$') % \
-                    (self._meta.resource_name, trailing_slash()),
-                    self.wrap_view('dispatch_experiments'),
-                    name='api_get_experiments'),
+                 r'(?P<pk>[0-9]+)/get_experiments%s$') %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('dispatch_experiments'),
+                name='api_get_experiments'),
             url((r'^(?P<resource_name>%s)/'
-                 r'get_annotations%s$') % \
-                    (self._meta.resource_name, trailing_slash()),
-                    self.wrap_view('dispatch_annotations'),
-                    name='api_get_annotations'),
+                 r'get_annotations%s$') %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('dispatch_annotations'),
+                name='api_get_annotations'),
         ]
 
     def dispatch_experiments(self, request, **kwargs):
@@ -198,8 +202,8 @@ class SampleResource(ModelResource):
                     sa_cols.append(sa.get(at, ''))
                 rows.append(u'\t'.join(sa_cols) + u'\n')
         response = HttpResponse(rows, content_type='text/tab-separated-values')
-        response['Content-Disposition'] = \
-                'attachment; filename="sample_annotations.tsv"'
+        response['Content-Disposition'] = (
+            'attachment; filename="sample_annotations.tsv"')
         return response
 
 
@@ -224,4 +228,98 @@ class ActivityResource(ModelResource):
         filtering = {
             'sample': ('exact', 'in', ),
             'node': ('exact', 'in', ),
+            'mlmodel': ('exact', ),  # See apply_filters()
+        }
+
+    def apply_filters(self, request, applicable_filters):
+        """
+        Instead of overriding prepend_url() method, we added a new
+        filter "mlmodel" to retrieve the activity records of a specific
+        mlmodel ID:
+          api/v0/activity/?mlmodel=<mlmodel_id>&...
+        """
+        object_list = super(ActivityResource, self).apply_filters(
+            request, applicable_filters)
+        mlmodel = request.GET.get('mlmodel', None)
+        if mlmodel:
+            # Instead of relying on tastypie/resources.py to catch the
+            # ValueError exception that may be raised in this function,
+            # we catch the one that may be raised by int() below and
+            # raise a customized BadRequest exception with more details.
+            try:
+                mlmodel_id = int(mlmodel)
+            except ValueError:
+                raise BadRequest("Invalid mlmodel ID: %s" % mlmodel)
+            object_list = object_list.filter(node__mlmodel=mlmodel_id)
+        return object_list
+
+
+class EdgeResource(ModelResource):
+    gene1 = fields.IntegerField(attribute='gene1_id', null=False)
+    gene2 = fields.IntegerField(attribute='gene2_id', null=False)
+    mlmodel = fields.IntegerField(attribute='mlmodel_id', null=False)
+
+    class Meta:
+        queryset = Edge.objects.all()
+        resource_name = 'edge'
+        allowed_methods = ['get']
+        include_resource_uri = False
+        limit = 0      # Disable default pagination
+        max_limit = 0  # Disable default pagination
+        filtering = {
+            'gene1': ('exact', 'in', ),
+            'gene2': ('exact', 'in', ),
+            'mlmodel': ('exact', 'in', ),
+            'genes': ('exact', ),  # New filter, see apply_filters().
+        }
+        # Allow ordering by weight.
+        # The following URL will sort the edges in ascending order of
+        # weight:
+        #   "api/v0/edge/?field=value&order_by=weight&format=json"
+        # The following URL will sort the edges in descending order of
+        # weight:
+        #   "api/v0/edge/?field=value&order_by=-weight&format=json"
+        # (Note the extra "-" character before "weight".)
+        ordering = ['weight']
+
+    def apply_filters(self, request, applicable_filters):
+        """
+        Instead of overriding prepend_url() method, we added a new
+        filter "genes" to retrieve the edges whose "gene1" or "gene2"
+        field is on the list of genes in a URL like this:
+          api/v0/edge/?genes=id1,id2,...&...
+        """
+        object_list = super(EdgeResource, self).apply_filters(
+            request, applicable_filters)
+        genes = request.GET.get('genes', None)
+        if genes:
+            # Instead of relying on tastypie/resources.py to catch the
+            # ValueError exception that may be raised in this function,
+            # we catch the one that may be raised by int() below and
+            # raise a customized BadRequest exception with more details.
+            try:
+                # Convert genes to a set of integers so that the
+                # duplicate(s) will be removed implicitly.
+                ids = {int(id) for id in genes.split(',')}
+            except ValueError:
+                raise BadRequest("Invalid gene IDs: %s" % genes)
+            # "in" operator in Django supports both list and set.
+            qset = Q(gene1__in=ids) | Q(gene2__in=ids)
+            object_list = object_list.filter(qset).distinct()
+        return object_list
+
+
+class ParticipationResource(ModelResource):
+    node = fields.IntegerField(attribute='node_id', null=False)
+    gene = fields.IntegerField(attribute='gene_id', null=False)
+
+    class Meta:
+        queryset = Participation.objects.all()
+        allowed_methods = ['get']
+        include_resource_uri = False
+        limit = 0      # Disable default pagination
+        max_limit = 0  # Disable default pagination
+        filtering = {
+            'node': ('exact', 'in', ),
+            'gene': ('exact', 'in', ),
         }

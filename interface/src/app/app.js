@@ -4,6 +4,7 @@ angular.module( 'adage', [
   'adage.home',
   'adage.about',
   'adage.analyze',
+  'adage.download',
   'ui.router'
 ])
 

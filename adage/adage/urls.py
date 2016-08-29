@@ -17,16 +17,23 @@ from django.conf.urls import include, url
 from django.views.generic import TemplateView
 from django.contrib import admin
 from tastypie.api import Api
+from organisms.api import OrganismResource
+from genes.api import GeneResource
 from analyze.api import SearchResource, ExperimentResource,\
-    AnnotationTypeResource, SampleResource, NodeResource, ActivityResource
+    AnnotationTypeResource, SampleResource, NodeResource, ActivityResource,\
+    EdgeResource, ParticipationResource
 
 v0_api = Api(api_name='v0')
 v0_api.register(SearchResource())
 v0_api.register(ExperimentResource())
 v0_api.register(AnnotationTypeResource())
 v0_api.register(SampleResource())
+v0_api.register(OrganismResource())
+v0_api.register(GeneResource())
 v0_api.register(NodeResource())
 v0_api.register(ActivityResource())
+v0_api.register(EdgeResource())
+v0_api.register(ParticipationResource())
 
 urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name="index.html"), name='home'),

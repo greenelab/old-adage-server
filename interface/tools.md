@@ -33,7 +33,7 @@ software and libraries from the command line.
 While `ngBoilerplate` makes heavy use of Node.js behind the scenes, you as the
 application developer don't need to really think about it much. Most of the
 interaction with Node.js will occur through Grunt (see next section), so you
-really only need to know how get the initial setup working.
+really only need to know how to get the initial setup working.
 
 `package.json` is an NPM package description file written in JSON. It contains
 basic metadata about your application, like its name, version, and dependencies.
@@ -53,7 +53,7 @@ where the magic happens.
 Node.js. Most importantly, Grunt brings us automation. There are lots of steps
 that go into taking our manageable codebase and making it into a
 production-ready website; we must gather, lint, test, annotate, and copy files
-about. Instead of doing all of that manually, we write (and use others') Grunt
+about. Instead of doing all of them manually, we write (and use others') Grunt
 tasks to do things for us.
 
 When we want to build our site, we can just type:
@@ -160,7 +160,7 @@ of course the documentation at gruntjs.com) will set you on the right path.
 
 ## Bower
 
-[Bower](bower.io) is a package manager for the web. It's similar in many
+[Bower](http://bower.io) is a package manager for the web. It's similar in many
 respects to NPM, though it is significantly simpler and only contains code for
 web projects, like Twitter Bootstrap and its AngularJS counterpart Angular
 Bootstrap. Bower allows us to say that our app depends in some way on these
@@ -220,4 +220,3 @@ through the [main README](README.md) to dive another level deeper and apply what
 you've learned for great good. I promise it will all make sense it short order.
 
 Happy programming!
-
