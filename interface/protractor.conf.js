@@ -33,7 +33,7 @@ exports.config = {
   // Multiple web browsers.
   multiCapabilities: [
     { browserName: 'chrome' },
-    { browserName: 'firefox' },
+    // { browserName: 'firefox' },
     // Add other browsers here, such as 'safari'.
   ],
 

@@ -65,9 +65,9 @@ module.exports = function ( karma ) {
      * you save.
      */
     browsers: [
-      'Chrome',
-      'Firefox',
       'PhantomJS',
+      // 'Chrome',
+      // 'Firefox',
       // Add other bowsers here, such as 'Safari'
     ],
   });
