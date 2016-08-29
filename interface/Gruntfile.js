@@ -304,7 +304,7 @@ module.exports = function ( grunt ) {
         boss: true,
         eqnull: true
       },
-      globals: {}  // Commented out to disable a warning message.
+      // globals: {}  // Commented out to disable a warning message.
     },
 
     /**
