@@ -1,3 +1,9 @@
+/*
+ * The sampleBin module provides a service for collecting the samples selected
+ * for analysis by the user (this would be a shopping cart in an e-commerce
+ * web site). It also provides utilities for retrieving additional sample
+ * information and activity levels required for drawing the heatmap.
+ */
 angular.module( 'adage.analyze.sampleBin', [
   'adage.analyze.sample',
   'ngResource'
@@ -151,10 +157,11 @@ function SampleBinCtrl($scope, $log, $uibModal, Sample, SampleBin) {
   };
 })
 
-.controller('AnalysisModalCtrl', function($scope, $uibModalInstance, analysis) {
+.controller('AnalysisModalCtrl', ['$scope', '$uibModalInstance', 'analysis',
+function($scope, $uibModalInstance, analysis) {
   $scope.analysis = analysis;
   $scope.close = function() {
     $uibModalInstance.dismiss('close');
   };
-})
+}])
 ;

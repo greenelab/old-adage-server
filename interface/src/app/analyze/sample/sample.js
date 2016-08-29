@@ -1,10 +1,5 @@
 angular.module( 'adage.analyze.sample', ['ngResource'])
 
-.config(['$resourceProvider', function($resourceProvider) {
-  // Don't strip trailing slashes from calculated URLs
-  $resourceProvider.defaults.stripTrailingSlashes = false;
-}])
-
 .factory( 'Sample', ['$resource', '$http', '$log', 
 function($resource, $http, $log) {
   var Sample = $resource(

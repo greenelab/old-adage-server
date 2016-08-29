@@ -1,8 +1,11 @@
+/*
+ * The analyze module handles the view that loads when a user clicks on
+ * "Analyze" in the nav bar.
+ */
 angular.module( 'adage.analyze', [
   'adage.analyze.search',
   'adage.analyze.detail',
-  'adage.analyze.analysis', // for sample-bin
-  // 'adage.analyze.sampleBin',
+  'adage.analyze.analysis', // includes sample-bin
   'ui.router',
   'placeholders',
   'ui.bootstrap',
@@ -30,11 +33,7 @@ angular.module( 'adage.analyze', [
 
 .controller( 'AnalyzeCtrl', ['$scope', '$log', '$location',
   '$anchorScroll', 'Sample',
-  function AnalyzeCtrl($scope, $log, $location, $anchorScroll,
-    Sample) {
-
-    //////////////////////////
-    // Analyze-related (overall layout) stuff here
+  function AnalyzeCtrl($scope, $log, $location, $anchorScroll, Sample) {
     $scope.analyze = {
       item_style: function(search_item) {
         // Determine which CSS classes should apply to this search_item.

@@ -1,14 +1,14 @@
+/*
+ * The analysis module handles the detail view that comes up when a user clicks
+ * on the sampleBin in the nav bar. It shows a sortable list of samples and
+ * contains the heatmap, which is the primary feature of the analysis view.
+*/
 angular.module( 'adage.analyze.analysis', [
   'adage.analyze.sampleBin',
   'adage.analyze.sample',
   'ngVega',
   'ngResource'
 ])
-
-.config(['$resourceProvider', function($resourceProvider) {
-  // Don't strip trailing slashes from calculated URLs
-  $resourceProvider.defaults.stripTrailingSlashes = false;
-}])
 
 .factory( 'AnnotationType', ['$resource', function($resource) {
   return $resource('/api/v0/annotationtype/');

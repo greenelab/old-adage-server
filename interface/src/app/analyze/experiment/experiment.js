@@ -3,11 +3,6 @@ angular.module( 'adage.analyze.experiment', [
   'ngResource'
 ])
 
-.config(['$resourceProvider', function($resourceProvider) {
-  // Don't strip trailing slashes from calculated URLs
-  $resourceProvider.defaults.stripTrailingSlashes = false;
-}])
-
 .factory( 'Experiment', ['$resource', function($resource) {
   var Experiment = $resource(
     '/api/v0/experiment/:accession/',
