@@ -42,7 +42,7 @@ angular.module( 'adage.analyze', [
         // looking at detail on this search_item, it should be highlighted.
         var classList = search_item.item_type;
         if ($scope.detail.showing &&
-            search_item.pk==$scope.detail.search_item.pk) {
+            search_item.pk === $scope.detail.search_item.pk) {
           classList += ' active';
         }
         return classList;

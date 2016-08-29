@@ -16,7 +16,8 @@
         ng-class="analyze.item_style(search_item)" class="list-group-item">
           <a id="{{search_item.pk}}" ng-click="detail.show(search_item)">
             <div class="media-left">
-              <span ng-if="search_item.item_type == 'experiment'" class="badge">
+              <span ng-if="search_item.item_type === 'experiment'"
+              class="badge">
                 {{ search_item.related_items.length }}
               </span>
             </div>

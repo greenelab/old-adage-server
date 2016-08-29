@@ -41,7 +41,7 @@ angular.module( 'adage.analyze.search', ['ngResource'])
           function(responseObject, responseHeaders) {
             var objectList = responseObject.objects;
             var noun = "";
-            if (objectList.length == 1) {
+            if (objectList.length === 1) {
               noun = " match.";
             } else {
               noun = " matches.";

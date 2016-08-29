@@ -15,7 +15,7 @@ function($log, Sample, Activity) {
     sampleData: {},
 
     add_sample: function(id) {
-      if (SampleBin.samples.indexOf(+id) != -1) {
+      if (SampleBin.samples.indexOf(+id) !== -1) {
         // quietly ignore the double-add
         $log.warn('SampleBin.add_sample: ' + id +
             ' already in the sample list; ignoring.');
@@ -50,25 +50,25 @@ function($log, Sample, Activity) {
     },
 
     add_item: function(search_item) {
-      if (search_item.item_type == 'sample') {
+      if (search_item.item_type === 'sample') {
         SampleBin.add_sample(search_item.pk);
-      } else if (search_item.item_type == 'experiment') {
+      } else if (search_item.item_type === 'experiment') {
         SampleBin.add_experiment(search_item.related_items);
       }
     },
 
     has_item: function(search_item) {
-      if (search_item.item_type == 'sample') {
-        if (SampleBin.samples.indexOf(+search_item.pk) != -1) {
+      if (search_item.item_type === 'sample') {
+        if (SampleBin.samples.indexOf(+search_item.pk) !== -1) {
           return true;
         } else {
           return false;
         }
-      } else if (search_item.item_type == 'experiment') {
+      } else if (search_item.item_type === 'experiment') {
         // what we want to know, in the case of an experiment, is 'are
         // all of the samples from this experiment already added?'
         for (var i = 0; i < search_item.related_items.length; i++) {
-          if (SampleBin.samples.indexOf(+search_item.related_items[i]) == -1) {
+          if (SampleBin.samples.indexOf(+search_item.related_items[i]) === -1) {
             return false;
           }
         }
