@@ -1,0 +1,10 @@
+*~
+*.pyc
+whoosh_index/
+*.sqlite3
+*.json_cache
+interface/build/
+interface/bin/
+interface/node_modules/
+interface/vendor/
+adage/adage/config.py
