@@ -20,6 +20,17 @@ engines:
       - python
   markdownlint:
     enabled: true
+    exclude_paths:
+    - "interface/CHANGELOG.md"
+    - "interface/CONTRIBUTING.md"
+    - "interface/README.md"
+    - "interface/tools.md"
+    - "interface/src/README.md"
+    - "interface/src/app/README.md"
+    - "interface/src/app/home/README.md"
+    - "interface/src/assets/README.md"
+    - "interface/src/common/README.md"
+    - "interface/src/less/README.md"
 ratings:
   paths:
   - "**.inc"
