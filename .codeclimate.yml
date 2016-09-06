@@ -1,0 +1,42 @@
+---
+engines:
+  duplication:
+    enabled: true
+    config:
+      languages:
+        python:
+          mass_threshold: 50
+        javascript:
+  fixme:
+    enabled: false
+  radon:
+    enabled: true
+    config:
+      python_version: 2
+  pep8:
+    enabled: true
+    config:
+      languages:
+      - python
+  markdownlint:
+    enabled: true
+    exclude_paths:
+    - "interface/CHANGELOG.md"
+    - "interface/CONTRIBUTING.md"
+    - "interface/README.md"
+    - "interface/tools.md"
+    - "interface/src/README.md"
+    - "interface/src/app/README.md"
+    - "interface/src/app/home/README.md"
+    - "interface/src/assets/README.md"
+    - "interface/src/common/README.md"
+    - "interface/src/less/README.md"
+ratings:
+  paths:
+  - "**.inc"
+  - "**.js"
+  - "**.jsx"
+  - "**.module"
+  - "**.py"
+exclude_paths:
+- "adage/**/migrations/"

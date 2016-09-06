@@ -199,7 +199,6 @@ class ModelsTestCase(TestCase):
         edges = Edge.objects.filter(gene2=last_gene)
         self.assertEqual(edges.count(), num_gene1)
 
-
     @staticmethod
     def create_participations(num_nodes, num_genes):
         """
