@@ -87,16 +87,16 @@ def push():
 
 
 @task
-def pull(hgopts=''):
-    """ pull code changes from repo (bitbucket, by default) to server """
+def pull(opts=''):
+    """ pull code changes from repo (GitHub, by default) to server """
     # config.py has aws keys in it, so we transfer only the settings we need
     # for deployment to the server
     run('echo "CONFIG = {0}" > /home/adage/adage-server/adage/adage/config.py'.\
             format(pprint.PrettyPrinter().pformat(CONFIG)))
-    if hgopts:
-        hgopts = ' ' + hgopts
+    if opts:
+        opts = ' ' + opts
     with cd('/home/adage/adage-server'):
-        run('hg pull' + hgopts)
+        run('git pull' + opts)
 
 
 def _install_django_requirements():
@@ -148,6 +148,9 @@ def init_setup_and_check():
 
 def bootstrap_database():
     """ Run a migrate to bootstrap the database """
+    # FIXME we can eliminate the first migrate here by purging from source repo
+    run('python manage.py migrate')
+    run('python manage.py makemigrations')
     run('python manage.py migrate')
 
 
@@ -173,6 +176,13 @@ def import_data_and_index():
     """
     run('python manage.py import_data "%s"' % CONFIG['data']['annotation_file'])
     rebuild_search_index()
+    run('python manage.py organisms_create_or_update --taxonomy_id=208964 '
+        '--scientific_name="Pseudomonas aeruginosa" '
+        '--common_name="P. aeruginosa"')
+    run('python manage.py add_ml_model "Ensemble ADAGE 300" 208964')
+    run('python manage.py import_activity ../data/all-pseudomonas-gene-'
+        'normalized_HWActivity_perGene_with_net300_100models_k=300_seed=123'
+        '_ClusterByweighted_avgweight_network_ADAGE.txt "Ensemble ADAGE 300"')
 
 
 @task(alias='idb')

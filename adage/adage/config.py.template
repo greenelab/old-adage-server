@@ -25,7 +25,7 @@ AWS_CONFIG = {
                      },
     'ec2_params':    {
                          # 'DryRun': True,
-                         'ImageId': 'ami-d05e75b8',
+                         'ImageId': 'ami-4f680658',    # Ubuntu 16.04
                          'MinCount': 1, 'MaxCount': 1,
                          'KeyName': '<configure>',
                          'SecurityGroups':  ['<configure>'],
@@ -35,6 +35,10 @@ AWS_CONFIG = {
                          'host': '<configure>',  # <-- our elastic IP address
                          'user': 'ubuntu',
                          'keyfile': '<configure>',
+                     },
+    'deploy':        {
+                         'keyfile': '<configure>',
+                         'keyfile_pub': '<configure>'
                      }
 }
 
