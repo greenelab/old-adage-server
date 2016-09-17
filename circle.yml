@@ -1,5 +1,2 @@
 general:
   build_dir: adage
-machine:
-  environment:
-    CODESHIP_SETTINGS: YES
