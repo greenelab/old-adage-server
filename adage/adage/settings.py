@@ -42,7 +42,7 @@ elif os.environ.get('CIRCLECI') == 'true':
     CONFIG['databases']['default']['PASSWORD'] = pg_pass
     CONFIG['databases']['default']['PORT'] = '5432'
     CONFIG['data']['data_dir'] = '/home/ubuntu/adage-server/data/'
-    CONFIG['data']['annotation_file']['PORT'] = '/home/ubuntu/adage-server/data/PseudomonasAnnotation.tsv'
+    CONFIG['data']['annotation_file'] = '/home/ubuntu/adage-server/data/PseudomonasAnnotation.tsv'
 else:
     from config import CONFIG
 
