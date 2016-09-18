@@ -11,9 +11,9 @@ ENV ADAGE_SRV=/srv
 ENV ADAGE_SRVSRC=$ADAGE_SRV/$ADAGE_SRC
 
 RUN apt-get update && apt-get install -y \
-  python3 \
-  python3-pip \
-  python3-psycopg2
+  python \
+  python-pip \
+  python-psycopg2
 
 # Create required directories
 WORKDIR $ADAGE_SRV
@@ -23,7 +23,7 @@ RUN mkdir media static logs
 COPY $ADAGE_SRC $ADAGE_SRV
 
 # Install ADAGE deps
-RUN pip3 install -r requirements.txt
+RUN pip install -r requirements.txt
 
 # Make available on port 8000
 EXPOSE 8000
