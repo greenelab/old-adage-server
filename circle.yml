@@ -1,2 +1,6 @@
 general:
   build_dir: adage
+
+machine:
+  services:
+    - docker
