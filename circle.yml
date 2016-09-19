@@ -4,3 +4,24 @@ general:
 machine:
   services:
     - docker
+
+dependencies:
+  override:
+    # set region so we can use the aws command-line tool to log into ecr
+    #- aws configure set default.region us-west-2
+    #- eval $(aws ecr get-login)
+
+    # pull image from ecr to cache docker layers for quicker rebuilds
+    - docker pull greenescientist/adageserver:latest
+
+    # build new image
+    - bin/build.sh
+
+deployment:
+  production:
+    # only apply this deployment on the master branch
+    #branch: master
+
+    commands:
+      # push image to ecr
+      - bin/push.sh
