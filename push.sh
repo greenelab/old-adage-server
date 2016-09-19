@@ -25,6 +25,6 @@ docker login --username=$DOCKER_USER --password=$DOCKER_PASSWD \
 docker tag $NAME $NAME:$HASH
 docker push $NAME:$HASH
 docker tag $NAME $NAME:latest
-docker push $NAME:latest
+# docker push $NAME:latest # Doesn't seem we need this with the tag command above.
 
 docker logout
