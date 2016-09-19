@@ -5,6 +5,10 @@ machine:
 
 dependencies:
   override:
+    # Go ahead and install requirements.txt. We're going to run tests here
+    # first, so that we can make sure the db connections, etc are working.
+    - pip install -r adage/requirements.txt
+    
     # set region so we can use the aws command-line tool to log into ecr
     #- aws configure set default.region us-west-2
     #- eval $(aws ecr get-login)
