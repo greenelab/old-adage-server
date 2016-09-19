@@ -20,7 +20,7 @@ dependencies:
 deployment:
   production:
     # only apply this deployment on the master branch
-    #branch: master
+    branch: circle-ci-test
 
     commands:
       # push image to ecr
