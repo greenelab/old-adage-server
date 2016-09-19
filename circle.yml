@@ -15,6 +15,11 @@ dependencies:
     # build new image
     - bash build.sh
 
+test:
+  override:
+    # put your test command(s) here
+    - python adage/manage.py test
+
 deployment:
   production:
     # only apply this deployment on the master branch
