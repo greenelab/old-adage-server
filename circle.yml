@@ -14,7 +14,7 @@ dependencies:
 
     # build new image
     - ls
-    - build.sh
+    - bash build.sh
 
 deployment:
   production:
@@ -23,4 +23,4 @@ deployment:
 
     commands:
       # push image to ecr
-      - push.sh
+      - bash push.sh
