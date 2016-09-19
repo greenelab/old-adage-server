@@ -20,6 +20,8 @@ HASH=$(git rev-parse HEAD)
 
 docker login --username=$DOCKER_USER --password=$DOCKER_PASSWD \
   --email=$DOCKER_EMAIL
+# Flag --email has been deprecated, will be removed in 1.13. CircleCI Still
+# requires this.
 
 # Don't need $REMOTE for docker hub but we'll want it later.
 docker tag $NAME $NAME:$HASH
