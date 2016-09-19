@@ -18,7 +18,8 @@ HASH=$(git rev-parse HEAD)
 
 #docker logout https://$REMOTE
 
-docker login --username=$DOCKER_USER --password=$DOCKER_PASSWD
+docker login --username=$DOCKER_USER --password=$DOCKER_PASSWD \
+  --email=$DOCKER_EMAIL
 
 # Don't need $REMOTE for docker hub but we'll want it later.
 docker tag $NAME $NAME:$HASH
