@@ -26,7 +26,16 @@ docker login --username=$DOCKER_USER --password=$DOCKER_PASSWD \
 # Don't need $REMOTE for docker hub but we'll want it later.
 docker tag $NAME $NAME:$HASH
 docker push $NAME:$HASH
-docker tag $NAME $NAME:latest
+
+# CircleCI Docker is old enough that -f is required here. It will break
+# locally though. So only use in the CIRCLECI environment. One day we will
+# have to remove this when CircleCI updates Docker.
+if [ $CIRCLECI ]
+then
+  docker tag -f $NAME $NAME:latest
+else
+  docker tag $NAME $NAME:latest
+fi
 docker push $NAME:latest
 
 docker logout
