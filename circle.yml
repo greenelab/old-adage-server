@@ -13,7 +13,6 @@ dependencies:
     - docker pull greenescientist/adageserver:latest
 
     # build new image
-    - ls
     - bash build.sh
 
 deployment:
