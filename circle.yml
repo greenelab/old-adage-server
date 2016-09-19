@@ -1,3 +1,4 @@
+
 machine:
   services:
     - docker
@@ -12,6 +13,7 @@ dependencies:
     - docker pull greenescientist/adageserver:latest
 
     # build new image
+    - ls
     - build.sh
 
 deployment:
