@@ -15,7 +15,7 @@ dependencies:
     - docker pull greenescientist/adageserver:latest
 
     # build new image
-    - bin/build.sh
+    - build.sh
 
 deployment:
   production:
@@ -24,4 +24,4 @@ deployment:
 
     commands:
       # push image to ecr
-      - bin/push.sh
+      - push.sh
