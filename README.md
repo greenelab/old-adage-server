@@ -121,11 +121,16 @@ Download the `get_pseudo_sdrf.py` and `gen_spreadsheets.py` files from
 and put them in whichever parent directory the adage-server repository has been
 cloned into.
 
-
 ### Build adage-server web interface
 
 ```shell
 cd interface/
+
+# Download newest version of Node.js. Also, the command
+# "curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -"
+# is needed before the "sudo apt-get install -y nodejs" if you are
+# running a Ubuntu version older than 16.04.
+sudo apt-get install -y nodejs
 
 # Install needed interface packages
 sudo npm -g install grunt-cli karma-cli bower
