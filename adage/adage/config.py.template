@@ -12,11 +12,14 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REPO_ROOT = os.path.dirname(BASE_DIR)
 
 # AWS credentials and configuration
-AWS_CONFIG = {
+AWS_DEPLOY = {
     'aws_access_key_id':        '<config-secret>',
     'aws_secret_access_key':    '<config-secret>',
     'region_name':              'us-east-1',
-    'rds_conn':      {
+    # 'dbmaster' holds credentials for the RDS instance used on AWS
+    'dbmaster':      {   # database user with CREATE DATABASE & ROLE privs
+                         # these are used to bootstrap a new database as
+                         # specified in CONFIG['databases']['default']
                          'NAME': 'adage_db',
                          'USER': 'adage_db',
                          'PASSWORD': '<config-secret>',
@@ -31,20 +34,26 @@ AWS_CONFIG = {
                          'SecurityGroups':  ['<configure>'],
                          'InstanceType': 't2.micro',
                      },
-    'host_conn':     {
+    'host_conn':     {   # this user needs sudo privilege
+                         # root user privs are used to create a new user
+                         # for hosting code as specified in OS_CONFIG
                          'host': '<configure>',  # <-- our elastic IP address
                          'user': 'ubuntu',
                          'keyfile': '<configure>',
                      },
-    'deploy':        {
+    'deploy':        {   # this key grants access to source code
                          'keyfile': '<configure>',
                          'keyfile_pub': '<configure>'
                      }
 }
 
-# os-level configuration
+# configure the user account that will host the source code and build output
 OS_CONFIG = {
-    'home_dir':      '/home/<configure:default=adage>/',
+    'user':         '<configure:default=adage>',
+    'host':         None,               # must be supplied at runtime!
+    'home_dir':     '/home/<configure:default=adage>/',
+    'keyfile':      '<configure>',      # local file: used to login
+    'keyfile_pub':  '<configure>'       # local file: added to authorized_keys
 }
 
 
@@ -58,18 +67,25 @@ DATA_CONFIG.update({
                                      'PseudomonasAnnotation.tsv'),
 })
 
-# test server deployment credentials and configuration (maybe on AWS)
-TEST_CONFIG = {
+# deployment server credentials and configuration (for AWS)
+AWS_CONFIG = {
+    # Set up some parameters for deployment
+    'os':            OS_CONFIG,
+    'repo':          'git@github.com:greenelab/adage-server.git',
     'data':          DATA_CONFIG,
-    'host_conn':     AWS_CONFIG['host_conn'].copy(),
+    'host_conn':     AWS_DEPLOY['host_conn'],
     'virt_env':      OS_CONFIG['home_dir'] + '.virtualenvs/adage',
     'django_dir':    os.path.join(OS_CONFIG['home_dir'],
                                   'adage-server', 'adage'),
-    'django_key':    '<config-secret>',
     'django_super':  '<configure:desc=superuser>',
     'django_email':  '<configure:desc=superuser_email>',
     'interface_dir': os.path.join(OS_CONFIG['home_dir'],
                                   'adage-server', 'interface'),
+    'dbmaster':      AWS_DEPLOY['dbmaster'],
+
+    # The following three keys are all that are needed for runtime use:
+    # django_key, databases, haystack
+    'django_key':    '<config-secret>',
     'databases':     {'default': {
                         'ENGINE': 'django.db.backends.postgresql_psycopg2',
                         # database name and user cannot have upper case letters
@@ -88,44 +104,41 @@ TEST_CONFIG = {
                         },
                      },
 
-
-    'tribe_id': 'ClientIDHere',
-    'tribe_secret': 'ClientSecretHere',
-    'tribe_redirect_uri': 'http://example.com/tribe_client/get_token',
+    # configure the following section to enable sign-in via Tribe's OAuth2
+    'tribe_id': '<configure:ClientIDHere>',
+    'tribe_secret': '<config-secret:ClientSecretHere>',
+    'tribe_redirect_uri': '<configure:http://example.com/tribe_client/get_token>',
     'tribe_scope': 'write',
     'tribe_login_redirect': '/#/home',
     'tribe_logout_redirect': '/#/home'
 }
-TEST_CONFIG['host_conn'].update({
-    'user':     'adage',
-    'keyfile':  '<configure>',
-})
-DEPLOY_TEST_CONFIG = TEST_CONFIG.copy()
-DEPLOY_TEST_CONFIG.update({
-    'host_conn':     AWS_CONFIG['host_conn'],
-    'dbmaster':      AWS_CONFIG['rds_conn'],
-})
 
 # development server deployment credentials and configuration (maybe on VMware)
-DEV_CONFIG = TEST_CONFIG.copy()
+DEV_CONFIG = AWS_CONFIG.copy()
 DEV_CONFIG.update({
-    'databases':     {'default': {
-                        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-                        # database name and user cannot have upper case letters
-                        'NAME': '<configure>',
-                        'USER': '<configure>',
-                        'PASSWORD': '<config-secret>',
-                        'HOST': '<configure>',
-                        'PORT': '5432',
-                        }
-                     },
-    'dbmaster':      {
-                        'NAME': '<configure>',
-                        'USER': '<configure>',
-                        'PASSWORD': '<config-secret>',
-                        'HOST': '<configure>',
-                        'PORT': '5432',
-                     },
+    'repo':          '<configure>',
+    'databases': { 'default': {
+                     'ENGINE': 'django.db.backends.postgresql_psycopg2',
+                     # database name and user cannot have upper case letters
+                     'NAME': '<configure>',
+                     'USER': '<configure>',
+                     'PASSWORD': '<config-secret>',
+                     'HOST': '<configure>',
+                     'PORT': '5432',
+                   }
+                 },
+    'dbmaster':  {
+                     'NAME': '<configure>',
+                     'USER': '<configure>',
+                     'PASSWORD': '<config-secret>',
+                     'HOST': '<configure>',
+                     'PORT': '5432',
+                 },
+    'host_conn': {  # this user needs sudo privilege
+                    'host': '<configure>',
+                    'user': '<configure:default=ubuntu>',
+                    'keyfile': '<configure>',
+                 },
 })
 
 # Configuration for our CI services
@@ -172,4 +185,5 @@ CIRCLECI_CONFIG.update({
                      },
 })
 
-CONFIG = TEST_CONFIG
+# now that each config is defined, specify which one to use
+CONFIG = AWS_CONFIG

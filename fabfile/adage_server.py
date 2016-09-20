@@ -1,51 +1,54 @@
 """ Fab tasks to deploy an Adage server build """
 
+# task organization that would be handy for ci:
+# TODO make a reinit_database task (drop and re-initialize)
+# TODO separate build environment from runtime (separate Docker layers?)
+
 from __future__ import with_statement
 import os
 import sys
 import logging
 import pprint
-from fabric.api import env, local, run, settings, hide, abort, task, runs_once
+from fabric.api import env, local, run, settings, hide, abort, task
 from fabric.api import cd, prefix, sudo
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG_DIR = os.path.join(BASE_DIR, 'adage', 'adage')
 if CONFIG_DIR not in sys.path:
     sys.path.append(CONFIG_DIR)
-# from config import DEV_CONFIG as CONFIG
-from config import TEST_CONFIG as CONFIG
+from config import CONFIG
 
 # increase logging level for more detail during debugging
 # logging.basicConfig(level=logging.INFO)
 
 
-# @runs_once
 @task
-def setup_ec2_conn(use_config=None):
+def setup_host_conn(use_conn=None):
     """
     Set up default connection information and key file, if available
     """
-    if use_config is None:
-        logging.info("setup_ec2_conn: reverting to default CONFIG")
-        use_config = CONFIG
+    if use_conn is None:
+        logging.info("setup_host_conn: reverting to default CONFIG")
+        use_conn = CONFIG['host_conn']
 
-    # If no host was provided on the command line, set the default as we
-    # would like it to be
-    # if (not env.hosts) or override_hosts:
-    # env.hosts = [ use_config['default_host'] ]
-    env.hosts = ['{user}@{host}'.format(**use_config['host_conn'])]
+    env.hosts = ['{user}@{host}'.format(**use_conn)]
 
-    logging.info('setup_ec2_conn using keyfile: ' +
-            use_config['host_conn']['keyfile'])
+    logging.info(
+        'setup_host_conn using keyfile: ' + use_conn['keyfile'] +
+        ' for [' + ', '.join(env.hosts) + ']'
+    )
     with settings(hide('running'), warn_only=True):
-        if local("test -e %s" % use_config['host_conn']['keyfile']).succeeded:
+        if local("test -e %s" % use_conn['keyfile']).succeeded:
             if not env.key_filename: env.key_filename = []
-            env.key_filename.append(use_config['host_conn']['keyfile'])
-            logging.info("Loaded aws_ubuntu private key from %s." % \
-                    use_config['host_conn']['keyfile'])
+            env.key_filename.append(use_conn['keyfile'])
+            logging.info("Loaded {user} private key from {keyfile}.".format(
+                **use_conn)
+            )
         else:
-            logging.warning("Could not load aws_ubuntu key from %s." % \
-                    use_config['host_conn']['keyfile'])
+            logging.warning(
+                "Could not load {user} private key from {keyfile}.".format(
+                    **use_conn)
+            )
 
 
 @task
@@ -59,31 +62,15 @@ def capture_django_requirements():
     local('pip freeze > requirements.txt')
 
 
-def _ensure_checkin():
-    """ make sure all code is checked in -- fail if it's not """
-    # TODO: make error reporting a bit more friendly and descriptive here
-    # this will fail if we don't have a clean status for all tracked hg files
-    local('test -z "`hg status | egrep -v \"^(\?)\"`"')
-
-
 @task
 def test():
     """
-    TODO: integrate testing! (for
-    django, see: https://docs.djangoproject.com/en/1.8/intro/tutorial05/ and for
+    TODO: integrate testing! (for django,
+    see: https://docs.djangoproject.com/en/1.8/intro/tutorial05/ and for
     angular, see: https://docs.angularjs.org/tutorial)
+    Note: this should invoke some unit & e2e tests to verify deployment
     """
     pass
-
-
-@task
-def push():
-    """
-    make sure our changes are checked in and pushed to bitbucket before
-    we proceed
-    """
-    _ensure_checkin()
-    local('hg push')
 
 
 @task
@@ -121,9 +108,10 @@ def _check_env():
 
 
 def _install_interface_requirements():
-    """ run through bower installation """
-    run('npm install')
-    run('bower install --config.interactive=false')
+    """ run through npm and bower installations """
+    with settings(warn_only=True):
+        run('npm install')
+        run('bower install --config.interactive=false')
 
 
 @task
@@ -171,18 +159,19 @@ def rebuild_search_index():
 @task
 def import_data_and_index():
     """
-    invoke import_data, which manually links to the get_pseudo_sdrf.py
-    file extracted from the get_pseudomonas repository
+    invoke import_data (which manually links to the get_pseudo_sdrf.py
+    file extracted from the get_pseudomonas repository) and
+    import_activity with sample data from CONFIG['data']
     """
-    run('python manage.py import_data "%s"' % CONFIG['data']['annotation_file'])
+    run('python manage.py import_data "%s"' %
+        CONFIG['data']['annotation_file'])
     rebuild_search_index()
     run('python manage.py organisms_create_or_update --taxonomy_id=208964 '
         '--scientific_name="Pseudomonas aeruginosa" '
         '--common_name="P. aeruginosa"')
     run('python manage.py add_ml_model "Ensemble ADAGE 300" 208964')
-    run('python manage.py import_activity ../data/all-pseudomonas-gene-'
-        'normalized_HWActivity_perGene_with_net300_100models_k=300_seed=123'
-        '_ClusterByweighted_avgweight_network_ADAGE.txt "Ensemble ADAGE 300"')
+    run('python manage.py import_activity "%s" "Ensemble ADAGE 300"' %
+        CONFIG['data']['activity_file'])
 
 
 @task(alias='idb')
@@ -217,7 +206,7 @@ def update():
     """
     Sync this deployment with the source repository, reindex and bounce server
     """
-    setup_ec2_conn()
+    setup_host_conn()
     pull()
     env.dir = CONFIG['django_dir']
     env.virt_env = CONFIG['virt_env']
@@ -229,14 +218,16 @@ def update():
 
 
 @task
-def deploy():
+def deploy(use_config=None):
     """
     Execute a complete deployment to update an adage server with code changes
     """
+    global CONFIG
+    if use_config:
+        CONFIG = use_config
+    
     # capture_django_requirements() # don't clobber what we've added from server
     # test()
-    # push() # it's hazardous to push, then pull immediately as there is a lag
-             # before the pull command can get the new code
     print("beginning adage-server deploy")
     pull()
     init_setup_and_check()
