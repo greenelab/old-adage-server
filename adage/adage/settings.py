@@ -35,6 +35,7 @@ elif os.environ.get('CIRCLECI') == 'true':
     CONFIG['databases']['default']['USER'] = 'ubuntu'
     CONFIG['databases']['default']['PASSWORD'] = ''
     CONFIG['databases']['default']['PORT'] = '5432'
+    print(CONFIG['data']['data_dir'])
 else:
     from config import CONFIG
 
