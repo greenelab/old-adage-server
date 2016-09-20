@@ -131,9 +131,9 @@ CI_CONFIG.update({
                         'PORT': '5434',  # v. 9.4
                      },
     'data':          {
-                        'data_dir': '/home/rof/clone/data/',
-                        'annotation_file':
-                            '/home/rof/clone/data/PseudomonasAnnotation.tsv',
+                        'data_dir': os.path.join(REPO_ROOT, 'data'),
+                        'annotation_file': os.path.join(REPO_ROOT, 'data',
+                              'PseudomonasAnnotation.tsv'),
                      },
 })
 
