@@ -12,12 +12,12 @@ Ubuntu (16.04).
 
 Fork [the adage-server repository on Github](https://github.com/greenelab/adage-server)
 (see [Github's documentation](https://help.github.com/articles/fork-a-repo/)
-for forking repositories) and then clone that fork in the directory of your
-choice.
+for forking repositories) and then clone that fork you made in the directory
+of your choice.
 
 ```shell
 cd /<your chosen directory>/
-git clone git@github.com:greenelab/adage-server.git
+git clone git@github.com:<your github account>/adage-server.git
 ```
 
 ### Edit settings in config.py file
