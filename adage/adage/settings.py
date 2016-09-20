@@ -12,7 +12,9 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+REPO_ROOT = os.path.dirname(BASE_DIR)
 
 # Any deployment configuration settings (including all secrets)
 # come from config.py, which is never checked into source control. If we're
@@ -23,26 +25,16 @@ if os.environ.get('CODESHIP_SETTINGS') == 'YES':
     CONFIG = CI_CONFIG
     pg_user = os.environ.get('PG_USER')
     pg_pass = os.environ.get('PG_PASSWORD')
-    CONFIG['dbmaster']['USER'] = pg_user
-    CONFIG['dbmaster']['PASSWORD'] = pg_pass
     CONFIG['databases']['default']['USER'] = pg_user
     CONFIG['databases']['default']['PASSWORD'] = pg_pass
 elif os.environ.get('CIRCLECI') == 'true':
     with open(os.path.join(BASE_DIR, 'adage', 'config.py.template')) as f:
         exec f
     CONFIG = CI_CONFIG
-    pg_user = 'ubuntu'
-    pg_pass = ''
-    CONFIG['dbmaster']['NAME'] = 'circleci_test'
-    CONFIG['dbmaster']['USER'] = pg_user
-    CONFIG['dbmaster']['PASSWORD'] = pg_pass
-    CONFIG['dbmaster']['PORT'] = '5432'
     CONFIG['databases']['default']['NAME'] = 'circleci_test'
-    CONFIG['databases']['default']['USER'] = pg_user
-    CONFIG['databases']['default']['PASSWORD'] = pg_pass
+    CONFIG['databases']['default']['USER'] = 'ubuntu'
+    CONFIG['databases']['default']['PASSWORD'] = ''
     CONFIG['databases']['default']['PORT'] = '5432'
-    CONFIG['data']['data_dir'] = '/home/ubuntu/adage-server/data/'
-    CONFIG['data']['annotation_file'] = '/home/ubuntu/adage-server/data/PseudomonasAnnotation.tsv'
 else:
     from config import CONFIG
 
