@@ -7,6 +7,10 @@
 # and replace with values tailored to your deployment.
 import random
 
+import os
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+REPO_ROOT = os.path.dirname(BASE_DIR)
+
 # AWS credentials and configuration
 AWS_CONFIG = {
     'aws_access_key_id':        '<config-secret>',
@@ -39,13 +43,14 @@ OS_CONFIG = {
     'home_dir':      '/home/<configure:default=adage>/',
 }
 
+
 # data for bootstrapping the database and testing
 DATA_CONFIG = {
-    'data_dir':      OS_CONFIG['home_dir'] + 'adage-server/data/',
+    'data_dir':      os.path.join(REPO_ROOT, 'data'),
 }
 DATA_CONFIG.update({
-    'annotation_file':  DATA_CONFIG['data_dir'] +
-                        'PseudomonasAnnotation.tsv',
+    'annotation_file':  os.path.join(REPO_ROOT, 'data',
+                                     'PseudomonasAnnotation.tsv'),
 })
 
 # test server deployment credentials and configuration (maybe on AWS)
@@ -53,11 +58,11 @@ TEST_CONFIG = {
     'data':          DATA_CONFIG,
     'host_conn':     AWS_CONFIG['host_conn'].copy(),
     'virt_env':      OS_CONFIG['home_dir'] + '.virtualenvs/adage',
-    'django_dir':    OS_CONFIG['home_dir'] + 'adage-server/adage',
+    'django_dir':    os.path.join(REPO_ROOT, 'adage'),
     'django_key':    '<config-secret>',
     'django_super':  '<configure:desc=superuser>',
     'django_email':  '<configure:desc=superuser_email>',
-    'interface_dir': OS_CONFIG['home_dir'] + 'adage-server/interface',
+    'interface_dir': os.path.join(REPO_ROOT, 'interface'),
     'databases':     {'default': {
                         'ENGINE': 'django.db.backends.postgresql_psycopg2',
                         # database name and user cannot have upper case letters
@@ -131,9 +136,8 @@ CI_CONFIG.update({
                         'PORT': '5434',  # v. 9.4
                      },
     'data':          {
-                        'data_dir': os.path.join(REPO_ROOT, 'data'),
-                        'annotation_file': os.path.join(REPO_ROOT, 'data',
-                              'PseudomonasAnnotation.tsv'),
+                        'data_dir': DATA_CONFIG['data_dir'],
+                        'annotation_file': DATA_CONFIG['annotation_file'],
                      },
 })
 
