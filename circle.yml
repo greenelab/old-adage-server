@@ -1,7 +1,10 @@
 
 machine:
-#  pre:
-#    - curl -sSL https://s3.amazonaws.com/circle-downloads/install-circleci-docker.sh | bash -s -- 1.10.0
+  pre:
+    # Add get_pseudomonas to the machine for two required files
+    - hg clone https://bitbucket.org/greenelab/get_pseudomonas
+    - ln -s get_pseudomonas/gen_spreadsheets.py
+    - ln -s get_pseudomonas/get_pseudo_sdrf.py
   services:
     - docker
 
