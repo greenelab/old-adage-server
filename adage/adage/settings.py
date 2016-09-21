@@ -14,7 +14,6 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-REPO_ROOT = os.path.dirname(BASE_DIR)
 
 # Any deployment configuration settings (including all secrets)
 # come from config.py, which is never checked into source control. If we're
