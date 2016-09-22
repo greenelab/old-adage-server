@@ -1,7 +1,11 @@
 #!/bin/bash
+
+# Avoid silent and/or consumed failures within a bash script.
+# if interested: http://redsymbol.net/articles/unofficial-bash-strict-mode/
 set -euo pipefail
 IFS=$'\n\t'
-REMOTE=example.ecr.us-west-2.amazonaws.com
+
+# REMOTE=example.ecr.us-west-2.amazonaws.com
 NAME=greenescientist/adageserver
 HASH=$(git rev-parse HEAD)
 
