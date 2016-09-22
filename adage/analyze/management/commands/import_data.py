@@ -7,13 +7,15 @@ import argparse
 import sys
 import os
 from operator import itemgetter
-import logging
-logger = logging.getLogger(__name__)
-logger.addHandler(logging.NullHandler())
 
 # Django imports
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
+
+# Unclear if there's any way to keep Flake8 happy and setup loggers.
+import logging
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.NullHandler())
 
 # import Django environment
 from analyze.models import Experiment, Sample, SampleAnnotation, AnnotationType
