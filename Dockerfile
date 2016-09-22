@@ -17,7 +17,7 @@ RUN apt-get update && apt-get install -y \
 
 # Create required directories
 WORKDIR $ADAGE_SRV
-RUN mkdir media static logs
+RUN mkdir static logs
 
 # Code to server directory
 COPY $ADAGE_SRC $ADAGE_SRV
