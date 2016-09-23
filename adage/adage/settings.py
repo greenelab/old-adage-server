@@ -57,6 +57,7 @@ INSTALLED_APPS = (
     'analyze',
     'organisms',
     'genes',
+    'tribe_client',
 )
 
 # Tastypie options
@@ -196,3 +197,7 @@ LOGGING = {
         'handlers': ['console'],
     },
 }
+
+TRIBE_ID = CONFIG['tribe_id']
+TRIBE_SECRET = CONFIG['tribe_secret']
+TRIBE_REDIRECT_URI = CONFIG['tribe_redirect_uri']

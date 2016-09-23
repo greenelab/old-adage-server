@@ -70,12 +70,22 @@
                 Download
               </a>
             </li>
+            <li ui-sref-active="active" ng-if="!user">
+              <a href="/tribe_client">
+                Login with Tribe
+              </a>
+            </li>
+            <profile-button></profile-button>
           </ul>
         </div>
       </div>
     </div>
 
-    <div class="container" ui-view="main"></div>
+    <div class="container" ui-view="main">
+    <br>
+      {% block content %}
+      {% endblock %}
+    </div>
 
     <footer class="footer">
     </footer>
