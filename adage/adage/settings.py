@@ -21,7 +21,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if os.environ.get('CODESHIP_SETTINGS') == 'YES':
     with open(os.path.join(BASE_DIR, 'adage', 'config.py.template')) as f:
         exec f
-    CONFIG = CI_CONFIG
+    CONFIG = CODESHIP_CONFIG
     CONFIG['databases']['default']['USER'] = os.environ.get('PG_USER')
     CONFIG['databases']['default']['PASSWORD'] = os.environ.get('PG_PASSWORD')
 elif os.environ.get('CIRCLECI') == 'true':

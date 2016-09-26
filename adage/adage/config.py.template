@@ -116,12 +116,22 @@ DEV_CONFIG.update({
                      },
 })
 
-# Codeship server deployment credentials and configuration
-CI_CONFIG = DEV_CONFIG.copy()
+# Configuration for our CI services
+
+CI_CONFIG = TEST_CONFIG.copy()
 CI_CONFIG.update({
     'django_dir':    os.path.join(REPO_ROOT, 'adage'),
     'django_key':    str(random.randint(0, 1000000)),
     'interface_dir': os.path.join(REPO_ROOT, 'interface'),
+    'data':          {
+                       'data_dir': DATA_CONFIG['data_dir']
+                       'annotation_file': DATA_CONFIG['annotation_file'],
+                    }
+})
+
+# Codeship server deployment credentials and configuration
+CODESHIP_CONFIG = CI_CONFIG.copy()
+CODESHIP_CONFIG.update({
     # see https://codeship.com/documentation/databases/postgresql/
     'databases':     {'default': {
                         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -133,23 +143,10 @@ CI_CONFIG.update({
                         'PORT': '5434',  # v. 9.4
                         }
                      },
-    'dbmaster':      {
-                        'NAME': 'development',
-                        'USER': '<configure>',
-                        'PASSWORD': '<config-secret>',
-                        'HOST': '127.0.0.1',
-                        'PORT': '5434',  # v. 9.4
-                     },
-    'data':          {
-                        'data_dir': '/home/rof/clone/data/',
-                        'annotation_file':
-                            '/home/rof/clone/data/PseudomonasAnnotation.tsv',
-                     },
 })
 
-CIRCLECI_CONFIG = TEST_CONFIG.copy()
+CIRCLECI_CONFIG = CI_CONFIG.copy()
 CIRCLECI_CONFIG.update({
-    'django_key':    str(random.randint(0, 1000000)),
     'databases':     {'default': {
                         'ENGINE': 'django.db.backends.postgresql_psycopg2',
                         # database name and user cannot have upper case letters
@@ -157,14 +154,9 @@ CIRCLECI_CONFIG.update({
                         'USER': 'ubuntu',
                         'PASSWORD': '',
                         'HOST': '127.0.0.1',
-                        'PORT': '5434'
+                        'PORT': '5432'
                         }
                      },
-    'data':          {
-                        'data_dir': os.path.join(REPO_ROOT, 'data'),
-                        'annotation_file': os.path.join(REPO_ROOT, 'data',
-                            'PseudomonasAnnotation.tsv')
-                     }
 })
 
 CONFIG = TEST_CONFIG
