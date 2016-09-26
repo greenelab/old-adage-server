@@ -21,7 +21,7 @@ angular.module('adage.tribe_client.directives', [
         },
         replace: true,
         restrict: "E",
-        templateUrl: 'tribe_auth/tribe-profile-button.tpl.html'
+        templateUrl: 'tribe_client/tribe-profile-button.tpl.html'
     };
 }])
 
