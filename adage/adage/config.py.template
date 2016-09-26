@@ -46,10 +46,11 @@ OS_CONFIG = {
 
 # data for bootstrapping the database and testing
 DATA_CONFIG = {
-    'data_dir':      os.path.join(REPO_ROOT, 'data'),
+    'data_dir':      os.path.join(OS_CONFIG['home_dir'],
+                                  'adage-server', 'data'),
 }
 DATA_CONFIG.update({
-    'annotation_file':  os.path.join(REPO_ROOT, 'data',
+    'annotation_file':  os.path.join(DATA_CONFIG['data_dir'],
                                      'PseudomonasAnnotation.tsv'),
 })
 
@@ -58,11 +59,13 @@ TEST_CONFIG = {
     'data':          DATA_CONFIG,
     'host_conn':     AWS_CONFIG['host_conn'].copy(),
     'virt_env':      OS_CONFIG['home_dir'] + '.virtualenvs/adage',
-    'django_dir':    os.path.join(REPO_ROOT, 'adage'),
+    'django_dir':    os.path.join(OS_CONFIG['home_dir'],
+                                  'adage-server', 'adage'),
     'django_key':    '<config-secret>',
     'django_super':  '<configure:desc=superuser>',
     'django_email':  '<configure:desc=superuser_email>',
-    'interface_dir': os.path.join(REPO_ROOT, 'interface'),
+    'interface_dir': os.path.join(OS_CONFIG['home_dir'],
+                                  'adage-server', 'interface'),
     'databases':     {'default': {
                         'ENGINE': 'django.db.backends.postgresql_psycopg2',
                         # database name and user cannot have upper case letters
@@ -116,7 +119,9 @@ DEV_CONFIG.update({
 # Codeship server deployment credentials and configuration
 CI_CONFIG = DEV_CONFIG.copy()
 CI_CONFIG.update({
+    'django_dir':    os.path.join(REPO_ROOT, 'adage'),
     'django_key':    str(random.randint(0, 1000000)),
+    'interface_dir': os.path.join(REPO_ROOT, 'interface'),
     # see https://codeship.com/documentation/databases/postgresql/
     'databases':     {'default': {
                         'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -136,9 +141,30 @@ CI_CONFIG.update({
                         'PORT': '5434',  # v. 9.4
                      },
     'data':          {
-                        'data_dir': DATA_CONFIG['data_dir'],
-                        'annotation_file': DATA_CONFIG['annotation_file'],
+                        'data_dir': '/home/rof/clone/data/',
+                        'annotation_file':
+                            '/home/rof/clone/data/PseudomonasAnnotation.tsv',
                      },
+})
+
+CIRCLECI_CONFIG = TEST_CONFIG.copy()
+CIRCLECI_CONFIG.update({
+    'django_key':    str(random.randint(0, 1000000)),
+    'databases':     {'default': {
+                        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+                        # database name and user cannot have upper case letters
+                        'NAME': 'circleci_test',
+                        'USER': 'ubuntu',
+                        'PASSWORD': '',
+                        'HOST': '127.0.0.1',
+                        'PORT': '5434'
+                        }
+                     },
+    'data':          {
+                        'data_dir': os.path.join(REPO_ROOT, 'data'),
+                        'annotation_file': os.path.join(REPO_ROOT, 'data',
+                            'PseudomonasAnnotation.tsv')
+                     }
 })
 
 CONFIG = TEST_CONFIG

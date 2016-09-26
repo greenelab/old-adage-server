@@ -22,19 +22,12 @@ if os.environ.get('CODESHIP_SETTINGS') == 'YES':
     with open(os.path.join(BASE_DIR, 'adage', 'config.py.template')) as f:
         exec f
     CONFIG = CI_CONFIG
-    pg_user = os.environ.get('PG_USER')
-    pg_pass = os.environ.get('PG_PASSWORD')
-    CONFIG['databases']['default']['USER'] = pg_user
-    CONFIG['databases']['default']['PASSWORD'] = pg_pass
+    CONFIG['databases']['default']['USER'] = os.environ.get('PG_USER')
+    CONFIG['databases']['default']['PASSWORD'] = os.environ.get('PG_PASSWORD')
 elif os.environ.get('CIRCLECI') == 'true':
     with open(os.path.join(BASE_DIR, 'adage', 'config.py.template')) as f:
         exec f
-    CONFIG = CI_CONFIG
-    CONFIG['databases']['default']['NAME'] = 'circleci_test'
-    CONFIG['databases']['default']['USER'] = 'ubuntu'
-    CONFIG['databases']['default']['PASSWORD'] = ''
-    CONFIG['databases']['default']['PORT'] = '5432'
-    print(CONFIG['data']['data_dir'])
+    CONFIG = CIRCLECI_CONFIG
 else:
     from config import CONFIG
 
