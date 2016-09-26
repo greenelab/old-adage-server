@@ -5,7 +5,7 @@ angular.module( 'adage', [
   'adage.about',
   'adage.analyze',
   'adage.download',
-  'adage.tribe_auth.user',
+  'adage.tribe_client',
   'ui.router',
   'ngResource'
 ])

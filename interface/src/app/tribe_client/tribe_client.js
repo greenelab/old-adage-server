@@ -1,5 +1,6 @@
-angular.module('adage.tribe_auth.user', [
-    'adage.tribe_auth.resource',
+angular.module('adage.tribe_client', [
+    'adage.tribe_client.resource',
+    'adage.tribe_client.directives',
 ])
 
 .factory( 'UserFactory', ['User', function( User ) {
@@ -32,29 +33,6 @@ angular.module('adage.tribe_auth.user', [
                 user[member] = newUser[member];// add properties back to user
             }
         }
-    };
-}])
-
-.directive('profileButton', [ 'UserFactory', function(UserFactory) {
-    return {
-        controller: ['$scope', 'UserFactory', function( $scope, UserFactory ) {
-
-            UserFactory.getPromise().$promise.then( function() {
-                $scope.userObj = UserFactory.getUser();
-            });
-
-        }],
-        link: function(scope, element, attr) {
-            scope.$on('user.update', function() {
-                UserFactory.resetPromise();
-                UserFactory.getPromise().$promise.then( function() {
-                    scope.userObj = UserFactory.getUser();
-                });
-            });
-        },
-        replace: true,
-        restrict: "E",
-        templateUrl: 'tribe_auth/tribe-profile-button.tpl.html'
     };
 }])
 
