@@ -124,7 +124,7 @@ CI_CONFIG.update({
     'django_key':    str(random.randint(0, 1000000)),
     'interface_dir': os.path.join(REPO_ROOT, 'interface'),
     'data':          {
-                       'data_dir': DATA_CONFIG['data_dir']
+                       'data_dir': DATA_CONFIG['data_dir'],
                        'annotation_file': DATA_CONFIG['annotation_file'],
                     }
 })
