@@ -13,11 +13,11 @@ ENV ADAGE_SRVSRC=$ADAGE_SRV/$ADAGE_SRC
 RUN apt-get update && apt-get install -y \
   python \
   python-pip \
-  python-psycopg2
+  python-psycopg2 # Install here so that postgres lib dependency is met.
 
 # Create required directories
 WORKDIR $ADAGE_SRV
-RUN mkdir media static logs
+RUN mkdir static logs
 
 # Code to server directory
 COPY $ADAGE_SRC $ADAGE_SRV
