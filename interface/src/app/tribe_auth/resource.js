@@ -3,12 +3,7 @@
  */
 angular.module("adage.tribe_auth.resource", ['ngResource'])
     .factory('User', ['$resource', function($resource) {
-        return $resource('/tribe_client/return_user', {}, {
-            query: {
-                method: 'GET',
-                isArray: false
-            }
-        });
+        return $resource('/tribe_client/return_user', {}, {});
     }])
 
 ;

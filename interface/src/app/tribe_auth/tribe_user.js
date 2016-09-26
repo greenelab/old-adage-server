@@ -2,7 +2,7 @@ angular.module('adage.tribe_auth.user', [
     'adage.tribe_auth.resource',
 ])
 
-.factory( 'UserFactory', function( User ) {
+.factory( 'UserFactory', ['User', function( User ) {
     var promise = false;
     var user = null;
 
@@ -12,7 +12,7 @@ angular.module('adage.tribe_auth.user', [
         },
         getPromise: function() {
             if (!promise) {
-                promise = User.query({}, function( data ) {
+                promise = User.get({}, function( data ) {
                     if (data.meta.total_count !== 0) {
                         user = data.objects[0];
                     }
@@ -33,9 +33,9 @@ angular.module('adage.tribe_auth.user', [
             }
         }
     };
-})
+}])
 
-.directive('profileButton', function(UserFactory) { 
+.directive('profileButton', [ 'UserFactory', function(UserFactory) {
     return {
         controller: ['$scope', 'UserFactory', function( $scope, UserFactory ) {
 
@@ -56,6 +56,6 @@ angular.module('adage.tribe_auth.user', [
         restrict: "E",
         templateUrl: 'tribe_auth/tribe-profile-button.tpl.html'
     };
-})
+}])
 
 ;
