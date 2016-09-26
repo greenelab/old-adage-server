@@ -11,7 +11,7 @@ angular.module( 'adage', [
 ])
 
 .config( function myAppConfig ( $stateProvider, $urlRouterProvider ) {
-  //$urlRouterProvider.otherwise( '/home' );
+  $urlRouterProvider.otherwise( '/home' );
 })
 
 // This configuration is required for all REST calls to the back end
@@ -21,22 +21,6 @@ angular.module( 'adage', [
 }])
 
 .run( function run ( $state, $location ) {
-
-    // Will only redirect if there is no state AND the url is not a
-    // route for tribe_client
-    String.prototype.startsWith = function(prefix) {
-        return this.slice(0, prefix.length) == prefix;
-    };
-
-    if ($state['current']['name'] === '') {
-      if (window.location.pathname.startsWith('/tribe_client')) {
-      }
-      else {
-          $state.go('home');
-      }
-    }
-
-
 })
 
 .controller( 'AppCtrl', function AppCtrl ( $scope, $location, UserFactory ) {
