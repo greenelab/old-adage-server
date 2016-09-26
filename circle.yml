@@ -1,0 +1,39 @@
+
+machine:
+  pre:
+    # Add get_pseudomonas to the machine for two required files
+    - hg clone https://bitbucket.org/greenelab/get_pseudomonas
+    - ln -s get_pseudomonas/gen_spreadsheets.py
+    - ln -s get_pseudomonas/get_pseudo_sdrf.py
+  services:
+    - docker
+
+dependencies:
+  override:
+    # Go ahead and install requirements.txt. We're going to run tests here
+    # first, so that we can make sure the db connections, etc are working.
+    - pip install -r adage/requirements.txt
+
+    # set region so we can use the aws command-line tool to log into ecr
+    #- aws configure set default.region us-west-2
+    #- eval $(aws ecr get-login)
+
+    # pull image from ecr to cache docker layers for quicker rebuilds
+    - docker pull greenescientist/adageserver:latest
+
+    # build new image
+    - bash build.sh
+
+test:
+  override:
+    # put your test command(s) here
+    - python adage/manage.py test adage
+
+deployment:
+  production:
+    # only apply this deployment on the master branch
+    branch: circle-ci-test
+
+    commands:
+      # push image to ecr
+      - bash push.sh

@@ -3,11 +3,16 @@
 
 from __future__ import unicode_literals
 from __future__ import print_function
-from django.core.management.base import BaseCommand, CommandError
 import argparse
 import sys
 import os
 from operator import itemgetter
+
+# Django imports
+from django.core.management.base import BaseCommand, CommandError
+from django.conf import settings
+
+# Unclear if there's any way to keep Flake8 happy and setup loggers.
 import logging
 logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
@@ -22,7 +27,8 @@ from analyze.models import Experiment, Sample, SampleAnnotation, AnnotationType
 #        repository into `adage-server` or (b) make the code we need into a
 #        pip-installable utility package that gets imported by both the `ADAGE`
 #        project and the `adage-server` project.
-sys.path.append(os.path.abspath('../../'))
+repo_parent = os.path.dirname(os.path.dirname(settings.BASE_DIR))
+sys.path.append(os.path.abspath(repo_parent))
 import get_pseudo_sdrf as gp
 import gen_spreadsheets as gs
 

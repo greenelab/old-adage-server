@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/1.8/ref/settings/
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 import os
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Any deployment configuration settings (including all secrets)
@@ -20,13 +21,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if os.environ.get('CODESHIP_SETTINGS') == 'YES':
     with open(os.path.join(BASE_DIR, 'adage', 'config.py.template')) as f:
         exec f
-    CONFIG = CI_CONFIG
-    pg_user = os.environ.get('PG_USER')
-    pg_pass = os.environ.get('PG_PASSWORD')
-    CONFIG['dbmaster']['USER'] = pg_user
-    CONFIG['dbmaster']['PASSWORD'] = pg_pass
-    CONFIG['databases']['default']['USER'] = pg_user
-    CONFIG['databases']['default']['PASSWORD'] = pg_pass
+    CONFIG = CODESHIP_CONFIG
+    CONFIG['databases']['default']['USER'] = os.environ.get('PG_USER')
+    CONFIG['databases']['default']['PASSWORD'] = os.environ.get('PG_PASSWORD')
+elif os.environ.get('CIRCLECI') == 'true':
+    with open(os.path.join(BASE_DIR, 'adage', 'config.py.template')) as f:
+        exec f
+    CONFIG = CIRCLECI_CONFIG
 else:
     from config import CONFIG
 
