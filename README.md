@@ -1,6 +1,6 @@
 # adage-server
 
-[ ![Codeship Status for greenelab/adage-server](https://app.codeship.com/projects/37137380-663e-0134-8e4c-6e3ad78451bb/status?branch=master)](https://app.codeship.com/projects/175862)
+[ ![Codeship Status for greenelab/adage-server](https://app.codeship.com/projects/f37eb3a0-667f-0134-56d8-262a64e36cc9/status?branch=master)](https://app.codeship.com/projects/175929)
 [![Code Climate](https://codeclimate.com/github/greenelab/adage-server/badges/gpa.svg)](https://codeclimate.com/github/greenelab/adage-server)
 
 ## Get a working instance of the adage-server running
