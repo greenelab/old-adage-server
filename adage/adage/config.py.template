@@ -92,8 +92,8 @@ AWS_CONFIG = {
                         'NAME': '<configure>',
                         'USER': '<configure>',
                         'PASSWORD': '<config-secret>',
-                        'HOST': AWS_CONFIG['rds_conn']['HOST'],
-                        'PORT': AWS_CONFIG['rds_conn']['PORT'],
+                        'HOST': AWS_DEPLOY['dbmaster']['HOST'],
+                        'PORT': AWS_DEPLOY['dbmaster']['PORT'],
                         }
                      },
     'haystack':      {'default': {
@@ -144,7 +144,7 @@ DEV_CONFIG.update({
 
 # Configuration for our CI services
 
-CI_CONFIG = TEST_CONFIG.copy()
+CI_CONFIG = AWS_CONFIG.copy()
 CI_CONFIG.update({
     'django_dir':    os.path.join(REPO_ROOT, 'adage'),
     'django_key':    str(random.randint(0, 1000000)),
