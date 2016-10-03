@@ -71,8 +71,8 @@
               </a>
             </li>
 
-            <login-button></login-button>
-            <profile-button></profile-button>
+            <login-button ng-if="!userObj"></login-button>
+            <profile-button ng-if="userObj"></profile-button>
 
           </ul>
         </div>
