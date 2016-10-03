@@ -31,6 +31,10 @@ angular.module('adage.tribe_client', [
             for (member in newUser) {
                 user[member] = newUser[member];// add properties back to user
             }
+        },
+        resetAndGetPromise: function () {
+            this.resetPromise();
+            return this.getPromise();
         }
     };
 }])

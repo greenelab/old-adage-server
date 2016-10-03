@@ -13,8 +13,7 @@ angular.module('adage.tribe_client.directives', [
         }],
         link: function(scope, element, attr) {
             scope.$on('user.update', function() {
-                UserFactory.resetPromise();
-                UserFactory.getPromise().$promise.then( function() {
+                UserFactory.resetAndGetPromise().$promise.then( function() {
                     scope.userObj = UserFactory.getUser();
                 });
             });
@@ -77,8 +76,7 @@ angular.module('adage.tribe_client.directives', [
         }],
         link: function(scope, element, attr) {
             scope.$on('user.update', function() {
-                UserFactory.resetPromise();
-                UserFactory.getPromise().$promise.then( function() {
+                UserFactory.resetAndGetPromise().$promise.then( function() {
                     scope.userObj = UserFactory.getUser();
                 });
             });
