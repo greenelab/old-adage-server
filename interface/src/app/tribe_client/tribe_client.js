@@ -4,7 +4,7 @@ angular.module('adage.tribe_client', [
 ])
 
 .factory( 'UserFactory', ['User', function( User ) {
-    var promise = false;
+    var promise = null;
     var user = null;
 
     return {
@@ -22,11 +22,10 @@ angular.module('adage.tribe_client', [
             return promise;
         },
         resetPromise: function() { // reset the promise in case we need to check the user again
-            promise = false;
+            promise = null;
         },
         setUser: function( newUser ) { //set the user object to have properties from the passed user
-            var member = null;
-            for (member in user) {
+            for (var member in user) {
                 delete user[member]; // delete properties from user
             }
             for (member in newUser) {
