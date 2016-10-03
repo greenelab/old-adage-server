@@ -201,3 +201,6 @@ LOGGING = {
 TRIBE_ID = CONFIG['tribe_id']
 TRIBE_SECRET = CONFIG['tribe_secret']
 TRIBE_REDIRECT_URI = CONFIG['tribe_redirect_uri']
+TRIBE_SCOPE = CONFIG['tribe_scope']
+TRIBE_LOGIN_REDIRECT = CONFIG['tribe_login_redirect']
+TRIBE_LOGOUT_REDIRECT = CONFIG['tribe_logout_redirect']
