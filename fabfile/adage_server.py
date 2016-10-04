@@ -39,7 +39,8 @@ def setup_host_conn(use_conn=None):
     )
     with settings(hide('running'), warn_only=True):
         if local("test -e %s" % use_conn['keyfile']).succeeded:
-            if not env.key_filename: env.key_filename = []
+            if not env.key_filename:
+                env.key_filename = []
             env.key_filename.append(use_conn['keyfile'])
             logging.info("Loaded {user} private key from {keyfile}.".format(
                 **use_conn)
@@ -49,17 +50,6 @@ def setup_host_conn(use_conn=None):
                 "Could not load {user} private key from {keyfile}.".format(
                     **use_conn)
             )
-
-
-@task
-def capture_django_requirements():
-    """
-    perform a pip freeze from within the virtual environment to
-    generate requirements.txt
-    """
-    if 'VIRTUAL_ENV' not in os.environ:
-        abort('Please run this command from your local virtual environment')
-    local('pip freeze > requirements.txt')
 
 
 @task
@@ -78,8 +68,9 @@ def pull(opts=''):
     """ pull code changes from repo (GitHub, by default) to server """
     # config.py has aws keys in it, so we transfer only the settings we need
     # for deployment to the server
-    run('echo "CONFIG = {0}" > /home/adage/adage-server/adage/adage/config.py'.\
-            format(pprint.PrettyPrinter().pformat(CONFIG)))
+    run(('echo "CONFIG = {0}" > '
+         '/home/adage/adage-server/adage/adage/config.py'
+         ).format(pprint.PrettyPrinter().pformat(CONFIG)))
     if opts:
         opts = ' ' + opts
     with cd('/home/adage/adage-server'):
@@ -145,9 +136,9 @@ def bootstrap_database():
 def create_admin_user():
     """ Create a default django administrator for the site """
     # FIXME: need to figure out how to set a default password non-interactively
-    run(('python manage.py createsuperuser '\
-            '--username={django_super} '\
-            '--email={django_email} --noinput').format(**CONFIG))
+    run(('python manage.py createsuperuser '
+         '--username={django_super} '
+         '--email={django_email} --noinput').format(**CONFIG))
 
 
 @task
@@ -188,10 +179,8 @@ def init_instance():
 @task
 def build_interface():
     """ have grunt perform a deployment build for us """
-    #make static
     with cd(CONFIG['interface_dir']), \
             prefix('source {0}/bin/activate'.format(CONFIG['virt_env'])):
-        # FIXME: is there a way to get grunt to skip the failing firefox launch?
         run('grunt --force')
 
 
@@ -225,8 +214,7 @@ def deploy(use_config=None):
     global CONFIG
     if use_config:
         CONFIG = use_config
-    
-    # capture_django_requirements() # don't clobber what we've added from server
+
     # test()
     print("beginning adage-server deploy")
     pull()
