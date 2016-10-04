@@ -1,8 +1,10 @@
 angular.module('adage.tribe_client.directives', [
+    'adage.tribe_client',
     'adage.tribe_client.resource',
+    'adage.tribe_client.utils'
 ])
 
-.directive('profileButton', [ function() {
+.directive('profileButton', ['UserFactory', 'CommonFuncts',  function( UserFactory, CommonFuncts ) {
     return {
         controller: ['$scope', 'UserFactory', function( $scope, UserFactory ) {
 
@@ -12,11 +14,7 @@ angular.module('adage.tribe_client.directives', [
 
         }],
         link: function(scope, element, attr) {
-            scope.$on('user.update', function() {
-                UserFactory.resetAndGetPromise().$promise.then( function() {
-                    scope.userObj = UserFactory.getUser();
-                });
-            });
+          CommonFuncts.updateUser(scope, element, attr);
         },
         replace: true,
         restrict: "E",
@@ -24,7 +22,7 @@ angular.module('adage.tribe_client.directives', [
     };
 }])
 
-.directive('loginButton', [ 'UserFactory', function( UserFactory ) {
+.directive('loginButton', ['UserFactory', 'CommonFuncts', function( UserFactory, CommonFuncts ) {
     return {
         controller: ['$scope', 'UserFactory', '$uibModal', '$rootScope', '$window',
           function( $scope, UserFactory, $uibModal, $rootScope, $window ) {
@@ -75,11 +73,7 @@ angular.module('adage.tribe_client.directives', [
 
         }],
         link: function(scope, element, attr) {
-            scope.$on('user.update', function() {
-                UserFactory.resetAndGetPromise().$promise.then( function() {
-                    scope.userObj = UserFactory.getUser();
-                });
-            });
+          CommonFuncts.updateUser(scope, element, attr);
         },
         replace: true,
         restrict: "E",
