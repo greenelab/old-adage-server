@@ -1,0 +1,14 @@
+<li ui-sref-active="active" uib-dropdown on-toggle="toggled(open)">
+  <a href id="simple-dropdown" uib-dropdown-toggle>
+    <i class="fa fa-user" style="color:SteelBlue"></i>
+    (Tribe) {{ userObj.username }} <b class="caret"></b>
+  </a>
+  <ul class="dropdown-menu" uib-dropdown-menu aria-labelledby="simple-dropdown">
+    <li><a href="/tribe_client">
+      <i class="fa fa-cubes"></i> My Gene Sets</a></li>
+    <li class="divider"></li>
+    <li><a href="/tribe_client/logout">
+      <i class="fa fa-sign-out" style="color:SteelBlue"></i>
+      &nbsp;&nbsp;Sign Out</a></li>
+  </ul>
+</li>

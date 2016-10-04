@@ -1,0 +1,28 @@
+<div class="modal-header">
+    <h3 class="modal-title" id="modal-title">
+      Sign in with <a href="{{ tribe_url }}" target="_blank">Tribe</a>
+to use your gene sets in ADAGE:
+    </h3>
+</div>
+
+<div class="modal-body">
+
+    <a class="btn btn-primary"
+      href="{{ tribe_url }}/accounts/create_temporary/"
+      target="_blank">
+        Create a temporary account (no email or password required)
+    </a>
+    </br>
+    </br>
+    <a class="btn btn-primary"
+      href="{{access_code_url}}?response_type=code&client_id={{client_id}}&scope={{tribe_scope}}"
+      target="_blank">
+      Create / Sign in with a Tribe account
+    </a>
+
+</div>
+
+<div class="modal-footer">
+  <button class="btn btn-primary" ng-click=refresh()>Refresh</button> &nbsp;
+  <button class="btn btn-warning" ng-click="cancel()">Cancel</button>
+</div>

@@ -83,6 +83,14 @@ TEST_CONFIG = {
                         'INDEX_NAME': 'haystack',
                         },
                      },
+
+
+    'tribe_id': 'ClientIDHere',
+    'tribe_secret': 'ClientSecretHere',
+    'tribe_redirect_uri': 'http://example.com/tribe_client/get_token',
+    'tribe_scope': 'write',
+    'tribe_login_redirect': '/#/home',
+    'tribe_logout_redirect': '/#/home'
 }
 TEST_CONFIG['host_conn'].update({
     'user':     'adage',

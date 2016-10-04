@@ -5,6 +5,7 @@ angular.module( 'adage', [
   'adage.about',
   'adage.analyze',
   'adage.download',
+  'adage.tribe_client',
   'ui.router',
   'ngResource'
 ])
@@ -22,12 +23,20 @@ angular.module( 'adage', [
 .run( function run () {
 })
 
-.controller( 'AppCtrl', function AppCtrl ( $scope, $location ) {
-  $scope.$on('$stateChangeSuccess', function(event, toState, toParams, fromState, fromParams){
-    if ( angular.isDefined( toState.data.pageTitle ) ) {
-      $scope.pageTitle = toState.data.pageTitle + ' | adage' ;
-    }
-  });
-})
+.controller( 'AppCtrl', ['$scope', 'UserFactory',
+  function AppCtrl ( $scope, UserFactory ) {
+
+    $scope.$on('$stateChangeSuccess',
+      function(event, toState, toParams, fromState, fromParams){
+        if ( angular.isDefined( toState.data.pageTitle ) ) {
+          $scope.pageTitle = toState.data.pageTitle + ' | adage' ;
+        }
+      });
+
+    UserFactory.getPromise().$promise.then( function() {
+        $scope.userObj = UserFactory.getUser();
+    });
+
+}])
 
 ;
