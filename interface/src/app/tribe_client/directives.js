@@ -13,9 +13,7 @@ angular.module('adage.tribe_client.directives', [
             });
 
         }],
-        link: function(scope, element, attr) {
-          CommonFuncts.updateUser(scope, element, attr);
-        },
+        link: CommonFuncts.updateUser,
         replace: true,
         restrict: "E",
         templateUrl: 'tribe_client/tribe-profile-button.tpl.html'
@@ -72,9 +70,7 @@ angular.module('adage.tribe_client.directives', [
             };
 
         }],
-        link: function(scope, element, attr) {
-          CommonFuncts.updateUser(scope, element, attr);
-        },
+        link: CommonFuncts.updateUser,
         replace: true,
         restrict: "E",
         templateUrl: 'tribe_client/tribe-login-button.tpl.html'
