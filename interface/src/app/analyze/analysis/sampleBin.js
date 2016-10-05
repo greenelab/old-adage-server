@@ -27,13 +27,21 @@ function($log, Sample, Activity) {
             ' already in the sample list; ignoring.');
       } else {
         SampleBin.samples.push(+id);
+        // TODO need to report query progress and errors somehow
+        // TODO this should use caching and promises to fetch sample data
+        // 1. check cache for existing Sample data. Hit = return
+        // 2. if cache miss: 
+        // 2a. getSampleDetails & append a promise to SampleBin.promises
+        // 2b. getActivityForSample & append a promise to SampleBin.promises
+        // ... now can use Promise.all(SampleBin.promises).then() to trigger
+        // a redraw of the heatmap when ready
       }
     },
 
     remove_sample: function(id) {
       var pos = SampleBin.samples.indexOf(+id);
       SampleBin.samples.splice(pos, 1);
-      // TODO need to report query progress and errors somehow
+      // TODO now need to mutate SampleBin.heatmapData.activity rather than re-retrieve data
       Activity.get({sample__in: SampleBin.samples.join()},
         // success callback
         function(responseObject, responseHeaders) {
