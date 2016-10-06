@@ -226,7 +226,7 @@ class ModelsTestCase(TestCase):
         for i in range(num_genes):
             Gene.objects.create(entrezid=(i + 1),
                                 systematic_name="sys_name #" + str(i + 1),
-                                standard_name="sys_name #" + str(i + 1),
+                                standard_name="std_name #" + str(i + 1),
                                 organism=organism)
         # Build a complete node-gene network.
         for node in Node.objects.all():
@@ -777,3 +777,19 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
             self.random_object(Participation).id) + "/"
         self.call_get_API(uri)
         self.call_non_get_API(uri)
+
+    def test_heavy_genes(self):
+        """
+        Test "heavy_genes" queries in NodeResource.
+        """
+        ModelsTestCase.create_participations(13, 29)
+        g1 = Gene.objects.first().id  # The first gene
+        g2 = Gene.objects.last().id   # The last gene
+        uri = "%snode/?heavy_genes=%s,%s&%s" % (self.baseURI, g1, g2,
+                                                "format=json&limit=0")
+        resp = self.api_client.get(uri)
+        resp = self.deserialize(resp)
+        api_result = len(resp['objects'])
+        self.assertEqual(api_result, Node.objects.count())
+
+        self.call_non_get_API(uri)  # Test non-get methods too.

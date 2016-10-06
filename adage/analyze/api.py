@@ -2,6 +2,7 @@ from django.conf.urls import url
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from django.http import HttpResponse
+from genes.api import GeneResource
 from tastypie import fields, http
 from tastypie.resources import Resource, ModelResource
 from tastypie.utils import trailing_slash
@@ -212,6 +213,36 @@ class NodeResource(ModelResource):
         queryset = Node.objects.all()
         resource_name = 'node'
         allowed_methods = ['get']
+        filtering = {
+            'name': ('exact', 'in', ),
+            'heavy_genes': ('exact', ),  # New filter, see apply_filters().
+        }
+
+    def apply_filters(self, request, applicable_filters):
+        object_list = super(NodeResource, self).apply_filters(
+            request, applicable_filters)
+        heavy_genes = request.GET.get('heavy_genes', None)
+        if heavy_genes:
+            # Instead of relying on tastypie/resources.py to catch the
+            # ValueError exception that may be raised in this function,
+            # we catch the one that may be raised by int() below and
+            # raise a customized BadRequest exception with more details.
+            try:
+                # Convert genes to a set of integers so that the
+                # duplicate(s) will be removed implicitly.
+                query_genes = {int(id) for id in heavy_genes.split(',')}
+            except ValueError:
+                raise BadRequest("Invalid gene IDs: %s" % heavy_genes)
+
+            for (i, q) in enumerate(query_genes):
+                q_nodes = {p.node.id for p in
+                           Participation.objects.filter(gene=q)}
+                if i == 0:
+                    related_nodes = q_nodes
+                else:
+                    related_nodes = related_nodes & q_nodes
+            object_list = object_list.filter(id__in=related_nodes)
+        return object_list
 
 
 class ActivityResource(ModelResource):
@@ -255,8 +286,8 @@ class ActivityResource(ModelResource):
 
 
 class EdgeResource(ModelResource):
-    gene1 = fields.IntegerField(attribute='gene1_id', null=False)
-    gene2 = fields.IntegerField(attribute='gene2_id', null=False)
+    gene1 = fields.ForeignKey(GeneResource, "gene1", full=True)
+    gene2 = fields.ForeignKey(GeneResource, "gene2", full=True)
     mlmodel = fields.IntegerField(attribute='mlmodel_id', null=False)
 
     class Meta:
