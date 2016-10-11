@@ -60,14 +60,16 @@ angular.module('adage.gene.search', [
         size: function() {
             return queries.length;
         },
-        search: function ( qparams ) { // Search for genes and add the results to the service
+        search: function ( qparams ) {
+          // Search for genes and add the results to the service
             Gene.search(qparams, function(data) {
                 var previousQueries = queries.length;
                 for (var i = 0; i < data.length; i++) {
                     query = data[i].search;
-                    if (!searchResults[ query ]) { //if search term didn't already exist
-                        searchResults[ query ] = data[i]; //add it to the results
-                        queries.push(query);// add to the list of queries
+                    if (!searchResults[ query ]) {
+                      //if search term didn't already exist
+                      searchResults[ query ] = data[i]; //add it to the results
+                      queries.push(query);// add to the list of queries
                     }
                 }
                 if (previousQueries != queries.length) {
@@ -144,67 +146,69 @@ angular.module('adage.gene.search', [
 
 // Directive for table containing search results
 .directive('searchResultTable', ['SearchResults', function( SearchResults ) {
-    return {
-        controller: ['$scope', 'SearchResults', function($scope, SearchResults) {
-            $scope.currentPage = 1;
-            $scope.itemsPerPage = 10;
-            $scope.totalResults = 0;
-            $scope.maxSize = 10;
-            $scope.resultsForPage = [];
-            $scope.searchResults = SearchResults.getSearchResults();
-            $scope.loadingSearchResults = false;
+  return {
+    controller: ['$scope', 'SearchResults', function($scope, SearchResults) {
+      $scope.currentPage = 1;
+      $scope.itemsPerPage = 10;
+      $scope.totalResults = 0;
+      $scope.maxSize = 10;
+      $scope.resultsForPage = [];
+      $scope.searchResults = SearchResults.getSearchResults();
+      $scope.loadingSearchResults = false;
 
-            $scope.addAllNonAmbiguous = function() {  
-            // Function to automatically add all genes that only have one search result
-                var searchResults = SearchResults.getSearchResults();
-                for (var key in searchResults) {
-                    var results = searchResults[key];
-                    if (results['found'].length <= 1) {
-                        if (results['found'][0]) {
-                            var gene = results['found'][0];
-                            SearchResults.remove(key);
-                        }
-                    }            
-                }
-            };
+      $scope.addAllNonAmbiguous = function() {
+      // Function to automatically add all genes that only have one search result
+        var searchResults = SearchResults.getSearchResults();
+        for (var key in searchResults) {
+          var results = searchResults[key];
+          if (results['found'].length <= 1) {
+            if (results['found'][0]) {
+              var gene = results['found'][0];
+              SearchResults.remove(key);
+            }
+          }
+        }
+      };
 
-            $scope.removeNotFound = function() {  
-            // Function to get rid of all the queries that returned no results.
-                var searchResults = SearchResults.getSearchResults();
-                for (var key in searchResults) {
-                    var results = searchResults[key];
-                    if (results['found'].length === 0) {
-                        SearchResults.remove(key);
-                    }            
-                }
-            };
+      $scope.removeNotFound = function() {
+      // Function to get rid of all the queries that returned no results.
+          var searchResults = SearchResults.getSearchResults();
+          for (var key in searchResults) {
+            var results = searchResults[key];
+            if (results['found'].length === 0) {
+              SearchResults.remove(key);
+            }
+          }
+      };
+    }],
 
-        }],
-        link: function(scope, element, attr) {
-            scope.$on('results.update', function() {
-                scope.totalResults = SearchResults.size();
-                var begin = ((scope.currentPage-1)*scope.itemsPerPage), end = begin + scope.itemsPerPage;
-                scope.resultsForPage = SearchResults.getQueries().slice(begin, end);
-            });
+    link: function(scope, element, attr) {
+      scope.$on('results.update', function() {
+        scope.totalResults = SearchResults.size();
+        var begin = ((scope.currentPage-1)*scope.itemsPerPage)
+        var end = begin + scope.itemsPerPage;
+        scope.resultsForPage = SearchResults.getQueries().slice(begin, end);
+      });
 
-            scope.$on('results.loadingSearchResults', function() {
-                scope.loadingSearchResults = true;
-            });
+      scope.$on('results.loadingSearchResults', function() {
+        scope.loadingSearchResults = true;
+      });
 
-            scope.$on('results.searchResultsReturned', function() {
-                scope.loadingSearchResults = false;
-            });
-    
-            //Watch for page changes and update
-            scope.$watch('currentPage', function() {
-                var begin = ((scope.currentPage-1)*scope.itemsPerPage), end = begin + scope.itemsPerPage;
-                scope.resultsForPage = SearchResults.getQueries().slice(begin, end);
-            });
-        },
-        replace: true,
-        restrict: "E",
-        scope: true,
-        templateUrl: 'gene/search-result-table.tpl.html'
+      scope.$on('results.searchResultsReturned', function() {
+        scope.loadingSearchResults = false;
+      });
+
+      //Watch for page changes and update
+      scope.$watch('currentPage', function() {
+        var begin = ((scope.currentPage-1)*scope.itemsPerPage)
+        var end = begin + scope.itemsPerPage;
+        scope.resultsForPage = SearchResults.getQueries().slice(begin, end);
+      });
+    },
+    replace: true,
+    restrict: "E",
+    scope: true,
+    templateUrl: 'gene/search-result-table.tpl.html'
     };
 }])
 
