@@ -1,6 +1,7 @@
 <div class="btn-group">
     <no-result-button query="{{query}}"></no-result-button>
     <previous-result-button ng-if="previousPages"></previous-result-button>
-    <gene-result-button query="{{query}}" ng-repeat="gene in pageGenes"></gene-result-button>
+    <gene-result-button query="{{query}}" ng-repeat="gene in pageGenes">
+    </gene-result-button>
     <more-result-button ng-if="additionalPages"></more-result-button> 
 </div>
