@@ -1,0 +1,25 @@
+<div class="row">
+  <div class="col-sm-12">
+    <div class="panel panel-default">
+      <div class="panel-body">
+        <div class="col-xs-3">
+          Search for Genes
+          <form class="form">
+            <textarea name="genes" rows="7" ng-model="genesToAdd.query"
+              placeholder="Search genes by symbol or Entrez ID">
+            </textarea>
+            <span class="error">{{ errors.name }}</span>
+            <br>
+            <button class="btn btn-primary" ng-click="searchGenes()"
+              ng-disabled="loadingSearchResults">
+              Search   <i class="fa fa-search"></i>
+            </button>
+          </form>
+        </div>
+        <div class="col-xs-9">  
+          <search-result-table></search-result-table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,28 @@
+<div class="row">
+  <div class="col-sm-12">
+    <div class="panel panel-default">
+      <div class="panel-heading">
+        <h3>
+          Selected Genes
+          <span class="pull-right">
+            <button class="btn btn-success"
+              ng-click="sendToNetwork()">
+              View Genes as Network
+            </button>
+          </span>
+        </h3>
+      </div>    
+      <div class="panel-body">
+        <table class="table table-striped"> 
+          <tr ng-repeat="gene in selectedGenes">
+            <td>
+              <selected-gene-button>
+                {{ gene.standard_name }}
+              </selected-gene-button>
+            </td>
+          </tr>     
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
