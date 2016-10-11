@@ -185,7 +185,7 @@ angular.module('adage.gene.search', [
     link: function(scope, element, attr) {
       scope.$on('results.update', function() {
         scope.totalResults = SearchResults.size();
-        var begin = ((scope.currentPage-1)*scope.itemsPerPage)
+        var begin = ((scope.currentPage-1)*scope.itemsPerPage);
         var end = begin + scope.itemsPerPage;
         scope.resultsForPage = SearchResults.getQueries().slice(begin, end);
       });
@@ -200,7 +200,7 @@ angular.module('adage.gene.search', [
 
       //Watch for page changes and update
       scope.$watch('currentPage', function() {
-        var begin = ((scope.currentPage-1)*scope.itemsPerPage)
+        var begin = ((scope.currentPage-1)*scope.itemsPerPage);
         var end = begin + scope.itemsPerPage;
         scope.resultsForPage = SearchResults.getQueries().slice(begin, end);
       });
