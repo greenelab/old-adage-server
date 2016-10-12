@@ -301,7 +301,7 @@ angular.module('adage.gene.search', [
 
 // Directive for button to get more options, should get
 // next page of search results for this query from the server
-.directive('moreResultButton', function( SearchResults ) {
+.directive('moreResultButton', ['SearchResults', function( SearchResults ) {
     return {
         link: function(scope, element, attr) {
             element.bind( "click", function() {
@@ -318,10 +318,10 @@ angular.module('adage.gene.search', [
         scope: false, 
         templateUrl: 'gene/more-result-button.tpl.html'
     };
-})
+}])
 
 // Directive for button to get previous search results 
-.directive('previousResultButton', function( SearchResults ) {
+.directive('previousResultButton', ['SearchResults', function( SearchResults ) {
     return {
         link: function(scope, element, attr) {
             element.bind( "click", function() {
@@ -338,11 +338,11 @@ angular.module('adage.gene.search', [
         scope: false, 
         templateUrl: 'gene/previous-result-button.tpl.html'
     };
-})
+}])
 
 // Directive for search buttonset, has buttons for handling
 // search results
-.directive('searchButtonset', function( SearchResults ) {
+.directive('searchButtonset', ['SearchResults', function( SearchResults ) {
     return {
         controller: function( $scope ) {
             $scope.pageDict = {page: 1};
@@ -351,8 +351,8 @@ angular.module('adage.gene.search', [
 
             var begin, end;
             $scope.updatePage = function(page) {
-                begin = ((page-1)*3);
-                end=begin+3;
+                begin = (page - 1) * 3;
+                end = begin + 3;
                 $scope.pageGenes = $scope.found.slice(begin, end);
 
                 // Boolean, telling whether or not there is (are) any
@@ -372,6 +372,6 @@ angular.module('adage.gene.search', [
         },
         templateUrl: 'gene/search-buttonset.tpl.html'
     };
-})
+}])
 
 ;

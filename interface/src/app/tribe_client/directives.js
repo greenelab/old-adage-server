@@ -78,16 +78,10 @@ angular.module('adage.tribe_client.directives', [
 }])
 
 // Directive for whole gene search form
-.directive('genesetSearchForm', function( ) {
+.directive('genesetSearchForm', function() {
     return {
-        controller: ['$scope', function($scope) {
-
-          }
-        ],
         replace: true,
         restrict: "E",
-        scope: {
-        },
         templateUrl: 'tribe_client/geneset-search-form.tpl.html'
     };
 })
