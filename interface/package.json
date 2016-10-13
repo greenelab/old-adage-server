@@ -12,10 +12,12 @@
     "url": "https://bitbucket.org/greenelab/adage-server"
   },
   "engines": {
-    "node" : ">=4.0"
+    "node": ">=4.0"
   },
   "dependencies": {},
   "devDependencies": {
+    "eslint": "^3.7.1",
+    "eslint-config-google": "^0.6.0",
     "grunt": "^1.0.1",
     "grunt-bump": "^0.8.0",
     "grunt-coffeelint": "^0.0.16",

@@ -1,3 +1,5 @@
+extends: google
+
 ecmaFeatures:
   modules: true
   jsx: true
