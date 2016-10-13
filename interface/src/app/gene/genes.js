@@ -75,7 +75,7 @@ angular.module('adage.gene.search', [
             queries.push(query); // add to the list of queries
           }
         }
-        if (previousQueries != queries.length) {
+        if (previousQueries !== queries.length) {
           $rootScope.$broadcast('results.update');
         }
         $rootScope.$broadcast('results.searchResultsReturned');
@@ -312,8 +312,7 @@ angular.module('adage.gene.search', [
   return {
     link: function(scope, element, attr) {
       element.bind("click", function() {
-        scope.page = scope.pageDict.page;
-        scope.page = scope.page + 1;
+        scope.page = scope.pageDict.page + 1;
         scope.$apply(function() {
           scope.pageDict.page = scope.page;
           scope.updatePage(scope.page);
@@ -332,8 +331,7 @@ angular.module('adage.gene.search', [
   return {
     link: function(scope, element, attr) {
       element.bind("click", function() {
-        scope.page = scope.pageDict.page;
-        scope.page = scope.page - 1;
+        scope.page = scope.pageDict.page - 1;
         scope.$apply(function() {
           scope.pageDict.page = scope.page;
           scope.updatePage(scope.page);
