@@ -66,11 +66,19 @@ def test():
 @task
 def pull(opts=''):
     """ pull code changes from repo (GitHub, by default) to server """
-    # config.py has aws keys in it, so we transfer only the settings we need
-    # for deployment to the server
+    # NOTE: config.py has aws keys and other sensitive data in it, so we
+    # transfer only the settings we need for deployment to the server
+    CONFIG_filtered = {
+        k: v for k, v in CONFIG.iteritems()
+        if k in (
+            'django_key', 'haystack', 'databases',
+            'tribe_id', 'tribe_secret', 'tribe_redirect_uri', 'tribe_scope',
+            'tribe_login_redirect', 'tribe_logout_redirect'
+        )
+    }
     run(('echo "CONFIG = {0}" > '
          '/home/adage/adage-server/adage/adage/config.py'
-         ).format(pprint.PrettyPrinter().pformat(CONFIG)))
+         ).format(pprint.PrettyPrinter().pformat(CONFIG_filtered)))
     if opts:
         opts = ' ' + opts
     with cd('/home/adage/adage-server'):
