@@ -68,10 +68,10 @@ angular.module('adage.gene.search', [
       Gene.search(qparams, function(data) {
         var previousQueries = queries.length;
         for (var i = 0; i < data.length; i++) {
-          query = data[i].search;
+          var query = data[i].search;
           if (!searchResults[query]) {
-            //if search term didn't already exist
-            searchResults[query] = data[i]; //add it to the results
+            // If search term didn't already exist
+            searchResults[query] = data[i]; // add it to the results
             queries.push(query); // add to the list of queries
           }
         }
@@ -85,23 +85,23 @@ angular.module('adage.gene.search', [
 }])
 
 .factory('SelectedGenesFactory', function() {
-  var selected_genes = {};
+  var selectedGenes = {};
 
   return {
     clear: function() {
-      selected_genes = {};
+      selectedGenes = {};
     },
 
     addGene: function(geneObj) {
-      selected_genes[geneObj.id] = geneObj;
+      selectedGenes[geneObj.id] = geneObj;
     },
 
     removeGene: function(geneObj) {
-      delete selected_genes[geneObj.id];
+      delete selectedGenes[geneObj.id];
     },
 
-    return_genes: function() {
-      return selected_genes;
+    returnGenes: function() {
+      return selectedGenes;
     }
   };
 })
@@ -111,20 +111,19 @@ angular.module('adage.gene.search', [
   return {
     controller: ['$scope', '$rootScope', 'SearchResults',
       function($scope, $rootScope, SearchResults) {
-
         $scope.loadingSearchResults = false;
 
         // Clear any existing search results
         SearchResults.clear();
 
         $scope.searchGenes = function() {
-          if (!$scope.genesToAdd) { //if the query is empty
+          if (!$scope.genesToAdd) { // if the query is empty
             return false;
           }
           $scope.loadingSearchResults = true;
 
           $rootScope.$broadcast('results.loadingSearchResults');
-          qparams = {
+          var qparams = {
             'query': $scope.genesToAdd.query
           };
 
@@ -138,7 +137,6 @@ angular.module('adage.gene.search', [
         $scope.$on('results.searchResultsReturned', function() {
           $scope.loadingSearchResults = false;
         });
-
       }
     ],
     replace: true,
@@ -204,7 +202,7 @@ angular.module('adage.gene.search', [
         scope.loadingSearchResults = false;
       });
 
-      //Watch for page changes and update
+      // Watch for page changes and update
       scope.$watch('currentPage', function() {
         var begin = ((scope.currentPage - 1) * scope.itemsPerPage);
         var end = begin + scope.itemsPerPage;
@@ -223,7 +221,7 @@ angular.module('adage.gene.search', [
   return {
     controller: ['$scope', 'SelectedGenesFactory', '$state',
       function($scope, SelectedGenesFactory, $state) {
-        $scope.selectedGenes = SelectedGenesFactory.return_genes();
+        $scope.selectedGenes = SelectedGenesFactory.returnGenes();
 
         $scope.sendToNetwork = function() {
           var genes = [];
@@ -326,7 +324,7 @@ angular.module('adage.gene.search', [
   };
 }])
 
-// Directive for button to get previous search results 
+// Directive for button to get previous search results
 .directive('previousResultButton', ['SearchResults', function(SearchResults) {
   return {
     link: function(scope, element, attr) {
@@ -356,7 +354,8 @@ angular.module('adage.gene.search', [
       $scope.results = SearchResults.getQueryResults($scope.query);
       $scope.found = $scope.results.found;
 
-      var begin, end;
+      var begin;
+      var end;
       $scope.updatePage = function(page) {
         begin = (page - 1) * 3;
         end = begin + 3;
