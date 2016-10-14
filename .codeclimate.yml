@@ -2,6 +2,8 @@
 engines:
   duplication:
     enabled: true
+    exclude_paths:
+    - "interface/Gruntfile.js"
     config:
       languages:
         python:
