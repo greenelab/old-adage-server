@@ -86,8 +86,9 @@ AWS_CONFIG = {
                                   'adage-server', 'interface'),
     'dbmaster':      AWS_DEPLOY['dbmaster'],
 
-    # The following three keys are all that are needed for runtime use:
-    # django_key, databases, haystack
+    # The following keys are all that are needed for runtime use:
+    # django_key, databases, haystack, 
+    # tribe_{id, secret, redirect_uri, scope, login_redirect, logout_redirect}
     'django_key':    '<config-secret>',
     'databases': {
         'default': {
@@ -122,19 +123,11 @@ AWS_CONFIG = {
 # development server deployment credentials and configuration (maybe on VMware)
 DEV_CONFIG = AWS_CONFIG.copy()
 DEV_CONFIG.update({
-    'repo':          '<configure>',
-    'databases': {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            # database name and user cannot have upper case letters
-            'NAME': '<configure>',
-            'USER': '<configure>',
-            'PASSWORD': '<config-secret>',
-            'HOST': '<configure>',
-            'PORT': '5432',
-        }
-    },
+    'repo': '<configure>',
     'dbmaster': {
+        # database user with CREATE DATABASE & ROLE privs
+        # these are used to bootstrap a new database as
+        # specified in CONFIG['databases']['default']
         'NAME': '<configure>',
         'USER': '<configure>',
         'PASSWORD': '<config-secret>',
@@ -145,6 +138,17 @@ DEV_CONFIG.update({
         'host': '<configure>',
         'user': '<configure:default=ubuntu>',
         'keyfile': '<configure>',
+    },
+    'databases': {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            # database name and user cannot have upper case letters
+            'NAME': '<configure>',
+            'USER': '<configure>',
+            'PASSWORD': '<config-secret>',
+            'HOST': '<configure>',
+            'PORT': '5432',
+        }
     },
 })
 
