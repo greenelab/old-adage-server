@@ -68,6 +68,9 @@ DATA_CONFIG = {
 DATA_CONFIG.update({
     'annotation_file':  os.path.join(DATA_CONFIG['data_dir'],
                                      'PseudomonasAnnotation.tsv'),
+    'activity_file':    os.path.join(DATA_CONFIG['data_dir'],
+        'all-pseudomonas-gene-normalized_HWActivity_perGene_with_net300_100'
+        'models_k=300_seed=123_ClusterByweighted_avgweight_network_ADAGE.txt')
 })
 
 # deployment server credentials and configuration (for AWS)
