@@ -55,13 +55,16 @@ angular.module('adage.tribe_client.directives', [
               ]
             });
 
-            modalInstance.result.then(function(success) {
-              if (success === true) {
-                // continue
-              }
-            }, function() {
+            modalInstance.result.then(
+              function(result) {
+                // This gets called when the $uibModalInstance.close()
+                // function gets called. We might need this bit in the
+                // future, as we make the login process smoother, so we
+                // won't get rid of it yet.
+              }, function() {
               // This gets called if modal gets dismissed
-              // when user clicks outside modal, etc.
+              // ($uibModalInstance.dismiss()), which happens when the
+              // user clicks outside the modal, etc.
             });
           };
         }
