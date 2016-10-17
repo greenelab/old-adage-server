@@ -252,8 +252,9 @@ angular.module('adage.gene.search', [
   };
 })
 
-// Directive for button where user does not find a result
-// Should remove entire row from list
+// A noResultButton is shown next to query tokens that found no matches
+// for a gene in the database. Clicking this button removes the query token
+// from the list of search results.
 .directive('noResultButton', ['SearchResults', function(SearchResults) {
   return {
     link: function(scope, element, attr) {
