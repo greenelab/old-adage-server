@@ -170,46 +170,49 @@ grunt
    above](#edit-settings-in-configpy-file).
 1. Fork the [deployment repository](TODO: migrate repo to github) and then clone
    that fork to a directory alongside your `adage-server` repository.
-	 
+
    ```shell
    > cd /<your chosen directory>/
    > git clone git@github.com:<your github account>/adage-deploy.git
    ```
+
 1. Install `fabric`, the tool we use for scripting deployment steps:
-   
+
    ```shell
    > pip install fabric
    ```
+
 1. If deploying to AWS, you also need to install `boto3` and its requirements:
-	 
+
    ```shell
    > pip install boto3
    ```
+
 1. To perform an AWS deployment, ensure your RDS instance is online, the
    `AWS_DEPLOY` section of `config.py` is properly completed, and run the
-	 following `fabric` command:
-   
-	 ```shell
-	 > fab deploy_aws
-	 ```
-	 
-	 This will spin up a new EC2 instance using the AWS credentials found in
-	 `config.py`, deploy the latest `adage-server` code from GitHub and
-	 configure all required services. Configuring DNS to direct your domain to
-	 the new server must be done manually. (We have DNS pointing to an Elastic IP
-	 address and simply re-associate to the new server when deployment succeeds.
+   following `fabric` command:
+
+   ```shell
+   > fab deploy_aws
+   ```
+
+   This will spin up a new EC2 instance using the AWS credentials found in
+   `config.py`, deploy the latest `adage-server` code from GitHub and
+   configure all required services. Configuring DNS to direct your domain to
+   the new server must be done manually. (We have DNS pointing to an Elastic IP
+   address and simply re-associate to the new server when deployment succeeds.
 1. To perform deployment to a new development server, run the following
    `fabric` command:
-	 
-	 ```shell
-	 > fab deploy_dev
-	 ```
-	 
-	 This will execute the same deployment steps as run for AWS deployment, but
-	 skips the step that spins up an EC2 instance and makes a configuration tweak
-	 that allows `nginx` to respond to requests for any hostname or IP address.
-	 This method assumes you have a fresh installation of Ubuntu 16.04 and that
-	 you have configured the `DEV_CONFIG` section of `config.py` with credentials
-	 for a user with `sudo` privileges that can be used to create the requisite
-	 services and a user account with the minimum privileges required to host
-	 the deployed `adage-server` code.
+
+   ```shell
+   > fab deploy_dev
+   ```
+
+   This will execute the same deployment steps as run for AWS deployment, but
+   skips the step that spins up an EC2 instance and makes a configuration tweak
+   that allows `nginx` to respond to requests for any hostname or IP address.
+   This method assumes you have a fresh installation of Ubuntu 16.04 and that
+   you have configured the `DEV_CONFIG` section of `config.py` with credentials
+   for a user with `sudo` privileges that can be used to create the requisite
+   services and a user account with the minimum privileges required to host
+   the deployed `adage-server` code.
