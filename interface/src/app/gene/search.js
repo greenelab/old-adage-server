@@ -1,5 +1,6 @@
 angular.module('adage.gene.search', [
-  'adage.gene.resource'
+  'adage.gene.resource',
+  'adage.gene.utils'
 ])
 
 .config(function($stateProvider) {
@@ -157,75 +158,75 @@ angular.module('adage.gene.search', [
 }])
 
 // Directive for table containing search results
-.directive('searchResultTable', ['SearchResults', function(SearchResults) {
-  return {
-    controller: ['$scope', 'SearchResults', 'SelectedGenesFactory',
-      function($scope, SearchResults, SelectedGenesFactory) {
-        $scope.currentPage = 1;
-        $scope.itemsPerPage = 10;
-        $scope.totalResults = 0;
-        $scope.maxSize = 10;
-        $scope.resultsForPage = [];
-        $scope.searchResults = SearchResults.getSearchResults();
-        $scope.loadingSearchResults = false;
+.directive('searchResultTable', ['SearchResults', 'CommonGeneFuncts',
+  function(SearchResults, CommonGeneFuncts) {
+    return {
+      controller: ['$scope', 'SearchResults', 'SelectedGenesFactory',
+        function($scope, SearchResults, SelectedGenesFactory) {
+          $scope.currentPage = 1;
+          $scope.itemsPerPage = 10;
+          $scope.totalResults = 0;
+          $scope.maxSize = 10;
+          $scope.resultsForPage = [];
+          $scope.searchResults = SearchResults.getSearchResults();
+          $scope.loadingSearchResults = false;
 
-        $scope.addAllNonAmbiguous = function() {
-          // Function to automatically add all genes that
-          // only have one search result.
-          var searchResults = SearchResults.getSearchResults();
-          for (var key in searchResults) {
-            var results = searchResults[key];
-            if (results.found.length <= 1) {
-              if (results.found[0]) {
-                SelectedGenesFactory.addGene(results.found[0]);
+          $scope.addAllNonAmbiguous = function() {
+            // Function to automatically add all genes that
+            // only have one search result.
+            var searchResults = SearchResults.getSearchResults();
+            for (var key in searchResults) {
+              var results = searchResults[key];
+              if (results.found.length <= 1) {
+                if (results.found[0]) {
+                  SelectedGenesFactory.addGene(results.found[0]);
+                  SearchResults.remove(key);
+                }
+              }
+            }
+          };
+
+          $scope.removeNotFound = function() {
+            // Function to get rid of all the queries that returned no results.
+            var searchResults = SearchResults.getSearchResults();
+            for (var key in searchResults) {
+              var results = searchResults[key];
+              if (results.found.length === 0) {
                 SearchResults.remove(key);
               }
             }
-          }
-        };
+          };
+        }
+      ],
 
-        $scope.removeNotFound = function() {
-          // Function to get rid of all the queries that returned no results.
-          var searchResults = SearchResults.getSearchResults();
-          for (var key in searchResults) {
-            var results = searchResults[key];
-            if (results.found.length === 0) {
-              SearchResults.remove(key);
-            }
-          }
-        };
-      }
-    ],
+      link: function(scope, element, attr) {
+        scope.$on('results.update', function() {
+          scope.totalResults = SearchResults.size();
+          scope.resultsForPage = CommonGeneFuncts.updatePageGenes(
+            scope, SearchResults);
+        });
 
-    link: function(scope, element, attr) {
-      scope.$on('results.update', function() {
-        scope.totalResults = SearchResults.size();
-        var begin = ((scope.currentPage - 1) * scope.itemsPerPage);
-        var end = begin + scope.itemsPerPage;
-        scope.resultsForPage = SearchResults.getQueries().slice(begin, end);
-      });
+        scope.$on('results.loadingSearchResults', function() {
+          scope.loadingSearchResults = true;
+        });
 
-      scope.$on('results.loadingSearchResults', function() {
-        scope.loadingSearchResults = true;
-      });
+        scope.$on('results.searchResultsReturned', function() {
+          scope.loadingSearchResults = false;
+        });
 
-      scope.$on('results.searchResultsReturned', function() {
-        scope.loadingSearchResults = false;
-      });
-
-      // Watch for page changes and update
-      scope.$watch('currentPage', function() {
-        var begin = ((scope.currentPage - 1) * scope.itemsPerPage);
-        var end = begin + scope.itemsPerPage;
-        scope.resultsForPage = SearchResults.getQueries().slice(begin, end);
-      });
-    },
-    replace: true,
-    restrict: "E",
-    scope: true,
-    templateUrl: 'gene/search-result-table.tpl.html'
-  };
-}])
+        // Watch for page changes and update
+        scope.$watch('currentPage', function() {
+          scope.resultsForPage = CommonGeneFuncts.updatePageGenes(
+            scope, SearchResults);
+        });
+      },
+      replace: true,
+      restrict: "E",
+      scope: true,
+      templateUrl: 'gene/search-result-table.tpl.html'
+    };
+  }
+])
 
 // Directive for table containing search results
 .directive('selectedGenesPanel', function() {
@@ -319,42 +320,40 @@ angular.module('adage.gene.search', [
 
 // Directive for button to get more options, should get
 // next page of search results for this query from the server
-.directive('moreResultButton', ['SearchResults', function(SearchResults) {
-  return {
-    link: function(scope, element, attr) {
-      element.bind("click", function() {
-        scope.page = scope.pageDict.page + 1;
-        scope.$apply(function() {
-          scope.pageDict.page = scope.page;
-          scope.updatePage(scope.page);
+.directive('moreResultButton', ['SearchResults', 'CommonGeneFuncts',
+  function(SearchResults, CommonGeneFuncts) {
+    return {
+      link: function(scope, element, attr) {
+        element.bind("click", function() {
+          scope.page = scope.pageDict.page + 1;
+          scope.$apply(CommonGeneFuncts.updatePageNumbers(scope));
         });
-      });
-    },
-    replace: true,
-    restrict: "E",
-    scope: false,
-    templateUrl: 'gene/more-result-button.tpl.html'
-  };
-}])
+      },
+      replace: true,
+      restrict: "E",
+      scope: false,
+      templateUrl: 'gene/more-result-button.tpl.html'
+    };
+  }
+])
 
 // Directive for button to get previous search results
-.directive('previousResultButton', ['SearchResults', function(SearchResults) {
-  return {
-    link: function(scope, element, attr) {
-      element.bind("click", function() {
-        scope.page = scope.pageDict.page - 1;
-        scope.$apply(function() {
-          scope.pageDict.page = scope.page;
-          scope.updatePage(scope.page);
+.directive('previousResultButton', ['SearchResults', 'CommonGeneFuncts',
+  function(SearchResults, CommonGeneFuncts) {
+    return {
+      link: function(scope, element, attr) {
+        element.bind("click", function() {
+          scope.page = scope.pageDict.page - 1;
+          scope.$apply(CommonGeneFuncts.updatePageNumbers(scope));
         });
-      });
-    },
-    replace: true,
-    restrict: "E",
-    scope: false,
-    templateUrl: 'gene/previous-result-button.tpl.html'
-  };
-}])
+      },
+      replace: true,
+      restrict: "E",
+      scope: false,
+      templateUrl: 'gene/previous-result-button.tpl.html'
+    };
+  }
+])
 
 // Directive for search buttonset, has buttons for handling
 // search results
