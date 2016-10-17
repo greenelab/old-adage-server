@@ -369,9 +369,15 @@ angular.module('adage.gene.search', [
 
       var begin;
       var end;
+
       $scope.updatePage = function(page) {
-        begin = (page - 1) * 3;
-        end = begin + 3;
+        // Number of gene results that appear in each
+        // 'page' of the search button-set.
+        var genesPerPage = 3;
+
+        begin = (page - 1) * genesPerPage;
+        end = begin + genesPerPage;
+
         $scope.pageGenes = $scope.found.slice(begin, end);
 
         // Boolean, telling whether or not there is (are) any
