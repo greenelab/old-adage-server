@@ -67,7 +67,12 @@ angular.module('adage.gene.search', [
       return queries.length;
     },
     search: function(qparams) {
-      // Search for genes and add the results to the service
+      // Gene.search will query for all of the search terms in qparams
+      // returning a list of objects containing each search term and the
+      // gene results for that term in each objects. If the search
+      // contained terms already found in our cache of searchResults,
+      // those results are ignored while terms not already present will
+      // be added to the cache.
       Gene.search(qparams, function(data) {
         var previousQueries = queries.length;
         for (var i = 0; i < data.length; i++) {
