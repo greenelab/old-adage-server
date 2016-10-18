@@ -1,0 +1,7 @@
+extends: google
+
+ecmaFeatures:
+  modules: true
+
+globals:
+  angular: true
