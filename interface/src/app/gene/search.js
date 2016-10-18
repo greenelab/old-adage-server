@@ -12,6 +12,7 @@ angular.module('adage.gene.search', [
           templateUrl: 'gene/gene-network.tpl.html',
           controller: ['$scope', 'UserFactory',
             function($scope, UserFactory) {
+              $scope.userObj = null;
               UserFactory.getPromise().$promise.then(function() {
                 $scope.userObj = UserFactory.getUser();
               });
@@ -25,10 +26,11 @@ angular.module('adage.gene.search', [
     })
 
   .state('gene_network', {
+    // This is a placeholder for the Gene Network page that
+    // Dongbo is working on, which may or may not live in this file.
+    // For the moment, it is just the state where users go to after
+    // they have selected their genes.
     url: '/gene_network/',
-    views: {
-      "main": {}
-    },
     data: {
       pageTitle: 'Gene Network'
     }
