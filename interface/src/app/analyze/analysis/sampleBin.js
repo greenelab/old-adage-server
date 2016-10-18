@@ -13,12 +13,14 @@ angular.module('adage.analyze.sampleBin', [
   return $resource('/api/v0/activity/');
 }])
 
-.factory('SampleBin', ['$log', 'Sample', 'Activity',
-function($log, Sample, Activity) {
+.factory('SampleBin', ['$log', '$cacheFactory', 'Sample', 'Activity',
+function($log, $cacheFactory, Sample, Activity) {
   var SampleBin = {
     samples: [],
     heatmapData: {},
     sampleData: {},
+    sampleCache: $cacheFactory('sample'),
+    activityCache: $cacheFactory('activity'),
 
     add_sample: function(id) {
       if (SampleBin.samples.indexOf(+id) !== -1) {
@@ -30,7 +32,7 @@ function($log, Sample, Activity) {
         // TODO need to report query progress and errors somehow
         // TODO this should use caching and promises to fetch sample data
         // 1. check cache for existing Sample data. Hit = return
-        // 2. if cache miss: 
+        // 2. if cache miss:
         // 2a. getSampleDetails & append a promise to SampleBin.promises
         // 2b. getActivityForSample & append a promise to SampleBin.promises
         // ... now can use Promise.all(SampleBin.promises).then() to trigger
