@@ -135,6 +135,8 @@ angular.module('adage.gene.search', [
         // Clear any existing search results
         SearchResults.clear();
 
+        $scope.errors = null;
+
         $scope.searchGenes = function() {
           if (!$scope.genesToAdd) { // if the query is empty
             return false;
@@ -166,6 +168,8 @@ angular.module('adage.gene.search', [
           var searchSuccess = SearchResults.getSearchSuccess();
           if (searchSuccess === null || searchSuccess === false) {
             $scope.errors = 'Gene search is temporarily down';
+          } else {
+            $scope.errors = null;
           }
         });
       }
