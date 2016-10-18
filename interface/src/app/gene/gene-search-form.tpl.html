@@ -8,7 +8,7 @@
             <textarea name="genes" rows="7" ng-model="genesToAdd.query"
               placeholder="Search genes by symbol or Entrez ID">
             </textarea>
-            <span class="error">{{ errors.name }}</span>
+            <p class="bg-danger">{{ errors }}</p>
             <br>
             <button class="btn btn-primary" ng-click="searchGenes()"
               ng-disabled="loadingSearchResults">
