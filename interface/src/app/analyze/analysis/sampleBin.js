@@ -22,10 +22,10 @@ function($log, $cacheFactory, Sample, Activity) {
     sampleCache: $cacheFactory('sample'),
     activityCache: $cacheFactory('activity'),
 
-    add_sample: function(id) {
+    addSample: function(id) {
       if (SampleBin.samples.indexOf(+id) !== -1) {
         // quietly ignore the double-add
-        $log.warn('SampleBin.add_sample: ' + id +
+        $log.warn('SampleBin.addSample: ' + id +
             ' already in the sample list; ignoring.');
       } else {
         SampleBin.samples.push(+id);
@@ -40,11 +40,12 @@ function($log, $cacheFactory, Sample, Activity) {
       }
     },
 
-    remove_sample: function(id) {
+    removeSample: function(id) {
       var pos = SampleBin.samples.indexOf(+id);
       SampleBin.samples.splice(pos, 1);
-      // TODO now need to mutate SampleBin.heatmapData.activity rather than re-retrieve data
-      Activity.get({sample__in: SampleBin.samples.join()},
+      // TODO caching: here need to update SampleBin.heatmapData.activity
+      // rather than re-retrieve data
+      Activity.get({'sample__in': SampleBin.samples.join()},
         // success callback
         function(responseObject, responseHeaders) {
           if (responseObject) {
@@ -59,32 +60,32 @@ function($log, $cacheFactory, Sample, Activity) {
       );
     },
 
-    add_experiment: function(sample_id_list) {
-      for (var i = 0; i < sample_id_list.length; i++) {
-        SampleBin.add_sample(sample_id_list[i]);
+    addExperiment: function(sampleIdList) {
+      for (var i = 0; i < sampleIdList.length; i++) {
+        SampleBin.addSample(sampleIdList[i]);
       }
     },
 
-    add_item: function(search_item) {
-      if (search_item.item_type === 'sample') {
-        SampleBin.add_sample(search_item.pk);
-      } else if (search_item.item_type === 'experiment') {
-        SampleBin.add_experiment(search_item.related_items);
+    addItem: function(searchItem) {
+      if (searchItem.item_type === 'sample') {
+        SampleBin.addSample(searchItem.pk);
+      } else if (searchItem.item_type === 'experiment') {
+        SampleBin.addExperiment(searchItem.related_items);
       }
     },
 
-    has_item: function(search_item) {
-      if (search_item.item_type === 'sample') {
-        if (SampleBin.samples.indexOf(+search_item.pk) !== -1) {
+    hasItem: function(searchItem) {
+      if (searchItem.item_type === 'sample') {
+        if (SampleBin.samples.indexOf(+searchItem.pk) !== -1) {
           return true;
         } else {
           return false;
         }
-      } else if (search_item.item_type === 'experiment') {
+      } else if (searchItem.item_type === 'experiment') {
         // what we want to know, in the case of an experiment, is 'are
         // all of the samples from this experiment already added?'
-        for (var i = 0; i < search_item.related_items.length; i++) {
-          if (SampleBin.samples.indexOf(+search_item.related_items[i]) === -1) {
+        for (var i = 0; i < searchItem.related_items.length; i++) {
+          if (SampleBin.samples.indexOf(+searchItem.related_items[i]) === -1) {
             return false;
           }
         }
@@ -129,7 +130,7 @@ function($log, $cacheFactory, Sample, Activity) {
     getActivityForSampleList: function(respObj, successFn, failFn) {
       // retrieve activity data for heatmap to display
       respObj.queryStatus = 'Retrieving sample activity...';
-      Activity.get({sample__in: this.samples.join()}, successFn, failFn);
+      Activity.get({'sample__in': this.samples.join()}, successFn, failFn);
     }
   };
 
@@ -143,7 +144,7 @@ function SampleBinCtrl($scope, $log, $uibModal, Sample, SampleBin) {
   $scope.sb = SampleBin;
 
   $scope.show = function() {
-    var modalInstance = $uibModal.open({
+    $uibModal.open({
       animation: true,
       templateUrl: 'analyze/analysis/analysisModal.tpl.html',
       controller: 'AnalysisModalCtrl',
