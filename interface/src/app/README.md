@@ -29,7 +29,7 @@ glimpse of how powerful this simple construct can be.
 ## `app.js`
 
 This is our main app configuration file. It kickstarts the whole process by
-requiring all the modules from `src/app` that we need. We must load these now to
+requiring all the modules from `src/app/` that we need. We must load these now to
 ensure the routes are loaded. If as in our "products" example there are
 subroutes, we only require the top-level module, and allow the submodules to
 require their own submodules.
@@ -46,9 +46,8 @@ angular.module( 'ngBoilerplate', [
   'templates-app',
   'templates-common',
   'ngBoilerplate.home',
-  'ngBoilerplate.about'
-  'ui.router',
-  'ui.route'
+  'ngBoilerplate.about',
+  'ui.router'
 ])
 ```
 
