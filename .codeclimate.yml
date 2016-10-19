@@ -11,6 +11,8 @@ engines:
         javascript:
   eslint:
     enabled: true
+    config:
+      config: interface/eslint.conf.js
     channel: "eslint-3"
     exclude_paths:
     - "interface/Gruntfile.js"
