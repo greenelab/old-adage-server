@@ -20,12 +20,11 @@ module.exports = {
   // gNNN: Line number of the same option in ./eslint.google.js
   rules: {
     'curly': 2,                   // (g081) Always use curly braces.
+    'eqeqeq': [2, 'always'],      // (g086) Never allows '==' or '!=' operators.
     'comma-dangle': [2, 'never'], // (g185) Never allows trailing comma.
     'indent': [2, 2],             // (g197) Indentation: always 2 spaces.
-    'keyword-spacing': 2,         // (g201) Whitepace before and after keyword.
-    'one-var': [2, {              // (g248) Allows "var x, y;".
-      var: 'always'
-    }],
+    'keyword-spacing': 2,         // (g201) Space before and after keyword.
+    'one-var': 0,                 // (g248) Allows "var x, y;".
     'no-var': 0                   // (g300) Allows "var" declaration.
   }
 };
