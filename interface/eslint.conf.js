@@ -1,6 +1,6 @@
 /**
  * GreeneLab JavaScript ESLint rules, extends from Google coding guide at:
- * https://github.com/google/eslint-config-google/index.js (commit 40e3b15)
+ * https://github.com/google/eslint-config-google/index.js (commit 0037169)
  * (renamed to "eslint.google.js").
  */
 
