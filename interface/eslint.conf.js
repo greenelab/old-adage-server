@@ -19,9 +19,9 @@ module.exports = {
   //   http://eslint.org/docs/user-guide/configuring#configuring-rules
   // gNNN: Line number of the same option in ./eslint.google.js
   rules: {
-    'curly': 2,                   // (g081) Always use curly braces.
-    'eqeqeq': [2, 'always'],      // (g086) Never allows '==' or '!=' operators.
-    'comma-dangle': [2, 'never'], // (g185) Never allows trailing comma.
+    'curly': 2,                   // (g080) Always use curly braces.
+    'eqeqeq': [2, 'always'],      // (g085) Never allows '==' or '!=' operators.
+    'comma-dangle': [2, 'never'], // (g184) Never allows trailing comma.
     'indent': [2, 2],             // (g197) Indentation: always 2 spaces.
     'keyword-spacing': 2,         // (g201) Space before and after keyword.
     'one-var': 0,                 // (g248) Allows "var x, y;".

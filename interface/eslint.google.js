@@ -33,7 +33,6 @@ module.exports = {
     // ---------------------------------------------
     'no-cond-assign': 0, // eslint:recommended
     // 'no-console': 2, // eslint:recommended
-    // 'no-condition': 2, // eslint:recommended
     // 'no-constant-condition': 2, // eslint:recommended
     // 'no-control-regex': 2, // eslint:recommended
     // 'no-debugger': 2, // eslint:recommended
@@ -189,6 +188,7 @@ module.exports = {
     // 'consistent-this': 0,
     'eol-last': 2,
     'func-call-spacing': 2,
+    // 'func-name-matching': 0,
     // 'func-names': 0,
     // 'func-style': 0,
     // 'id-blacklist': 0,
@@ -215,7 +215,7 @@ module.exports = {
     // 'max-params': 0,
     // 'max-statements-per-line': 0,
     // 'max-statements': 0,
-    // 'multiline-ternary': 0, // TODO(philipwalton): add a rule to enfore the
+    // 'multiline-ternary': 0, // TODO(philipwalton): add a rule to enforce the
                                // operator appearing at the end of the line.
     'new-cap': 2,
     // 'new-parens': 0,
