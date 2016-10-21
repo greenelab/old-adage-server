@@ -10,12 +10,24 @@ angular.module('adage.gene.search', [
       views: {
         "main": {
           templateUrl: 'gene/gene-network.tpl.html',
-          controller: ['$scope', 'UserFactory',
-            function($scope, UserFactory) {
+          controller: ['$scope', 'UserFactory', '$uibModal',
+            function($scope, UserFactory, $uibModal) {
               $scope.userObj = null;
               UserFactory.getPromise().$promise.then(function() {
                 $scope.userObj = UserFactory.getUser();
               });
+
+              $scope.searchTribe = function() {
+                var modalInstance = $uibModal.open({
+                  templateUrl: 'tribe_client/geneset-search-modal.tpl.html',
+                  controller: ['$scope', function($scope) {
+                    $scope.organism = 'Pseudomonas aeruginosa';
+                  }]
+                });
+
+                modalInstance.result.then(function(standards) {
+                });
+              };
             }
           ]
         }

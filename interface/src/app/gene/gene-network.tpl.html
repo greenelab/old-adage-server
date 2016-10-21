@@ -3,8 +3,19 @@
     Gene Network
   </h1>
   <div class="well">
-    <geneset-search-form ng-if="userObj"></geneset-search-form>
     <gene-search-form></gene-search-form>
+
+    <div class="panel panel-default" ng-if="userObj">
+      <div class="panel-body">
+        <h4>
+          Have a Tribe gene set you want to use? &nbsp;
+          <button class="btn btn-primary" ng-click="searchTribe()">
+            Search Tribe <i class="fa fa-search"></i>
+          </button><br>
+        </h4>
+      </div>
+    </div>
+
     <selected-genes-panel></selected-genes-panel>
   </div>
 </div>

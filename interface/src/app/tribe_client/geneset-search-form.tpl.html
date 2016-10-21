@@ -1,22 +1,11 @@
-<div class="row">
-  <div class="col-sm-12">
-    <div class="panel panel-default">
-      <div class="panel-body">
-        <div class="col-md-5">
-          <form class="form">
-            Tribe Gene Set &nbsp;
-            <input id="gene" type="text" name="gene" /> &nbsp;
-            <button class="btn btn-primary" ng-click=""
-              ng-disabled="loadingSearchResults">
-              Search   <i class="fa fa-search"></i>
-            </button><br>
-            <span class="error">{{ errors.name }}</span>
-          </form>
-        </div>
-        <div class="col-md-7">  
-          Search results
-        </div>
-      </div>
-    </div>
-  </div>
+<div>
+  <form class="form-inline">
+    <select ng-disabled="true">
+      <option ng-selected="true" value="organism">{{organism}}</option>  
+    </select>
+
+    <input ng-model="search.query" placeholder="Search text">
+
+    <button class="btn btn-default" ng-click="searchGenesets(search)">Search</button>
+  </form>
 </div>
