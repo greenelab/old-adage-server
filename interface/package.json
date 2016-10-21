@@ -16,8 +16,6 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "eslint": "^3.7.1",
-    "eslint-config-google": "^0.6.0",
     "grunt": "^1.0.1",
     "grunt-bump": "^0.8.0",
     "grunt-coffeelint": "^0.0.16",
@@ -30,6 +28,7 @@
     "grunt-contrib-uglify": "^2.0.0",
     "grunt-contrib-watch": "^1.0.0",
     "grunt-conventional-changelog": "^6.1.0",
+    "grunt-eslint": "^19.0.0",
     "grunt-html2js": "^0.3.6",
     "grunt-karma": "^2.0.0",
     "grunt-ng-annotate": "^2.0.2",
