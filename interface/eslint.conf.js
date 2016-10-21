@@ -25,6 +25,7 @@ module.exports = {
     'indent': [2, 2],             // (g197) Indentation: always 2 spaces.
     'keyword-spacing': 2,         // (g201) Space before and after keyword.
     'one-var': 0,                 // (g248) Allows "var x, y;".
+    'space-in-parens': 2,         // (g271) No spaces after '(' or before ')'.
     'no-var': 0                   // (g300) Allows "var" declaration.
   }
 };
