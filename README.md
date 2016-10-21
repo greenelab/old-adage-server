@@ -6,7 +6,7 @@
 This codebase tracks work in progress toward a web server that will
 allow users to apply a working ADAGE model to their own data sets. It should be
 considered pre-release status. The following instructions detail the steps
-required for getting a development build up and running manually. For a guide
+required for getting a development instance up and running manually. For a guide
 to automated deployment, see [Deployment Steps](#deployment-steps) below.
 
 ## Get a working instance of the adage-server running
@@ -176,7 +176,8 @@ grunt
    > git clone git@github.com:<your github account>/adage-deploy.git
    ```
 
-1. Install `fabric`, the tool we use for scripting deployment steps:
+1. [Install `fabric`](http://www.fabfile.org), the tool we use for scripting
+   deployment steps:
 
    ```shell
    > pip install fabric

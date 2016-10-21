@@ -28,7 +28,6 @@ AWS_DEPLOY = {
         'PORT': '5432',
     },
     'ec2_params': {
-        # 'DryRun': True,
         'ImageId': 'ami-4f680658',    # Ubuntu 16.04
         'MinCount': 1, 'MaxCount': 1,
         'KeyName': '<configure>',
