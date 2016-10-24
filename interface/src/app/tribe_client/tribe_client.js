@@ -23,7 +23,8 @@ angular.module('adage.tribe_client', [
       }
       return promise;
     },
-    resetPromise: function() { // reset the promise in case we need to check the user again
+    resetPromise: function() {
+      // reset the promise in case we need to check the user again
       promise = null;
     },
     setUser: function(newUser) {

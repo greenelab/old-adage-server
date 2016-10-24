@@ -8,7 +8,7 @@ angular.module('adage.gene.search', [
     .state('gene_search', {
       url: '/gene_search',
       views: {
-        "main": {
+        'main': {
           templateUrl: 'gene/gene-network.tpl.html',
           controller: ['$scope', 'UserFactory', '$uibModal',
             function($scope, UserFactory, $uibModal) {
