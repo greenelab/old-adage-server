@@ -46,7 +46,7 @@ angular.module('adage.tribe_client.genesets', [
       };
     }],
     replace: true,
-    restrict: "E",
+    restrict: 'E',
     scope: {
       limit: '=limit',
       organism: '='
@@ -80,7 +80,7 @@ angular.module('adage.tribe_client.genesets', [
       });
     },
     replace: true,
-    restrict: "E",
+    restrict: 'E',
     templateUrl: 'tribe_client/geneset-result-table.tpl.html'
   };
 })
