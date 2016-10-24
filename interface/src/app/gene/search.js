@@ -24,7 +24,7 @@ angular.module('adage.gene.search', [
                     // TODO: Right now, we are hard-coding this organism
                     // as Pseudomonas (since it is the only one currently
                     // supported by ADAGE). However, as we incorporate
-                    // multi-species support, this organism will havt to
+                    // multi-species support, this organism will have to
                     // be obtained from the ML model. This is the same as
                     // the issue in geneSearchForm (also with $scope.organism).
                     $scope.organism = 'Pseudomonas aeruginosa';
