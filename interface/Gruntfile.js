@@ -20,6 +20,7 @@ module.exports = function ( grunt ) {
   grunt.loadNpmTasks('grunt-html2js');
   grunt.loadNpmTasks('grunt-protractor-runner');
   grunt.loadNpmTasks('grunt-protractor-webdriver');
+  grunt.loadNpmTasks('grunt-eslint');
 
   /**
    * Load in our build configuration file.
@@ -323,6 +324,18 @@ module.exports = function ( grunt ) {
           src: [ '<%= app_files.coffeeunit %>' ]
         }
       }
+    },
+
+    /**
+     * eslint configuration.
+     */
+    eslint: {
+      options: {
+        configFile: 'eslint.conf.js'
+      },
+      src: ['<%= app_files.js %>'],
+      unit: ['<%= app_files.jsunit %>'],
+      e2e: ['<%= app_files.jse2e %>']
     },
 
     /**
