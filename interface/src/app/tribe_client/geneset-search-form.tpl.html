@@ -1,11 +1,14 @@
-<div>
-  <form class="form-inline">
-    <select ng-disabled="true">
-      <option ng-selected="true" value="organism">{{organism}}</option>  
-    </select>
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h4>
+      Have a Tribe gene set you want to use?
+    </h4>
+  </div>
 
-    <input ng-model="search.query" placeholder="Search text">
-
-    <button class="btn btn-default" ng-click="searchGenesets(search)">Search</button>
-  </form>
+  <div class="panel-body">
+    <label for="title">Search Tribe gene sets</label>
+    <geneset-search-bar organism="organism" limit="limit" genesets="genesets"></geneset-search-bar>
+    <hr>
+    <gene-set-table limit="limit" genesets="genesets"></gene-set-table>        
+  </div>
 </div>

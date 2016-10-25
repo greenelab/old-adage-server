@@ -4,10 +4,10 @@ angular.module('adage.tribe_client.genesets', [
 
 // Geneset Search Factory
 // Allows for retreiving for and interacting with search results for genesets.
-.factory('GenesetSearch', function($rootScope, Genesets) {
+.factory('GenesetSearch', ['Genesets', function(Genesets) {
   var genesets = [];
   var query = {};
-  var totalResults = 0;
+  var resultCount = null;
 
   return {
     getQuery: function() {
@@ -19,70 +19,85 @@ angular.module('adage.tribe_client.genesets', [
     clear: function() {
       query = {};
       genesets = [];
-      $rootScope.$broadcast('genesets.update');
     },
-    totalResults: function() {
-      return totalResults;
+    getResultCount: function() {
+      return resultCount;
     },
     query: function(searchParams) {
       query = searchParams;
       Genesets.query(query, function(data) {
-        totalResults = data.meta.total_count;
+        resultCount = data.meta.total_count;
         genesets = data.objects;
-        $rootScope.$broadcast('genesets.update');
       });
     }
   };
-})
+}])
+
+.directive('genesetSearchForm', ['GenesetSearch', function(GenesetSearch) {
+  return {
+    controller: ['$scope', function($scope) {
+      $scope.genesets = GenesetSearch.getGenesets();
+    }],
+    replace: true,
+    restrict: 'E',
+    scope: {
+      limit: '=',
+      organism: '='
+    },
+    templateUrl: 'tribe_client/geneset-search-form.tpl.html'
+  };
+}])
+
 
 // Search box for users to enter their search text into
-// and go search Tribe.
-.directive('genesetSearchForm', function(GenesetSearch) {
+// and go search Tribe genesets.
+.directive('genesetSearchBar', ['GenesetSearch', function(GenesetSearch) {
   return {
     controller: ['$scope', function($scope) {
       $scope.searchGenesets = function(search) {
         search['organism__scientific_name'] = $scope.organism;
+        search['limit'] = $scope.limit;
         GenesetSearch.query(search);
+        $scope.genesets = GenesetSearch.getGenesets();
       };
     }],
     replace: true,
     restrict: 'E',
     scope: {
-      limit: '=limit',
-      organism: '='
+      limit: '=',
+      organism: '=',
+      genesets: '='
     },
-    templateUrl: 'tribe_client/geneset-search-form.tpl.html'
+    templateUrl: 'tribe_client/geneset-search-bar.tpl.html'
   };
-})
+}])
 
 // Directive for table containing search results
-.directive('geneSetTable', function(GenesetSearch) {
+.directive('geneSetTable', ['GenesetSearch', function(GenesetSearch) {
   return {
     controller: ['$scope', function($scope) {
-      $scope.currentPage = 1;
-      $scope.totalResults = 0;
-
       // Number of results (in this case genesets) to come back
-      // in each page.
+      // in each response page.
       $scope.limit = 10;
-      $scope.genesets = GenesetSearch.getGenesets();
+
+      $scope.genesetResultCount = GenesetSearch.getResultCount();
 
       var query = GenesetSearch.getQuery();
       query['limit'] = $scope.limit;
-      query['show_tip'] = true;
       query['organism__scientific_name'] = $scope.organism;
+
       GenesetSearch.query(query);
+      $scope.genesets = GenesetSearch.getGenesets();
     }],
-    link: function(scope, element, attr) {
-      scope.$on('genesets.update', function() {
-        scope.genesets = GenesetSearch.getGenesets();
-        scope.totalResults = GenesetSearch.totalResults();
-      });
-    },
     replace: true,
     restrict: 'E',
+    scope: {
+      limit: '=',
+      organism: '=',
+      genesets: '='
+    },
     templateUrl: 'tribe_client/geneset-result-table.tpl.html'
   };
-})
+}])
 
 ;

@@ -23,7 +23,8 @@ angular.module('adage.tribe_client.resource', ['ngResource'])
       query: {
         method: 'JSONP',
         params: {
-          callback: 'JSON_CALLBACK'
+          'show_tip': true,
+          'callback': 'JSON_CALLBACK'
         },
         isArray: false
       }

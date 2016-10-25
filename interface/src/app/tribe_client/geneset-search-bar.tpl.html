@@ -1,0 +1,12 @@
+<div>
+  <form class="form-inline">
+    <label>Organism:</label>
+    <select ng-disabled="true">
+      <option ng-selected="true" value="organism">{{organism}}</option>  
+    </select>
+
+    <input ng-model="search.query" placeholder="Search text">
+
+    <button class="btn btn-default" ng-click="searchGenesets(search)">Search</button>
+  </form>
+</div>
