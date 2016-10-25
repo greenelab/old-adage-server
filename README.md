@@ -168,8 +168,9 @@ grunt
 
 1. Follow the steps to [edit settings in config.py as described
    above](#edit-settings-in-configpy-file).
-1. Fork the [deployment repository](TODO: migrate repo to github) and then clone
-   that fork to a directory alongside your `adage-server` repository.
+1. Fork the [deployment repository](https://github.com/greenelab/adage-deploy)
+   and then clone that fork to a directory alongside your `adage-server`
+   repository.
 
    ```shell
    > cd /<your chosen directory>/
