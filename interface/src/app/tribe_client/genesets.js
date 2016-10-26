@@ -2,38 +2,7 @@ angular.module('adage.tribe_client.genesets', [
   'adage.tribe_client.resource'
 ])
 
-// Geneset Search Factory
-// Allows for retreiving for and interacting with search results for genesets.
-.factory('GenesetSearch', ['Genesets', function(Genesets) {
-  var genesets = [];
-  var query = {};
-  var resultCount = null;
-
-  return {
-    getQuery: function() {
-      return query;
-    },
-    getGenesets: function() {
-      return genesets;
-    },
-    clear: function() {
-      query = {};
-      genesets = [];
-    },
-    getResultCount: function() {
-      return resultCount;
-    },
-    query: function(searchParams) {
-      query = searchParams;
-      Genesets.query(query, function(data) {
-        resultCount = data.meta.total_count;
-        genesets = data.objects;
-      });
-    }
-  };
-}])
-
-.directive('genesetSearchForm', ['GenesetSearch', function(GenesetSearch) {
+.directive('genesetSearchForm', [function() {
   return {
     controller: ['$scope', function($scope) {
       // Number of results (in this case genesets) to come back
@@ -53,7 +22,7 @@ angular.module('adage.tribe_client.genesets', [
 
 // Search box for users to enter their search text into
 // and go search Tribe genesets.
-.directive('genesetSearchBar', ['GenesetSearch', function(GenesetSearch) {
+.directive('genesetSearchBar', ['Genesets', function(Genesets) {
   return {
     controller: ['$scope', function($scope) {
       $scope.search = {};
@@ -61,10 +30,10 @@ angular.module('adage.tribe_client.genesets', [
       $scope.search['limit'] = $scope.limit;
 
       $scope.searchGenesets = function() {
-        GenesetSearch.query($scope.search);
-        $scope.genesets = GenesetSearch.getGenesets();
-        $scope.genesetResultCount = GenesetSearch.getResultCount();
-        console.log($scope.genesets);
+        Genesets.query($scope.search, function(data) {
+          $scope.genesetResultCount = data.meta.total_count;
+          $scope.genesets = data.objects;
+        });
       };
     }],
     replace: true,
@@ -79,10 +48,8 @@ angular.module('adage.tribe_client.genesets', [
 }])
 
 // Directive for table containing search results
-.directive('genesetResultTable', ['GenesetSearch', function(GenesetSearch) {
+.directive('genesetResultTable', [function() {
   return {
-    controller: ['$scope', function($scope) {
-    }],
     replace: true,
     restrict: 'E',
     scope: {
