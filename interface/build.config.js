@@ -74,6 +74,10 @@ module.exports = {
       'vendor/angular-sanitize/angular-sanitize.js',
       'vendor/angular-ui-router/release/angular-ui-router.js',
       'vendor/ng-sortable/dist/ng-sortable.min.js',
+      'vendor/jquery/dist/jquery.min.js',              // why no effect?
+      'vendor/jquery-ui/ui/minified/jquery-ui.min.js', // why not effect?
+      'vendor/angular-ui-slider/src/slider.js',
+      'vendor/d3-tip/index.js',
       'vendor/placeholders/angular-placeholders-0.0.1-SNAPSHOT.min.js'
     ],
     css: [

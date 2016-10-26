@@ -1,0 +1,69 @@
+// d3.network styles (based on Aaron Wong's suggestion):
+line.edge {
+  stroke-opacity: .6;
+}
+circle.gene {
+  stroke-width: 2px;
+  stroke: #AAA;
+  fill: #FFF;
+}
+circle.gene-query {
+  stroke-width: 3px;
+}
+
+text.gene-name {
+  font-weight: bold;
+}
+
+text {
+  font-size: 13;
+}
+
+// d3-tip styles, based on:
+// https://github.com/Caged/d3-tip/blob/master/examples/example-styles.css
+.gene-tip {
+  #title {
+    text-align: center;
+  }
+
+  line-height: 1;
+  font-weight: bold;
+  padding: 12px;
+  background: rgba(100, 150, 200, 0.9);
+  color: #fff;
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+.edge-tip {
+  #title {
+    text-align: center;
+  }
+
+  line-height: 1;
+  font-weight: bold;
+  padding: 12px;
+  background: rgba(100, 150, 200, 0.9);
+  color: #fff;
+  border-radius: 2px;
+  pointer-events: none;
+}
+
+// ui-slider styles:
+#slider {
+  width: 500px;
+
+  .ui-slider-handle {
+    width: 12px;
+    background: Blue;
+  };
+
+  .ui-slider-range {
+    background: DarkGray;
+  }
+
+  .ui-slider-tip {
+    position: absolute;
+    top: 15px;
+  }
+}
