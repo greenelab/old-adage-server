@@ -36,7 +36,9 @@ angular.module('adage.tribe_client.genesets', [
 .directive('genesetSearchForm', ['GenesetSearch', function(GenesetSearch) {
   return {
     controller: ['$scope', function($scope) {
-      $scope.genesets = GenesetSearch.getGenesets();
+      // Number of results (in this case genesets) to come back
+      // in each response page.
+      $scope.limit = 10;
     }],
     replace: true,
     restrict: 'E',
@@ -54,11 +56,15 @@ angular.module('adage.tribe_client.genesets', [
 .directive('genesetSearchBar', ['GenesetSearch', function(GenesetSearch) {
   return {
     controller: ['$scope', function($scope) {
-      $scope.searchGenesets = function(search) {
-        search['organism__scientific_name'] = $scope.organism;
-        search['limit'] = $scope.limit;
-        GenesetSearch.query(search);
+      $scope.search = {};
+      $scope.search['organism__scientific_name'] = $scope.organism;
+      $scope.search['limit'] = $scope.limit;
+
+      $scope.searchGenesets = function() {
+        GenesetSearch.query($scope.search);
         $scope.genesets = GenesetSearch.getGenesets();
+        $scope.genesetResultCount = GenesetSearch.getResultCount();
+        console.log($scope.genesets);
       };
     }],
     replace: true,
@@ -73,21 +79,9 @@ angular.module('adage.tribe_client.genesets', [
 }])
 
 // Directive for table containing search results
-.directive('geneSetTable', ['GenesetSearch', function(GenesetSearch) {
+.directive('genesetResultTable', ['GenesetSearch', function(GenesetSearch) {
   return {
     controller: ['$scope', function($scope) {
-      // Number of results (in this case genesets) to come back
-      // in each response page.
-      $scope.limit = 10;
-
-      $scope.genesetResultCount = GenesetSearch.getResultCount();
-
-      var query = GenesetSearch.getQuery();
-      query['limit'] = $scope.limit;
-      query['organism__scientific_name'] = $scope.organism;
-
-      GenesetSearch.query(query);
-      $scope.genesets = GenesetSearch.getGenesets();
     }],
     replace: true,
     restrict: 'E',
