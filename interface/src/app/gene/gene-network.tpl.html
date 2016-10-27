@@ -3,8 +3,9 @@
     Gene Network
   </h1>
   <div class="well">
-    <geneset-search-form ng-if="userObj"></geneset-search-form>
     <gene-search-form></gene-search-form>
+    <geneset-search-form ng-if="userObj" organism="organism">
+    </geneset-search-form>
     <selected-genes-panel></selected-genes-panel>
   </div>
 </div>

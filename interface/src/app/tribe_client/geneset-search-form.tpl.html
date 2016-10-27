@@ -1,22 +1,14 @@
-<div class="row">
-  <div class="col-sm-12">
-    <div class="panel panel-default">
-      <div class="panel-body">
-        <div class="col-md-5">
-          <form class="form">
-            Tribe Gene Set &nbsp;
-            <input id="gene" type="text" name="gene" /> &nbsp;
-            <button class="btn btn-primary" ng-click=""
-              ng-disabled="loadingSearchResults">
-              Search   <i class="fa fa-search"></i>
-            </button><br>
-            <span class="error">{{ errors.name }}</span>
-          </form>
-        </div>
-        <div class="col-md-7">  
-          Search results
-        </div>
-      </div>
-    </div>
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h4>
+      Have a Tribe gene set you want to use?
+    </h4>
+  </div>
+
+  <div class="panel-body">
+    <label for="title">Search Tribe gene sets</label>
+    <geneset-search-bar organism="organism" limit="limit" genesets="genesets"></geneset-search-bar>
+    <hr>
+    <geneset-result-table limit="limit" genesets="genesets"></geneset-result-table>
   </div>
 </div>

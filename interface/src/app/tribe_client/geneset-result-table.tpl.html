@@ -1,0 +1,15 @@
+<div>
+  <table class="table table-striped" name="searchResults">
+    <tr>
+      <th>Title</th>
+      <th>Species</th>
+      <th>Creator</th>
+    </tr>
+
+    <tr ng-repeat="geneset in genesets">
+      <td>{{ geneset.title }}</td>
+      <td>{{ geneset.organism.scientific_name }}</td>
+      <td>{{ geneset.creator.username }}</td>
+    </tr>
+  </table>
+</div>

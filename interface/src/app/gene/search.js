@@ -8,7 +8,7 @@ angular.module('adage.gene.search', [
     .state('gene_search', {
       url: '/gene_search',
       views: {
-        "main": {
+        'main': {
           templateUrl: 'gene/gene-network.tpl.html',
           controller: ['$scope', 'UserFactory',
             function($scope, UserFactory) {
@@ -16,6 +16,14 @@ angular.module('adage.gene.search', [
               UserFactory.getPromise().$promise.then(function() {
                 $scope.userObj = UserFactory.getUser();
               });
+
+              // TODO: Right now, we are hard-coding this organism
+              // as Pseudomonas (since it is the only one currently
+              // supported by ADAGE). However, as we incorporate
+              // multi-species support, this organism will have to
+              // be obtained from the ML model. This is the same as
+              // the issue in geneSearchForm (also with $scope.organism).
+              $scope.organism = 'Pseudomonas aeruginosa';
             }
           ]
         }
@@ -24,17 +32,7 @@ angular.module('adage.gene.search', [
         pageTitle: 'Gene Search'
       }
     })
-
-  .state('gene_network', {
-    // This is a placeholder for the Gene Network page that
-    // Dongbo is working on, which may or may not live in this file.
-    // For the moment, it is just the state where users go to after
-    // they have selected their genes.
-    url: '/gene_network/',
-    data: {
-      pageTitle: 'Gene Network'
-    }
-  });
+  ;
 })
 
 .factory('SearchResults', ['$rootScope', 'Gene', function($rootScope, Gene) {
