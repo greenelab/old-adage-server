@@ -12,7 +12,6 @@ angular.module('adage.tribe_client.genesets', [
     replace: true,
     restrict: 'E',
     scope: {
-      limit: '=',
       organism: '='
     },
     templateUrl: 'tribe_client/geneset-search-form.tpl.html'
@@ -53,6 +52,10 @@ angular.module('adage.tribe_client.genesets', [
     replace: true,
     restrict: 'E',
     scope: {
+      // TODO: Implement pagination for geneset search results in
+      // case the number of results ($scope.genesetResultCount above)
+      // is greater than this 'limit' parameter (the maximum number of
+      // geneset results that the Tribe API should return at once).
       limit: '=',
       organism: '=',
       genesets: '='
