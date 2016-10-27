@@ -25,7 +25,7 @@
 
     <!-- Required js for ui-slider
          FIXME: Why adding these two libraries in build.config.js does not work?
-        -->
+    -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js">
     </script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js">
@@ -34,8 +34,11 @@
     <!-- compiled JavaScript --><% scripts.forEach( function ( file ) { %>
     <script type="text/javascript" src="/static/<%= file %>"></script><% }); %>
 
-    <!-- d3.network library, written by Aaron Wang (aaronkw) -->
-    <script src="https://rawgit.com/dongbohu/d3-network/master/d3.network.js"
+    <!-- d3.network library, written by Aaron Wang (aaronkw)
+      FIXME: Ideally d3.netwrok.js should be installed in vendor/ subdirectory,
+      but since it is under active development, it is requested online for now.
+      -->
+    <script src="https://rawgit.com/aaronkw/d3-network/master/d3.network.js"
             charset="utf-8"></script>
 
     <!-- it's stupid to have to load it here, but this is for the +1 button -->
