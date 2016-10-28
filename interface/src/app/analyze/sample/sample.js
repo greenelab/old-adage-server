@@ -1,12 +1,12 @@
-angular.module( 'adage.analyze.sample', ['ngResource'])
+angular.module('adage.analyze.sample', ['ngResource'])
 
-.factory( 'Sample', ['$resource', '$http', '$log', 
+.factory('Sample', ['$resource', '$http', '$log',
 function($resource, $http, $log) {
   var Sample = $resource(
     '/api/v0/sample/:id/',
     // TODO need to add logic for handling pagination of results.
     // then, can change "limit" below to something sensible
-    { id: '@id', limit: 0 },
+    {id: '@id', limit: 0},
     // Angular expects a query service to give only a list but our Tastypie
     // interface wraps the response list with pagination so we tell Angular to
     // expect an object instead via isArray: false
@@ -30,24 +30,24 @@ function($resource, $http, $log) {
   return Sample;
 }])
 
-.controller( 'SampleCtrl', ['$scope', '$log', '$location', 'Sample',
+.controller('SampleCtrl', ['$scope', '$log', '$location', 'Sample',
   'Experiment',
   function SampleCtrl($scope, $log, $location, Sample, Experiment) {
     $scope.makeHref = Experiment.makeHref;
-    
+
     var queryError = function(responseObject, responseHeaders) {
       $log.warn('Query errored with: ' + responseObject);
-      $scope.sample.status = "Query failed.";
+      $scope.sample.status = 'Query failed.';
     };
 
     $scope.show = function(id) {
       $scope.sample = {
-        status: "retrieving..."
+        status: 'retrieving...'
       };
       Sample.get({id: id},
         function(responseObject, responseHeaders) {
           if (responseObject) {
-            $scope.sample.status = "";
+            $scope.sample.status = '';
             $scope.sample.results = responseObject;
           }
         },
@@ -56,7 +56,7 @@ function($resource, $http, $log) {
       Sample.getExperiments({id: id},
         function(responseObject, responseHeaders) {
           if (responseObject) {
-            $scope.sample.status = "";
+            $scope.sample.status = '';
             $scope.sample.related_experiments = responseObject;
           }
         },

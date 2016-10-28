@@ -4,16 +4,16 @@
  * web site). It also provides utilities for retrieving additional sample
  * information and activity levels required for drawing the heatmap.
  */
-angular.module( 'adage.analyze.sampleBin', [
+angular.module('adage.analyze.sampleBin', [
   'adage.analyze.sample',
   'ngResource'
 ])
 
-.factory( 'Activity', ['$resource', function($resource) {
+.factory('Activity', ['$resource', function($resource) {
   return $resource('/api/v0/activity/');
 }])
 
-.factory( 'SampleBin', ['$log', 'Sample', 'Activity',
+.factory('SampleBin', ['$log', 'Sample', 'Activity',
 function($log, Sample, Activity) {
   var SampleBin = {
     samples: [],
@@ -118,7 +118,7 @@ function($log, Sample, Activity) {
 
     getActivityForSampleList: function(respObj, successFn, failFn) {
       // retrieve activity data for heatmap to display
-      respObj.queryStatus = "Retrieving sample activity...";
+      respObj.queryStatus = 'Retrieving sample activity...';
       Activity.get({sample__in: this.samples.join()}, successFn, failFn);
     }
   };
@@ -129,7 +129,6 @@ function($log, Sample, Activity) {
 .controller('SampleBinCtrl', ['$scope', '$log', '$uibModal', 'Sample',
 'SampleBin',
 function SampleBinCtrl($scope, $log, $uibModal, Sample, SampleBin) {
-
   // give our templates a way to access the SampleBin service
   $scope.sb = SampleBin;
 

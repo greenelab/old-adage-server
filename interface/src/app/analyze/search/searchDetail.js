@@ -1,22 +1,22 @@
-angular.module( 'adage.analyze.detail', [
+angular.module('adage.analyze.detail', [
   'adage.analyze.sample',
   'adage.analyze.experiment'
 ])
 
-.controller( 'SearchDetailCtrl', ['$scope', '$log', '$location', 
+.controller('SearchDetailCtrl', ['$scope', '$log', '$location',
   '$timeout', 'Sample', 'Experiment',
-  function SearchDetailCtrl( $scope, $log, $location,
-    $timeout, Sample, Experiment ) {
+  function SearchDetailCtrl($scope, $log, $location,
+    $timeout, Sample, Experiment) {
     $scope.detail = {
-      // The detail object contains all of the information needed for 
+      // The detail object contains all of the information needed for
       // displaying the detail page for search_item and includes convenience
       // methods for managing that information.
       showing: false,
       search_item: null,
-      status: "retrieving...",
+      status: 'retrieving...',
       related_items: [],
 
-      show: function( search_item ) {
+      show: function(search_item) {
         $scope.detail.search_item = search_item;
         $scope.detail.showing = true;
         $timeout(function() {
@@ -41,7 +41,7 @@ angular.module( 'adage.analyze.detail', [
         }
       }
     };
-}])
+  }])
 
 .directive('searchDetail', function() {
   return {
