@@ -3,6 +3,12 @@
 [ ![Codeship Status for greenelab/adage-server](https://app.codeship.com/projects/f37eb3a0-667f-0134-56d8-262a64e36cc9/status?branch=master)](https://app.codeship.com/projects/175929)
 [![Code Climate](https://codeclimate.com/github/greenelab/adage-server/badges/gpa.svg)](https://codeclimate.com/github/greenelab/adage-server)
 
+This codebase tracks work in progress toward a web server that will
+allow users to apply a working ADAGE model to their own data sets. It should be
+considered pre-release status. The following instructions detail the steps
+required for getting a development instance up and running manually. For a guide
+to automated deployment, see [Deployment Steps](#deployment-steps) below.
+
 ## Get a working instance of the adage-server running
 
 Note: The following steps assume you have already installed PostgreSQL (>=9.4),
@@ -23,10 +29,12 @@ git clone git@github.com:<your github account>/adage-server.git
 
 ### Edit settings in config.py file
 
-The `config.py` file (in the adage-server/adage/adage folder) contains many
-of the settings for the deployment. The idea is that you should edit
-adage-server/adage/adage/config.py.template from the repository with your
-deployment's information and save it as config.py. This puts all of the
+The file `config.py` (in the `adage-server/adage/adage folder`) contains all of
+the settings that must be edited for deployment. Because this file contains
+secrets and deployment-specific information, it is not tracked under source
+control. You should copy the file
+`adage-server/adage/adage/config.py.template` from the repository and use that
+as a starting point for your own deployment's `config.py`. This puts all of the
 secrets and deployment-specific information into a single, easily-controlled
 file.
 
@@ -42,7 +50,7 @@ OS_CONFIG = {
 Set up Database Name, User, Password and Host in `databases` settings:
 
 ```python
-CONFIG.update({
+DEV_CONFIG.update({
     'databases': {
         'default': {
 
@@ -52,21 +60,35 @@ CONFIG.update({
 
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
 
-             # database name and user cannot have upper case letters
-             'NAME': '<your_adage_database_name>',
-             'USER': '<your_adage_db_username>',
-             'PASSWORD': '<your_db_username_password>',
+            # database name and user cannot have upper case letters
+            'NAME': '<your_adage_database_name>',
+            'USER': '<your_adage_db_username>',
+            'PASSWORD': '<your_db_username_password>',
 
-             # Wherever PostgreSQL is being hosted,
-             # usually localhost for development
-             'HOST': 'localhost',
+            # Wherever PostgreSQL is being hosted,
+            # usually localhost for development
+            'HOST': 'localhost',
 
-             # Port where it is being hosted from,
-             # usually 5432
-             'PORT': '5432',
+            # Port where it is being hosted from,
+            # usually 5432
+            'PORT': '5432',
         }
     },
 })
+```
+
+Other settings in `DEV_CONFIG` may be left alone unless you are using the
+`fabric` scripts as described in [Deployment Steps](#deployment-steps).
+
+If you intend to use features from Tribe in your installation of `adage-server`,
+you will need to follow the instructions for setting up `tribe-client` found
+on its PyPI page: <https://pypi.python.org/pypi/tribe-client> and fill in the
+corresponding `TRIBE_*` variables in `config.py`.
+
+Change the last line of the file to read:
+
+```python
+CONFIG = DEV_CONFIG
 ```
 
 ### Set up the database name, user, and password on PostgreSQL
@@ -141,3 +163,58 @@ bower install
 # Run Grunt to build the interface
 grunt
 ```
+
+## Deployment Steps
+
+1. Follow the steps to [edit settings in config.py as described
+   above](#edit-settings-in-configpy-file).
+1. Fork the [deployment repository](https://github.com/greenelab/adage-deploy)
+   and then clone that fork to a directory alongside your `adage-server`
+   repository.
+
+   ```shell
+   > cd /<your chosen directory>/
+   > git clone git@github.com:<your github account>/adage-deploy.git
+   ```
+
+1. [Install `fabric`](http://www.fabfile.org), the tool we use for scripting
+   deployment steps:
+
+   ```shell
+   > pip install fabric
+   ```
+
+1. If deploying to AWS, you also need to install `boto3` and its requirements:
+
+   ```shell
+   > pip install boto3
+   ```
+
+1. To perform an AWS deployment, ensure your RDS instance is online, the
+   `AWS_DEPLOY` section of `config.py` is properly completed, and run the
+   following `fabric` command:
+
+   ```shell
+   > fab deploy_aws
+   ```
+
+   This will spin up a new EC2 instance using the AWS credentials found in
+   `config.py`, deploy the latest `adage-server` code from GitHub and
+   configure all required services. Configuring DNS to direct your domain to
+   the new server must be done manually. (We have DNS pointing to an Elastic IP
+   address and simply re-associate to the new server when deployment succeeds.
+1. To perform deployment to a new development server, run the following
+   `fabric` command:
+
+   ```shell
+   > fab deploy_dev
+   ```
+
+   This will execute the same deployment steps as run for AWS deployment, but
+   skips the step that spins up an EC2 instance and makes a configuration tweak
+   that allows `nginx` to respond to requests for any hostname or IP address.
+   This method assumes you have a fresh installation of Ubuntu 16.04 and that
+   you have configured the `DEV_CONFIG` section of `config.py` with credentials
+   for a user with `sudo` privileges that can be used to create the requisite
+   services and a user account with the minimum privileges required to host
+   the deployed `adage-server` code.

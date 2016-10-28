@@ -14,7 +14,7 @@ angular.module('adage.tribe_client.directives', [
       }],
       link: CommonFuncts.updateUser,
       replace: true,
-      restrict: "E",
+      restrict: 'E',
       templateUrl: 'tribe_client/tribe-profile-button.tpl.html'
     };
   }
@@ -23,7 +23,8 @@ angular.module('adage.tribe_client.directives', [
 .directive('loginButton', ['UserFactory', 'CommonFuncts',
   function(UserFactory, CommonFuncts) {
     return {
-      controller: ['$scope', 'UserFactory', '$uibModal', '$rootScope', '$window',
+      controller: [
+        '$scope', 'UserFactory', '$uibModal', '$rootScope', '$window',
         function($scope, UserFactory, $uibModal, $rootScope, $window) {
           UserFactory.getPromise().$promise.then(function() {
             $scope.userObj = UserFactory.getUser();
@@ -71,23 +72,10 @@ angular.module('adage.tribe_client.directives', [
       ],
       link: CommonFuncts.updateUser,
       replace: true,
-      restrict: "E",
+      restrict: 'E',
       templateUrl: 'tribe_client/tribe-login-button.tpl.html'
     };
   }
 ])
-
-// Directive for whole gene search form
-.directive('genesetSearchForm', function() {
-  return {
-    controller: ['$scope', function($scope) {
-      // TODO RAZ: This is empty for now, but will be used for geneset search
-      // in the next feature & pull request.
-    }],
-    replace: true,
-    restrict: "E",
-    templateUrl: 'tribe_client/geneset-search-form.tpl.html'
-  };
-})
 
 ;

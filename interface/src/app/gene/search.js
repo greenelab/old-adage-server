@@ -8,7 +8,7 @@ angular.module('adage.gene.search', [
     .state('gene_search', {
       url: '/gene_search',
       views: {
-        "main": {
+        'main': {
           templateUrl: 'gene/gene-network.tpl.html',
           controller: ['$scope', 'UserFactory',
             function($scope, UserFactory) {
@@ -16,6 +16,14 @@ angular.module('adage.gene.search', [
               UserFactory.getPromise().$promise.then(function() {
                 $scope.userObj = UserFactory.getUser();
               });
+
+              // TODO: Right now, we are hard-coding this organism
+              // as Pseudomonas (since it is the only one currently
+              // supported by ADAGE). However, as we incorporate
+              // multi-species support, this organism will have to
+              // be obtained from the ML model. This is the same as
+              // the issue in geneSearchForm (also with $scope.organism).
+              $scope.organism = 'Pseudomonas aeruginosa';
             }
           ]
         }
@@ -24,17 +32,7 @@ angular.module('adage.gene.search', [
         pageTitle: 'Gene Search'
       }
     })
-
-  .state('gene_network', {
-    // This is a placeholder for the Gene Network page that
-    // Dongbo is working on, which may or may not live in this file.
-    // For the moment, it is just the state where users go to after
-    // they have selected their genes.
-    url: '/gene_network/',
-    data: {
-      pageTitle: 'Gene Network'
-    }
-  });
+  ;
 })
 
 .factory('SearchResults', ['$rootScope', 'Gene', function($rootScope, Gene) {
@@ -175,7 +173,7 @@ angular.module('adage.gene.search', [
       }
     ],
     replace: true,
-    restrict: "E",
+    restrict: 'E',
     scope: {
       query: '@'
     },
@@ -247,7 +245,7 @@ angular.module('adage.gene.search', [
         });
       },
       replace: true,
-      restrict: "E",
+      restrict: 'E',
       scope: true,
       templateUrl: 'gene/search-result-table.tpl.html'
     };
@@ -273,7 +271,7 @@ angular.module('adage.gene.search', [
       }
     ],
     replace: true,
-    restrict: "E",
+    restrict: 'E',
     scope: true,
     templateUrl: 'gene/selected-genes-panel.tpl.html'
   };
@@ -285,7 +283,7 @@ angular.module('adage.gene.search', [
 .directive('noResultButton', ['SearchResults', function(SearchResults) {
   return {
     link: function(scope, element, attr) {
-      element.bind("click", function() {
+      element.bind('click', function() {
         // Because this results in data being updated
         // and isn't using ng-* listeners we need to
         // wrap things in $apply()
@@ -296,7 +294,7 @@ angular.module('adage.gene.search', [
       });
     },
     replace: true,
-    restrict: "E",
+    restrict: 'E',
     scope: {
       query: '@'
     },
@@ -309,9 +307,9 @@ angular.module('adage.gene.search', [
 .directive('geneResultButton', ['SearchResults', 'SelectedGenesFactory',
   function(SearchResults, SelectedGenesFactory) {
     return {
-      restrict: "E",
+      restrict: 'E',
       link: function(scope, element, attr) {
-        element.bind("click", function() {
+        element.bind('click', function() {
           scope.$apply(function() {
             SelectedGenesFactory.addGene(scope.gene);
             SearchResults.remove(scope.query);
@@ -330,9 +328,9 @@ angular.module('adage.gene.search', [
 .directive('selectedGeneButton', ['SelectedGenesFactory',
   function(SelectedGenesFactory) {
     return {
-      restrict: "E",
+      restrict: 'E',
       link: function(scope, element, attr) {
-        element.bind("click", function() {
+        element.bind('click', function() {
           scope.$apply(function() {
             SelectedGenesFactory.removeGene(scope.gene);
           });
@@ -350,13 +348,13 @@ angular.module('adage.gene.search', [
   function(SearchResults, CommonGeneFuncts) {
     return {
       link: function(scope, element, attr) {
-        element.bind("click", function() {
+        element.bind('click', function() {
           scope.page = scope.pageDict.page + 1;
           scope.$apply(CommonGeneFuncts.updatePageNumbers(scope));
         });
       },
       replace: true,
-      restrict: "E",
+      restrict: 'E',
       scope: false,
       templateUrl: 'gene/more-result-button.tpl.html'
     };
@@ -368,13 +366,13 @@ angular.module('adage.gene.search', [
   function(SearchResults, CommonGeneFuncts) {
     return {
       link: function(scope, element, attr) {
-        element.bind("click", function() {
+        element.bind('click', function() {
           scope.page = scope.pageDict.page - 1;
           scope.$apply(CommonGeneFuncts.updatePageNumbers(scope));
         });
       },
       replace: true,
-      restrict: "E",
+      restrict: 'E',
       scope: false,
       templateUrl: 'gene/previous-result-button.tpl.html'
     };
@@ -415,7 +413,7 @@ angular.module('adage.gene.search', [
       };
       $scope.updatePage($scope.pageDict.page);
     },
-    restrict: "E",
+    restrict: 'E',
     replace: true,
     scope: {
       query: '='
