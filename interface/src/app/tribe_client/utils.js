@@ -1,19 +1,19 @@
 angular.module('adage.tribe_client.utils', [
-    'adage.tribe_client',
+  'adage.tribe_client'
 ])
 
-.factory('CommonFuncts', ['UserFactory', function( UserFactory ) {
+.factory('CommonFuncts', ['UserFactory', function(UserFactory) {
+  return {
 
-    return {
-        updateUser: function(scope, element, attr) {
-            scope.$on('user.update', function() {
-                UserFactory.resetAndGetPromise().$promise.then( function() {
-                    scope.userObj = UserFactory.getUser();
-                });
-            });
-        }
-    };
+    updateUser: function(scope, element, attr) {
+      scope.$on('user.update', function() {
+        UserFactory.resetAndGetPromise().$promise.then(function() {
+          scope.userObj = UserFactory.getUser();
+        });
+      });
+    }
 
+  };
 }])
 
 ;

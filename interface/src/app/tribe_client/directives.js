@@ -14,7 +14,7 @@ angular.module('adage.tribe_client.directives', [
       }],
       link: CommonFuncts.updateUser,
       replace: true,
-      restrict: "E",
+      restrict: 'E',
       templateUrl: 'tribe_client/tribe-profile-button.tpl.html'
     };
   }
@@ -23,7 +23,8 @@ angular.module('adage.tribe_client.directives', [
 .directive('loginButton', ['UserFactory', 'CommonFuncts',
   function(UserFactory, CommonFuncts) {
     return {
-      controller: ['$scope', 'UserFactory', '$uibModal', '$rootScope', '$window',
+      controller: [
+        '$scope', 'UserFactory', '$uibModal', '$rootScope', '$window',
         function($scope, UserFactory, $uibModal, $rootScope, $window) {
           UserFactory.getPromise().$promise.then(function() {
             $scope.userObj = UserFactory.getUser();
@@ -71,7 +72,7 @@ angular.module('adage.tribe_client.directives', [
       ],
       link: CommonFuncts.updateUser,
       replace: true,
-      restrict: "E",
+      restrict: 'E',
       templateUrl: 'tribe_client/tribe-login-button.tpl.html'
     };
   }

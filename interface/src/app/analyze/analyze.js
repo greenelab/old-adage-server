@@ -2,7 +2,7 @@
  * The analyze module handles the view that loads when a user clicks on
  * "Analyze" in the nav bar.
  */
-angular.module( 'adage.analyze', [
+angular.module('adage.analyze', [
   'adage.analyze.search',
   'adage.analyze.detail',
   'adage.analyze.analysis', // includes sample-bin
@@ -15,15 +15,15 @@ angular.module( 'adage.analyze', [
 ])
 
 .config(function config($stateProvider) {
-  $stateProvider.state( 'analyze', {
+  $stateProvider.state('analyze', {
     url: '/analyze',
     views: {
-      "main": {
+      'main': {
         controller: 'AnalyzeCtrl',
         templateUrl: 'analyze/analyze.tpl.html'
       }
     },
-    data: { pageTitle: 'Analyze' }
+    data: {pageTitle: 'Analyze'}
   });
 })
 
@@ -31,7 +31,7 @@ angular.module( 'adage.analyze', [
   $anchorScroll.yOffset = 80;
 }])
 
-.controller( 'AnalyzeCtrl', ['$scope', '$log', '$location',
+.controller('AnalyzeCtrl', ['$scope', '$log', '$location',
   '$anchorScroll', 'Sample',
   function AnalyzeCtrl($scope, $log, $location, $anchorScroll, Sample) {
     $scope.analyze = {
@@ -48,10 +48,10 @@ angular.module( 'adage.analyze', [
       },
 
       scroll_to_id: function(id) {
-        $log.info("scroll_to_id called with: " + id);
+        $log.info('scroll_to_id called with: ' + id);
         $location.hash(id);
         $anchorScroll();
       }
     };
-}])
+  }])
 ;
