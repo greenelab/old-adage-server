@@ -14,7 +14,7 @@ angular.module('adage.download', [
   $stateProvider.state('download', {
     url: '/download',
     views: {
-      "main": {
+      'main': {
         controller: 'DownloadCtrl',
         templateUrl: 'download/download.tpl.html'
       }
@@ -28,15 +28,15 @@ angular.module('adage.download', [
 .factory('AnnotationTypes', ['$resource', function($resource) {
   return $resource(
     '/api/v0/annotationtype/',
-    { q: '', limit: 0 },
-    { 'query': { method: 'GET', isArray: false } }
+    {q: '', limit: 0},
+    {'query': {method: 'GET', isArray: false}}
   );
 }])
 
 .controller('DownloadCtrl', ['$scope', '$window', 'AnnotationTypes',
   function DownloadController($scope, $window, AnnotationTypes) {
     $scope.annotations = {
-      query_message: "Connecting to the server ...",
+      query_message: 'Connecting to the server ...',
       included_types: [],
       excluded_types: []
     };
@@ -48,11 +48,11 @@ angular.module('adage.download', [
           $scope.annotations.included_types.push(
             responseObject.objects[i].typename);
         }
-        $scope.annotations.query_message = "";
+        $scope.annotations.query_message = '';
       },
       function(responseObject, responseHeaders) {
         $log.error('Query errored with: ' + responseObject);
-        $scope.annotations.query_message = "Connection to server failed";
+        $scope.annotations.query_message = 'Connection to server failed';
       }
     );
 
@@ -72,10 +72,9 @@ angular.module('adage.download', [
 
     // Handler of "Download" button click event.
     $scope.start_download = function() {
-      var uri = "/api/v0/sample/get_annotations/?annotation_types=";
+      var uri = '/api/v0/sample/get_annotations/?annotation_types=';
       uri += $scope.annotations.included_types.join();
       $window.location.href = uri;  // Call compiled downloading API.
     };
-
   }
 ]);
