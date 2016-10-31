@@ -101,7 +101,7 @@ angular.module('adage.gene.search', [
   };
 }])
 
-.factory('SelectedGenesFactory', function() {
+.factory('SelectedGenesFactory', [function() {
   var selectedGenes = {};
 
   return {
@@ -121,7 +121,7 @@ angular.module('adage.gene.search', [
       return selectedGenes;
     }
   };
-})
+}])
 
 // Directive for whole gene search form
 .directive('geneSearchForm', ['SearchResults', function(SearchResults) {
@@ -253,7 +253,7 @@ angular.module('adage.gene.search', [
 ])
 
 // Directive for table containing search results
-.directive('selectedGenesPanel', function() {
+.directive('selectedGenesPanel', [function() {
   return {
     controller: ['$scope', 'SelectedGenesFactory', '$state',
       function($scope, SelectedGenesFactory, $state) {
@@ -275,7 +275,7 @@ angular.module('adage.gene.search', [
     scope: true,
     templateUrl: 'gene/selected-genes-panel.tpl.html'
   };
-})
+}])
 
 // A noResultButton is shown next to query tokens that found no matches
 // for a gene in the database. Clicking this button removes the query token
