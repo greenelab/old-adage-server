@@ -14,6 +14,16 @@ angular.module('adage.gene.utils', [
     updatePageNumbers: function(scope) {
       scope.pageDict.page = scope.page;
       scope.updatePage(scope.page);
+    },
+
+    getGeneLabel: function(gene) {
+      var geneLabel = gene.systematic_name;
+
+      if (gene.standard_name) {
+        geneLabel = gene.standard_name;
+      } else {}
+
+      return geneLabel;
     }
 
   };
