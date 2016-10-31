@@ -304,9 +304,13 @@ angular.module('adage.gene.search', [
 
 // Directive for button with a gene, should add gene
 // and remove entire row from list
-.directive('geneResultButton', ['SearchResults', 'SelectedGenesFactory',
-  function(SearchResults, SelectedGenesFactory) {
+.directive('geneResultButton',
+  ['SearchResults', 'SelectedGenesFactory', 'CommonGeneFuncts',
+  function(SearchResults, SelectedGenesFactory, CommonGeneFuncts) {
     return {
+      controller: function($scope) {
+        $scope.geneLabel = CommonGeneFuncts.getGeneLabel($scope.gene);
+      },
       restrict: 'E',
       link: function(scope, element, attr) {
         element.bind('click', function() {
@@ -325,9 +329,12 @@ angular.module('adage.gene.search', [
 // Button directive for each of the genes that have been selected.
 // Clicking it should remove the gene from the selected genes object
 // in SelectedGenesFactory.
-.directive('selectedGeneButton', ['SelectedGenesFactory',
-  function(SelectedGenesFactory) {
+.directive('selectedGeneButton', ['SelectedGenesFactory', 'CommonGeneFuncts',
+  function(SelectedGenesFactory, CommonGeneFuncts) {
     return {
+      controller: function($scope) {
+        $scope.geneLabel = CommonGeneFuncts.getGeneLabel($scope.gene);
+      },
       restrict: 'E',
       link: function(scope, element, attr) {
         element.bind('click', function() {
