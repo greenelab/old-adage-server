@@ -177,7 +177,7 @@ angular.module('adage.gene.search', [
     scope: {
       query: '@'
     },
-    templateUrl: 'gene/gene-search-form.tpl.html'
+    templateUrl: 'gene/search/gene-search-form.tpl.html'
   };
 }])
 
@@ -247,7 +247,7 @@ angular.module('adage.gene.search', [
       replace: true,
       restrict: 'E',
       scope: true,
-      templateUrl: 'gene/search-result-table.tpl.html'
+      templateUrl: 'gene/search/search-result-table.tpl.html'
     };
   }
 ])
@@ -273,7 +273,7 @@ angular.module('adage.gene.search', [
     replace: true,
     restrict: 'E',
     scope: true,
-    templateUrl: 'gene/selected-genes-panel.tpl.html'
+    templateUrl: 'gene/search/selected-genes-panel.tpl.html'
   };
 }])
 
@@ -298,7 +298,7 @@ angular.module('adage.gene.search', [
     scope: {
       query: '@'
     },
-    templateUrl: 'gene/no-result-button.tpl.html'
+    templateUrl: 'gene/search/no-result-button.tpl.html'
   };
 }])
 
@@ -317,7 +317,7 @@ angular.module('adage.gene.search', [
         });
       },
       replace: true,
-      templateUrl: 'gene/gene-result-button.tpl.html'
+      templateUrl: 'gene/search/gene-result-button.tpl.html'
     };
   }
 ])
@@ -337,7 +337,7 @@ angular.module('adage.gene.search', [
         });
       },
       replace: true,
-      templateUrl: 'gene/gene-result-button.tpl.html'
+      templateUrl: 'gene/search/gene-result-button.tpl.html'
     };
   }
 ])
@@ -356,7 +356,7 @@ angular.module('adage.gene.search', [
       replace: true,
       restrict: 'E',
       scope: false,
-      templateUrl: 'gene/more-result-button.tpl.html'
+      templateUrl: 'gene/search/more-result-button.tpl.html'
     };
   }
 ])
@@ -374,7 +374,7 @@ angular.module('adage.gene.search', [
       replace: true,
       restrict: 'E',
       scope: false,
-      templateUrl: 'gene/previous-result-button.tpl.html'
+      templateUrl: 'gene/search/previous-result-button.tpl.html'
     };
   }
 ])
@@ -418,7 +418,7 @@ angular.module('adage.gene.search', [
     scope: {
       query: '='
     },
-    templateUrl: 'gene/search-buttonset.tpl.html'
+    templateUrl: 'gene/search/search-buttonset.tpl.html'
   };
 }])
 
