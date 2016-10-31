@@ -37,6 +37,21 @@ angular.module('adage.gene.network', [
       var rawMinWeight = -1.0;
       var rawMaxWeight = 1.0;
       var scaledMaxWeight = rawMaxWeight - rawMinWeight;
+      var setEdgeColor = d3.scale.linear()
+          .domain([0, scaledMaxWeight / 2.0, scaledMaxWeight])
+          .range(['green', 'orange', 'red']);
+
+      var network = d3.network()  // Initialize the network.
+          .minEdge(0)
+          .maxEdge(rawMaxWeight - rawMinWeight)
+          .edgeColor(setEdgeColor)
+          .geneText(function(d) {
+            return d.label;
+          })
+          .legendStart(rawMinWeight)
+          .legendEnd(rawMaxWeight)
+          .legendText('Correlation');
+
       var self = this;
       // The following properties of "self" will be available to HTML.
       self.minCorrelation = -1.0;
@@ -57,35 +72,8 @@ angular.module('adage.gene.network', [
       }
 
       var urlGenes = $stateParams.genes.split(',');
-      var setEdgeColor = d3.scale.linear()
-          .domain([0, scaledMaxWeight / 2.0, scaledMaxWeight])
-          .range(['green', 'orange', 'red']);
-
       var genes = [];
       var edges = [];
-      var network = d3.network()  // Initialize the network.
-          .minEdge(0)
-          .maxEdge(rawMaxWeight - rawMinWeight)
-          .edgeColor(setEdgeColor)
-          .geneText(function(d) {
-            return d.label;
-          })
-          .legendStart(rawMinWeight)
-          .legendEnd(rawMaxWeight)
-          .legendText('Correlation');
-
-      // Initialize the SVG.
-      var svg = d3.select('#chart').append('svg');
-      var minSvgSize = 600;  // Minimum size of svg.
-      var maxSvgSize = 1280; // Maximum size of svg.
-
-      // Initialize tips on gene and edge.
-      var geneTip = d3.tip()
-          .attr('class', 'gene-tip')
-          .offset([-20, 0]);
-      var edgeTip = d3.tip()
-          .attr('class', 'edge-tip')
-          .offset([-20, 0]);
 
       /**
        * Find index of input gene ID in genes array.
@@ -119,7 +107,7 @@ angular.module('adage.gene.network', [
             geneIn.query = true;
           }
           geneIn.label = (geneIn.standard_name ? geneIn.standard_name
-                           : geneIn.systematic_name);
+                          : geneIn.systematic_name);
           genes.push(geneIn);
           idx = genes.length - 1;
         }
@@ -131,108 +119,122 @@ angular.module('adage.gene.network', [
       }
 
       /**
-       * Compile gene information tips.
-       * @param {selected_gene_data} data;
-       * @return {string} The string in HTML format.
-       */
-      function getGeneInfo(data) {
-        var result = '<div id="title">' + data.label + '</div>';
-        result += '<br />Entrez ID: ' + data.entrezid;
-        if (data.systematic_name) {
-          result += '<br />Systematic name: ' + data.systematic_name;
-        }
-        if (data.standard_name) {
-          result += '<br />Standard name: ' + data.standard_name;
-        }
-        if (data.description) {
-          result += '<br />Description: ' + data.description;
-        }
-        if (data.aliases) {
-          result += '<br />aliases: ' + data.aliases;
-        }
-        return result;
-      }
-
-      /**
-       * Callback function to show edge tips when mouse is over an edge.
-       * @param {edge_data} data;
-       * @return {void}.
-       */
-      function showEdgeTip(data) {
-        var rawWeight = data.weight + rawMinWeight;
-        var str = 'Edge weight: ' + rawWeight.toFixed(3);
-        var heavyGenes = [data.gene1.id, data.gene2.id].join(',');
-        var target = d3.event.target;
-        NodeService.get(
-          {'heavy_genes': heavyGenes, 'limit': 0},
-          function success(response) {
-            var n = response.objects.length;
-            str += '<br />' + n + (n > 1 ? ' nodes are ' : ' node is ');
-            str += 'related to both genes' + (n > 0 ? ':' : '.');
-            for (var i = 0; i < n; ++i) {
-              str += '<br />* ' + response.objects[i].name + '</li>';
-            }
-
-            edgeTip.html(str);
-            edgeTip.show(data, target);
-          },
-          function error(err) {
-            $log.error('Failed to get node info for gene edge: ' + err);
-            str += 'Can\'t get node information, please try again later.';
-            edgeTip.html(str);
-            edgeTip.show(data, target);
-          }
-        );
-      }
-
-      /**
-       * Callback function to hide edge tips.
-       * @param {edge_data} data;
-       * @return {void}.
-       * ---------------------------------------------------------------------
-       * Since the edge tip is shown asynchronously, when edgeTip.hide() is
-       * called immediately to hide the tip box, the box won't be hidden if
-       * it is shown AFTER mouseout action. To solve this problem,
-       * edgeTip.hide() is called asynchronously after 100 millisecond.
-       * This is more like a workaround. Not sure whether there is a better
-       * solution.
-       * ---------------------------------------------------------------------
-       */
-      function hideEdgeTip(data) {
-        setTimeout(function() {
-          edgeTip.hide();
-        }, 100);
-      }
-
-      /**
        * Draw gene-gene network.
        * @param {void} null;
        * @return {void}.
        */
       function drawNetwork() {
+        // Calculate svg size.
+        var minSvgSize = 600;  // Minimum size of svg.
+        var maxSvgSize = 1280; // Maximum size of svg.
         var svgSize = genes.length * 10;
         if (svgSize < minSvgSize) {
           svgSize = minSvgSize;
         } else if (svgSize > maxSvgSize) {
           svgSize = maxSvgSize;
         }
-        svg.attr('width', svgSize)
+
+        // Initialize tips on gene and edge.
+        var geneTip = d3.tip()
+            .attr('class', 'gene-tip')
+            .offset([-20, 0]);
+        var edgeTip = d3.tip()
+            .attr('class', 'edge-tip')
+            .offset([-20, 0]);
+
+        /**
+         * Compile gene information tips.
+         * @param {selected_gene_data} data;
+         * @return {string} The string in HTML format.
+         */
+        function getGeneInfo(data) {
+          var result = '<div id="title">' + data.label + '</div>';
+          result += '<br />Entrez ID: ' + data.entrezid;
+          if (data.systematic_name) {
+            result += '<br />Systematic name: ' + data.systematic_name;
+          }
+          if (data.standard_name) {
+            result += '<br />Standard name: ' + data.standard_name;
+          }
+          if (data.description) {
+            result += '<br />Description: ' + data.description;
+          }
+          if (data.aliases) {
+            result += '<br />aliases: ' + data.aliases;
+          }
+          return result;
+        }
+
+        /**
+         * Callback function to show edge tips when mouse is over an edge.
+         * @param {edge_data} data;
+         * @return {void}.
+         */
+        function showEdgeTip(data) {
+          var rawWeight = data.weight + rawMinWeight;
+          var str = 'Edge weight: ' + rawWeight.toFixed(3);
+          var heavyGenes = [data.gene1.id, data.gene2.id].join(',');
+          var target = d3.event.target;
+          NodeService.get(
+            {'heavy_genes': heavyGenes, 'limit': 0},
+            function success(response) {
+              var n = response.objects.length;
+              str += '<br />' + n + (n > 1 ? ' nodes are ' : ' node is ');
+              str += 'related to both genes' + (n > 0 ? ':' : '.');
+              for (var i = 0; i < n; ++i) {
+                str += '<br />* ' + response.objects[i].name + '</li>';
+              }
+
+              edgeTip.html(str);
+              edgeTip.show(data, target);
+            },
+            function error(err) {
+              $log.error('Failed to get node info for gene edge: ' + err);
+              str += 'Can\'t get node information, please try again later.';
+              edgeTip.html(str);
+              edgeTip.show(data, target);
+            }
+          );
+        }
+
+        /**
+         * Callback function to hide edge tips.
+         * @param {edge_data} data;
+         * @return {void}.
+         * ---------------------------------------------------------------------
+         * Since the edge tip is shown asynchronously, when edgeTip.hide() is
+         * called immediately to hide the tip box, the box won't be hidden if
+         * it is shown AFTER mouseout action. To solve this problem,
+         * edgeTip.hide() is called asynchronously after 100 millisecond.
+         * This is more like a workaround. Not sure whether there is a better
+         * solution.
+         * ---------------------------------------------------------------------
+         */
+        function hideEdgeTip(data) {
+          setTimeout(function() {
+            edgeTip.hide();
+          }, 100);
+        }
+
+        network.genes(genes).edges(edges);
+        d3.select('#chart').append('svg')  // Initialize SVG
+          .attr('width', svgSize)
           .attr('height', svgSize)
           .call(network)
           .call(geneTip)
           .call(edgeTip);
 
+        geneTip.html(getGeneInfo);
+        network.onGene('mouseover.custom', geneTip.show);
+        network.onGene('mouseout.custom', geneTip.hide);
+        network.onEdge('mouseover.custom', showEdgeTip);
+        network.onEdge('mouseout.custom', hideEdgeTip);
+
+        // Draw network svg with legend and filter.
         network.showLegend()
           .filter(self.minCorrelation - rawMinWeight, self.maxNodeNum)
           .draw();
       }
-
-      network.genes(genes).edges(edges);
-      geneTip.html(getGeneInfo);
-      network.onGene('mouseover.custom', geneTip.show);
-      network.onGene('mouseout.custom', geneTip.hide);
-      network.onEdge('mouseover.custom', showEdgeTip);
-      network.onEdge('mouseout.custom', hideEdgeTip);
 
       EdgeService.get(
         {genes: $stateParams.genes, mlmodel: $stateParams.mlmodel, limit: 0},
