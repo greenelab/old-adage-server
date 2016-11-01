@@ -22,7 +22,7 @@ angular.module('adage.gene.utils', [
 
       if (gene.standard_name) {
         geneLabel = gene.standard_name;
-      } else {}
+      }
 
       return geneLabel;
     }
