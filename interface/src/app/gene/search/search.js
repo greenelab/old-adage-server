@@ -199,8 +199,13 @@ angular.module('adage.gene.search', [
             // Function to automatically add all genes that
             // only have one search result.
             var searchResults = SearchResults.getSearchResults();
-            for (var key in searchResults) {
+
+            var searchResultKeys = Object.keys(searchResults);
+
+            for (var i = 0; i < searchResultKeys.length; i++) {
+              var key = searchResultKeys[i];
               var results = searchResults[key];
+
               if (results.found.length <= 1) {
                 if (results.found[0]) {
                   SelectedGenesFactory.addGene(results.found[0]);
@@ -213,8 +218,13 @@ angular.module('adage.gene.search', [
           $scope.removeNotFound = function() {
             // Function to get rid of all the queries that returned no results.
             var searchResults = SearchResults.getSearchResults();
-            for (var key in searchResults) {
+
+            var searchResultKeys = Object.keys(searchResults);
+
+            for (var i = 0; i < searchResultKeys.length; i++) {
+              var key = searchResultKeys[i];
               var results = searchResults[key];
+
               if (results.found.length === 0) {
                 SearchResults.remove(key);
               }
@@ -260,12 +270,8 @@ angular.module('adage.gene.search', [
         $scope.selectedGenes = SelectedGenesFactory.returnGenes();
 
         $scope.sendToNetwork = function() {
-          var genes = [];
-          for (var gene in $scope.selectedGenes) {
-            genes.push(gene);
-          }
-
-          var geneString = genes.join();
+          var geneIds = Object.keys($scope.selectedGenes);
+          var geneString = geneIds.join();
 
           $state.go('gene_network', {
             'genes': geneString
