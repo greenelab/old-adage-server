@@ -9,8 +9,9 @@
 </div>
 
 <!-- DO NOT put the following "chart" div into a div that is controlled by
-     ng-hide or ng-if; otherwise the legend bar in d3.network won't be rendered
-     correctly (some of the legend marks will be absent).
+     "ng-hide" of "ng-if", otherwise the legend bar in d3.network won't be
+     rendered correctly (some of the legend marks may be absent).
+     See details in GitHub Issue #25.
   -->
 <div id="chart"></div>
 
