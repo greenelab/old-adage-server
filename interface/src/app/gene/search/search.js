@@ -264,8 +264,11 @@ angular.module('adage.gene.search', [
           for (var gene in $scope.selectedGenes) {
             genes.push(gene);
           }
+
+          var geneString = genes.join();
+
           $state.go('gene_network', {
-            'genes': genes
+            'genes': geneString
           });
         };
       }
