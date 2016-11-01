@@ -22,8 +22,6 @@ angular.module('adage', [
   $resourceProvider.defaults.stripTrailingSlashes = false;
 }])
 
-.run(function run() { })
-
 .controller('AppCtrl', ['$scope', 'UserFactory',
   function AppCtrl($scope, UserFactory) {
     $scope.$on('$stateChangeSuccess',
