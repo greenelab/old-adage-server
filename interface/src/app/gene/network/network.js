@@ -6,7 +6,7 @@ angular.module('adage.gene.network', [
   'ui.router',
   'placeholders',
   'ui.bootstrap',
-  'ui.slider'
+  'rzModule'
 ])
 
 .config(function config($stateProvider) {
@@ -36,6 +36,7 @@ angular.module('adage.gene.network', [
                                    $log) {
       var rawMinWeight = -1.0;
       var rawMaxWeight = 1.0;
+      var minCorrelation = rawMinWeight;
       var scaledMaxWeight = rawMaxWeight - rawMinWeight;
       var setEdgeColor = d3.scale.linear()
           .domain([0, scaledMaxWeight / 2.0, scaledMaxWeight])
@@ -54,14 +55,23 @@ angular.module('adage.gene.network', [
 
       var self = this;
       // The following properties of "self" will be available to HTML.
-      self.minCorrelation = -1.0;
       self.maxNodeNum = Number.MAX_SAFE_INTEGER;
       self.statusMessage = 'Connecting to the server ...';
-      self.sliderOptions = {  // Slider configuration.
-        range: 'max',
-        stop: function(event, ui) {
-          network.filter(self.minCorrelation - rawMinWeight,
-                         self.maxNodeNum).draw();
+      self.slider = {  // Slider configuration
+        position: minCorrelation,
+        options: {
+          floor: rawMinWeight,
+          ceil: rawMaxWeight,
+          step: 0.01,
+          precision: 2,
+          showSelectionBarEnd: true,
+          showTicks: 0.5,
+          showTicksValues: true,
+          onEnd: function(id, value) {
+            minCorrelation = value;
+            network.filter(minCorrelation - rawMinWeight, self.maxNodeNum)
+              .draw();
+          }
         }
       };
 
@@ -232,7 +242,7 @@ angular.module('adage.gene.network', [
 
         // Draw network svg with legend and filter.
         network.showLegend()
-          .filter(self.minCorrelation - rawMinWeight, self.maxNodeNum)
+          .filter(0, self.maxNodeNum)
           .draw();
       }
 

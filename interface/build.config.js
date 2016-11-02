@@ -64,12 +64,6 @@ module.exports = {
    */
   vendor_files: {
     js: [
-      // For some unknown reason(s), jquery and jquery-ui library files MUST be
-      // put at the beginning of this array; Otherwise the ui-slider wouldn't
-      // show up on the web UI, and we got the following error in the console:
-      // "TypeError: d.slider is not a function".
-      'vendor/jquery/dist/jquery.min.js',
-      'vendor/jquery-ui/ui/minified/jquery-ui.min.js',
       'vendor/d3/d3.js',
       'vendor/vega/vega.js',
       'vendor/angular/angular.js',
@@ -80,11 +74,12 @@ module.exports = {
       'vendor/angular-sanitize/angular-sanitize.js',
       'vendor/angular-ui-router/release/angular-ui-router.js',
       'vendor/ng-sortable/dist/ng-sortable.min.js',
-      'vendor/angular-ui-slider/src/slider.js',
+      'vendor/angularjs-slider/dist/rzslider.min.js',
       'vendor/d3-tip/index.js',
       'vendor/placeholders/angular-placeholders-0.0.1-SNAPSHOT.min.js'
     ],
     css: [
+      'vendor/angularjs-slider/dist/rzslider.min.css'
     ],
     assets: [
     ]

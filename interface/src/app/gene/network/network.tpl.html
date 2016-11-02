@@ -1,10 +1,13 @@
 <h1>ADAGE: Gene-Gene Network</h1>
 
 <div ng-hide="ctrl.statusMessage">
-  <strong>Minimum Correlation: (-1.0 ~ 1.0)</strong>
-  <div id="slider" ui-slider="ctrl.sliderOptions" use-decimals data-tip
-       min="-1.0" max="1.0" step="0.01" ng-model="ctrl.minCorrelation">
+  <div>
+    <strong>Minimum Correlation:</strong>
   </div>
+  <rzslider
+     rz-slider-model="ctrl.slider.position"
+     rz-slider-options="ctrl.slider.options">
+  </rzslider>
   <br />
 </div>
 
