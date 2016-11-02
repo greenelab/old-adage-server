@@ -101,7 +101,7 @@ angular.module('adage.gene.search', [
   };
 }])
 
-.factory('SelectedGenesFactory', function() {
+.factory('SelectedGenesFactory', [function() {
   var selectedGenes = {};
 
   return {
@@ -121,7 +121,7 @@ angular.module('adage.gene.search', [
       return selectedGenes;
     }
   };
-})
+}])
 
 // Directive for whole gene search form
 .directive('geneSearchForm', ['SearchResults', function(SearchResults) {
@@ -177,7 +177,7 @@ angular.module('adage.gene.search', [
     scope: {
       query: '@'
     },
-    templateUrl: 'gene/gene-search-form.tpl.html'
+    templateUrl: 'gene/search/gene-search-form.tpl.html'
   };
 }])
 
@@ -199,8 +199,13 @@ angular.module('adage.gene.search', [
             // Function to automatically add all genes that
             // only have one search result.
             var searchResults = SearchResults.getSearchResults();
-            for (var key in searchResults) {
+
+            var searchResultKeys = Object.keys(searchResults);
+
+            for (var i = 0; i < searchResultKeys.length; i++) {
+              var key = searchResultKeys[i];
               var results = searchResults[key];
+
               if (results.found.length <= 1) {
                 if (results.found[0]) {
                   SelectedGenesFactory.addGene(results.found[0]);
@@ -213,8 +218,13 @@ angular.module('adage.gene.search', [
           $scope.removeNotFound = function() {
             // Function to get rid of all the queries that returned no results.
             var searchResults = SearchResults.getSearchResults();
-            for (var key in searchResults) {
+
+            var searchResultKeys = Object.keys(searchResults);
+
+            for (var i = 0; i < searchResultKeys.length; i++) {
+              var key = searchResultKeys[i];
               var results = searchResults[key];
+
               if (results.found.length === 0) {
                 SearchResults.remove(key);
               }
@@ -247,25 +257,24 @@ angular.module('adage.gene.search', [
       replace: true,
       restrict: 'E',
       scope: true,
-      templateUrl: 'gene/search-result-table.tpl.html'
+      templateUrl: 'gene/search/search-result-table.tpl.html'
     };
   }
 ])
 
 // Directive for table containing search results
-.directive('selectedGenesPanel', function() {
+.directive('selectedGenesPanel', [function() {
   return {
     controller: ['$scope', 'SelectedGenesFactory', '$state',
       function($scope, SelectedGenesFactory, $state) {
         $scope.selectedGenes = SelectedGenesFactory.returnGenes();
 
         $scope.sendToNetwork = function() {
-          var genes = [];
-          for (var gene in $scope.selectedGenes) {
-            genes.push(gene);
-          }
+          var geneIds = Object.keys($scope.selectedGenes);
+          var geneString = geneIds.join();
+
           $state.go('gene_network', {
-            'genes': genes
+            'genes': geneString
           });
         };
       }
@@ -273,9 +282,9 @@ angular.module('adage.gene.search', [
     replace: true,
     restrict: 'E',
     scope: true,
-    templateUrl: 'gene/selected-genes-panel.tpl.html'
+    templateUrl: 'gene/search/selected-genes-panel.tpl.html'
   };
-})
+}])
 
 // A noResultButton is shown next to query tokens that found no matches
 // for a gene in the database. Clicking this button removes the query token
@@ -298,15 +307,19 @@ angular.module('adage.gene.search', [
     scope: {
       query: '@'
     },
-    templateUrl: 'gene/no-result-button.tpl.html'
+    templateUrl: 'gene/search/no-result-button.tpl.html'
   };
 }])
 
 // Directive for button with a gene, should add gene
 // and remove entire row from list
-.directive('geneResultButton', ['SearchResults', 'SelectedGenesFactory',
-  function(SearchResults, SelectedGenesFactory) {
+.directive('geneResultButton',
+  ['SearchResults', 'SelectedGenesFactory', 'CommonGeneFuncts',
+  function(SearchResults, SelectedGenesFactory, CommonGeneFuncts) {
     return {
+      controller: function($scope) {
+        $scope.geneLabel = CommonGeneFuncts.getGeneLabel($scope.gene);
+      },
       restrict: 'E',
       link: function(scope, element, attr) {
         element.bind('click', function() {
@@ -317,7 +330,7 @@ angular.module('adage.gene.search', [
         });
       },
       replace: true,
-      templateUrl: 'gene/gene-result-button.tpl.html'
+      templateUrl: 'gene/search/gene-result-button.tpl.html'
     };
   }
 ])
@@ -325,9 +338,12 @@ angular.module('adage.gene.search', [
 // Button directive for each of the genes that have been selected.
 // Clicking it should remove the gene from the selected genes object
 // in SelectedGenesFactory.
-.directive('selectedGeneButton', ['SelectedGenesFactory',
-  function(SelectedGenesFactory) {
+.directive('selectedGeneButton', ['SelectedGenesFactory', 'CommonGeneFuncts',
+  function(SelectedGenesFactory, CommonGeneFuncts) {
     return {
+      controller: function($scope) {
+        $scope.geneLabel = CommonGeneFuncts.getGeneLabel($scope.gene);
+      },
       restrict: 'E',
       link: function(scope, element, attr) {
         element.bind('click', function() {
@@ -337,7 +353,7 @@ angular.module('adage.gene.search', [
         });
       },
       replace: true,
-      templateUrl: 'gene/gene-result-button.tpl.html'
+      templateUrl: 'gene/search/gene-result-button.tpl.html'
     };
   }
 ])
@@ -356,7 +372,7 @@ angular.module('adage.gene.search', [
       replace: true,
       restrict: 'E',
       scope: false,
-      templateUrl: 'gene/more-result-button.tpl.html'
+      templateUrl: 'gene/search/more-result-button.tpl.html'
     };
   }
 ])
@@ -374,7 +390,7 @@ angular.module('adage.gene.search', [
       replace: true,
       restrict: 'E',
       scope: false,
-      templateUrl: 'gene/previous-result-button.tpl.html'
+      templateUrl: 'gene/search/previous-result-button.tpl.html'
     };
   }
 ])
@@ -418,7 +434,7 @@ angular.module('adage.gene.search', [
     scope: {
       query: '='
     },
-    templateUrl: 'gene/search-buttonset.tpl.html'
+    templateUrl: 'gene/search/search-buttonset.tpl.html'
   };
 }])
 
