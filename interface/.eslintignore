@@ -1,0 +1,7 @@
+build.config.js
+eslint.google.js
+Gruntfile.js
+build/*
+karma/*
+node_modules/*
+vendor/*
