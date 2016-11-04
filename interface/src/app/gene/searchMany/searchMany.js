@@ -1,4 +1,4 @@
-angular.module('adage.gene.search', [
+angular.module('adage.gene.searchMany', [
   'adage.gene.resource',
   'adage.gene.utils',
   'adage.gene.selected'
