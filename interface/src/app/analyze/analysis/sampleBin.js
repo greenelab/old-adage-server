@@ -13,8 +13,8 @@ angular.module('adage.analyze.sampleBin', [
   return $resource('/api/v0/activity/');
 }])
 
-.factory('SampleBin', ['$log', '$cacheFactory', 'Sample', 'Activity',
-function($log, $cacheFactory, Sample, Activity) {
+.factory('SampleBin', ['$log', '$cacheFactory', '$q', 'Sample', 'Activity',
+function($log, $cacheFactory, $q, Sample, Activity) {
   var SampleBin = {
     samples: [],
     heatmapData: {},
@@ -29,35 +29,14 @@ function($log, $cacheFactory, Sample, Activity) {
             ' already in the sample list; ignoring.');
       } else {
         SampleBin.samples.push(+id);
-        // TODO need to report query progress and errors somehow
-        // TODO this should use caching and promises to fetch sample data
-        // 1. check cache for existing Sample data. Hit = return
-        // 2. if cache miss:
-        // 2a. getSampleDetails & append a promise to SampleBin.promises
-        // 2b. getActivityForSample & append a promise to SampleBin.promises
-        // ... now can use Promise.all(SampleBin.promises).then() to trigger
-        // a redraw of the heatmap when ready
+        // TODO when cache generalized: start pre-fetching sample data here
       }
     },
 
     removeSample: function(id) {
       var pos = SampleBin.samples.indexOf(+id);
       SampleBin.samples.splice(pos, 1);
-      // TODO caching: here need to update SampleBin.heatmapData.activity
-      // rather than re-retrieve data
-      Activity.get({'sample__in': SampleBin.samples.join()},
-        // success callback
-        function(responseObject, responseHeaders) {
-          if (responseObject) {
-            SampleBin.heatmapData.activity = responseObject.objects;
-            // TODO need to find & report (list) samples that return no results
-          }
-        },
-        // failure callback
-        function(responseObject, responseHeaders) {
-          $log.error('Query errored with: ' + responseObject);
-        }
-      );
+      SampleBin.rebuildHeatmapActivity(SampleBin.samples);
     },
 
     addExperiment: function(sampleIdList) {
@@ -127,10 +106,55 @@ function($log, $cacheFactory, Sample, Activity) {
       );
     },
 
-    getActivityForSampleList: function(respObj, successFn, failFn) {
+    rebuildHeatmapActivity: function(samples) {
+      // FIXME need a "reloading..." spinner or something while this happens
+      var loadCache = function(responseObject) {
+        if (responseObject) {
+          var sampleID = responseObject.objects[0].sample;
+          SampleBin.activityCache.put(sampleID, responseObject.objects);
+          $log.info('populating cache with ' + sampleID);
+          // TODO need to find & report (list) samples that
+          // return no results
+        } else {
+          // FIXME what happens if responseObject is empty? (possible?)
+          $log.error('responseObject is empty: what now?');
+        }
+      };
+      var updateHeatmapActivity = function(activityPromisesFulfilled) {
+        // when all promises are fulfilled, we can update heatmapData
+        var newActivity = [];
+
+        for (var i = 0; i < samples.length; i++) {
+          var sampleActivity = SampleBin.activityCache.get(samples[i]);
+          newActivity = newActivity.concat(sampleActivity);
+        }
+        SampleBin.heatmapData.activity = newActivity;
+      };
+      var logError = function(errObject) {
+        $log.error('Query errored with: ' + errObject);
+      };
+
+      // preflight the cache and request anything missing
+      var activityPromises = [];
+      for (var i = 0; i < samples.length; i++) {
+        var sampleActivity = SampleBin.activityCache.get(samples[i]);
+        if (!sampleActivity) {
+          $log.info('cache miss for ' + samples[i]);
+          // cache miss, so populate the entry
+          var p = Activity.get({'sample': samples[i]}).$promise;
+          activityPromises.push(p);
+          p.then(loadCache).catch(logError);
+        }
+      }
+      // when the cache is ready, update the heatmap activity data
+      $q.all(activityPromises).then(updateHeatmapActivity).catch(logError);
+    },
+
+    getActivityForSampleList: function(respObj) {
       // retrieve activity data for heatmap to display
-      respObj.queryStatus = 'Retrieving sample activity...';
-      Activity.get({'sample__in': this.samples.join()}, successFn, failFn);
+      // FIXME restore query progress messages (see rebuildHeatmapActivity)
+      // respObj.queryStatus = 'Retrieving sample activity...';
+      SampleBin.rebuildHeatmapActivity(this.samples);
     }
   };
 
