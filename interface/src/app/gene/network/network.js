@@ -212,12 +212,12 @@ angular.module('adage.gene.network', [
          * @param {edge_data} data;
          * @return {void}.
          * ---------------------------------------------------------------------
-         * Since the edge tip is shown asynchronously, when edgeTip.hide() is
-         * called immediately to hide the tip box, the box won't be hidden if
-         * it is shown AFTER mouseout action. To solve this problem,
-         * edgeTip.hide() is called asynchronously after 100 millisecond.
-         * This is more like a workaround. Not sure whether there is a better
-         * solution.
+         * FIXME: Since the edge tip is shown asynchronously, when
+         * edgeTip.hide() is called immediately to hide the tip box, the box
+         * won't be hidden if it is shown AFTER mouseout action.  To solve this
+         * problem, edgeTip.hide() is called asynchronously after 100
+         * milliseconds.  This is more like a workaround. Not sure whether there
+         * is a better solution.
          * ---------------------------------------------------------------------
          */
         function hideEdgeTip(data) {
