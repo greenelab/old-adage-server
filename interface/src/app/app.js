@@ -6,7 +6,7 @@ angular.module('adage', [
   'adage.analyze',
   'adage.download',
   'adage.tribe_client',
-  'adage.gene.search',
+  'adage.gene.searchMany',
   'adage.gene.network',
   'ui.router',
   'ngResource'
