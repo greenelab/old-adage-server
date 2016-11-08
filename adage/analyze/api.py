@@ -11,8 +11,8 @@ from tastypie.exceptions import BadRequest
 from haystack.query import SearchQuerySet
 from haystack.inputs import AutoQuery
 from models import (
-    Experiment, Sample, SampleAnnotation, AnnotationType, Node, Activity, Edge,
-    Participation
+    Experiment, Sample, SampleAnnotation, AnnotationType, MLModel, Node,
+    Activity, Edge, Participation
 )
 
 # Many helpful hints for this implementation came from:
@@ -208,7 +208,15 @@ class SampleResource(ModelResource):
         return response
 
 
+class MLModelResource(ModelResource):
+    class Meta:
+        queryset = MLModel.objects.all()
+        allowed_methods = ['get']
+
+
 class NodeResource(ModelResource):
+    mlmodel = fields.ForeignKey(MLModelResource, "mlmodel", full=True)
+
     class Meta:
         queryset = Node.objects.all()
         resource_name = 'node'
@@ -342,7 +350,7 @@ class EdgeResource(ModelResource):
 
 class ParticipationResource(ModelResource):
     node = fields.IntegerField(attribute='node_id', null=False)
-    gene = fields.IntegerField(attribute='gene_id', null=False)
+    gene = fields.ForeignKey(GeneResource, "gene", full=True)
 
     class Meta:
         queryset = Participation.objects.all()
