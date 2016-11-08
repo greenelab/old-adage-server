@@ -23,39 +23,39 @@ function($log, $cacheFactory, $q, Sample, Activity) {
     activityCache: $cacheFactory('activity'),
 
     addSample: function(id) {
-      if (SampleBin.samples.indexOf(+id) !== -1) {
+      if (this.samples.indexOf(+id) !== -1) {
         // quietly ignore the double-add
         $log.warn('SampleBin.addSample: ' + id +
             ' already in the sample list; ignoring.');
       } else {
-        SampleBin.samples.push(+id);
+        this.samples.push(+id);
         // TODO when cache generalized: start pre-fetching sample data here
       }
     },
 
     removeSample: function(id) {
-      var pos = SampleBin.samples.indexOf(+id);
-      SampleBin.samples.splice(pos, 1);
-      SampleBin.rebuildHeatmapActivity(SampleBin.samples);
+      var pos = this.samples.indexOf(+id);
+      this.samples.splice(pos, 1);
+      this.rebuildHeatmapActivity(this.samples);
     },
 
     addExperiment: function(sampleIdList) {
       for (var i = 0; i < sampleIdList.length; i++) {
-        SampleBin.addSample(sampleIdList[i]);
+        this.addSample(sampleIdList[i]);
       }
     },
 
     addItem: function(searchItem) {
       if (searchItem.item_type === 'sample') {
-        SampleBin.addSample(searchItem.pk);
+        this.addSample(searchItem.pk);
       } else if (searchItem.item_type === 'experiment') {
-        SampleBin.addExperiment(searchItem.related_items);
+        this.addExperiment(searchItem.related_items);
       }
     },
 
     hasItem: function(searchItem) {
       if (searchItem.item_type === 'sample') {
-        if (SampleBin.samples.indexOf(+searchItem.pk) !== -1) {
+        if (this.samples.indexOf(+searchItem.pk) !== -1) {
           return true;
         } else {
           return false;
@@ -64,7 +64,7 @@ function($log, $cacheFactory, $q, Sample, Activity) {
         // what we want to know, in the case of an experiment, is 'are
         // all of the samples from this experiment already added?'
         for (var i = 0; i < searchItem.related_items.length; i++) {
-          if (SampleBin.samples.indexOf(+searchItem.related_items[i]) === -1) {
+          if (this.samples.indexOf(+searchItem.related_items[i]) === -1) {
             return false;
           }
         }
@@ -73,33 +73,32 @@ function($log, $cacheFactory, $q, Sample, Activity) {
     },
 
     getSampleData: function(id) {
-      return SampleBin.sampleData[id];
+      return this.sampleData[id];
     },
     setSampleData: function(id, obj) {
-      SampleBin.sampleData[id] = obj;
+      this.sampleData[id] = obj;
     },
 
     getSampleObjects: function() {
-      return SampleBin.samples.map(function(val, i, arr) {
-        return SampleBin.getSampleData(val) || {id: val};
-      });
+      return this.samples.map(function(val, i, arr) {
+        return this.getSampleData(val) || {id: val};
+      }, this);
     },
 
     getSampleDetails: function(pk) {
       // TODO need to report query progress and errors somehow
+      var cbSampleBin = this; // closure link to SampleBin for callbacks
       Sample.get({id: pk},
-        // success callback
-        function(responseObject, responseHeaders) {
+        function success(responseObject, responseHeaders) {
           if (responseObject) {
-            SampleBin.setSampleData(pk, responseObject);
+            cbSampleBin.setSampleData(pk, responseObject);
             // TODO need a trigger to update heatmapData?
           } else {
             $log.warn('Query for sample ' + pk + ' returned nothing.');
             // TODO user error reporting
           }
         },
-        // error callback
-        function(responseObject, responseHeaders) {
+        function error(responseObject, responseHeaders) {
           // TODO user error reporting
           $log.error($scope.analysis.queryStatus);
         }
@@ -108,10 +107,11 @@ function($log, $cacheFactory, $q, Sample, Activity) {
 
     rebuildHeatmapActivity: function(samples) {
       // FIXME need a "reloading..." spinner or something while this happens
+      var cbSampleBin = this; // closure link to SampleBin for callbacks
       var loadCache = function(responseObject) {
         if (responseObject) {
           var sampleID = responseObject.objects[0].sample;
-          SampleBin.activityCache.put(sampleID, responseObject.objects);
+          cbSampleBin.activityCache.put(sampleID, responseObject.objects);
           $log.info('populating cache with ' + sampleID);
           // TODO need to find & report (list) samples that
           // return no results
@@ -125,10 +125,10 @@ function($log, $cacheFactory, $q, Sample, Activity) {
         var newActivity = [];
 
         for (var i = 0; i < samples.length; i++) {
-          var sampleActivity = SampleBin.activityCache.get(samples[i]);
+          var sampleActivity = cbSampleBin.activityCache.get(samples[i]);
           newActivity = newActivity.concat(sampleActivity);
         }
-        SampleBin.heatmapData.activity = newActivity;
+        cbSampleBin.heatmapData.activity = newActivity;
       };
       var logError = function(errObject) {
         $log.error('Query errored with: ' + errObject);
@@ -137,7 +137,7 @@ function($log, $cacheFactory, $q, Sample, Activity) {
       // preflight the cache and request anything missing
       var activityPromises = [];
       for (var i = 0; i < samples.length; i++) {
-        var sampleActivity = SampleBin.activityCache.get(samples[i]);
+        var sampleActivity = this.activityCache.get(samples[i]);
         if (!sampleActivity) {
           $log.info('cache miss for ' + samples[i]);
           // cache miss, so populate the entry
@@ -154,7 +154,7 @@ function($log, $cacheFactory, $q, Sample, Activity) {
       // retrieve activity data for heatmap to display
       // FIXME restore query progress messages (see rebuildHeatmapActivity)
       // respObj.queryStatus = 'Retrieving sample activity...';
-      SampleBin.rebuildHeatmapActivity(this.samples);
+      this.rebuildHeatmapActivity(this.samples);
     }
   };
 
