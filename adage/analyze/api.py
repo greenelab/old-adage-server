@@ -349,6 +349,12 @@ class EdgeResource(ModelResource):
 
 
 class ParticipationResource(ModelResource):
+    """
+    To avoid unnecessary table joins and improve the query performance, only
+    "gene" is enabled as a foreign key (because the Node page on frontend needs
+    the gene details given a certain node), but at this time, we don't intend
+    to do a query that returns node details given an input gene.
+    """
     node = fields.IntegerField(attribute='node_id', null=False)
     gene = fields.ForeignKey(GeneResource, "gene", full=True)
 
