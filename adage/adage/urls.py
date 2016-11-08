@@ -19,9 +19,10 @@ from django.contrib import admin
 from tastypie.api import Api
 from organisms.api import OrganismResource
 from genes.api import GeneResource
-from analyze.api import SearchResource, ExperimentResource,\
-    AnnotationTypeResource, SampleResource, NodeResource, ActivityResource,\
-    EdgeResource, ParticipationResource
+from analyze.api import (SearchResource, ExperimentResource,
+                         AnnotationTypeResource, SampleResource,
+                         MLModelResource, NodeResource, ActivityResource,
+                         EdgeResource, ParticipationResource)
 
 v0_api = Api(api_name='v0')
 v0_api.register(SearchResource())
@@ -30,6 +31,7 @@ v0_api.register(AnnotationTypeResource())
 v0_api.register(SampleResource())
 v0_api.register(OrganismResource())
 v0_api.register(GeneResource())
+v0_api.register(MLModelResource())
 v0_api.register(NodeResource())
 v0_api.register(ActivityResource())
 v0_api.register(EdgeResource())

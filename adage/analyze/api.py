@@ -11,8 +11,8 @@ from tastypie.exceptions import BadRequest
 from haystack.query import SearchQuerySet
 from haystack.inputs import AutoQuery
 from models import (
-    Experiment, Sample, SampleAnnotation, AnnotationType, Node, Activity, Edge,
-    Participation
+    Experiment, Sample, SampleAnnotation, AnnotationType, MLModel, Node,
+    Activity, Edge, Participation
 )
 
 # Many helpful hints for this implementation came from:
@@ -208,7 +208,15 @@ class SampleResource(ModelResource):
         return response
 
 
+class MLModelResource(ModelResource):
+    class Meta:
+        queryset = MLModel.objects.all()
+        allowed_methods = ['get']
+
+
 class NodeResource(ModelResource):
+    mlmodel = fields.ForeignKey(MLModelResource, "mlmodel", full=True)
+
     class Meta:
         queryset = Node.objects.all()
         resource_name = 'node'
@@ -341,8 +349,15 @@ class EdgeResource(ModelResource):
 
 
 class ParticipationResource(ModelResource):
+    """
+    To avoid unnecessary table joins and improve the query performance, only
+    "gene" is enabled as a foreign key (because the Node page on frontend needs
+    the gene details given a certain node); "node" is not set as a foreign key
+    because at this time, we don't intend to do a query that returns node
+    details given an input gene.
+    """
     node = fields.IntegerField(attribute='node_id', null=False)
-    gene = fields.IntegerField(attribute='gene_id', null=False)
+    gene = fields.ForeignKey(GeneResource, "gene", full=True)
 
     class Meta:
         queryset = Participation.objects.all()
