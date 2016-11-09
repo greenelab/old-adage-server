@@ -16,7 +16,8 @@ angular.module('adage.analyze.analysis', [
 
 .controller('AnalysisCtrl', ['$scope', '$log', '$location', 'Sample',
 'Activity', 'AnnotationType', 'SampleBin',
-function AnalysisCtrl($scope, $log, $location, Sample, Activity, AnnotationType, SampleBin) {
+function AnalysisCtrl($scope, $log, $location, Sample, Activity,
+AnnotationType, SampleBin) {
   // give our templates a way to access the SampleBin service
   $scope.sb = SampleBin;
 
@@ -132,7 +133,8 @@ function AnalysisCtrl($scope, $log, $location, Sample, Activity, AnnotationType,
         // "properties": {
         //   "labels": {
         //     // "text": {"field": "sample_object.ml_data_source"}
-        //     "text": {"template": "test {{datum.data.sample_object.ml_data_source}}"}
+        //     "text": {"template": "test
+        // {{datum.data.sample_object.ml_data_source}}"}
         //   }
         // }
       }
@@ -185,23 +187,7 @@ function AnalysisCtrl($scope, $log, $location, Sample, Activity, AnnotationType,
     SampleBin.getSampleDetails(SampleBin.samples[i]);
   }
 
-  SampleBin.getActivityForSampleList($scope.analysis,
-    // success callback
-    function(responseObject, responseHeaders) {
-      if (responseObject) {
-        $scope.analysis.queryStatus = '';
-        // FIXME retrieved data belong in a cache inside sampleBin service
-        SampleBin.heatmapData.activity = responseObject.objects;
-        // TODO need to find & report (list) samples that return no results
-      }
-    },
-    // failure callback
-    function(responseObject, responseHeaders) {
-      $log.error('Query errored with: ' + responseObject);
-      // TODO need a unit test to prove this works
-      $scope.analysis.queryStatus = 'Query for activity failed.';
-    }
-  );
+  SampleBin.getActivityForSampleList($scope.analysis);
 }])
 
 .directive('analysisDetail', function() {

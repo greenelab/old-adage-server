@@ -13,68 +13,58 @@ angular.module('adage.analyze.sampleBin', [
   return $resource('/api/v0/activity/');
 }])
 
-.factory('SampleBin', ['$log', 'Sample', 'Activity',
-function($log, Sample, Activity) {
+.factory('SampleBin', ['$log', '$cacheFactory', '$q', 'Sample', 'Activity',
+function($log, $cacheFactory, $q, Sample, Activity) {
   var SampleBin = {
     samples: [],
     heatmapData: {},
     sampleData: {},
+    sampleCache: $cacheFactory('sample'),
+    activityCache: $cacheFactory('activity'),
 
-    add_sample: function(id) {
-      if (SampleBin.samples.indexOf(+id) !== -1) {
+    addSample: function(id) {
+      if (this.samples.indexOf(+id) !== -1) {
         // quietly ignore the double-add
-        $log.warn('SampleBin.add_sample: ' + id +
+        $log.warn('SampleBin.addSample: ' + id +
             ' already in the sample list; ignoring.');
       } else {
-        SampleBin.samples.push(+id);
+        this.samples.push(+id);
+        // TODO when cache generalized: start pre-fetching sample data here
       }
     },
 
-    remove_sample: function(id) {
-      var pos = SampleBin.samples.indexOf(+id);
-      SampleBin.samples.splice(pos, 1);
-      // TODO need to report query progress and errors somehow
-      Activity.get({sample__in: SampleBin.samples.join()},
-        // success callback
-        function(responseObject, responseHeaders) {
-          if (responseObject) {
-            SampleBin.heatmapData.activity = responseObject.objects;
-            // TODO need to find & report (list) samples that return no results
-          }
-        },
-        // failure callback
-        function(responseObject, responseHeaders) {
-          $log.error('Query errored with: ' + responseObject);
-        }
-      );
+    removeSample: function(id) {
+      var pos = this.samples.indexOf(+id);
+      this.samples.splice(pos, 1);
+      this.rebuildHeatmapActivity(this.samples);
     },
 
-    add_experiment: function(sample_id_list) {
-      for (var i = 0; i < sample_id_list.length; i++) {
-        SampleBin.add_sample(sample_id_list[i]);
+    addExperiment: function(sampleIdList) {
+      for (var i = 0; i < sampleIdList.length; i++) {
+        this.addSample(sampleIdList[i]);
       }
     },
 
-    add_item: function(search_item) {
-      if (search_item.item_type === 'sample') {
-        SampleBin.add_sample(search_item.pk);
-      } else if (search_item.item_type === 'experiment') {
-        SampleBin.add_experiment(search_item.related_items);
+    addItem: function(searchItem) {
+      if (searchItem.item_type === 'sample') {
+        this.addSample(searchItem.pk);
+      } else if (searchItem.item_type === 'experiment') {
+        this.addExperiment(searchItem.related_items);
       }
     },
 
-    has_item: function(search_item) {
-      if (search_item.item_type === 'sample') {
-        if (SampleBin.samples.indexOf(+search_item.pk) !== -1) {
+    hasItem: function(searchItem) {
+      if (searchItem.item_type === 'sample') {
+        if (this.samples.indexOf(+searchItem.pk) !== -1) {
           return true;
         } else {
           return false;
         }
-      } else if (search_item.item_type === 'experiment') {
+      } else if (searchItem.item_type === 'experiment') {
         // what we want to know, in the case of an experiment, is 'are
         // all of the samples from this experiment already added?'
-        for (var i = 0; i < search_item.related_items.length; i++) {
-          if (SampleBin.samples.indexOf(+search_item.related_items[i]) === -1) {
+        for (var i = 0; i < searchItem.related_items.length; i++) {
+          if (this.samples.indexOf(+searchItem.related_items[i]) === -1) {
             return false;
           }
         }
@@ -83,43 +73,88 @@ function($log, Sample, Activity) {
     },
 
     getSampleData: function(id) {
-      return SampleBin.sampleData[id];
+      return this.sampleData[id];
     },
     setSampleData: function(id, obj) {
-      SampleBin.sampleData[id] = obj;
+      this.sampleData[id] = obj;
     },
 
     getSampleObjects: function() {
-      return SampleBin.samples.map(function(val, i, arr) {
-        return SampleBin.getSampleData(val) || {id: val};
-      });
+      return this.samples.map(function(val, i, arr) {
+        return this.getSampleData(val) || {id: val};
+      }, this);
     },
 
     getSampleDetails: function(pk) {
       // TODO need to report query progress and errors somehow
+      var cbSampleBin = this; // closure link to SampleBin for callbacks
       Sample.get({id: pk},
-        // success callback
-        function(responseObject, responseHeaders) {
+        function success(responseObject, responseHeaders) {
           if (responseObject) {
-            SampleBin.setSampleData(pk, responseObject);
+            cbSampleBin.setSampleData(pk, responseObject);
             // TODO need a trigger to update heatmapData?
           } else {
             $log.warn('Query for sample ' + pk + ' returned nothing.');
             // TODO user error reporting
           }
         },
-        // error callback
-        function(responseObject, responseHeaders) {
+        function error(responseObject, responseHeaders) {
           // TODO user error reporting
           $log.error($scope.analysis.queryStatus);
         }
       );
     },
 
-    getActivityForSampleList: function(respObj, successFn, failFn) {
+    rebuildHeatmapActivity: function(samples) {
+      // FIXME need a "reloading..." spinner or something while this happens
+      var cbSampleBin = this; // closure link to SampleBin for callbacks
+      var loadCache = function(responseObject) {
+        if (responseObject) {
+          var sampleID = responseObject.objects[0].sample;
+          cbSampleBin.activityCache.put(sampleID, responseObject.objects);
+          $log.info('populating cache with ' + sampleID);
+          // TODO need to find & report (list) samples that
+          // return no results
+        } else {
+          // FIXME what happens if responseObject is empty? (possible?)
+          $log.error('responseObject is empty: what now?');
+        }
+      };
+      var updateHeatmapActivity = function(activityPromisesFulfilled) {
+        // when all promises are fulfilled, we can update heatmapData
+        var newActivity = [];
+
+        for (var i = 0; i < samples.length; i++) {
+          var sampleActivity = cbSampleBin.activityCache.get(samples[i]);
+          newActivity = newActivity.concat(sampleActivity);
+        }
+        cbSampleBin.heatmapData.activity = newActivity;
+      };
+      var logError = function(errObject) {
+        $log.error('Query errored with: ' + errObject);
+      };
+
+      // preflight the cache and request anything missing
+      var activityPromises = [];
+      for (var i = 0; i < samples.length; i++) {
+        var sampleActivity = this.activityCache.get(samples[i]);
+        if (!sampleActivity) {
+          $log.info('cache miss for ' + samples[i]);
+          // cache miss, so populate the entry
+          var p = Activity.get({'sample': samples[i]}).$promise;
+          activityPromises.push(p);
+          p.then(loadCache).catch(logError);
+        }
+      }
+      // when the cache is ready, update the heatmap activity data
+      $q.all(activityPromises).then(updateHeatmapActivity).catch(logError);
+    },
+
+    getActivityForSampleList: function(respObj) {
       // retrieve activity data for heatmap to display
-      respObj.queryStatus = 'Retrieving sample activity...';
-      Activity.get({sample__in: this.samples.join()}, successFn, failFn);
+      // FIXME restore query progress messages (see rebuildHeatmapActivity)
+      // respObj.queryStatus = 'Retrieving sample activity...';
+      this.rebuildHeatmapActivity(this.samples);
     }
   };
 
@@ -133,7 +168,7 @@ function SampleBinCtrl($scope, $log, $uibModal, Sample, SampleBin) {
   $scope.sb = SampleBin;
 
   $scope.show = function() {
-    var modalInstance = $uibModal.open({
+    $uibModal.open({
       animation: true,
       templateUrl: 'analyze/analysis/analysisModal.tpl.html',
       controller: 'AnalysisModalCtrl',
