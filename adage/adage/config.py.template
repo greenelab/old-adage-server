@@ -65,11 +65,23 @@ DATA_CONFIG = {
                                   'adage-server', 'data'),
 }
 DATA_CONFIG.update({
-    'annotation_file':  os.path.join(DATA_CONFIG['data_dir'],
-                                     'PseudomonasAnnotation.tsv'),
-    'activity_file':    os.path.join(DATA_CONFIG['data_dir'],
+    'annotation_file': os.path.join(
+        DATA_CONFIG['data_dir'], 'PseudomonasAnnotation.tsv'),
+    'activity_file': os.path.join(
+        DATA_CONFIG['data_dir'],
         'all-pseudomonas-gene-normalized_HWActivity_perGene_with_net300_100'
-        'models_k=300_seed=123_ClusterByweighted_avgweight_network_ADAGE.txt')
+        'models_k=300_seed=123_ClusterByweighted_avgweight_network_ADAGE.txt'),
+    'pao1_genes_url':
+        'ftp://ftp.ncbi.nih.gov/gene/DATA/GENE_INFO/Archaea_Bacteria/Pseudomonas_aeruginosa_PAO1.gene_info.gz',
+    'pao1_genes_file': os.path.join(
+        DATA_CONFIG['data_dir'], 'Pseudomonas_aeruginosa_PAO1.gene_info'),
+    'gene_history_url': 'ftp://ftp.ncbi.nih.gov/gene/DATA/gene_history.gz',
+    'gene_history_file': os.path.join(DATA_CONFIG['data_dir'], 'gene_history'),
+    'gene_network_file': os.path.join(
+        DATA_CONFIG['data_dir'],
+        'eADAGE_net300_allNodes_ADAGEnet_PAID_corCutoff0.4.txt'),
+    'node_gene_network_file': os.path.join(
+        DATA_CONFIG['data_dir'], 'node_gene_network.txt')
 })
 
 # deployment server credentials and configuration (for AWS)
@@ -89,7 +101,7 @@ AWS_CONFIG = {
     'dbmaster':      AWS_DEPLOY['dbmaster'],
 
     # The following keys are all that are needed for runtime use:
-    # django_key, databases, haystack, 
+    # django_key, databases, haystack,
     # tribe_{id, secret, redirect_uri, scope, login_redirect, logout_redirect}
     'django_key':    '<config-secret>',
     'databases': {
