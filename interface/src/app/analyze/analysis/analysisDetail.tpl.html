@@ -16,8 +16,8 @@
       }}</td>
     </tr>
   </thead>
-  <tbody ng-model="sb.samples" as-sortable="sortableOptions">
-    <tr ng-repeat="id in sb.samples" as-sortable-item>
+  <tbody ng-model="sb.heatmapData.samples" as-sortable="sortableOptions">
+    <tr ng-repeat="id in sb.heatmapData.samples" as-sortable-item>
       <td>
         <button type="button" class="btn close"
         ng-click="sb.removeSample(id)" aria-label="Delete">

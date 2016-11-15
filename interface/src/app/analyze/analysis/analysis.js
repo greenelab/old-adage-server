@@ -48,6 +48,9 @@ AnnotationType, SampleBin) {
         ]
       }, {
         // this dataset "streamed" in via ngVega from heatmapData
+        'name': 'samples'
+      }, {
+        // this dataset "streamed" in via ngVega from heatmapData
         'name': 'sample_objects'
       }, {
         // compute minimum normalized value for each node (across samples)
@@ -183,8 +186,9 @@ AnnotationType, SampleBin) {
   };
 
   // populate sample details
-  for (var i = 0; i < SampleBin.samples.length; i++) {
-    SampleBin.getSampleDetails(SampleBin.samples[i]);
+  // FIXME implement this loop as a method on SampleBin? (prob. with caching)
+  for (var i = 0; i < SampleBin.heatmapData.samples.length; i++) {
+    SampleBin.getSampleDetails(SampleBin.heatmapData.samples[i]);
   }
 
   SampleBin.getActivityForSampleList($scope.analysis);
