@@ -1,0 +1,30 @@
+<div ng-if="!queryStatus">
+  <h4>
+    <div style="float: left">
+      <b>High-weight Genes: </b>{{genes.length}}
+    </div>
+    <div ng-if="genes.length > 0">
+      &nbsp({{hypoPercentage}}% Hypothetical)
+    </div>
+  </h4>
+
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Systematic Name</th>
+        <th>Standard Name</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="gene in genes | orderBy: 'sysName'">
+        <td><b>{{gene.sysName}}</b></td>
+        <td>{{gene.stdName}}</td>
+        <td>{{gene.desc}}</td>
+      </tr>
+    </tbody>
+  </table>
+
+</div>
+
+<div ng-bind="queryStatus"></div>
