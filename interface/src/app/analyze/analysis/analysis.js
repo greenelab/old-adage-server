@@ -80,10 +80,10 @@ AnnotationType, SampleBin) {
             'expr': 'datum.normval - datum.node_summary.min_normval'
           }, {
             'type': 'lookup',
-            'on': 'sample_objects',
-            'onKey': 'id',
+            'on': 'samples',
+            'onKey': 'data',
             'keys': ['sample'],
-            'as': ['sample_object']
+            'as': ['sample_order']
           }
         ]
       }
@@ -98,7 +98,11 @@ AnnotationType, SampleBin) {
       }, {
         'name': 'samples',
         'type': 'ordinal',
-        'domain': {'data': 'activity_normalized', 'field': 'sample'},
+        'domain': {
+          'data': 'activity_normalized',
+          'field': 'sample_order._id',
+          'sort': true
+        },
         'range': 'height'
       }, {
         'name': 'minvals',
@@ -127,21 +131,11 @@ AnnotationType, SampleBin) {
       }
     ],
 
-    'axes': [
-      // this generated x-axis is useless, so we make one in marks below
-      // {"type": "x", "scale": "nodes", "title": "Node ID"},
-      {
-        'type': 'y', 'scale': 'samples', 'title': 'sample'
-        // FIXME vega doesn't like either of these attempts at labels
-        // "properties": {
-        //   "labels": {
-        //     // "text": {"field": "sample_object.ml_data_source"}
-        //     "text": {"template": "test
-        // {{datum.data.sample_object.ml_data_source}}"}
-        //   }
-        // }
-      }
-    ],
+    // 'axes': [
+    //   // these generated axes are useless, so we make them in marks below
+    //   {"type": "x", "scale": "nodes", "title": "Node ID"},
+    //   {'type': 'y', 'scale': 'samples', 'title': 'sample'}
+    // ],
 
     // FIXME the legend is broken due to malformed SVG output
     // "legends": [{"fill": "s", "values": [0.0, 0.5, 1.0]}],
@@ -152,11 +146,11 @@ AnnotationType, SampleBin) {
         'properties': {
           'enter': {
             // TODO compute these constants also (see above)
+            'text': {'value': 'node'},
             'x': {'value': 1200},
             'y': {'value': 220},
             'fontWeight': {'value': 'bold'},
-            'fill': {'value': 'black'},
-            'text': {'value': 'node'}
+            'fill': {'value': 'black'}
           }
         }
       }, {
@@ -166,9 +160,26 @@ AnnotationType, SampleBin) {
           'enter': {
             'x': {'scale': 'nodes', 'field': 'node'},
             'width': {'scale': 'nodes', 'band': true},
-            'y': {'scale': 'samples', 'field': 'sample'},
+            'y': {'scale': 'samples', 'field': 'sample_order._id'},
             'height': {'scale': 'samples', 'band': true},
             'fill': {'scale': 's', 'field': 'normval'}
+          }
+        }
+      }, {
+        'type': 'text',
+        'from': {'data': 'samples'},
+        'properties': {
+          'update': {
+            'text': {'field': 'data'},
+            'x': {'value': -5},
+            'y': {
+              'scale': 'samples',
+              'field': '_id',
+              'offset': 18
+            },
+            'align': {'value': 'right'},
+            'fontWeight': {'value': 'bold'},
+            'fill': {'value': 'black'}
           }
         }
       }
