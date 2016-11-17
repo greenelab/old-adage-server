@@ -1,14 +1,13 @@
 /**
- * "adage.gene.network" module.
+ * "adage.gene.node" module.
  */
 
 angular.module('adage.node', [
   'ui.router',
-  'placeholders',
   'ui.bootstrap'
 ])
 
-.config(function config($stateProvider) {
+.config(['$stateProvider', function($stateProvider) {
   $stateProvider.state('node', {
     url: '/node/{id:int}',
     views: {
@@ -19,15 +18,13 @@ angular.module('adage.node', [
     },
     data: {pageTitle: 'Node Information'}
   });
-})
+}])
 
-.factory('NodeInfo', ['$resource', '$stateParams',
-  function($resource) {
-    return $resource('/api/v0/node/:id');
-  }
-])
+.factory('NodeInfo', ['$resource', function($resource) {
+  return $resource('/api/v0/node/:id');
+}])
 
-.factory('HeavyGenes', ['$resource', function($resource) {
+.factory('ParticipationService', ['$resource', function($resource) {
   return $resource('/api/v0/participation/');
 }])
 
@@ -55,16 +52,17 @@ angular.module('adage.node', [
   }
 ])
 
-.directive('highWeightGenes', ['HeavyGenes', '$log',
-  function(HeavyGenes, $log) {
+.directive('highWeightGenes', ['ParticipationService', '$log',
+  function(ParticipationService, $log) {
     return {
       templateUrl: 'node/heavy_genes.tpl.html',
+      restrict: 'AE',
       scope: {
         nodeId: '='
       },
       link: function($scope) {
         $scope.queryStatus = 'Connecting to the server ...';
-        HeavyGenes.get(
+        ParticipationService.get(
           {node: $scope.nodeId, limit: 0},
           function success(response) {
             $scope.genes = [];
@@ -73,7 +71,7 @@ angular.module('adage.node', [
             var numHypo = 0;
             for (; i < n; ++i) {
               sysName = response.objects[i].gene.systematic_name;
-              stdName= response.objects[i].gene.standard_name;
+              stdName = response.objects[i].gene.standard_name;
               desc = response.objects[i].gene.description;
               if (desc.toLowerCase() === 'hypothetical protein') {
                 ++numHypo;
@@ -94,5 +92,5 @@ angular.module('adage.node', [
   }]
 )
 
-// TODO: Directives for the other setions
+// TODO: Directives for the other sections
 ;

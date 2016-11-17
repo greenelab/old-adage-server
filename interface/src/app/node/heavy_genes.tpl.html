@@ -1,11 +1,9 @@
 <div ng-if="!queryStatus">
   <h4>
-    <div style="float: left">
-      <b>High-weight Genes: </b>{{genes.length}}
-    </div>
-    <div ng-if="genes.length > 0">
-      &nbsp({{hypoPercentage}}% Hypothetical)
-    </div>
+    <b>High-weight Genes: </b>{{genes.length}}
+    <span ng-if="genes.length > 0">
+      &nbsp;({{hypoPercentage}}% Hypothetical)
+    </span>
   </h4>
 
   <table class="table table-striped">
