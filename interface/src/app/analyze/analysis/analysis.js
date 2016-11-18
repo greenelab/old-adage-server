@@ -25,14 +25,11 @@ AnnotationType, SampleBin) {
   $scope.sortableOptions = {
     containerPositioning: 'relative',
     placeholder: '<tr style="display: table-row;"></tr>'
-    // TODO: when reordering implemented in heatmap, need to trigger here
-    // orderChanged: function(event) {
-    // }
   };
 
   // Vega objects
   $scope.heatmapSpec = {
-    // TODO compute these constants: w=numNodes*4, h=numSamples*12
+    // TODO dynamic layout: compute constants w=numNodes*4, h=numSamples*12
     'width': 2400,
     'height': 200,
     'padding': {'left': 50, 'right': 10, 'top': 10, 'bottom': 20},
@@ -145,7 +142,7 @@ AnnotationType, SampleBin) {
         'type': 'text',
         'properties': {
           'enter': {
-            // TODO compute these constants also (see above)
+            // TODO dynamic layout: compute these constants also (see above)
             'text': {'value': 'node'},
             'x': {'value': 1200},
             'y': {'value': 220},
@@ -168,6 +165,7 @@ AnnotationType, SampleBin) {
       }, {
         'type': 'text',
         'from': {'data': 'samples'},
+        // TODO dynamic layout: adjust these "magic numbers" automatically
         'properties': {
           'update': {
             'text': {'field': 'data'},
