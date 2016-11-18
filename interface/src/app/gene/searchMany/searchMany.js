@@ -36,226 +36,151 @@ angular.module('adage.gene.searchMany', [
   ;
 })
 
-.factory('SearchResults', ['$rootScope', 'Gene', function($rootScope, Gene) {
-  var queries = [];
-  var searchResults = {};
-  var searchSuccess = null;
 
+// Directive for whole gene search form
+.directive('geneSearchPanel', [function() {
   return {
-    getQueries: function() {
-      return queries;
+    controller: ['$scope', function($scope) {
+      $scope.loadingSearchResults = false;
+
+      $scope.queries = [];
+      $scope.searchResults = {};
+    }],
+    restrict: 'E',
+    scope: {
+      organism: '='
     },
-    getQueryResults: function(query) {
-      return searchResults[query];
-    },
-    getSearchResults: function() {
-      return searchResults;
-    },
-    getSearchSuccess: function() {
-      return searchSuccess;
-    },
-    remove: function(query) { // Remove a query and its associated result
-      queries = queries.filter(function(el) {
-        return el !== query;
-      });
-      delete searchResults[query];
-      $rootScope.$broadcast('results.update');
-    },
-    clear: function() { // Clear the service
-      queries = [];
-      searchResults = {};
-      $rootScope.$broadcast('results.update');
-    },
-    size: function() {
-      return queries.length;
-    },
-    search: function(qparams) {
-      // Gene.search will query for all of the search terms in qparams
-      // returning a list of objects containing each search term and the
-      // gene results for that term in each objects. If the search
-      // contained terms already found in our cache of searchResults,
-      // those results are ignored while terms not already present will
-      // be added to the cache.
-      Gene.search(qparams,
-        function(data) {
-          var previousQueries = queries.length;
-          for (var i = 0; i < data.length; i++) {
-            var query = data[i].search;
-            if (!searchResults[query]) {
-              // If search term didn't already exist
-              searchResults[query] = data[i]; // add it to the results
-              queries.push(query); // add to the list of queries
-            }
-          }
-          if (previousQueries !== queries.length) {
-            $rootScope.$broadcast('results.update');
-          }
-          searchSuccess = true;
-          $rootScope.$broadcast('results.searchResultsReturned');
-        },
-        function(responseObject, responseHeaders) {
-          searchSuccess = false;
-          $rootScope.$broadcast('results.searchResultsReturned');
-        }
-      );
-    }
+    templateUrl: 'gene/searchMany/gene-search-panel.tpl.html'
   };
 }])
 
 
 // Directive for whole gene search form
-.directive('geneSearchForm', ['SearchResults', function(SearchResults) {
+.directive('geneSearchForm', [function() {
   return {
-    controller: ['$scope', '$rootScope', 'SearchResults',
-      function($scope, $rootScope, SearchResults) {
-        $scope.loadingSearchResults = false;
+    controller: ['$scope', 'Gene', function($scope, Gene) {
+      $scope.errors = null;
 
-        // Clear any existing search results
-        SearchResults.clear();
-        $scope.errors = null;
+      $scope.searchGenes = function() {
+        // Gene.search will query for all of the search terms in qparams
+        // returning a list of objects containing each search term and the
+        // gene results for that term in each objects. If the search
+        // contained terms already found in our cache of searchResults,
+        // those results are ignored while terms not already present will
+        // be added to the cache.
 
-        $scope.searchGenes = function() {
-          if (!$scope.genesToAdd) { // if the query is empty
-            return false;
-          }
-          $scope.loadingSearchResults = true;
+        if (!$scope.geneQueries) { // if the query is empty
+          return false;
+        }
 
-          $rootScope.$broadcast('results.loadingSearchResults');
+        var qparams = {'query': $scope.geneQueries};
 
-          var qparams = {
-            'query': $scope.genesToAdd.query
-          };
+        $scope.loadingSearchResults = true;
 
-          if ($scope.organism) {
-            // TODO: adage doesn't currently support multiple organisms.
-            // Therefore, when retrieving gene objects from the API gene
-            // search endpoint, this will return *all* gene objects it finds,
-            // without filtering for organism. At the point when we add
-            // genes for more than one species to the database, we will
-            // need to set this $scope.organism to whatever organism is in
-            // the ML model (or genes for many organisms will be returned).
-            qparams['organism'] = $scope.organism;
-          }
-          SearchResults.search(qparams);
-        };
+        if ($scope.organism) {
+          // TODO: adage doesn't currently support multiple organisms.
+          // Therefore, when retrieving gene objects from the API gene
+          // search endpoint, this will return *all* gene objects it finds,
+          // without filtering for organism. At the point when we add
+          // genes for more than one species to the database, we will
+          // need to set this $scope.organism to whatever organism is in
+          // the ML model (or genes for many organisms will be returned).
+          // qparams['organism'] = $scope.organism;
+        }
 
-        $scope.$on('results.searchResultsReturned', function() {
-          $scope.loadingSearchResults = false;
-          var searchSuccess = SearchResults.getSearchSuccess();
-          if (searchSuccess === null || searchSuccess === false) {
-            $scope.errors = 'Gene search is temporarily down';
-          } else {
+        Gene.search(qparams,
+          function(data) {
+            for (var i = 0; i < data.length; i++) {
+              var query = data[i].search;
+              if (!$scope.searchResults[query]) {
+                // If search term didn't already exist
+                $scope.searchResults[query] = data[i]; // add it to the results
+              }
+            }
             $scope.errors = null;
+            $scope.loadingSearchResults = false;
+          },
+
+          function(responseObject, responseHeaders) {
+            $scope.errors = 'Gene search is temporarily down';
+            $scope.loadingSearchResults = false;
           }
-        });
-      }
-    ],
-    replace: true,
-    restrict: 'E',
+        );
+      };
+    }],
     scope: {
-      query: '@'
+      searchResults: '=',
+      queries: '='
     },
+    restrict: 'E',
     templateUrl: 'gene/searchMany/gene-search-form.tpl.html'
   };
 }])
 
 // Directive for table containing search results
-.directive('searchResultTable', ['SearchResults', 'CommonGeneFuncts',
-  function(SearchResults, CommonGeneFuncts) {
-    return {
-      controller: ['$scope', 'SearchResults', 'SelectedGenesFactory',
-        function($scope, SearchResults, SelectedGenesFactory) {
-          $scope.currentPage = 1;
-          $scope.itemsPerPage = 10;
-          $scope.totalResults = 0;
-          $scope.maxSize = 10;
-          $scope.resultsForPage = [];
-          $scope.searchResults = SearchResults.getSearchResults();
-          $scope.loadingSearchResults = false;
+.directive('searchResultTable', [function() {
+  return {
+    controller: ['$scope', 'SelectedGenesFactory',
+      function($scope, SelectedGenesFactory) {
+        $scope.currentPage = 1;
+        $scope.itemsPerPage = 10;
+        $scope.totalResults = 0;
+        $scope.maxSize = 10;
+        $scope.resultsForPage = [];
 
-          $scope.addAllNonAmbiguous = function() {
-            // Function to automatically add all genes that
-            // only have one search result.
-            var searchResults = SearchResults.getSearchResults();
+        $scope.updatePageGenes = function() {
+          var begin = ($scope.currentPage - 1) * $scope.itemsPerPage;
+          var end = begin + $scope.itemsPerPage;
+          return $scope.queries.slice(begin, end);
+        };
 
-            var searchResultKeys = Object.keys(searchResults);
+        $scope.addAllNonAmbiguous = function() {
+          // Function to automatically add all genes that
+          // only have one search result.
+          for (var i = 0; i < $scope.queries.length; i++) {
+            var key = $scope.queries[i];
+            var results = $scope.searchResults[key];
 
-            for (var i = 0; i < searchResultKeys.length; i++) {
-              var key = searchResultKeys[i];
-              var results = searchResults[key];
-
-              if (results.found.length <= 1) {
-                if (results.found[0]) {
-                  SelectedGenesFactory.addGene(results.found[0]);
-                  SearchResults.remove(key);
-                }
+            if (results.found.length <= 1) {
+              if (results.found[0]) {
+                SelectedGenesFactory.addGene(results.found[0]);
+                delete $scope.searchResults[key];
               }
             }
-          };
+          }
+        };
 
-          $scope.removeNotFound = function() {
-            // Function to get rid of all the queries that returned no results.
-            var searchResults = SearchResults.getSearchResults();
+        $scope.removeNotFound = function() {
+          // Function to get rid of all the queries that returned no results.
+          for (var i = 0; i < $scope.queries.length; i++) {
+            var key = $scope.queries[i];
+            var results = $scope.searchResults[key];
 
-            var searchResultKeys = Object.keys(searchResults);
-
-            for (var i = 0; i < searchResultKeys.length; i++) {
-              var key = searchResultKeys[i];
-              var results = searchResults[key];
-
-              if (results.found.length === 0) {
-                SearchResults.remove(key);
-              }
+            if (results.found.length === 0) {
+              delete $scope.searchResults[key];
             }
-          };
-        }
-      ],
+          }
+        };
 
-      link: function(scope, element, attr) {
-        scope.$on('results.update', function() {
-          scope.totalResults = SearchResults.size();
-          scope.resultsForPage = CommonGeneFuncts.updatePageGenes(
-            scope, SearchResults);
+        $scope.$watchCollection('searchResults', function() {
+          $scope.queries = Object.keys($scope.searchResults);
+          $scope.totalResults = $scope.queries.length;
+          $scope.resultsForPage = $scope.updatePageGenes();
         });
 
-        scope.$on('results.loadingSearchResults', function() {
-          scope.loadingSearchResults = true;
-        });
-
-        scope.$on('results.searchResultsReturned', function() {
-          scope.loadingSearchResults = false;
-        });
 
         // Watch for page changes and update
-        scope.$watch('currentPage', function() {
-          scope.resultsForPage = CommonGeneFuncts.updatePageGenes(
-            scope, SearchResults);
+        $scope.$watch('currentPage', function() {
+          $scope.resultsForPage = $scope.updatePageGenes();
         });
-      },
-      replace: true,
-      restrict: 'E',
-      scope: true,
-      templateUrl: 'gene/searchMany/search-result-table.tpl.html'
-    };
-  }
-])
-
-// A noResultButton is shown next to query tokens that found no matches
-// for a gene in the database. Clicking this button removes the query token
-// from the list of search results.
-.directive('noResultButton', [function() {
-  return {
-    controller: ['$scope', 'SearchResults', function($scope, SearchResults) {
-      $scope.removeGene = function() {
-        SearchResults.remove($scope.query);
-      };
-    }],
-    replace: true,
-    restrict: 'E',
+      }
+    ],
     scope: {
-      query: '@'
+      searchResults: '=',
+      queries: '='
     },
-    templateUrl: 'gene/searchMany/no-result-button.tpl.html'
+    restrict: 'E',
+    templateUrl: 'gene/searchMany/search-result-table.tpl.html'
   };
 }])
 
@@ -264,94 +189,80 @@ angular.module('adage.gene.searchMany', [
 .directive('geneResultButton', [function() {
   return {
     controller: [
-      '$scope', 'SearchResults', 'SelectedGenesFactory', 'CommonGeneFuncts',
-      function($scope, SearchResults, SelectedGenesFactory, CommonGeneFuncts) {
+      '$scope', 'SelectedGenesFactory', 'CommonGeneFuncts',
+      function($scope, SelectedGenesFactory, CommonGeneFuncts) {
         $scope.geneLabel = CommonGeneFuncts.getGeneLabel($scope.gene);
 
         $scope.addToSelectedGenes = function() {
           SelectedGenesFactory.addGene($scope.gene);
-          SearchResults.remove($scope.query);
+          delete $scope.searchResults[$scope.query];
         };
       }
     ],
-    restrict: 'E',
+    scope: {
+      query: '@',
+      gene: '=',
+      searchResults: '=',
+      queries: '='
+    },
     replace: true,
+    restrict: 'E',
     templateUrl: 'gene/searchMany/gene-result-button.tpl.html'
-  };
-}])
-
-// Directive for button to get more options, should get
-// next page of search results for this query from the server
-.directive('moreResultButton', [function() {
-  return {
-    controller: ['$scope', 'SearchResults', 'CommonGeneFuncts',
-      function($scope, SearchResults, CommonGeneFuncts) {
-        $scope.nextGenePage = function() {
-          $scope.page = $scope.pageDict.page + 1;
-          CommonGeneFuncts.updatePageNumbers($scope);
-        };
-      }
-    ],
-    replace: true,
-    restrict: 'E',
-    scope: false,
-    templateUrl: 'gene/searchMany/more-result-button.tpl.html'
-  };
-}])
-
-// Directive for button to get previous search results
-.directive('previousResultButton', [function() {
-  return {
-    controller: ['$scope', 'SearchResults', 'CommonGeneFuncts',
-      function($scope, SearchResults, CommonGeneFuncts) {
-        $scope.previousGenePage = function() {
-          $scope.page = $scope.pageDict.page - 1;
-          CommonGeneFuncts.updatePageNumbers($scope);
-        };
-      }
-    ],
-    replace: true,
-    restrict: 'E',
-    scope: false,
-    templateUrl: 'gene/searchMany/previous-result-button.tpl.html'
   };
 }])
 
 // Directive for search buttonset, has buttons for handling
 // search results
-.directive('searchButtonset', ['SearchResults', function(SearchResults) {
+.directive('searchButtonset', [function() {
   return {
     controller: function($scope) {
-      $scope.pageDict = {page: 1};
-      $scope.results = SearchResults.getQueryResults($scope.query);
-      $scope.found = $scope.results.found;
+      $scope.buttonPage = 1;
+      $scope.queryResults = $scope.searchResults[$scope.query];
+      $scope.found = $scope.queryResults.found;
 
       var begin;
       var end;
-      $scope.updatePage = function(page) {
+      $scope.updateButtonPage = function(page) {
         // Number of gene results that appear in each
         // 'page' of the search button-set.
         var genesPerPage = 3;
 
         begin = (page - 1) * genesPerPage;
         end = begin + genesPerPage;
-        $scope.pageGenes = $scope.found.slice(begin, end);
+        $scope.buttonPageGenes = $scope.found.slice(begin, end);
 
-        // Boolean, telling whether or not there is (are) any
-        // additional results page(s)
-        $scope.additionalPages = (end < $scope.found.length);
+        // Boolean, telling whether or not there are any
+        // additional results page
+        $scope.additionalButtonPages = (end < $scope.found.length);
 
-        // Boolean, telling whether or not there is (are) any
-        // previous results page(s)
-        $scope.previousPages = (begin > 0);
+        // Boolean, telling whether or not there are any
+        // previous results page
+        $scope.previousButtonPages = (begin > 0);
       };
-      $scope.updatePage($scope.pageDict.page);
+      $scope.updateButtonPage($scope.buttonPage);
+
+      // Clicking this button removes the query token
+      // from the list of search results.
+      $scope.removeGene = function() {
+        delete $scope.searchResults[$scope.query];
+      };
+
+      $scope.previousGenePage = function() {
+        $scope.buttonPage -= 1;
+        $scope.updateButtonPage($scope.buttonPage);
+      };
+
+      $scope.nextGenePage = function() {
+        $scope.buttonPage += 1;
+        $scope.updateButtonPage($scope.buttonPage);
+      };
+    },
+    scope: {
+      query: '@',
+      queries: '=',
+      searchResults: '='
     },
     restrict: 'E',
-    replace: true,
-    scope: {
-      query: '='
-    },
     templateUrl: 'gene/searchMany/search-buttonset.tpl.html'
   };
 }])
