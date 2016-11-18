@@ -2,14 +2,16 @@
   <button class="btn btn-default" ng-click="removeGene()">
     <i class="fa fa-minus-square"></i> None
   </button>
+
   <button class="btn btn-default" ng-if="previousButtonPages"
     ng-click="previousGenePage()">
       <i class="fa fa-angle-double-left"></i> Previous
   </button>
 
-  <gene-result-button query="{{query}}" search-results="searchResults"
-    queries="queries" ng-repeat="gene in buttonPageGenes" gene="gene">
-  </gene-result-button>
+  <button class="btn btn-default" uib-tooltip="{{ gene.description }}"
+    ng-repeat="gene in buttonPageGenes" ng-click="addToSelectedGenes(gene)">
+      {{ getGeneLabel(gene) }}
+  </button>
 
   <button class="btn btn-default" ng-click="nextGenePage()"
     ng-if="additionalButtonPages">

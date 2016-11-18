@@ -184,79 +184,63 @@ angular.module('adage.gene.searchMany', [
   };
 }])
 
-// Directive for button with a gene, should add gene
-// and remove entire row from list
-.directive('geneResultButton', [function() {
-  return {
-    controller: [
-      '$scope', 'SelectedGenesFactory', 'CommonGeneFuncts',
-      function($scope, SelectedGenesFactory, CommonGeneFuncts) {
-        $scope.geneLabel = CommonGeneFuncts.getGeneLabel($scope.gene);
-
-        $scope.addToSelectedGenes = function() {
-          SelectedGenesFactory.addGene($scope.gene);
-          delete $scope.searchResults[$scope.query];
-        };
-      }
-    ],
-    scope: {
-      query: '@',
-      gene: '=',
-      searchResults: '=',
-      queries: '='
-    },
-    replace: true,
-    restrict: 'E',
-    templateUrl: 'gene/searchMany/gene-result-button.tpl.html'
-  };
-}])
-
 // Directive for search buttonset, has buttons for handling
 // search results
 .directive('searchButtonset', [function() {
   return {
-    controller: function($scope) {
-      $scope.buttonPage = 1;
-      $scope.queryResults = $scope.searchResults[$scope.query];
-      $scope.found = $scope.queryResults.found;
+    controller: ['$scope', 'SelectedGenesFactory', 'CommonGeneFuncts',
+      function($scope, SelectedGenesFactory, CommonGeneFuncts) {
+        $scope.buttonPage = 1;
+        $scope.queryResults = $scope.searchResults[$scope.query];
+        $scope.found = $scope.queryResults.found;
 
-      var begin;
-      var end;
-      $scope.updateButtonPage = function(page) {
-        // Number of gene results that appear in each
-        // 'page' of the search button-set.
-        var genesPerPage = 3;
+        var begin;
+        var end;
+        $scope.updateButtonPage = function(page) {
+          // Number of gene results that appear in each
+          // 'page' of the search button-set.
+          var genesPerPage = 3;
 
-        begin = (page - 1) * genesPerPage;
-        end = begin + genesPerPage;
-        $scope.buttonPageGenes = $scope.found.slice(begin, end);
+          begin = (page - 1) * genesPerPage;
+          end = begin + genesPerPage;
+          $scope.buttonPageGenes = $scope.found.slice(begin, end);
 
-        // Boolean, telling whether or not there are any
-        // additional results page
-        $scope.additionalButtonPages = (end < $scope.found.length);
+          // Boolean, telling whether or not there are any
+          // additional results page
+          $scope.additionalButtonPages = (end < $scope.found.length);
 
-        // Boolean, telling whether or not there are any
-        // previous results page
-        $scope.previousButtonPages = (begin > 0);
-      };
-      $scope.updateButtonPage($scope.buttonPage);
-
-      // Clicking this button removes the query token
-      // from the list of search results.
-      $scope.removeGene = function() {
-        delete $scope.searchResults[$scope.query];
-      };
-
-      $scope.previousGenePage = function() {
-        $scope.buttonPage -= 1;
+          // Boolean, telling whether or not there are any
+          // previous results page
+          $scope.previousButtonPages = (begin > 0);
+        };
         $scope.updateButtonPage($scope.buttonPage);
-      };
 
-      $scope.nextGenePage = function() {
-        $scope.buttonPage += 1;
-        $scope.updateButtonPage($scope.buttonPage);
-      };
-    },
+        // Clicking this button removes the query token
+        // from the list of search results.
+        $scope.removeGene = function() {
+          delete $scope.searchResults[$scope.query];
+        };
+
+        $scope.previousGenePage = function() {
+          $scope.buttonPage -= 1;
+          $scope.updateButtonPage($scope.buttonPage);
+        };
+
+        $scope.nextGenePage = function() {
+          $scope.buttonPage += 1;
+          $scope.updateButtonPage($scope.buttonPage);
+        };
+
+        $scope.getGeneLabel = function(gene) {
+          return CommonGeneFuncts.getGeneLabel(gene);
+        };
+
+        $scope.addToSelectedGenes = function(gene) {
+          SelectedGenesFactory.addGene(gene);
+          delete $scope.searchResults[$scope.query];
+        };
+      }
+    ],
     scope: {
       query: '@',
       queries: '=',
