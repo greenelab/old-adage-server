@@ -1,5 +1,5 @@
 /**
- * "adage.gene.node" module.
+ * "adage.node" module.
  */
 
 angular.module('adage.node', [
