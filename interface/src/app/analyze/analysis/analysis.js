@@ -128,8 +128,11 @@ AnnotationType, SampleBin) {
       }
     ],
 
+    // These default axes are not helpful, so we make our own in marks below.
+    // x-axis: there are so many nodes, the labels overlap each other
+    // y-axis: can only seem to label using data from the 'samples' scale,
+    //         which now uses internal _id -- not useful information for users
     // 'axes': [
-    //   // these generated axes are useless, so we make them in marks below
     //   {"type": "x", "scale": "nodes", "title": "Node ID"},
     //   {'type': 'y', 'scale': 'samples', 'title': 'sample'}
     // ],
