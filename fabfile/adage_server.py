@@ -135,9 +135,6 @@ def init_setup_and_check():
 
 def bootstrap_database():
     """ Run a migrate to bootstrap the database """
-    # FIXME we can eliminate the first migrate here by purging from source repo
-    run('python manage.py migrate')
-    run('python manage.py makemigrations')
     run('python manage.py migrate')
 
 
