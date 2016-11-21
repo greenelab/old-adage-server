@@ -1,0 +1,36 @@
+<h1>ADAGE: Node Information</h1>
+
+<div ng-if="!ctrl.statusMessage">
+  <h3>{{ctrl.name}}</h3>
+  <h4>(Model: {{ctrl.mlmodel}})</h4>
+  <hr>
+  <div class="container">
+    <div class="row">
+      <div class="col-xs-6">
+        <h4><font color="red">
+            UPCOMING: Pathways with statistical enrichment
+        </font></h4>
+      </div>
+
+      <div class="col-xs-6">
+        <h4><font color="red">
+            UPCOMING: Experiments with highest range
+        </font></h4>
+      </div>
+    </div>
+    <hr>
+    <div class="row">
+      <div class="col-xs-6">
+        <high-weight-genes node-id="ctrl.id"></high-weight-genes>
+      </div>
+
+      <div class="col-xs-6">
+        <h4><font color="red">
+            UPCOMING: Most extreme samples
+        </font></h4>
+      </div>
+    </div>
+  </div>
+</div>
+
+<h3 class="text-warning" ng-bind="ctrl.statusMessage"></h3>

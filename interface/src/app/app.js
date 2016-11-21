@@ -8,6 +8,7 @@ angular.module('adage', [
   'adage.tribe_client',
   'adage.gene.searchMany',
   'adage.gene.network',
+  'adage.node',
   'ui.router',
   'ngResource'
 ])
