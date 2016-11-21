@@ -9,6 +9,7 @@ engines:
         python:
           mass_threshold: 50
         javascript:
+          mass_threshold: 50
   eslint:
     enabled: true
     config:

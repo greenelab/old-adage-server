@@ -4,12 +4,11 @@
 
 angular.module('adage.gene.network', [
   'ui.router',
-  'placeholders',
   'ui.bootstrap',
   'rzModule'
 ])
 
-.config(function config($stateProvider) {
+.config(['$stateProvider', function($stateProvider) {
   $stateProvider.state('gene_network', {
     url: '/gene_network/?genes&mlmodel',
     views: {
@@ -20,7 +19,7 @@ angular.module('adage.gene.network', [
     },
     data: {pageTitle: 'Gene Network'}
   });
-})
+}])
 
 .factory('EdgeService', ['$resource', function($resource) {
   return $resource('/api/v0/edge/');
