@@ -16,27 +16,28 @@ angular.module('adage.analyze.sampleBin', [
 .factory('SampleBin', ['$log', '$cacheFactory', '$q', 'Sample', 'Activity',
 function($log, $cacheFactory, $q, Sample, Activity) {
   var SampleBin = {
-    samples: [],
-    heatmapData: {},
+    heatmapData: {
+      samples: []
+    },
     sampleData: {},
     sampleCache: $cacheFactory('sample'),
     activityCache: $cacheFactory('activity'),
 
     addSample: function(id) {
-      if (this.samples.indexOf(+id) !== -1) {
+      if (this.heatmapData.samples.indexOf(+id) !== -1) {
         // quietly ignore the double-add
         $log.warn('SampleBin.addSample: ' + id +
             ' already in the sample list; ignoring.');
       } else {
-        this.samples.push(+id);
+        this.heatmapData.samples.push(+id);
         // TODO when cache generalized: start pre-fetching sample data here
       }
     },
 
     removeSample: function(id) {
-      var pos = this.samples.indexOf(+id);
-      this.samples.splice(pos, 1);
-      this.rebuildHeatmapActivity(this.samples);
+      var pos = this.heatmapData.samples.indexOf(+id);
+      this.heatmapData.samples.splice(pos, 1);
+      this.rebuildHeatmapActivity(this.heatmapData.samples);
     },
 
     addExperiment: function(sampleIdList) {
@@ -55,7 +56,7 @@ function($log, $cacheFactory, $q, Sample, Activity) {
 
     hasItem: function(searchItem) {
       if (searchItem.item_type === 'sample') {
-        if (this.samples.indexOf(+searchItem.pk) !== -1) {
+        if (this.heatmapData.samples.indexOf(+searchItem.pk) !== -1) {
           return true;
         } else {
           return false;
@@ -64,7 +65,8 @@ function($log, $cacheFactory, $q, Sample, Activity) {
         // what we want to know, in the case of an experiment, is 'are
         // all of the samples from this experiment already added?'
         for (var i = 0; i < searchItem.related_items.length; i++) {
-          if (this.samples.indexOf(+searchItem.related_items[i]) === -1) {
+          if (this.heatmapData.samples.indexOf(
+              +searchItem.related_items[i]) === -1) {
             return false;
           }
         }
@@ -80,7 +82,7 @@ function($log, $cacheFactory, $q, Sample, Activity) {
     },
 
     getSampleObjects: function() {
-      return this.samples.map(function(val, i, arr) {
+      return this.heatmapData.samples.map(function(val, i, arr) {
         return this.getSampleData(val) || {id: val};
       }, this);
     },
@@ -154,7 +156,7 @@ function($log, $cacheFactory, $q, Sample, Activity) {
       // retrieve activity data for heatmap to display
       // FIXME restore query progress messages (see rebuildHeatmapActivity)
       // respObj.queryStatus = 'Retrieving sample activity...';
-      this.rebuildHeatmapActivity(this.samples);
+      this.rebuildHeatmapActivity(this.heatmapData.samples);
     }
   };
 

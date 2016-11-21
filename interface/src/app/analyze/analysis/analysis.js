@@ -25,14 +25,11 @@ AnnotationType, SampleBin) {
   $scope.sortableOptions = {
     containerPositioning: 'relative',
     placeholder: '<tr style="display: table-row;"></tr>'
-    // TODO: when reordering implemented in heatmap, need to trigger here
-    // orderChanged: function(event) {
-    // }
   };
 
   // Vega objects
   $scope.heatmapSpec = {
-    // TODO compute these constants: w=numNodes*4, h=numSamples*12
+    // TODO dynamic layout: compute constants w=numNodes*4, h=numSamples*12
     'width': 2400,
     'height': 200,
     'padding': {'left': 50, 'right': 10, 'top': 10, 'bottom': 20},
@@ -46,6 +43,9 @@ AnnotationType, SampleBin) {
           // we want to show "activity level" so ignore sign on values
           {'type': 'formula', 'field': 'normval', 'expr': 'abs(datum.value)'}
         ]
+      }, {
+        // this dataset "streamed" in via ngVega from heatmapData
+        'name': 'samples'
       }, {
         // this dataset "streamed" in via ngVega from heatmapData
         'name': 'sample_objects'
@@ -77,10 +77,10 @@ AnnotationType, SampleBin) {
             'expr': 'datum.normval - datum.node_summary.min_normval'
           }, {
             'type': 'lookup',
-            'on': 'sample_objects',
-            'onKey': 'id',
+            'on': 'samples',
+            'onKey': 'data',
             'keys': ['sample'],
-            'as': ['sample_object']
+            'as': ['sample_order']
           }
         ]
       }
@@ -95,7 +95,11 @@ AnnotationType, SampleBin) {
       }, {
         'name': 'samples',
         'type': 'ordinal',
-        'domain': {'data': 'activity_normalized', 'field': 'sample'},
+        'domain': {
+          'data': 'activity_normalized',
+          'field': 'sample_order._id',
+          'sort': true
+        },
         'range': 'height'
       }, {
         'name': 'minvals',
@@ -124,21 +128,14 @@ AnnotationType, SampleBin) {
       }
     ],
 
-    'axes': [
-      // this generated x-axis is useless, so we make one in marks below
-      // {"type": "x", "scale": "nodes", "title": "Node ID"},
-      {
-        'type': 'y', 'scale': 'samples', 'title': 'sample'
-        // FIXME vega doesn't like either of these attempts at labels
-        // "properties": {
-        //   "labels": {
-        //     // "text": {"field": "sample_object.ml_data_source"}
-        //     "text": {"template": "test
-        // {{datum.data.sample_object.ml_data_source}}"}
-        //   }
-        // }
-      }
-    ],
+    // These default axes are not helpful, so we make our own in marks below.
+    // x-axis: there are so many nodes, the labels overlap each other
+    // y-axis: can only seem to label using data from the 'samples' scale,
+    //         which now uses internal _id -- not useful information for users
+    // 'axes': [
+    //   {"type": "x", "scale": "nodes", "title": "Node ID"},
+    //   {'type': 'y', 'scale': 'samples', 'title': 'sample'}
+    // ],
 
     // FIXME the legend is broken due to malformed SVG output
     // "legends": [{"fill": "s", "values": [0.0, 0.5, 1.0]}],
@@ -148,12 +145,12 @@ AnnotationType, SampleBin) {
         'type': 'text',
         'properties': {
           'enter': {
-            // TODO compute these constants also (see above)
+            // TODO dynamic layout: compute these constants also (see above)
+            'text': {'value': 'node'},
             'x': {'value': 1200},
             'y': {'value': 220},
             'fontWeight': {'value': 'bold'},
-            'fill': {'value': 'black'},
-            'text': {'value': 'node'}
+            'fill': {'value': 'black'}
           }
         }
       }, {
@@ -163,9 +160,27 @@ AnnotationType, SampleBin) {
           'enter': {
             'x': {'scale': 'nodes', 'field': 'node'},
             'width': {'scale': 'nodes', 'band': true},
-            'y': {'scale': 'samples', 'field': 'sample'},
+            'y': {'scale': 'samples', 'field': 'sample_order._id'},
             'height': {'scale': 'samples', 'band': true},
             'fill': {'scale': 's', 'field': 'normval'}
+          }
+        }
+      }, {
+        'type': 'text',
+        'from': {'data': 'samples'},
+        // TODO dynamic layout: adjust these "magic numbers" automatically
+        'properties': {
+          'update': {
+            'text': {'field': 'data'},
+            'x': {'value': -5},
+            'y': {
+              'scale': 'samples',
+              'field': '_id',
+              'offset': 18
+            },
+            'align': {'value': 'right'},
+            'fontWeight': {'value': 'bold'},
+            'fill': {'value': 'black'}
           }
         }
       }
@@ -183,8 +198,9 @@ AnnotationType, SampleBin) {
   };
 
   // populate sample details
-  for (var i = 0; i < SampleBin.samples.length; i++) {
-    SampleBin.getSampleDetails(SampleBin.samples[i]);
+  // FIXME implement this loop as a method on SampleBin? (prob. with caching)
+  for (var i = 0; i < SampleBin.heatmapData.samples.length; i++) {
+    SampleBin.getSampleDetails(SampleBin.heatmapData.samples[i]);
   }
 
   SampleBin.getActivityForSampleList($scope.analysis);
