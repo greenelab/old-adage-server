@@ -154,41 +154,41 @@ aeruginosa_ that we use for "bootstrapping" our database. The commands to load
 the data are scripted in our `fabric` deployment scripts. If you choose, you
 may run those commands at this point using the following steps:
 
-1.  [Install `fabric`](http://www.fabfile.org), the tool we use for scripting
-    deployment steps:
+1. [Install `fabric`](http://www.fabfile.org), the tool we use for scripting
+   deployment steps:
 
-    ```shell
-    > pip install fabric
-    ```
+   ```shell
+   > pip install fabric
+   ```
 
-1.  Ensure your virtual environment path is set in `config.py`. If the path to
-    the virtual environment you created above matches the `virt_env` specified
-    in `config.py`, you are all set (by default, the `DEV_CONFIG` will inherit
-    that field from `AWS_CONFIG`). If not, you will need to add this setting to
-    your `DEV_CONFIG` because the command in the next step makes use of it.
+1. Ensure your virtual environment path is set in `config.py`. If the path to
+   the virtual environment you created above matches the `virt_env` specified
+   in `config.py`, you are all set (by default, the `DEV_CONFIG` will inherit
+   that field from `AWS_CONFIG`). If not, you will need to add this setting to
+   your `DEV_CONFIG` because the command in the next step makes use of it.
 
-    The command below also uses the `django_dir` setting. If you have specified
-    your `home_dir` and set up your clone of the repository in a directory
-    named `adage_server` within the `home_dir`, then this will match the
-    default configuration. If not, you will also need to specify the
-    `django_dir` explicitly in your `DEV_CONFIG`.
+   The command below also uses the `django_dir` setting. If you have specified
+   your `home_dir` and set up your clone of the repository in a directory
+   named `adage_server` within the `home_dir`, then this will match the
+   default configuration. If not, you will also need to specify the
+   `django_dir` explicitly in your `DEV_CONFIG`.
 
-1.  Run the following commands from your local clone of
-    [the adage-server repository](https://github.com/greenelab/adage-server):
+1. Run the following commands from your local clone of
+   [the adage-server repository](https://github.com/greenelab/adage-server):
 
-    ```shell
-    > cd <your adage-server directory>
-    > fab adage_server.init_instance:<user>@<hostname>
-    ```
+   ```shell
+   > cd <your adage-server directory>
+   > fab adage_server.init_instance:<user>@<hostname>
+   ```
 
-    Fabric is configured to run commands on a remote server. Specify a host
-    name or IP address for the `hostname` you are setting up (you can just
-    specify `localhost` if you are configuring the local account and you have
-    an ssh server running) and specify the `user` with the clone of the
-    repository.
+   Fabric is configured to run commands on a remote server. Specify a host
+   name or IP address for the `hostname` you are setting up (you can just
+   specify `localhost` if you are configuring the local account and you have
+   an ssh server running) and specify the `user` with the clone of the
+   repository.
 
-    Fabric will execute commands to populate the database and rebuild the
-    search index automatically.
+   Fabric will execute commands to populate the database and rebuild the
+   search index automatically.
 
 This is a lengthy process that will take over an hour to retrieve and load data
 to initialize all models in the `adage-server` with data from our _Pseudomonas
