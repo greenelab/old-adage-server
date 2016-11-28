@@ -135,15 +135,14 @@ def init_setup_and_check():
 
 def bootstrap_database():
     """ Run a migrate to bootstrap the database """
-    # FIXME we can eliminate the first migrate here by purging from source repo
-    run('python manage.py migrate')
-    run('python manage.py makemigrations')
     run('python manage.py migrate')
 
 
 def create_admin_user():
     """ Create a default django administrator for the site """
-    # FIXME: need to figure out how to set a default password non-interactively
+    # NOTE: this creates the user, but does not set a password, which means
+    # that user cannot login. To assign a password for the user, use the
+    # following command: python manage.py changepassword {django_super}
     run(('python manage.py createsuperuser '
          '--username={django_super} '
          '--email={django_email} --noinput').format(**CONFIG))
@@ -162,15 +161,38 @@ def import_data_and_index():
     file extracted from the get_pseudomonas repository) and
     import_activity with sample data from CONFIG['data']
     """
+    # import annotations
     run('python manage.py import_data "%s"' %
         CONFIG['data']['annotation_file'])
-    rebuild_search_index()
+    # define organism and ml_model
     run('python manage.py organisms_create_or_update --taxonomy_id=208964 '
         '--scientific_name="Pseudomonas aeruginosa" '
-        '--common_name="P. aeruginosa"')
+        '--common_name="Pseudomonas aeruginosa"')
     run('python manage.py add_ml_model "Ensemble ADAGE 300" 208964')
+    # import activity data
     run('python manage.py import_activity "%s" "Ensemble ADAGE 300"' %
         CONFIG['data']['activity_file'])
+    # define a CrossRefDB for PseudoCap
+    run('python manage.py genes_add_xrdb --name=PseudoCap '
+        '--URL=http://www.pseudomonas.com/getAnnotation.do?locusID=_REPL_')
+    # retrieve data file for PAO1 genes and load it
+    run('wget -qO - "%s" | zcat > %s' %
+        (CONFIG['data']['pao1_genes_url'], CONFIG['data']['pao1_genes_file']))
+    run((
+        'python manage.py genes_load_geneinfo --geneinfo_file="%s" '
+        '--taxonomy_id=208964 --systematic_col=3 --symbol_col=2 '
+        '--put_systematic_in_xrdb=PseudoCap') %
+        CONFIG['data']['pao1_genes_file'])
+    run('wget -qO - "%s" | zcat > %s' % (CONFIG['data']['gene_history_url'],
+        CONFIG['data']['gene_history_file']))
+    run(('python manage.py genes_load_gene_history %s 208964 '
+        '--tax_id_col=1 --discontinued_id_col=3 --discontinued_symbol_col=4') %
+        CONFIG['data']['gene_history_file'])
+    run('python manage.py import_gene_network  %s "Ensemble ADAGE 300"' %
+        CONFIG['data']['gene_network_file'])
+    run('./manage.py import_node_gene_network %s "Ensemble ADAGE 300"' %
+        CONFIG['data']['node_gene_network_file'])
+    rebuild_search_index()
 
 
 @task(alias='idb')

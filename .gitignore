@@ -8,3 +8,5 @@ interface/bin/
 interface/node_modules/
 interface/vendor/
 adage/adage/config.py
+data/gene_history
+data/*.gene_info
