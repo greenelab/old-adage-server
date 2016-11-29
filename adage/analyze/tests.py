@@ -15,8 +15,8 @@ from organisms.models import Organism
 from genes.models import Gene
 from analyze.models import Experiment, Sample, AnnotationType, SampleAnnotation
 from analyze.models import MLModel, Node, Activity, Edge, Participation
-from analyze.management.commands.import_data import bootstrap_database, \
-    JSON_CACHE_FILE_NAME
+from analyze.management.commands.import_data import (
+    bootstrap_database, JSON_CACHE_FILE_NAME)
 from datetime import datetime
 from tastypie.test import ResourceTestCaseMixin
 from fixtureless import Factory
@@ -381,18 +381,18 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         # Create relationships between Sample and Experiment
         for s in Sample.objects.all():
             s.experiments.add(Experiment.objects.all()[0])
-        self.get_experiment_URI = self.baseURI + 'sample/' + \
-            str(self.random_object(Sample).id) + \
-            '/get_experiments/'
+        self.get_experiment_URI = (self.baseURI + 'sample/' +
+                                   str(self.random_object(Sample).id) +
+                                   '/get_experiments/')
 
         # Create activity records
         self.node_counter = 50
         self.create_activities(self.node_counter)
 
-        self.activityURI = self.baseURI + "activity/" + \
-            str(self.random_object(Activity).id) + "/"
-        self.activity_sample_URI = self.baseURI + "activity/?sample=" + \
-            str(self.random_object(Sample).id)
+        self.activityURI = (self.baseURI + "activity/" +
+                            str(self.random_object(Activity).id) + "/")
+        self.activity_sample_URI = (self.baseURI + "activity/?sample=" +
+                                    str(self.random_object(Sample).id))
 
         # Depending on the numbers of genes and edges we want to create
         # in the test, ModelsTestCase.create_edges() may take a few
@@ -793,3 +793,32 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         self.assertEqual(api_result, Node.objects.count())
 
         self.call_non_get_API(uri)  # Test non-get methods too.
+
+    def test_node_filter_in_experiment(self):
+        """
+        Test the "node" filter in ExperimentResource.
+        """
+        # Create a few more random experiments:
+        num_extra_exp = 3
+        factory.create(Experiment, num_extra_exp)
+        self.assertEqual(Experiment.objects.count(), num_extra_exp + 1)
+        # Build relationship between the first sample and the last experiment:
+        Sample.objects.first().experiments.add(Experiment.objects.last())
+
+        # Confirm that a random node is related to both the experiment that is
+        # created from ModelsTestCase.experiment_data and the last experiment.
+        # (Note that when the database was initialized in setup(), the
+        # experiement that was created from ModelsTestCase.experiment_data was
+        # related to all samples, and each sample was related to all nodes.)
+        node = self.random_object(Node)
+        self.assertEqual(Activity.objects.filter(node=node).count(),
+                         self.s_counter)
+        node_filter_uri = "%sexperiment/?node=%s&format=json" % (
+            self.baseURI, node.id)
+        resp = self.api_client.get(node_filter_uri)
+        related_experiments = self.deserialize(resp)['objects']
+        self.assertEqual(len(related_experiments), 2)
+        self.assertEqual(related_experiments[0]['accession'],
+                         ModelsTestCase.experiment_data['accession'])
+        self.assertEqual(related_experiments[1]['accession'],
+                         Experiment.objects.last().accession)
