@@ -173,7 +173,7 @@ class Activity(models.Model):
     value = models.FloatField()
 
     def __unicode__(self):
-        return "Sample %s at Node %s with value %f" % (self.sample.sample,
+        return "Sample %s at Node %s with value %f" % (self.sample.name,
                                                        self.node.name,
                                                        self.value)
 
