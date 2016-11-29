@@ -99,6 +99,27 @@ class ExperimentResource(ModelResource):
     class Meta:
         queryset = Experiment.objects.all()
         allowed_methods = ['get']
+        filtering = {
+            'node': ('exact', ),  # See apply_filters().
+        }
+
+    def apply_filters(self, request, applicable_filters):
+        object_list = super(ExperimentResource, self).apply_filters(
+            request, applicable_filters)
+        node = request.GET.get('node', None)
+        if node:
+            # Catch ValueError exception that may be raised by int() below,
+            # and raise a customized BadRequest exception with more details.
+            try:
+                node_id = int(node)
+            except ValueError:
+                raise BadRequest("Invalid node ID: %s" % node)
+
+            samples = Activity.objects.filter(node=node_id).values('sample')
+            experiments = Sample.objects.filter(pk__in=samples).values(
+                'experiments').distinct()
+            object_list = object_list.filter(pk__in=experiments)
+        return object_list
 
 
 class AnnotationTypeResource(ModelResource):
