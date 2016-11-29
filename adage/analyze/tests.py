@@ -805,11 +805,11 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         # Build relationship between the first sample and the last experiment:
         Sample.objects.first().experiments.add(Experiment.objects.last())
 
-        # Confirm that a random node is related to both the experiment that is
+        # Confirm that a random node is related to both the experiment that was
         # created from ModelsTestCase.experiment_data and the last experiment.
         # (Note that when the database was initialized in setup(), the
-        # experiement that was created from ModelsTestCase.experiment_data was
-        # related to all samples, and each sample was related to all nodes.)
+        # experiment created from ModelsTestCase.experiment_data was related to
+        # all samples, and each sample was related to all nodes.)
         node = self.random_object(Node)
         self.assertEqual(Activity.objects.filter(node=node).count(),
                          self.s_counter)
