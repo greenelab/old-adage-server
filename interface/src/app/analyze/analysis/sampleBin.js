@@ -75,16 +75,40 @@ function($log, $cacheFactory, $q, Sample, Activity) {
     },
 
     getSampleData: function(id) {
-      return this.sampleData[id];
+      var sampleObj = this.sampleData[id];
+      sampleObj.activity = this.activityCache.get(id).map(
+        // distill .activity to an array of just "value"s
+        function(val, i, arr) {
+          return val.value;
+        }
+      );
+      return sampleObj;
     },
     setSampleData: function(id, obj) {
       this.sampleData[id] = obj;
+      // TODO need to pre-fetch activity into cache here?
+      //      (if so, also need to track promises)
     },
 
     getSampleObjects: function() {
+      // reformat data from heatmapData.activity to a form that can be used
+      // by hcluster.js: need a separate array of objects for each sample
       return this.heatmapData.samples.map(function(val, i, arr) {
         return this.getSampleData(val) || {id: val};
       }, this);
+    },
+    _getIDs: function(val, i, arr) {
+      return val.id;
+    },
+    testCluster: function() {
+      var samps = this.getSampleObjects();
+      var sampClust = hcluster()
+        .distance('euclidean')
+        .linkage('avg')
+        .verbose('true')
+        .posKey('activity')
+        .data(samps);
+      this.heatmapData.samples = sampClust.orderedNodes().map(this._getIDs);
     },
 
     getSampleDetails: function(pk) {
@@ -94,7 +118,6 @@ function($log, $cacheFactory, $q, Sample, Activity) {
         function success(responseObject, responseHeaders) {
           if (responseObject) {
             cbSampleBin.setSampleData(pk, responseObject);
-            // TODO need a trigger to update heatmapData?
           } else {
             $log.warn('Query for sample ' + pk + ' returned nothing.');
             // TODO user error reporting
