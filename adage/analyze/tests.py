@@ -813,8 +813,7 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         node = self.random_object(Node)
         self.assertEqual(Activity.objects.filter(node=node).count(),
                          self.s_counter)
-        node_filter_uri = "%sexperiment/?node=%s&format=json" % (
-            self.baseURI, node.id)
+        node_filter_uri = "%sexperiment/?node=%s" % (self.baseURI, node.id)
         resp = self.api_client.get(node_filter_uri)
         related_experiments = self.deserialize(resp)['objects']
         self.assertEqual(len(related_experiments), 2)
