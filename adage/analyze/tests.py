@@ -610,14 +610,14 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
 
     def test_activity_sample_get(self):
         """
-        Test GET method via "activity/?sample=<id>&format=json" API.
+        Test GET method via "activity/?sample=<id>" API.
         """
         self.call_get_API(self.activity_sample_URI)
 
     def test_activity_sample_non_get(self):
         """
         Test POST, PUT, PATCH and DELETE methods via
-        "activity/?sample=<id>&format=json" API.
+        "activity/?sample=<id>" API.
         """
         self.call_non_get_API(self.activity_sample_URI)
 
@@ -652,8 +652,7 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
 
     def test_edge_union(self):
         """
-        Test edge unions via
-        'api/v0/edge/?genes=<id1,id2,...>&format=json' API.
+        Test edge unions via 'api/v0/edge/?genes=<id1,id2,...>' API.
         """
         ModelsTestCase.create_edges(self.gene_counter, self.num_gene1,
                                     self.num_gene2)
@@ -664,8 +663,7 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         # The number of edges in the union of the first and last genes
         # should be: num_gene1 + num_gene2 - 1, "-1" is due to double
         # counting of the edge between the first and last genes.
-        uri = "%sedge/?genes=%s,%s&%s" % (self.baseURI, id1, id2,
-                                          "format=json")
+        uri = "%sedge/?genes=%s,%s" % (self.baseURI, id1, id2)
         resp = self.api_client.get(uri)
         resp = self.deserialize(resp)
         api_result = len(resp['objects'])
@@ -680,7 +678,7 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         # genes.
         random_genes = random.sample(Gene.objects.all(), 100)
         ids_str = ",".join([str(gene.id) for gene in random_genes])
-        uri = "%sedge/?genes=%s&%s" % (self.baseURI, ids_str, "format=json")
+        uri = "%sedge/?genes=%s" % (self.baseURI, ids_str)
         resp = self.api_client.get(uri)
         resp = self.deserialize(resp)
         api_result = len(resp['objects'])
@@ -692,7 +690,7 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
     def test_edge_intersection(self):
         """
         Test edge intersections via:
-        'api/v0/edge/?gene1__in=id1,id2,...&gene2__in=id1,id2,...&format=json'
+        'api/v0/edge/?gene1__in=id1,id2,...&gene2__in=id1,id2,...'
         API.
         """
         ModelsTestCase.create_edges(self.gene_counter, self.num_gene1,
@@ -702,9 +700,9 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         id1 = Gene.objects.first().id  # First gene
         id2 = Gene.objects.last().id   # Last gene
         ids_str = str(id1) + "," + str(id2)
-        uri = "%sedge/?gene1__in=%s&gene2__in=%s&%s" % (self.baseURI,
-                                                        ids_str, ids_str,
-                                                        "format=json")
+        uri = "%sedge/?gene1__in=%s&gene2__in=%s" % (
+            self.baseURI, ids_str, ids_str)
+
         resp = self.api_client.get(uri)
         resp = self.deserialize(resp)
         api_result = len(resp['objects'])
@@ -714,9 +712,8 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         # selected genes.
         random_genes = random.sample(Gene.objects.all(), 100)
         ids_str = ",".join([str(gene.id) for gene in random_genes])
-        uri = "%sedge/?gene1__in=%s&gene2__in=%s&%s" % (self.baseURI,
-                                                        ids_str, ids_str,
-                                                        "format=json")
+        uri = "%sedge/?gene1__in=%s&gene2__in=%s" % (
+            self.baseURI, ids_str, ids_str)
         resp = self.api_client.get(uri)
         resp = self.deserialize(resp)
         api_result = len(resp['objects'])
@@ -727,17 +724,16 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
     def test_edge_ordering(self):
         """
         Test acending order of edges via:
-        'api/v0/edge/?<field>=<value>&order_by=weight&format=json'
+        'api/v0/edge/?<field>=<value>&order_by=weight'
         and descending order of edges via:
-        'api/v0/edge/?<field>=<value>&order_by=-weight&format=json'
+        'api/v0/edge/?<field>=<value>&order_by=-weight'
         """
         ModelsTestCase.create_edges(self.gene_counter, self.num_gene1,
                                     self.num_gene2)
 
         # Test edges from the first gene.
         id1 = Gene.objects.first().id  # The first gene
-        uri = "%sedge/?gene1=%s&%s&%s" % (self.baseURI, id1,
-                                          "order_by=weight", "format=json")
+        uri = "%sedge/?gene1=%s&%s" % (self.baseURI, id1, "order_by=weight")
         resp = self.api_client.get(uri)
         resp = self.deserialize(resp)
         edges = resp['objects']
@@ -752,8 +748,7 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
 
         # Test edges to the last gene.
         id2 = Gene.objects.last().id
-        uri = "%sedge/?gene2=%s&%s&%s" % (self.baseURI, id2,
-                                          "order_by=-weight", "format=json")
+        uri = "%sedge/?gene2=%s&%s" % (self.baseURI, id2, "order_by=-weight")
 
         resp = self.api_client.get(uri)
         resp = self.deserialize(resp)
@@ -785,8 +780,8 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         ModelsTestCase.create_participations(13, 29)
         g1 = Gene.objects.first().id  # The first gene
         g2 = Gene.objects.last().id   # The last gene
-        uri = "%snode/?heavy_genes=%s,%s&%s" % (self.baseURI, g1, g2,
-                                                "format=json&limit=0")
+        uri = "%snode/?heavy_genes=%s,%s%s" % (
+            self.baseURI, g1, g2, "&limit=0")
         resp = self.api_client.get(uri)
         resp = self.deserialize(resp)
         api_result = len(resp['objects'])
