@@ -103,6 +103,12 @@ class ExperimentResource(ModelResource):
             'node': ('exact', ),  # See apply_filters().
         }
 
+    # Implementation of "node" filter, which allows the API to get the
+    # experiements that are related to a given node.  According to the
+    # database schema, "Node" model has many-to-many relationship with
+    # "Sample" model through "Activity" model; and "Sample" model has
+    # (implicit) many-to-many relationship with "Experiment" model
+    # through the "experiments" field in "Sample".
     def apply_filters(self, request, applicable_filters):
         object_list = super(ExperimentResource, self).apply_filters(
             request, applicable_filters)
