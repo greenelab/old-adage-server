@@ -17,7 +17,8 @@ angular.module('adage.analyze.sampleBin', [
 function($log, $cacheFactory, $q, Sample, Activity) {
   var SampleBin = {
     heatmapData: {
-      samples: []
+      samples: [],
+      nodeOrder: null
     },
     sampleData: {},
     sampleCache: $cacheFactory('sample'),
@@ -31,12 +32,14 @@ function($log, $cacheFactory, $q, Sample, Activity) {
       } else {
         this.heatmapData.samples.push(+id);
         // TODO when cache generalized: start pre-fetching sample data here
+        this.heatmapData.nodeOrder = null;  // reset to default order
       }
     },
 
     removeSample: function(id) {
       var pos = this.heatmapData.samples.indexOf(+id);
       this.heatmapData.samples.splice(pos, 1);
+      this.heatmapData.nodeOrder = null;  // reset to default order
       this.rebuildHeatmapActivity(this.heatmapData.samples);
     },
 
@@ -97,18 +100,26 @@ function($log, $cacheFactory, $q, Sample, Activity) {
         return this.getSampleData(val) || {id: val};
       }, this);
     },
-    _getIDs: function(val, i, arr) {
-      return val.id;
-    },
-    testCluster: function() {
-      var samps = this.getSampleObjects();
-      var sampClust = hcluster()
-        .distance('euclidean')
-        .linkage('avg')
-        .verbose('true')
-        .posKey('activity')
-        .data(samps);
-      this.heatmapData.samples = sampClust.orderedNodes().map(this._getIDs);
+    getNodeObjects: function() {
+      // reformat data from heatmapData.activity to a form that can be used
+      // by hcluster.js: need a separate array of objects for each node
+      var firstSampleNodes = this.activityCache.get(
+        this.heatmapData.samples[0]
+      );
+      var retval = firstSampleNodes.map(function(val, i, arr) {
+        var nodeObject = {
+          'id': val.node
+        };
+        nodeObject.activity = this.heatmapData.samples.map(
+          function(sampId, i, arr) {
+            // FIXME: counting on array order to match node order here
+            return this.activityCache.get(sampId)[nodeObject.id - 1].value;
+          },
+          this
+        );
+        return nodeObject;
+      }, this);
+      return retval;
     },
 
     getSampleDetails: function(pk) {
@@ -128,6 +139,26 @@ function($log, $cacheFactory, $q, Sample, Activity) {
           $log.error($scope.analysis.queryStatus);
         }
       );
+    },
+
+    _getIDs: function(val, i, arr) {
+      return val.id;
+    },
+    clusterSamples: function() {
+      var sampleClust = hcluster()
+        .distance('euclidean')
+        .linkage('avg')
+        .posKey('activity')
+        .data(this.getSampleObjects());
+      this.heatmapData.samples = sampleClust.orderedNodes().map(this._getIDs);
+    },
+    clusterNodes: function() {
+      var nodeClust = hcluster()
+        .distance('euclidean')
+        .linkage('avg')
+        .posKey('activity')
+        .data(this.getNodeObjects());
+      this.heatmapData.nodeOrder = nodeClust.orderedNodes().map(this._getIDs);
     },
 
     rebuildHeatmapActivity: function(samples) {
@@ -152,6 +183,14 @@ function($log, $cacheFactory, $q, Sample, Activity) {
         for (var i = 0; i < samples.length; i++) {
           var sampleActivity = cbSampleBin.activityCache.get(samples[i]);
           newActivity = newActivity.concat(sampleActivity);
+          // re-initialize nodeOrder, if needed
+          if (i === 0 && !cbSampleBin.heatmapData.nodeOrder) {
+            cbSampleBin.heatmapData.nodeOrder = sampleActivity.map(
+              function(val, i, arr) {
+                return val.node;
+              }
+            );
+          }
         }
         cbSampleBin.heatmapData.activity = newActivity;
       };

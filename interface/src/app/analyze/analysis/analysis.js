@@ -48,6 +48,9 @@ AnnotationType, SampleBin) {
         'name': 'samples'
       }, {
         // this dataset "streamed" in via ngVega from heatmapData
+        'name': 'nodeOrder'
+      }, {
+        // this dataset "streamed" in via ngVega from heatmapData
         'name': 'sample_objects'
       }, {
         // compute minimum normalized value for each node (across samples)
@@ -61,7 +64,8 @@ AnnotationType, SampleBin) {
           }
         ]
       }, {
-        // now subtract the minimum sample value from each node
+        // now subtract the minimum sample value from each node and
+        // lookup the order for drawing samples and nodes
         'name': 'activity_normalized',
         'source': 'activity',
         'transform': [
@@ -81,6 +85,12 @@ AnnotationType, SampleBin) {
             'onKey': 'data',
             'keys': ['sample'],
             'as': ['sample_order']
+          }, {
+            'type': 'lookup',
+            'on': 'nodeOrder',
+            'onKey': 'data',
+            'keys': ['node'],
+            'as': ['node_order']
           }
         ]
       }
@@ -90,7 +100,11 @@ AnnotationType, SampleBin) {
       {
         'name': 'nodes',
         'type': 'ordinal',
-        'domain': {'data': 'activity_normalized', 'field': 'node'},
+        'domain': {
+          'data': 'activity_normalized',
+          'field': 'node_order._id',
+          'sort': true
+        },
         'range': 'width'
       }, {
         'name': 'samples',
@@ -158,7 +172,7 @@ AnnotationType, SampleBin) {
         'from': {'data': 'activity_normalized'},
         'properties': {
           'enter': {
-            'x': {'scale': 'nodes', 'field': 'node'},
+            'x': {'scale': 'nodes', 'field': 'node_order._id'},
             'width': {'scale': 'nodes', 'band': true},
             'y': {'scale': 'samples', 'field': 'sample_order._id'},
             'height': {'scale': 'samples', 'band': true},
