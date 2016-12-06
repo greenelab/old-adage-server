@@ -6,6 +6,7 @@
 angular.module('adage.analyze.analysis', [
   'adage.analyze.sampleBin',
   'adage.analyze.sample',
+  'statusBar',
   'ngVega',
   'ngResource'
 ])
@@ -14,9 +15,9 @@ angular.module('adage.analyze.analysis', [
   return $resource('/api/v0/annotationtype/');
 }])
 
-.controller('AnalysisCtrl', ['$scope', '$log', '$location', 'Sample',
+.controller('AnalysisCtrl', ['$scope', '$log', '$location', '$q', 'Sample',
 'Activity', 'AnnotationType', 'SampleBin',
-function AnalysisCtrl($scope, $log, $location, Sample, Activity,
+function AnalysisCtrl($scope, $log, $location, $q, Sample, Activity,
 AnnotationType, SampleBin) {
   // give our templates a way to access the SampleBin service
   $scope.sb = SampleBin;
@@ -201,9 +202,10 @@ AnnotationType, SampleBin) {
     ]
   };
 
-  // TODO these exampleCols are temporarily hard-coded until a column chooser
-  // feature can be added
   $scope.analysis = {
+    status: '',
+    // TODO these exampleCols are temporarily hard-coded until a column chooser
+    // feature can be added
     exampleCols: [
       {'typename': 'genotype'},
       {'typename': 'medium'},
@@ -213,9 +215,18 @@ AnnotationType, SampleBin) {
 
   // populate sample details
   // FIXME implement this loop as a method on SampleBin? (prob. with caching)
+  $scope.analysis.status = 'Retrieving sample details';
+  var pArrSamples = [];
   for (var i = 0; i < SampleBin.heatmapData.samples.length; i++) {
-    SampleBin.getSampleDetails(SampleBin.heatmapData.samples[i]);
+    pArrSamples.push(
+      SampleBin.getSampleDetails(SampleBin.heatmapData.samples[i])
+    );
   }
+  $q.all(pArrSamples).then(function() {
+    $scope.analysis.status = '';
+  }).catch(function(errObject) {
+    $log.error('Sample detail retrieval errored with: ' + errObject);
+  });
 
   SampleBin.getActivityForSampleList($scope.analysis);
 }])

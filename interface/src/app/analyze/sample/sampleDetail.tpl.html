@@ -10,10 +10,7 @@
     sample.related_experiments[0].accession, sample.results.ml_data_source)
   }}">{{sample.results.ml_data_source}}</a></small>
 </h3>
-<p ng-if="sample.status" class="alert alert-warning" role="alert">
-  Status: {{sample.status}}<br>
-  If this message persists, please try refreshing your browser.
-</p>
+<status-bar msg-text="sample.status"></status-bar>
 <table class="table">
   <tr ng-repeat="(type, text) in sample.results.annotations">
     <th>{{type}}</th><td>{{text}}</td>

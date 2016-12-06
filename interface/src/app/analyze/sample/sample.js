@@ -1,4 +1,6 @@
-angular.module('adage.analyze.sample', ['ngResource'])
+angular.module('adage.analyze.sample', [
+  'statusBar', 'ngResource'
+])
 
 .factory('Sample', ['$resource', '$http', '$log',
 function($resource, $http, $log) {

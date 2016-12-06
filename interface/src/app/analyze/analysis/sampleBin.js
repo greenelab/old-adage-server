@@ -123,9 +123,9 @@ function($log, $cacheFactory, $q, Sample, Activity) {
     },
 
     getSampleDetails: function(pk) {
-      // TODO need to report query progress and errors somehow
+      // TODO caller can now implement user error reporting via $promise
       var cbSampleBin = this; // closure link to SampleBin for callbacks
-      Sample.get({id: pk},
+      var pSample = Sample.get({id: pk},
         function success(responseObject, responseHeaders) {
           if (responseObject) {
             cbSampleBin.setSampleData(pk, responseObject);
@@ -135,10 +135,10 @@ function($log, $cacheFactory, $q, Sample, Activity) {
           }
         },
         function error(responseObject, responseHeaders) {
-          // TODO user error reporting
           $log.error($scope.analysis.queryStatus);
         }
-      );
+      ).$promise;
+      return pSample;
     },
 
     _getIDs: function(val, i, arr) {
@@ -163,14 +163,14 @@ function($log, $cacheFactory, $q, Sample, Activity) {
 
     rebuildHeatmapActivity: function(samples) {
       // FIXME need a "reloading..." spinner or something while this happens
+      //  note: progress can be reported by returning a $promise to the caller
       var cbSampleBin = this; // closure link to SampleBin for callbacks
       var loadCache = function(responseObject) {
         if (responseObject) {
           var sampleID = responseObject.objects[0].sample;
           cbSampleBin.activityCache.put(sampleID, responseObject.objects);
           $log.info('populating cache with ' + sampleID);
-          // TODO need to find & report (list) samples that
-          // return no results
+          // TODO need to find & report samples that return no results
         } else {
           // FIXME what happens if responseObject is empty? (possible?)
           $log.error('responseObject is empty: what now?');
@@ -217,6 +217,7 @@ function($log, $cacheFactory, $q, Sample, Activity) {
     getActivityForSampleList: function(respObj) {
       // retrieve activity data for heatmap to display
       // FIXME restore query progress messages (see rebuildHeatmapActivity)
+      //  note: progress can be reported by returning a $promise to the caller
       // respObj.queryStatus = 'Retrieving sample activity...';
       this.rebuildHeatmapActivity(this.heatmapData.samples);
     }
