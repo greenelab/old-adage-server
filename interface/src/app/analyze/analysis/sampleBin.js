@@ -145,6 +145,7 @@ function($log, $cacheFactory, $q, Sample, Activity) {
       return val.id;
     },
     clusterSamples: function() {
+      // TODO implement non-blocking response here as done for clusterNodes()
       var sampleClust = hcluster()
         .distance('euclidean')
         .linkage('avg')
@@ -153,12 +154,28 @@ function($log, $cacheFactory, $q, Sample, Activity) {
       this.heatmapData.samples = sampleClust.orderedNodes().map(this._getIDs);
     },
     clusterNodes: function() {
-      var nodeClust = hcluster()
-        .distance('euclidean')
-        .linkage('avg')
-        .posKey('activity')
-        .data(this.getNodeObjects());
-      this.heatmapData.nodeOrder = nodeClust.orderedNodes().map(this._getIDs);
+      // declare some closure variables our callbacks will need
+      var cbSampleBin = this,
+        defer = $q.defer();
+
+      setTimeout(function() {
+        // We'd like the clustering code to run asynchronously so our caller
+        // can display a status update and then remove it when finished.
+        // setTimeout(fn, 0) is a trick for triggering this behavior
+        defer.resolve(true);  // triggers the cascade of .then() calls below
+      }, 0);
+
+      return defer.promise.then(function() {
+        // do the actual clustering (in the .data call here)
+        var nodeClust = hcluster()
+          .distance('euclidean')
+          .linkage('avg')
+          .posKey('activity')
+          .data(cbSampleBin.getNodeObjects());
+        // update the heatmap
+        cbSampleBin.heatmapData.nodeOrder =
+          nodeClust.orderedNodes().map(cbSampleBin._getIDs);
+      });
     },
 
     rebuildHeatmapActivity: function(samples) {

@@ -19,8 +19,27 @@ angular.module('adage.analyze.analysis', [
 'Activity', 'AnnotationType', 'SampleBin',
 function AnalysisCtrl($scope, $log, $location, $q, Sample, Activity,
 AnnotationType, SampleBin) {
+  $scope.analysis = {
+    status: '',
+    // TODO these exampleCols are temporarily hard-coded until a column chooser
+    // feature can be added
+    exampleCols: [
+      {'typename': 'genotype'},
+      {'typename': 'medium'},
+      {'typename': 'strain'}
+    ]
+  };
+
   // give our templates a way to access the SampleBin service
   $scope.sb = SampleBin;
+
+  // wrap some SampleBin features to implement status updates
+  $scope.clusterNodes = function() {
+    $scope.analysis.status = 'clustering nodes (this will take a minute)';
+    SampleBin.clusterNodes().then(function() {
+      $scope.analysis.status = '';
+    });
+  };
 
   // these options are important for making ngSortable work with tables
   $scope.sortableOptions = {
@@ -199,17 +218,6 @@ AnnotationType, SampleBin) {
           }
         }
       }
-    ]
-  };
-
-  $scope.analysis = {
-    status: '',
-    // TODO these exampleCols are temporarily hard-coded until a column chooser
-    // feature can be added
-    exampleCols: [
-      {'typename': 'genotype'},
-      {'typename': 'medium'},
-      {'typename': 'strain'}
     ]
   };
 
