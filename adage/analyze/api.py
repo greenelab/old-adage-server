@@ -142,6 +142,9 @@ class SampleResource(ModelResource):
         allowed_methods = ['get']
         experiments_allowed_methods = allowed_methods
         annotations_allowed_methods = allowed_methods
+        filtering = {
+            'experiment': ('exact', ),  # Implemented in apply_filters()
+        }
 
     def prepend_urls(self):
         return [
@@ -233,6 +236,20 @@ class SampleResource(ModelResource):
         response['Content-Disposition'] = (
             'attachment; filename="sample_annotations.tsv"')
         return response
+
+    def apply_filters(self, request, applicable_filters):
+        """
+        Implementation of "experiment" filter, which allows the API to
+        get all samples that are related to a given experiment (whose
+        primary key is "accession").
+        """
+        object_list = super(SampleResource, self).apply_filters(
+            request, applicable_filters)
+        experiment = request.GET.get('experiment', None)
+        if experiment:
+            samples = Experiment.objects.get(pk=experiment).sample_set.all()
+            object_list = object_list.filter(pk__in=samples)
+        return object_list
 
 
 class MLModelResource(ModelResource):
