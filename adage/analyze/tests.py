@@ -799,7 +799,7 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
             accession="z1", name="z2", description="z3")
         # Build relationship between the first sample and exp2:
         Sample.objects.first().experiments.add(exp2)
-        # Create a few more random experiements that are not related to
+        # Create a few more random experiments that won't be related to
         # any samples:
         factory.create(Experiment, 3)
         return exp2
