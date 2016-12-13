@@ -247,7 +247,12 @@ class SampleResource(ModelResource):
             request, applicable_filters)
         experiment = request.GET.get('experiment', None)
         if experiment:
-            samples = Experiment.objects.get(pk=experiment).sample_set.all()
+            try:
+                e = Experiment.objects.get(pk=experiment)
+            except ObjectDoesNotExist:
+                # Return an empty set if the experiment is not found.
+                return Sample.objects.none()
+            samples = e.sample_set.all()
             object_list = object_list.filter(pk__in=samples)
         return object_list
 
