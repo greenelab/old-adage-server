@@ -25,6 +25,15 @@ angular.module('adage.gene.searchMany', [
               // be obtained from the ML model. This is the same as
               // the issue in geneSearchForm (also with $scope.organism).
               $scope.organism = 'Pseudomonas aeruginosa';
+
+              // '$scope.autocomplete.autocomlete' holds a boolean value,
+              // of whether or not the user wants to use autocomplete
+              // search to look up a few genes. If not, then the autocomplete
+              // search panel will disappear, and the panel to search many
+              // genes will appear. We need to send the value itself inside
+              // an object so that it gets sent properly back and forth
+              // through the corresponding $scopes.
+              $scope.autocomplete = {autocomplete: true};
             }
           ]
         }
@@ -37,7 +46,7 @@ angular.module('adage.gene.searchMany', [
 })
 
 
-// Directive for whole gene search form
+// Directive for panel where user can search many genes
 .directive('geneSearchPanel', [function() {
   return {
     controller: ['$scope', function($scope) {
@@ -45,10 +54,15 @@ angular.module('adage.gene.searchMany', [
 
       $scope.queries = [];
       $scope.searchResults = {};
+
+      $scope.switchToFew = function() {
+        $scope.autocomplete.autocomplete = true;
+      };
     }],
     restrict: 'E',
     scope: {
-      organism: '='
+      organism: '=',
+      autocomplete: '='
     },
     templateUrl: 'gene/searchMany/gene-search-panel.tpl.html'
   };
