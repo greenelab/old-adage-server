@@ -789,30 +789,67 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
 
         self.call_non_get_API(uri)  # Test non-get methods too.
 
+    def create_extra_experiments(self):
+        """
+        Generate a few more experiements, one of which is returned
+        (and will be used by test cases later).
+        """
+        # Create a new experiment:
+        exp2 = Experiment.objects.create(
+            accession="z1", name="z2", description="z3")
+        # Build relationship between the first sample and exp2:
+        Sample.objects.first().experiments.add(exp2)
+        # Create a few more random experiments that won't be related to
+        # any samples:
+        factory.create(Experiment, 3)
+        return exp2
+
     def test_node_filter_in_experiment(self):
         """
         Test the "node" filter in ExperimentResource.
         """
-        # Create a few more random experiments:
-        num_extra_exp = 3
-        factory.create(Experiment, num_extra_exp)
-        self.assertEqual(Experiment.objects.count(), num_extra_exp + 1)
-        # Build relationship between the first sample and the last experiment:
-        Sample.objects.first().experiments.add(Experiment.objects.last())
+        exp2 = self.create_extra_experiments()  # Create new experiments.
 
-        # Confirm that a random node is related to both the experiment that was
-        # created from ModelsTestCase.experiment_data and the last experiment.
-        # (Note that when the database was initialized in setup(), the
-        # experiment created from ModelsTestCase.experiment_data was related to
-        # all samples, and each sample was related to all nodes.)
+        # Confirm that a random node is related to both the experiment
+        # that was created from ModelsTestCase.experiment_data and exp2.
+        # Note that when the database was initialized in setup(), the
+        # experiment created from ModelsTestCase.experiment_data was
+        # related to all samples, and each sample was related to all nodes.
         node = self.random_object(Node)
         self.assertEqual(Activity.objects.filter(node=node).count(),
                          self.s_counter)
-        node_filter_uri = "%sexperiment/?node=%s" % (self.baseURI, node.id)
-        resp = self.api_client.get(node_filter_uri)
+        filter_uri = "%sexperiment/?node=%s&limit=0" % (self.baseURI, node.id)
+        resp = self.api_client.get(filter_uri)
         related_experiments = self.deserialize(resp)['objects']
         self.assertEqual(len(related_experiments), 2)
         self.assertEqual(related_experiments[0]['accession'],
                          ModelsTestCase.experiment_data['accession'])
-        self.assertEqual(related_experiments[1]['accession'],
-                         Experiment.objects.last().accession)
+        self.assertEqual(related_experiments[1]['accession'], exp2.accession)
+
+        # Test non-get methods too.
+        self.call_non_get_API(filter_uri)
+
+    def test_experiment_filter_in_sample(self):
+        """
+        Test the "experiment" filter in SampleResource.
+        """
+        exp2 = self.create_extra_experiments()  # Create new experiments.
+
+        # Confirm that all samples are related to the experiment that is
+        # created from ModelsTestCase.experiment_data.
+        filter_uri = "%ssample/?experiment=%s&limit=0" % (
+            self.baseURI, ModelsTestCase.experiment_data['accession'])
+        resp = self.api_client.get(filter_uri)
+        related_samples = self.deserialize(resp)['objects']
+        self.assertEqual(len(related_samples), Sample.objects.count())
+
+        # Confirm that only the first sample is related to exp2.
+        filter_uri = "%ssample/?experiment=%s&limit=0" % (
+            self.baseURI, exp2.accession)
+        resp = self.api_client.get(filter_uri)
+        related_samples = self.deserialize(resp)['objects']
+        self.assertEqual(len(related_samples), 1)
+        self.assertEqual(related_samples[0]['id'], Sample.objects.first().id)
+
+        # Test non-get methods too.
+        self.call_non_get_API(filter_uri)
