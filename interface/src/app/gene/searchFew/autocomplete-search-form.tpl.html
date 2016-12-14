@@ -1,0 +1,30 @@
+<form>
+
+  <div class="control-group">
+    <div class="well">
+      <span ng-repeat="gene in selectedGenes">
+        <selected-gene-button></selected-gene-button>
+      </span>
+
+      <input type="text" ng-model="autocompleteQuery"
+        placeholder="Enter gene name"
+        uib-typeahead="result.standard_name for result in searchGenes($viewValue)"
+        typeahead-min-length="2"
+        typeahead-on-select="onSelect($item,$model,$label)"
+        typeahead-loading="loadingGenes">
+
+      <i ng-show="loadingGenes" class="fa fa-spinner"></i>
+      <div ng-show="noResults">
+        <i class="fa fa-remove"></i> No genes found for query
+      </div>
+    </div>
+  </div>
+
+  <p class="bg-danger">{{ errors }}</p>
+
+  <div class="form-group">
+    <button class="btn btn-success" ng-click="sendToNetwork()">
+      View Genes as Network <i class="fa fa-check"></i>
+    </button>
+  </div>
+</form>
