@@ -10,6 +10,11 @@ angular.module('adage.gene.resource', ['ngResource'])
         url: '/api/v0/gene/search/',
         method: 'GET',
         isArray: true
+      },
+
+      autocomplete: {
+        url: '/api/v0/gene/autocomplete/',
+        method: 'GET'
       }
 
     }
