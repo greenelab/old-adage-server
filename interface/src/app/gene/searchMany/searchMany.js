@@ -11,31 +11,34 @@ angular.module('adage.gene.searchMany', [
       views: {
         'main': {
           templateUrl: 'gene/gene-network.tpl.html',
-          controller: ['$scope', 'UserFactory',
-            function($scope, UserFactory) {
-              $scope.userObj = null;
-              UserFactory.getPromise().$promise.then(function() {
-                $scope.userObj = UserFactory.getUser();
-              });
+          controller: ['UserFactory', function(UserFactory) {
+            var self = this;
+            self.userObj = null;
+            UserFactory.getPromise().$promise.then(function() {
+              self.userObj = UserFactory.getUser();
+            });
 
-              // TODO: Right now, we are hard-coding this organism
-              // as Pseudomonas (since it is the only one currently
-              // supported by ADAGE). However, as we incorporate
-              // multi-species support, this organism will have to
-              // be obtained from the ML model. This is the same as
-              // the issue in geneSearchForm (also with $scope.organism).
-              $scope.organism = 'Pseudomonas aeruginosa';
+            // TODO: Right now, we are hard-coding this organism
+            // as Pseudomonas (since it is the only one currently
+            // supported by ADAGE). However, as we incorporate
+            // multi-species support, this organism will have to
+            // be obtained from the ML model. This is the same as
+            // the issue in geneSearchForm (also with $scope.organism).
+            self.organism = 'Pseudomonas aeruginosa';
 
-              // '$scope.autocomplete.autocomlete' holds a boolean value,
-              // of whether or not the user wants to use autocomplete
-              // search to look up a few genes. If not, then the autocomplete
-              // search panel will disappear, and the panel to search many
-              // genes will appear. We need to send the value itself inside
-              // an object so that it gets sent properly back and forth
-              // through the corresponding $scopes.
-              $scope.autocomplete = {autocomplete: true};
-            }
-          ]
+            // '$scope.autocomplete' holds a boolean value, of whether or
+            // not the user wants to use autocomplete search to llok up a
+            // few genes. If not, then the autocomplete search panel will
+            // disappear, and the panel to search many genes will appear.
+            // *Note: This boolean value wasn't getting properly propagated
+            // through the scopes of this state and the child directives
+            // if it was just placed in the $scope object. It needed to be
+            // placed either inside a new object (which was then placed in
+            // the $scope object), or making it part of the controller
+            // instance object.
+            self.autocomplete = true;
+          }],
+          controllerAs: 'searchCtrl'
         }
       },
       data: {
@@ -56,7 +59,7 @@ angular.module('adage.gene.searchMany', [
       $scope.searchResults = {};
 
       $scope.switchToFew = function() {
-        $scope.autocomplete.autocomplete = true;
+        $scope.autocomplete = true;
       };
     }],
     restrict: 'E',

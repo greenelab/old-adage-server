@@ -9,7 +9,7 @@ angular.module('adage.gene.searchFew', [
   return {
     controller: ['$scope', function($scope) {
       $scope.switchToMany = function() {
-        $scope.autocomplete.autocomplete = false;
+        $scope.autocomplete = false;
       };
     }],
     restrict: 'E',
@@ -23,8 +23,9 @@ angular.module('adage.gene.searchFew', [
 
 .directive('autocompleteSearchForm', [function() {
   return {
-    controller: ['$scope', '$state', 'Gene', 'SelectedGenesFactory',
-      function($scope, $state, Gene, SelectedGenesFactory) {
+    controller: [
+      '$scope', '$state', 'Gene', 'SelectedGenesFactory', 'CommonGeneFuncts',
+      function($scope, $state, Gene, SelectedGenesFactory, CommonGeneFuncts) {
         var numResultsToReturn = 10;
         $scope.errors = null;
         $scope.autocompleteQuery = '';
@@ -70,12 +71,7 @@ angular.module('adage.gene.searchFew', [
         };
 
         $scope.sendToNetwork = function() {
-          var geneIds = Object.keys($scope.selectedGenes);
-          var geneString = geneIds.join();
-
-          $state.go('gene_network', {
-            'genes': geneString
-          });
+          CommonGeneFuncts.sendToNetwork($scope, $state);
         };
       }
     ],
