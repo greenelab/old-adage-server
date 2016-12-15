@@ -28,17 +28,12 @@ angular.module('adage.gene.selected', [
 // Directive for table containing search results
 .directive('selectedGenesPanel', [function() {
   return {
-    controller: ['$scope', 'SelectedGenesFactory', '$state',
-      function($scope, SelectedGenesFactory, $state) {
+    controller: ['$scope', 'SelectedGenesFactory', '$state', 'CommonGeneFuncts',
+      function($scope, SelectedGenesFactory, $state, CommonGeneFuncts) {
         $scope.selectedGenes = SelectedGenesFactory.returnGenes();
 
         $scope.sendToNetwork = function() {
-          var geneIds = Object.keys($scope.selectedGenes);
-          var geneString = geneIds.join();
-
-          $state.go('gene_network', {
-            'genes': geneString
-          });
+          CommonGeneFuncts.sendToNetwork($scope, $state);
         };
       }
     ],
