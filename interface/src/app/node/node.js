@@ -98,14 +98,22 @@ angular.module('adage.node', [
     restrict: 'E',
     scope: {
       nodeId: '@',
-      topNum: '@'
+      numExp: '@'
     },
     link: function($scope) {
       $scope.queryStatus = 'Connecting to the server ...';
       $scope.activities = {};
       $scope.experiments = [];
       $scope.topMode = true;
-      $scope.numExp = $scope.topNum;
+      $scope.topNum = $scope.numExp;
+      // If input "num-exp" is not a finite and positive number,
+      // write a warning message and reset the value to 20.
+      if (!isFinite($scope.topNum) || parseInt($scope.topNum) <= 0) {
+        $log.warn('Invalid value of num-exp: ' + $scope.topNum +
+                  ', reset it to 20.');
+        $scope.topNum = 20;
+      }
+      $scope.numExpShown = $scope.topNum;
       // Get activities that are related to the current node:
       var activityURI = '/api/v0/activity/?limit=0&node=' + $scope.nodeId;
       $http.get(activityURI)
@@ -280,13 +288,13 @@ angular.module('adage.node', [
       // Event handler when user clicks "Show All" button.
       $scope.showAll = function() {
         $scope.topMode = false;
-        $scope.numExp = $scope.experiments.length;
+        $scope.numExpShown = $scope.experiments.length;
       };
 
       // Event handler when user clicks "Show Top 20" button.
       $scope.showTop = function() {
         $scope.topMode = true;
-        $scope.numExp = $scope.topNum;
+        $scope.numExpShown = $scope.topNum;
       };
     }
   };
