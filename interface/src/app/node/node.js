@@ -137,8 +137,8 @@ angular.module('adage.node', [
           // (1) Add a new key "isExpanded", whose default is false;
           // (2) Convert entries in sample_set from sample URI to sample ID,
           //     and delete samples that are not related to current node;
-          // (3) Add a new "range" key, which is the range of activity values
-          //     and will be used to order experiments on web UI.
+          // (3) Add a new "range" key, which is the range of activity values.
+          //     (This key will be used to order experiments on web UI.)
           var enhanceExpData = function(exp) {
             exp.isExpanded = false;  // Enhancement (1)
             var nodeRelatedSamples = [];
