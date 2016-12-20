@@ -26,16 +26,19 @@ angular.module('adage.gene.searchMany', [
             // the issue in geneSearchForm (also with $scope.organism).
             self.organism = 'Pseudomonas aeruginosa';
 
-            // '$scope.autocomplete' holds a boolean value, of whether or
+            // 'self.autocomplete' holds a boolean value, of whether or
             // not the user wants to use autocomplete search to look up a
             // few genes. If not, then the autocomplete search panel will
             // disappear, and the panel to search many genes will appear.
-            // *Note: This boolean value wasn't getting properly propagated
-            // through the scopes of this state and the child directives
-            // if it was just placed in the $scope object. It needed to be
-            // placed either inside a new object (which was then placed in
-            // the $scope object), or made part of the controller instance
-            // object.
+            //
+            // *Note: This boolean value wasn't getting properly changed
+            // in the child directives when it was passed as a primitive.
+            // It needed to be either set as a property inside a new object
+            // (which was then placed in the $scope object), or made part of
+            // the controller instance object when using 'controllerAs' syntax.
+            // We chose to follow this last approach as it is considered
+            // a best practice. For more information on this, see:
+            // https://github.com/angular/angular.js/wiki/Understanding-Scopes
             self.autocomplete = true;
           }],
           controllerAs: 'searchCtrl'
