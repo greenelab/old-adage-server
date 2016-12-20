@@ -14,8 +14,16 @@ angular.module('adage.gene.utils', [
       }
 
       return geneLabel;
-    }
+    },
 
+    sendToNetwork: function(scope, state) {
+      var geneIds = Object.keys(scope.selectedGenes);
+      var geneString = geneIds.join();
+
+      state.go('gene_network', {
+        'genes': geneString
+      });
+    }
   };
 }])
 
