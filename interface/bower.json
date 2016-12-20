@@ -21,7 +21,9 @@
     "ng-sortable": "~1.3.6",
     "ng-vega": "^1.3.2",
     "d3-tip": "~0.7.1",
-    "angularjs-slider": "^5.8.1"
+    "angularjs-slider": "^5.8.1",
+    "vega-lite": "^1.3.1",
+    "vega-embed": "^2.2.0"
   },
   "resolutions": {
     "angular": "~1.5.5",
