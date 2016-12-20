@@ -27,15 +27,15 @@ angular.module('adage.gene.searchMany', [
             self.organism = 'Pseudomonas aeruginosa';
 
             // '$scope.autocomplete' holds a boolean value, of whether or
-            // not the user wants to use autocomplete search to llok up a
+            // not the user wants to use autocomplete search to look up a
             // few genes. If not, then the autocomplete search panel will
             // disappear, and the panel to search many genes will appear.
             // *Note: This boolean value wasn't getting properly propagated
             // through the scopes of this state and the child directives
             // if it was just placed in the $scope object. It needed to be
             // placed either inside a new object (which was then placed in
-            // the $scope object), or making it part of the controller
-            // instance object.
+            // the $scope object), or made part of the controller instance
+            // object.
             self.autocomplete = true;
           }],
           controllerAs: 'searchCtrl'
