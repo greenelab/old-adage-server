@@ -97,24 +97,26 @@ angular.module('adage.node', [
     templateUrl: 'node/high_range_exp.tpl.html',
     restrict: 'E',
     scope: {
-      nodeId: '@'
+      nodeId: '@',
+      topNum: '@'
     },
     link: function($scope) {
       $scope.queryStatus = 'Connecting to the server ...';
       $scope.activities = {};
       $scope.experiments = [];
-      $scope.top20Mode = true;
-      $scope.numExp = 20;
-
+      $scope.topMode = true;
+      $scope.numExp = $scope.topNum;
       // Get activities that are related to the current node:
-      $http.get('/api/v0/activity/?limit=0&node=' + $scope.nodeId)
+      var activityURI = '/api/v0/activity/?limit=0&node=' + $scope.nodeId;
+      $http.get(activityURI)
         .then(function success(response) {
           var sampleID;
           for (var i = 0; i < response.data.objects.length; ++i) {
             sampleID = response.data.objects[i].sample;
             $scope.activities[sampleID] = response.data.objects[i].value;
           }
-          return $http.get('/api/v0/experiment/?limit=0&node=' + $scope.nodeId);
+          var expURI = '/api/v0/experiment/?limit=0&node=' + $scope.nodeId;
+          return $http.get(expURI);
         }, function error(err) {
           $log.error('Failed to get activities: ' + err.statusText);
           $scope.queryStatus = 'Failed to get related activities from server';
@@ -277,14 +279,14 @@ angular.module('adage.node', [
 
       // Event handler when user clicks "Show All" button.
       $scope.showAll = function() {
-        $scope.top20Mode = false;
+        $scope.topMode = false;
         $scope.numExp = $scope.experiments.length;
       };
 
       // Event handler when user clicks "Show Top 20" button.
-      $scope.show20 = function() {
-        $scope.top20Mode = true;
-        $scope.numExp = 20;
+      $scope.showTop = function() {
+        $scope.topMode = true;
+        $scope.numExp = $scope.topNum;
       };
     }
   };
