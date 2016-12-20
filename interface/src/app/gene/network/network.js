@@ -262,8 +262,8 @@ angular.module('adage.gene.network', [
           self.statusMessage = '';
           drawNetwork();
         },
-        function error(errObject) {
-          $log.error('Failed to get edges: ' + errObject);
+        function error(response) {
+          $log.error('Failed to get edges: ' + response.statusText);
           self.statusMessage = 'Connection to server failed';
         }
       );
