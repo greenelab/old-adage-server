@@ -198,7 +198,7 @@ angular.module('adage.gene.network', [
               edgeTip.show(data, target);
             },
             function error(err) {
-              $log.error('Failed to get node info for gene edge: ' + err);
+              $log.error('Failed to get node info for gene edge: ' + err.statusText);
               str += 'Can\'t get node information, please try again later.';
               edgeTip.html(str);
               edgeTip.show(data, target);
@@ -262,8 +262,8 @@ angular.module('adage.gene.network', [
           self.statusMessage = '';
           drawNetwork();
         },
-        function error(response) {
-          $log.error('Failed to get edges: ' + response.statusText);
+        function error(err) {
+          $log.error('Failed to get edges: ' + err.statusText);
           self.statusMessage = 'Connection to server failed';
         }
       );
