@@ -10,6 +10,7 @@ angular.module('adage', [
   'adage.gene.searchMany',
   'adage.gene.network',
   'adage.node',
+  'adage.help',
   'ui.router',
   'ngResource'
 ])
