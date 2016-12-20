@@ -198,7 +198,8 @@ angular.module('adage.gene.network', [
               edgeTip.show(data, target);
             },
             function error(err) {
-              $log.error('Failed to get node info for gene edge: ' + err.statusText);
+              $log.error(
+                'Failed to get node info for gene edge: ' + err.statusText);
               str += 'Can\'t get node information, please try again later.';
               edgeTip.html(str);
               edgeTip.show(data, target);
