@@ -114,6 +114,7 @@ angular.module('adage.node', [
         $scope.topNum = 20;
       }
       $scope.numExpShown = $scope.topNum;
+
       // Get activities that are related to the current node:
       var activityURI = '/api/v0/activity/?limit=0&node=' + $scope.nodeId;
       $http.get(activityURI)
