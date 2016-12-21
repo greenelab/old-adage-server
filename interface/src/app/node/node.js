@@ -98,22 +98,30 @@ angular.module('adage.node', [
     restrict: 'E',
     scope: {
       nodeId: '@',
-      numExp: '@'
+      inputTopNum: '@topExp'
     },
     link: function($scope) {
       $scope.queryStatus = 'Connecting to the server ...';
       $scope.activities = {};
       $scope.experiments = [];
       $scope.topMode = true;
-      $scope.topNum = $scope.numExp;
-      // If input "num-exp" is not a finite and positive number,
-      // write a warning message and reset the value to 20.
-      if (!isFinite($scope.topNum) || parseInt($scope.topNum) <= 0) {
-        $log.warn('Invalid value of num-exp: ' + $scope.topNum +
+      // If "top-exp" tag is not found, or its value is not a finite positive
+      // integer, write a log message and set the value to 20.
+      // Because the value of "top-exp" is passed into the directive by the
+      // read-only '@', we use another variable "$scope.topNum" to denote the
+      // validated number of top experiments.
+      if (typeof $scope.inputTopNum === 'undefined') {
+        $log.info('top-exp tag not found, reset it to 20.');
+        $scope.topNum = 20;
+      } else if (!isFinite($scope.inputTopNum) ||
+                 parseInt($scope.inputTopNum) <= 0) {
+        $log.warn('Invalid value of top-exp: ' + $scope.inputTopNum +
                   ', reset it to 20.');
         $scope.topNum = 20;
+      } else {
+        $scope.topNum = $scope.inputTopNum;
       }
-      $scope.numExpShown = $scope.topNum;
+      $scope.numExpShown = $scope.topNum; // Current # of experiments on web UI.
 
       // Get activities that are related to the current node:
       var activityURI = '/api/v0/activity/?limit=0&node=' + $scope.nodeId;
