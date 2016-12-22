@@ -271,8 +271,7 @@ angular.module('adage.node', [
         if (exp.isExpanded && !exp.samples) {
           exp.sampleStatus = 'Connecting to the server ...';
           var sampleURI = '/api/v0/sample/';
-          var httpConfig = {params: {experiment: exp.accession}};
-          $http.get(sampleURI, httpConfig)
+          $http.get(sampleURI, {params: {experiment: exp.accession}})
             .then(function success(response) {
               exp.samples = [];
               // Add "activity" property to each sample that is related to the
@@ -292,16 +291,11 @@ angular.module('adage.node', [
         }
       };
 
-      // Event handler when user clicks "Show All" button.
-      $scope.showAll = function() {
-        $scope.topMode = false;
-        $scope.numExpShown = $scope.experiments.length;
-      };
-
-      // Event handler when user clicks "Show Top 20" button.
-      $scope.showTop = function() {
-        $scope.topMode = true;
-        $scope.numExpShown = $scope.topNum;
+      // Event handler when user clicks "Show All" or "Show Top N" button.
+      $scope.setMode = function() {
+        $scope.topMode = !$scope.topMode;
+        $scope.numExpShown =
+          $scope.topMode ? $scope.topNum : $scope.experiments.length;
       };
     }
   };
