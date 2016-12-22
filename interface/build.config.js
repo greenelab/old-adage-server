@@ -66,6 +66,8 @@ module.exports = {
     js: [
       'vendor/d3/d3.js',
       'vendor/vega/vega.js',
+      'vendor/vega-lite/vega-lite.min.js',
+      'vendor/vega-embed/vega-embed.min.js',
       'vendor/angular/angular.js',
       'vendor/ng-vega/dist/ng-vega.js',
       'vendor/angular-animate/angular-animate.js',

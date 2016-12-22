@@ -1,0 +1,48 @@
+<div ng-if="!queryStatus">
+  <h4>
+    <b>Experiments with the Highest Range: </b>
+  </h4>
+  <button class="btn btn-primary" ng-click="setMode()"
+          ng-hide="topMode">Show Top {{topNum}}</button>
+  <button class="btn btn-primary" ng-click="setMode()"
+          ng-show="topMode">Show All</button>
+
+  <br />
+  (Click
+  <i class="fa fa-plus-square fa-lg" aria-hidden="true"></i> or
+  <i class="fa fa-minus-square fa-lg" aria-hidden="true"></i>
+  to show or hide the samples related to both the node and experiment.)
+  <table class="table table-striped">
+    <tbody>
+      <!-- It may seem more intuitive to use:
+             <tr ng-repeat="exp in experiments | limitTo: numExpShown">
+           but this approach would require re-rendering the vega-lite widget;
+           instead we use "$index >= numExpShown" to hide rows of lower range.
+         -->
+      <tr ng-repeat="exp in experiments" ng-show="$index < numExpShown">
+        <td>
+          <i class="fa fa-plus-square fa-lg" aria-hidden="true"
+             ng-show="!exp.isExpanded" ng-click="toggleExpansion(exp)"></i>
+          <i class="fa fa-minus-square fa-lg" aria-hidden="true"
+             ng-show="exp.isExpanded" ng-click="toggleExpansion(exp)"></i>
+          <b>{{$index + 1}}. {{exp.accession}}: </b>{{exp.name}}
+
+          <!-- Location of vega-lite widget -->
+          <div id="{{ 'exp-' + $index }}"></div>
+
+          <ol ng-if="exp.isExpanded">
+            <li ng-if="!exp.sampleStatus"
+                ng-repeat="sample in exp.samples | orderBy: '-activity'">
+              Activity Value: <b>{{sample.activity.toFixed(5)}}</b><br/>
+              Sample Name: <b>{{sample.name}}</b><br/>
+              Data Source: <b>{{sample.ml_data_source}}</b>
+            </li>
+            <div ng-bind="exp.sampleStatus"></div>
+          </ol>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<div ng-bind="queryStatus"></div>
