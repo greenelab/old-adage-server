@@ -124,16 +124,15 @@ angular.module('adage.node', [
       $scope.numExpShown = $scope.topNum; // Current # of experiments on web UI.
 
       // Get activities that are related to the current node:
-      var activityURI = '/api/v0/activity/?limit=0&node=' + $scope.nodeId;
-      $http.get(activityURI)
+      var httpConfig = {params: {node: $scope.nodeId, limit: 0}};
+      $http.get('/api/v0/activity/', httpConfig)
         .then(function success(response) {
           var sampleID;
           for (var i = 0; i < response.data.objects.length; ++i) {
             sampleID = response.data.objects[i].sample;
             $scope.activities[sampleID] = response.data.objects[i].value;
           }
-          var expURI = '/api/v0/experiment/?limit=0&node=' + $scope.nodeId;
-          return $http.get(expURI);
+          return $http.get('/api/v0/experiment/', httpConfig);
         }, function error(err) {
           $log.error('Failed to get activities: ' + err.statusText);
           $scope.queryStatus = 'Failed to get related activities from server';
@@ -259,11 +258,10 @@ angular.module('adage.node', [
           }
           // Clear $scope.queryStatus to indicate that the view is ready!
           $scope.queryStatus = '';
-        }, // end of success function.
-        function error(err) {
+        }, function error(err) {
           $log.error('Failed to get activities: ' + err.statusText);
           $scope.queryStatus = 'Failed to get related experiments from server';
-        }); // end of $http.get().then() chaining.
+        }); // end of $http.get().then().then() chaining.
 
       // Event handler when user clicks "+" or "-" icon in front of
       // an experiment.
@@ -272,9 +270,10 @@ angular.module('adage.node', [
         // Get samples data if they are not available yet.
         if (exp.isExpanded && !exp.samples) {
           exp.sampleStatus = 'Connecting to the server ...';
-          var sampleURI = '/api/v0/sample/?experiment=' + exp.accession;
-          $http.get(sampleURI).then(
-            function success(response) {
+          var sampleURI = '/api/v0/sample/';
+          var httpConfig = {params: {experiment: exp.accession}};
+          $http.get(sampleURI, httpConfig)
+            .then(function success(response) {
               exp.samples = [];
               // Add "activity" property to each sample that is related to the
               // current node. (It will be used to order samples on web UI.)
@@ -285,8 +284,7 @@ angular.module('adage.node', [
                 }
               });
               exp.sampleStatus = '';
-            },
-            function error(err) {
+            }, function error(err) {
               $log.error('Failed to get sample data: ' + err.statusText);
               exp.sampleStatus = 'Failed to get sample data from ' + sampleURI;
             }
@@ -307,8 +305,4 @@ angular.module('adage.node', [
       };
     }
   };
-}])
-
-
-// TODO: Directives for the other sections
-;
+}]);
