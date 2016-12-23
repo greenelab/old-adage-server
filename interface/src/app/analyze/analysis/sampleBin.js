@@ -101,24 +101,42 @@ function($log, $cacheFactory, $q, Sample, Activity) {
       }, this);
     },
     getNodeObjects: function() {
-      // reformat data from heatmapData.activity to a form that can be used
-      // by hcluster.js: need a separate array of objects for each node
+      // The heatmapData.activity array organizes activity data in a
+      // representation convenient to render using vega.js: each element of the
+      // array corresponds to one mark on the heatmap. For clustering by
+      // hcluster.js, on the other hand, we need to reorganize the data so that
+      // all activity for each *node* is collected in an array. The result is
+      // essentially the same as that from `getSampleObjects` above, but
+      // transposed. We achieve this without too many intermediate steps via
+      // two nested Array.prototype.map() operations:
+
+      // (1) first, we obtain a list of nodes by retrieving node activity
+      //     for the first sample in our heatmap
       var firstSampleNodes = this.activityCache.get(
         this.heatmapData.samples[0]
       );
+      // (2a) next, we build a new array (`retval`) comprised of `nodeObject`s
+      //      by walking through the `firstSampleNodes` and constructing a
+      //      `nodeObject` for each. [outer .map()]
       var retval = firstSampleNodes.map(function(val, i, arr) {
         var nodeObject = {
-          'id': val.node
+          'id': val.node,
+          'activity': this.heatmapData.samples.map(
+            // (2b) the array of activity for each node is built by plucking the
+            //      activity `.value` for each sample within this node from the
+            //      `activityCache` [inner .map()]
+            function(sampId, i, arr) {
+              // FIXME: counting on array order to match node order here
+              return this.activityCache.get(sampId)[nodeObject.id - 1].value;
+            },
+            this
+          )
         };
-        nodeObject.activity = this.heatmapData.samples.map(
-          function(sampId, i, arr) {
-            // FIXME: counting on array order to match node order here
-            return this.activityCache.get(sampId)[nodeObject.id - 1].value;
-          },
-          this
-        );
         return nodeObject;
       }, this);
+
+      // (3) the two nested .map()s are all we need to do to organize the
+      //     data for the convenience of hcluster.js, so we're done
       return retval;
     },
 
