@@ -127,7 +127,7 @@ function($log, $cacheFactory, $q, Sample, Activity) {
             //      `activityCache` [inner .map()]
             function(sampId, i, arr) {
               // FIXME: counting on array order to match node order here
-              return this.activityCache.get(sampId)[nodeObject.id - 1].value;
+              return this.activityCache.get(sampId)[val.node - 1].value;
             },
             this
           )
