@@ -1,5 +1,6 @@
 angular.module('adage.analyze.experiment', [
   'adage.analyze.sample',
+  'statusBar',
   'ngResource'
 ])
 

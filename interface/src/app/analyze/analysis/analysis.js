@@ -6,6 +6,7 @@
 angular.module('adage.analyze.analysis', [
   'adage.analyze.sampleBin',
   'adage.analyze.sample',
+  'statusBar',
   'ngVega',
   'ngResource'
 ])
@@ -14,12 +15,31 @@ angular.module('adage.analyze.analysis', [
   return $resource('/api/v0/annotationtype/');
 }])
 
-.controller('AnalysisCtrl', ['$scope', '$log', '$location', 'Sample',
+.controller('AnalysisCtrl', ['$scope', '$log', '$location', '$q', 'Sample',
 'Activity', 'AnnotationType', 'SampleBin',
-function AnalysisCtrl($scope, $log, $location, Sample, Activity,
+function AnalysisCtrl($scope, $log, $location, $q, Sample, Activity,
 AnnotationType, SampleBin) {
+  $scope.analysis = {
+    status: '',
+    // TODO these exampleCols are temporarily hard-coded until a column chooser
+    // feature can be added
+    exampleCols: [
+      {'typename': 'genotype'},
+      {'typename': 'medium'},
+      {'typename': 'strain'}
+    ]
+  };
+
   // give our templates a way to access the SampleBin service
   $scope.sb = SampleBin;
+
+  // wrap some SampleBin features to implement status updates
+  $scope.clusterNodes = function() {
+    $scope.analysis.status = 'clustering nodes (this will take a minute)';
+    SampleBin.clusterNodes().then(function() {
+      $scope.analysis.status = '';
+    });
+  };
 
   // these options are important for making ngSortable work with tables
   $scope.sortableOptions = {
@@ -48,6 +68,9 @@ AnnotationType, SampleBin) {
         'name': 'samples'
       }, {
         // this dataset "streamed" in via ngVega from heatmapData
+        'name': 'nodeOrder'
+      }, {
+        // this dataset "streamed" in via ngVega from heatmapData
         'name': 'sample_objects'
       }, {
         // compute minimum normalized value for each node (across samples)
@@ -61,7 +84,8 @@ AnnotationType, SampleBin) {
           }
         ]
       }, {
-        // now subtract the minimum sample value from each node
+        // now subtract the minimum sample value from each node and
+        // lookup the order for drawing samples and nodes
         'name': 'activity_normalized',
         'source': 'activity',
         'transform': [
@@ -81,6 +105,12 @@ AnnotationType, SampleBin) {
             'onKey': 'data',
             'keys': ['sample'],
             'as': ['sample_order']
+          }, {
+            'type': 'lookup',
+            'on': 'nodeOrder',
+            'onKey': 'data',
+            'keys': ['node'],
+            'as': ['node_order']
           }
         ]
       }
@@ -90,7 +120,11 @@ AnnotationType, SampleBin) {
       {
         'name': 'nodes',
         'type': 'ordinal',
-        'domain': {'data': 'activity_normalized', 'field': 'node'},
+        'domain': {
+          'data': 'activity_normalized',
+          'field': 'node_order._id',
+          'sort': true
+        },
         'range': 'width'
       }, {
         'name': 'samples',
@@ -158,7 +192,7 @@ AnnotationType, SampleBin) {
         'from': {'data': 'activity_normalized'},
         'properties': {
           'enter': {
-            'x': {'scale': 'nodes', 'field': 'node'},
+            'x': {'scale': 'nodes', 'field': 'node_order._id'},
             'width': {'scale': 'nodes', 'band': true},
             'y': {'scale': 'samples', 'field': 'sample_order._id'},
             'height': {'scale': 'samples', 'band': true},
@@ -187,21 +221,20 @@ AnnotationType, SampleBin) {
     ]
   };
 
-  // TODO these exampleCols are temporarily hard-coded until a column chooser
-  // feature can be added
-  $scope.analysis = {
-    exampleCols: [
-      {'typename': 'genotype'},
-      {'typename': 'medium'},
-      {'typename': 'strain'}
-    ]
-  };
-
   // populate sample details
   // FIXME implement this loop as a method on SampleBin? (prob. with caching)
+  $scope.analysis.status = 'Retrieving sample details';
+  var pArrSamples = [];
   for (var i = 0; i < SampleBin.heatmapData.samples.length; i++) {
-    SampleBin.getSampleDetails(SampleBin.heatmapData.samples[i]);
+    pArrSamples.push(
+      SampleBin.getSampleDetails(SampleBin.heatmapData.samples[i])
+    );
   }
+  $q.all(pArrSamples).then(function() {
+    $scope.analysis.status = '';
+  }).catch(function(errObject) {
+    $log.error('Sample detail retrieval errored with: ' + errObject);
+  });
 
   SampleBin.getActivityForSampleList($scope.analysis);
 }])

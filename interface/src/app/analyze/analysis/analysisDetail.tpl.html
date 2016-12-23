@@ -2,7 +2,7 @@
   TODO each sample should be built using a reusable Angular directive
 -->
 <h1>Samples <small>(drag to reorder)</small></h1>
-<p ng-bind="analysis.queryStatus"></p>
+<status-bar msg-text="analysis.status"></status-bar>
 <!-- TODO need a tool to select and order annotation columns -->
 <table class="table table-hover">
   <thead>
@@ -35,7 +35,20 @@
     </tr>
   </tbody>
 </table>
-<p>Note: reordering samples above will not (yet) reorder samples in the
-  heatmap below. Scroll to the right to see all nodes in the heatmap. Sorting
-  and zooming features to come in a future update.</p>
+<p>Note: scroll to the right to see all nodes in the heatmap. Zooming
+   feature to come in a future update.</p>
 <div vega spec="heatmapSpec" vega-data="sb.heatmapData"></div>
+
+<nav class="navbar navbar-default">
+  <p class="navbar-text">Cluster</p>
+  <div class="btn-group" role="group" aria-label="clustering">
+    <button type="button" class="btn btn-default navbar-btn"
+    ng-click="sb.clusterSamples()">
+      Samples
+    </button>
+    <button type="button" class="btn btn-default navbar-btn"
+    ng-click="clusterNodes()">
+      Nodes
+    </button>
+  </div>
+</nav>

@@ -17,7 +17,8 @@ angular.module('adage.analyze.sampleBin', [
 function($log, $cacheFactory, $q, Sample, Activity) {
   var SampleBin = {
     heatmapData: {
-      samples: []
+      samples: [],
+      nodeOrder: null
     },
     sampleData: {},
     sampleCache: $cacheFactory('sample'),
@@ -31,12 +32,14 @@ function($log, $cacheFactory, $q, Sample, Activity) {
       } else {
         this.heatmapData.samples.push(+id);
         // TODO when cache generalized: start pre-fetching sample data here
+        this.heatmapData.nodeOrder = null;  // reset to default order
       }
     },
 
     removeSample: function(id) {
       var pos = this.heatmapData.samples.indexOf(+id);
       this.heatmapData.samples.splice(pos, 1);
+      this.heatmapData.nodeOrder = null;  // reset to default order
       this.rebuildHeatmapActivity(this.heatmapData.samples);
     },
 
@@ -75,48 +78,134 @@ function($log, $cacheFactory, $q, Sample, Activity) {
     },
 
     getSampleData: function(id) {
-      return this.sampleData[id];
+      var sampleObj = this.sampleData[id];
+      sampleObj.activity = this.activityCache.get(id).map(
+        // distill .activity to an array of just "value"s
+        function(val, i, arr) {
+          return val.value;
+        }
+      );
+      return sampleObj;
     },
     setSampleData: function(id, obj) {
       this.sampleData[id] = obj;
+      // TODO need to pre-fetch activity into cache here?
+      //      (if so, also need to track promises)
     },
 
     getSampleObjects: function() {
+      // reformat data from heatmapData.activity to a form that can be used
+      // by hcluster.js: need a separate array of objects for each sample
       return this.heatmapData.samples.map(function(val, i, arr) {
         return this.getSampleData(val) || {id: val};
       }, this);
     },
+    getNodeObjects: function() {
+      // The heatmapData.activity array organizes activity data in a
+      // representation convenient to render using vega.js: each element of the
+      // array corresponds to one mark on the heatmap. For clustering by
+      // hcluster.js, on the other hand, we need to reorganize the data so that
+      // all activity for each *node* is collected in an array. The result is
+      // essentially the same as that from `getSampleObjects` above, but
+      // transposed. We achieve this without too many intermediate steps via
+      // two nested Array.prototype.map() operations:
+
+      // (1) first, we obtain a list of nodes by retrieving node activity
+      //     for the first sample in our heatmap
+      var firstSampleNodes = this.activityCache.get(
+        this.heatmapData.samples[0]
+      );
+      // (2a) next, we build a new array (`retval`) comprised of `nodeObject`s
+      //      by walking through the `firstSampleNodes` and constructing a
+      //      `nodeObject` for each. [outer .map()]
+      var retval = firstSampleNodes.map(function(val, i, arr) {
+        var nodeObject = {
+          'id': val.node,
+          'activity': this.heatmapData.samples.map(
+            // (2b) the array of activity for each node is built by plucking the
+            //      activity `.value` for each sample within this node from the
+            //      `activityCache` [inner .map()]
+            function(sampId, i, arr) {
+              // FIXME: counting on array order to match node order here
+              return this.activityCache.get(sampId)[val.node - 1].value;
+            },
+            this
+          )
+        };
+        return nodeObject;
+      }, this);
+
+      // (3) the two nested .map()s are all we need to do to organize the
+      //     data for the convenience of hcluster.js, so we're done
+      return retval;
+    },
 
     getSampleDetails: function(pk) {
-      // TODO need to report query progress and errors somehow
+      // TODO caller can now implement user error reporting via $promise
       var cbSampleBin = this; // closure link to SampleBin for callbacks
-      Sample.get({id: pk},
+      var pSample = Sample.get({id: pk},
         function success(responseObject, responseHeaders) {
           if (responseObject) {
             cbSampleBin.setSampleData(pk, responseObject);
-            // TODO need a trigger to update heatmapData?
           } else {
             $log.warn('Query for sample ' + pk + ' returned nothing.');
             // TODO user error reporting
           }
         },
         function error(responseObject, responseHeaders) {
-          // TODO user error reporting
           $log.error($scope.analysis.queryStatus);
         }
-      );
+      ).$promise;
+      return pSample;
+    },
+
+    _getIDs: function(val, i, arr) {
+      return val.id;
+    },
+    clusterSamples: function() {
+      // TODO implement non-blocking response here as done for clusterNodes()
+      var sampleClust = hcluster()
+        .distance('euclidean')
+        .linkage('avg')
+        .posKey('activity')
+        .data(this.getSampleObjects());
+      this.heatmapData.samples = sampleClust.orderedNodes().map(this._getIDs);
+    },
+    clusterNodes: function() {
+      // declare some closure variables our callbacks will need
+      var cbSampleBin = this,
+        defer = $q.defer();
+
+      setTimeout(function() {
+        // We'd like the clustering code to run asynchronously so our caller
+        // can display a status update and then remove it when finished.
+        // setTimeout(fn, 0) is a trick for triggering this behavior
+        defer.resolve(true);  // triggers the cascade of .then() calls below
+      }, 0);
+
+      return defer.promise.then(function() {
+        // do the actual clustering (in the .data call here)
+        var nodeClust = hcluster()
+          .distance('euclidean')
+          .linkage('avg')
+          .posKey('activity')
+          .data(cbSampleBin.getNodeObjects());
+        // update the heatmap
+        cbSampleBin.heatmapData.nodeOrder =
+          nodeClust.orderedNodes().map(cbSampleBin._getIDs);
+      });
     },
 
     rebuildHeatmapActivity: function(samples) {
       // FIXME need a "reloading..." spinner or something while this happens
+      //  note: progress can be reported by returning a $promise to the caller
       var cbSampleBin = this; // closure link to SampleBin for callbacks
       var loadCache = function(responseObject) {
         if (responseObject) {
           var sampleID = responseObject.objects[0].sample;
           cbSampleBin.activityCache.put(sampleID, responseObject.objects);
           $log.info('populating cache with ' + sampleID);
-          // TODO need to find & report (list) samples that
-          // return no results
+          // TODO need to find & report samples that return no results
         } else {
           // FIXME what happens if responseObject is empty? (possible?)
           $log.error('responseObject is empty: what now?');
@@ -129,6 +218,14 @@ function($log, $cacheFactory, $q, Sample, Activity) {
         for (var i = 0; i < samples.length; i++) {
           var sampleActivity = cbSampleBin.activityCache.get(samples[i]);
           newActivity = newActivity.concat(sampleActivity);
+          // re-initialize nodeOrder, if needed
+          if (i === 0 && !cbSampleBin.heatmapData.nodeOrder) {
+            cbSampleBin.heatmapData.nodeOrder = sampleActivity.map(
+              function(val, i, arr) {
+                return val.node;
+              }
+            );
+          }
         }
         cbSampleBin.heatmapData.activity = newActivity;
       };
@@ -155,6 +252,7 @@ function($log, $cacheFactory, $q, Sample, Activity) {
     getActivityForSampleList: function(respObj) {
       // retrieve activity data for heatmap to display
       // FIXME restore query progress messages (see rebuildHeatmapActivity)
+      //  note: progress can be reported by returning a $promise to the caller
       // respObj.queryStatus = 'Retrieving sample activity...';
       this.rebuildHeatmapActivity(this.heatmapData.samples);
     }

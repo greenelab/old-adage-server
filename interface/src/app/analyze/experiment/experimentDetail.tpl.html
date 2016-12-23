@@ -4,10 +4,7 @@
       target="_blank">{{id}}</a>
     </small>
   </h1>
-  <p ng-if="experiment.status" class="alert alert-warning" role="alert">
-    Status: {{experiment.status}}<br>
-    If this message persists, please try refreshing your browser.
-  </p>
+  <status-bar msg-text="experiment.status"></status-bar>
   <h2>{{experiment.results.name}}</h2>
 </div>
 <p>{{experiment.results.description}}</p>
