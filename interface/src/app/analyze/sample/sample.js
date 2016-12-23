@@ -1,5 +1,6 @@
 angular.module('adage.analyze.sample', [
-  'statusBar', 'ngResource'
+  'statusBar',
+  'ngResource'
 ])
 
 .factory('Sample', ['$resource', '$http', '$log',
@@ -59,7 +60,7 @@ function($resource, $http, $log) {
         function(responseObject, responseHeaders) {
           if (responseObject) {
             $scope.sample.status = '';
-            $scope.sample.related_experiments = responseObject;
+            $scope.sample.relatedExperiments = responseObject;
           }
         },
         queryError

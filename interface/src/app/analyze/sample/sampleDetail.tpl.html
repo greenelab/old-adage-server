@@ -7,7 +7,7 @@
 -->
 <h3>Data Source
   <small><a href="{{makeHref.mlDataSource(
-    sample.related_experiments[0].accession, sample.results.ml_data_source)
+    sample.relatedExperiments[0].accession, sample.results.ml_data_source)
   }}">{{sample.results.ml_data_source}}</a></small>
 </h3>
 <status-bar msg-text="sample.status"></status-bar>
@@ -18,7 +18,7 @@
 </table>
 <h3>Related Experiments</h3>
 <ul class="list-group">
-  <li ng-repeat="expt in sample.related_experiments" 
+  <li ng-repeat="expt in sample.relatedExperiments"
     class="list-group-item">
     <a ng-click="analyze.scroll_to_id(expt.accession)">{{expt.accession}}</a>:
     {{expt.name}}
