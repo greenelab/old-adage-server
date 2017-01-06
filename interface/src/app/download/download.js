@@ -1,80 +1,74 @@
 /**
- * "download" module, which will download sample annotations of given
- * annotation typenames.
+ * "adage.download" module, which will download sample annotations based on
+ * selected annotation types.
  */
 
 angular.module('adage.download', [
   'ui.router',
-  'placeholders',
   'ui.bootstrap',
+  'ngResource',
   'as.sortable'
 ])
 
-.config(function config($stateProvider) {
+.config(['$stateProvider', function config($stateProvider) {
   $stateProvider.state('download', {
     url: '/download',
     views: {
-      'main': {
-        controller: 'DownloadCtrl',
-        templateUrl: 'download/download.tpl.html'
+      main: {
+        templateUrl: 'download/download.tpl.html',
+        controller: 'DownloadCtrl as ctrl'
       }
     },
     data: {pageTitle: 'Download'}
   });
-})
-
-// "AnnotationTypes" is a service that retrieves a list of available
-// annotation columns, from which the user can select for download.
-.factory('AnnotationTypes', ['$resource', function($resource) {
-  return $resource(
-    '/api/v0/annotationtype/',
-    {q: '', limit: 0},
-    {'query': {method: 'GET', isArray: false}}
-  );
 }])
 
-.controller('DownloadCtrl', ['$scope', '$window', 'AnnotationTypes',
-  function DownloadController($scope, $window, AnnotationTypes) {
-    $scope.annotations = {
-      query_message: 'Connecting to the server ...',
-      included_types: [],
-      excluded_types: []
-    };
+.factory('AnnotationTypes', ['$resource', function($resource) {
+  return $resource('/api/v0/annotationtype');
+}])
 
-    AnnotationTypes.query(
-      {q: ''},
-      function(responseObject, responseHeaders) {
-        for (var i = 0; i < responseObject.objects.length; ++i) {
-          $scope.annotations.included_types.push(
-            responseObject.objects[i].typename);
-        }
-        $scope.annotations.query_message = '';
-      },
-      function(responseObject, responseHeaders) {
-        $log.error('Query errored with: ' + responseObject);
-        $scope.annotations.query_message = 'Connection to server failed';
-      }
-    );
+.controller('DownloadCtrl', ['$window', '$log', 'AnnotationTypes',
+  function DownloadController($window, $log, AnnotationTypes) {
+    var self = this;
+    self.queryStatus = 'Connecting to the server ...';
+    self.fixedTypes = ['experiment', 'sample_name', 'ml_data_source'];
+    self.includedTypes = [];
+    self.excludedTypes = [];
 
     // Remove a type from inclusion list.
-    $scope.del_type = function(index) {
-      current_item = $scope.annotations.included_types[index];
-      $scope.annotations.included_types.splice(index, 1);
-      $scope.annotations.excluded_types.push(current_item);
+    self.delType = function(index) {
+      var currItem = self.includedTypes[index];
+      self.includedTypes.splice(index, 1);
+      self.excludedTypes.push(currItem);
     };
 
     // Add a type back to inclusion list.
-    $scope.add_type = function(index) {
-      current_item = $scope.annotations.excluded_types[index];
-      $scope.annotations.excluded_types.splice(index, 1);
-      $scope.annotations.included_types.push(current_item);
+    self.addType = function(index) {
+      var currItem = self.excludedTypes[index];
+      self.excludedTypes.splice(index, 1);
+      self.includedTypes.push(currItem);
     };
 
     // Handler of "Download" button click event.
-    $scope.start_download = function() {
+    self.startDownload = function() {
       var uri = '/api/v0/sample/get_annotations/?annotation_types=';
-      uri += $scope.annotations.included_types.join();
-      $window.location.href = uri;  // Call compiled downloading API.
+      uri += self.includedTypes.join();
+      $window.location.href = uri;
     };
+
+    // Retrieve selectable annotation types from the server.
+    AnnotationTypes.get({limit: 0},
+      function success(response) {
+        response.objects.forEach(function(element) {
+          self.includedTypes.push(element.typename);
+        });
+        self.queryStatus = '';
+      },
+      function error(errResponse) {
+        var errMessage = errResponse.statusCode + ' ' + errResponse.statusText;
+        $log.error('Failed to get annotation types: ' + errMessage);
+        self.queryStatus = 'Connection to server failed: ' + errMessage;
+      }
+    );
   }
 ]);
