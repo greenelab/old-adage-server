@@ -51,6 +51,11 @@ describe('DownloadCtrl with server calls', function() {
   beforeEach(module('adage.download'));
 
   var ctrl, $httpBackend;
+  // Set local variable "$httpBackend" to $httpBackend service instance
+  // in ngMock, then set "ctrl" to DownloadCtrl instance.
+  // The underscore wrapping in the first argument _$httpBackend_ is
+  // explained in "Resolving References" section of this article:
+  // https://docs.angularjs.org/api/ngMock/function/angular.mock.inject
   beforeEach(inject(function(_$httpBackend_, $controller) {
     $httpBackend = _$httpBackend_;
     // The exact URI requested by controller through AnnotationTypes service:
