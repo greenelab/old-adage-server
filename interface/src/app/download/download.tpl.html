@@ -1,5 +1,7 @@
 <h1>ADAGE: Download Sample Annotations Selectively</h1>
 
+<div ng-bind="ctrl.queryStatus"></div>
+
 <div ng-hide="ctrl.queryStatus">
   <p class="lead">
     <ul>
@@ -26,7 +28,7 @@
 
   <div class="container">
     <div class="row">
-      <div class="col-xs-4">
+      <div class="col-xs-6 col-md-4">
         <!-- Three fixed types -->
         <table class="table table-bordered" style="margin-bottom: 0">
           <thead>
@@ -58,7 +60,7 @@
       </div>
 
       <!-- Excluded types -->
-      <div class="col-xs-4">
+      <div class="col-xs-6 col-md-4">
         <table class="table table-bordered table-hover">
           <thead>
             <tr><th style="text-align: center">
@@ -76,9 +78,8 @@
           </tbody>
         </table>
       </div>
-      <div class="col-xs-4"></div>
+
+      <div class="col-md-4"></div>
     </div>
   </div>
 </div>
-
-<div ng-bind="ctrl.queryStatus"></div>
