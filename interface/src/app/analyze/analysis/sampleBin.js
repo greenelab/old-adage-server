@@ -268,6 +268,7 @@ function SampleBinCtrl($scope, $log, $uibModal, Sample, SampleBin) {
   $scope.sb = SampleBin;
 
   $scope.show = function() {
+    // TODO dynamic layout: this needs to open an Angular route (not a modal)
     $uibModal.open({
       animation: true,
       templateUrl: 'analyze/analysis/analysisModal.tpl.html',
