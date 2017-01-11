@@ -52,7 +52,7 @@
               <td class="success" as-sortable-item-handle>
                 <i class="fa fa-trash fa-lg" aria-hidden="true"
                    ng-click="ctrl.delType($index)"></i>
-                {{$index + 4}}: {{item}}
+                {{$index + 1 + ctrl.fixedTypes.length}}: {{item}}
               </td>
             </tr>
           </tbody>
