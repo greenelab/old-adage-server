@@ -68,6 +68,10 @@
             </th></tr>
           </thead>
           <tbody ng-model="ctrl.excludedTypes" as-sortable>
+            <!-- A dummy row that creates draggable area -->
+            <tr ng-hide="ctrl.excludedTypes.length" as-sortable-item>
+              <td as-sortable-item-handle>&nbsp;</td>
+            </tr>
             <tr ng-repeat="item in ctrl.excludedTypes" as-sortable-item>
               <td class="danger" as-sortable-item-handle>
                 <i class="fa fa-undo fa-lg" aria-hidden="true"
