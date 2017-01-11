@@ -67,7 +67,8 @@ angular.module('adage.download', [
       function error(errResponse) {
         var errMessage = errResponse.statusCode + ' ' + errResponse.statusText;
         $log.error('Failed to get annotation types: ' + errMessage);
-        self.queryStatus = 'Connection to server failed: ' + errMessage;
+        self.queryStatus = 'Connection to server failed: ' + errMessage +
+          '. Please refresh the page.';
       }
     );
   }
