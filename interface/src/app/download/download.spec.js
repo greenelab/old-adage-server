@@ -20,8 +20,9 @@ describe('DownloadCtrl w/o server calls', function() {
     ctrl = $controller('DownloadCtrl');
   }));
 
-  it('should be defined', function() {
+  it('should be defined and truthy', function() {
     expect(ctrl).toBeDefined();
+    expect(ctrl).toBeTruthy();
   });
 
   it('should have three fixed annotation types', function() {
