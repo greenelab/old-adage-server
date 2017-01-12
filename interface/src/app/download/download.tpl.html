@@ -68,8 +68,8 @@
             </th></tr>
           </thead>
           <tbody ng-model="ctrl.excludedTypes" as-sortable>
-            <!-- A dummy row that creates draggable area -->
-            <tr ng-hide="ctrl.excludedTypes.length" as-sortable-item>
+            <!-- When table is blank, create a dummy row to make it "draggable".
+            <tr ng-if="ctrl.excludedTypes.length === 0" as-sortable-item>
               <td as-sortable-item-handle>&nbsp;</td>
             </tr>
             <tr ng-repeat="item in ctrl.excludedTypes" as-sortable-item>
