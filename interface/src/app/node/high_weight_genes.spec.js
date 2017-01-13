@@ -27,21 +27,21 @@ describe('<high-weight-genes> directive', function() {
 
     // Mocked response data of genes:
     var mockGenes = [
-      {gene: {'systematic_name': 'g1_sys',
-              'standard_name': 'g1_std',
-              'description': 'g1_desc'
-             }
-      },
-      {gene: {'systematic_name': 'g2_sys',
-              'standard_name': 'g2_std',
-              'description': 'hypothetical protein'
-             }
-      },
-      {gene: {'systematic_name': 'g3_sys',
-              'standard_name': 'g3_std',
-              'description': 'g3_desc'
-             }
-      }
+      {gene: {
+        'systematic_name': 'g1_sys',
+        'standard_name': 'g1_std',
+        'description': 'g1_desc'
+      }},
+      {gene: {
+        'systematic_name': 'g2_sys',
+        'standard_name': 'g2_std',
+        'description': 'hypothetical protein'
+      }},
+      {gene: {
+        'systematic_name': 'g3_sys',
+        'standard_name': 'g3_std',
+        'description': 'g3_desc'
+      }}
     ];
 
     $httpBackend.expectGET(uri).respond({objects: mockGenes});
