@@ -267,7 +267,8 @@ function SampleBinCtrl($scope, $log, $uibModal, Sample, SampleBin) {
   // give our templates a way to access the SampleBin service
   $scope.sb = SampleBin;
 
-  $scope.show = function() {
+  // FIXME heatmap: this is a hack to get the modal working for now...
+  $scope.sb.show = function() {
     // TODO dynamic layout: this needs to open an Angular route (not a modal)
     $uibModal.open({
       animation: true,

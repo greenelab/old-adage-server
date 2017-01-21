@@ -86,14 +86,12 @@
 
           <ul class="nav navbar-nav navbar-right">
             <li ui-sref-active="active">
-              <sample-bin></sample-bin>
-            </li>
-            <li ui-sref-active="active">
               <a href ui-sref="help">Help</a>
             </li>
             <login-button ng-if="!userObj"></login-button>
             <profile-button ng-if="userObj"></profile-button>
           </ul>
+          <sample-bin class="navbar-right"></sample-bin>
         </div>
       </div>
     </div>
