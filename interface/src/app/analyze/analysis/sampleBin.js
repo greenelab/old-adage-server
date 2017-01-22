@@ -18,7 +18,7 @@ function($log, $cacheFactory, $q, Sample, Activity) {
   var SampleBin = {
     heatmapData: {
       samples: [],
-      nodeOrder: null
+      nodeOrder: []
     },
     sampleData: {},
     sampleCache: $cacheFactory('sample'),
@@ -32,14 +32,14 @@ function($log, $cacheFactory, $q, Sample, Activity) {
       } else {
         this.heatmapData.samples.push(+id);
         // TODO when cache generalized: start pre-fetching sample data here
-        this.heatmapData.nodeOrder = null;  // reset to default order
+        this.heatmapData.nodeOrder = [];  // reset to default order
       }
     },
 
     removeSample: function(id) {
       var pos = this.heatmapData.samples.indexOf(+id);
       this.heatmapData.samples.splice(pos, 1);
-      this.heatmapData.nodeOrder = null;  // reset to default order
+      this.heatmapData.nodeOrder = [];  // reset to default order
       this.rebuildHeatmapActivity(this.heatmapData.samples);
     },
 
@@ -219,7 +219,7 @@ function($log, $cacheFactory, $q, Sample, Activity) {
           var sampleActivity = cbSampleBin.activityCache.get(samples[i]);
           newActivity = newActivity.concat(sampleActivity);
           // re-initialize nodeOrder, if needed
-          if (i === 0 && !cbSampleBin.heatmapData.nodeOrder) {
+          if (i === 0 && cbSampleBin.heatmapData.nodeOrder.length === 0) {
             cbSampleBin.heatmapData.nodeOrder = sampleActivity.map(
               function(val, i, arr) {
                 return val.node;
@@ -266,26 +266,11 @@ function($log, $cacheFactory, $q, Sample, Activity) {
 function SampleBinCtrl($scope, $log, $uibModal, Sample, SampleBin) {
   // give our templates a way to access the SampleBin service
   $scope.sb = SampleBin;
-
-  // FIXME heatmap: this is a hack to get the modal working for now...
-  $scope.sb.show = function() {
-    // TODO dynamic layout: this needs to open an Angular route (not a modal)
-    $uibModal.open({
-      animation: true,
-      templateUrl: 'analyze/analysis/analysisModal.tpl.html',
-      controller: 'AnalysisModalCtrl',
-      size: 'lg',
-      resolve: {
-        analysis: function() {
-          return $scope.analysis;
-        }
-      }
-    });
-  };
 }])
 
 .directive('sampleBin', function() {
   return {
+    replace: true,
     restrict: 'E',
     // scope: {},
     templateUrl: 'analyze/analysis/sampleBin.tpl.html',

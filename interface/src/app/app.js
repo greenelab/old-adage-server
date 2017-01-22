@@ -4,6 +4,7 @@ angular.module('adage', [
   'adage.home',
   'adage.about',
   'adage.analyze',
+  'adage.analyze.analysis',
   'adage.analyze.sampleBin',
   'adage.download',
   'adage.tribe_client',
