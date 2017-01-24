@@ -18,18 +18,22 @@ angular.module('adage.gene.network', [
         controller: 'GeneNetworkCtrl as ctrl'
       }
     },
-    // When "gene_network" state exits, remove "edge-tip" elements from the DOM.
-    // (Without this function, the edge tip window will be visible in other
-    // states too.) The "gene-tip" element will disappear when mouse is out,
-    // so we don't need to worry about it.
+    // When "gene_network" state exits, remove "gene-tip" and "edge-tip"
+    // elements from the DOM. (Without this function, the tips window will
+    // be visible in other states too.)
     onExit: function() {
-      var elements = document.getElementsByClassName('edge-tip');
-      if (elements) { // This should be always true.
-        var n = elements.length;
-        for (var i = 0; i < n; ++i) {
-          elements[i].parentNode.removeChild(elements[i]);
+      var removeTips = function(className) {
+        var elements = document.getElementsByClassName(className);
+        var i, n;
+        if (elements) { // This should be always true.
+          n = elements.length;
+          for (i = 0; i < n; ++i) {
+            elements[i].parentNode.removeChild(elements[i]);
+          }
         }
-      }
+      };
+      removeTips('gene-tip');
+      removeTips('edge-tip');
     },
     data: {pageTitle: 'Gene Network'}
   });
@@ -251,8 +255,7 @@ angular.module('adage.gene.network', [
           .call(edgeTip);
 
         geneTip.html(getGeneInfo);
-        network.onGene('mouseover.custom', geneTip.show);
-        network.onGene('mouseout.custom', geneTip.hide);
+        network.onGene('click.custom', geneTip.show);
         network.onEdge('click.custom', showEdgeTip);
 
         // Draw network svg with legend and filter.
@@ -260,14 +263,20 @@ angular.module('adage.gene.network', [
           .filter(0, self.maxNodeNum)
           .draw();
 
-        // Add event handler so that edge-tip will be hidden when clicked:
-        var edgeTips = document.getElementsByClassName('edge-tip');
-        if (edgeTips) {
-          var n = edgeTips.length;
-          for (var i = 0; i < n; ++i) {
-            edgeTips[i].onclick = hideEdgeTip;
+        // Add event handlers to gene-tip and edge-tip so that they will be
+        // hidden when clicked:
+        var addClickHandler = function(className, handler) {
+          var elements = document.getElementsByClassName(className);
+          var i, n;
+          if (elements) {
+            n = elements.length;
+            for (i = 0; i < n; ++i) {
+              elements[i].onclick = handler;
+            }
           }
-        }
+        };
+        addClickHandler('gene-tip', geneTip.hide);
+        addClickHandler('edge-tip', hideEdgeTip);
       } // End of drawNetwork()
 
       EdgeService.get(
