@@ -5,6 +5,7 @@
 angular.module('adage.gene.network', [
   'ui.router',
   'ui.bootstrap',
+  'ngResource',
   'rzModule'
 ])
 
@@ -15,6 +16,19 @@ angular.module('adage.gene.network', [
       main: {
         templateUrl: 'gene/network/network.tpl.html',
         controller: 'GeneNetworkCtrl as ctrl'
+      }
+    },
+    // When "gene_network" state exits, remove "edge-tip" elements from the DOM.
+    // (Without this function, the edge tip window will be visible in other
+    // states too.) The "gene-tip" element will disappear when mouse is out,
+    // so we don't need to worry about it.
+    onExit: function() {
+      var elements = document.getElementsByClassName('edge-tip');
+      if (elements) { // This should be always true.
+        var n = elements.length;
+        for (var i = 0; i < n; ++i) {
+          elements[i].parentNode.removeChild(elements[i]);
+        }
       }
     },
     data: {pageTitle: 'Gene Network'}
@@ -187,20 +201,22 @@ angular.module('adage.gene.network', [
           NodeService.get(
             {'heavy_genes': heavyGenes, 'limit': 0},
             function success(response) {
-              var n = response.objects.length;
+              var i = 0, n = response.objects.length;
+              var uri;
               str += '<br />' + n + (n > 1 ? ' nodes are ' : ' node is ');
               str += 'related to both genes' + (n > 0 ? ':' : '.');
-              for (var i = 0; i < n; ++i) {
-                str += '<br />* ' + response.objects[i].name + '</li>';
+              for (; i < n; ++i) {
+                uri = '<a href="#/node/' + response.objects[i].id + '">';
+                str += '<br />* ' + uri + response.objects[i].name + '</a>';
               }
-
               edgeTip.html(str);
               edgeTip.show(data, target);
             },
-            function error(err) {
-              $log.error(
-                'Failed to get node info for gene edge: ' + err.statusText);
-              str += 'Can\'t get node information, please try again later.';
+            function error(response) {
+              var message = 'Failed to get node info for gene edge: ' +
+                  response.statusCode + ' ' + response.statusText;
+              $log.error(message);
+              str += message + '. Please try again later.';
               edgeTip.html(str);
               edgeTip.show(data, target);
             }
@@ -237,14 +253,22 @@ angular.module('adage.gene.network', [
         geneTip.html(getGeneInfo);
         network.onGene('mouseover.custom', geneTip.show);
         network.onGene('mouseout.custom', geneTip.hide);
-        network.onEdge('mouseover.custom', showEdgeTip);
-        network.onEdge('mouseout.custom', hideEdgeTip);
+        network.onEdge('click.custom', showEdgeTip);
 
         // Draw network svg with legend and filter.
         network.showLegend()
           .filter(0, self.maxNodeNum)
           .draw();
-      }
+
+        // Add event handler so that edge-tip will be hidden when clicked:
+        var edgeTips = document.getElementsByClassName('edge-tip');
+        if (edgeTips) {
+          var n = edgeTips.length;
+          for (var i = 0; i < n; ++i) {
+            edgeTips[i].onclick = hideEdgeTip;
+          }
+        }
+      } // End of drawNetwork()
 
       EdgeService.get(
         {genes: $stateParams.genes, mlmodel: $stateParams.mlmodel, limit: 0},
@@ -263,9 +287,11 @@ angular.module('adage.gene.network', [
           self.statusMessage = '';
           drawNetwork();
         },
-        function error(err) {
-          $log.error('Failed to get edges: ' + err.statusText);
-          self.statusMessage = 'Connection to server failed';
+        function error(response) {
+          var message = 'Failed to get edges: ' + response.statusCode +
+              ' ' + response.statusText;
+          $log.error(message);
+          self.statusMessage = message + '. Please try again later';
         }
       );
     }
