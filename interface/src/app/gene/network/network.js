@@ -193,57 +193,50 @@ angular.module('adage.gene.network', [
         }
 
         /**
-         * Callback function to show edge tips when mouse is over an edge.
+         * Callback function to show gene tips when a gene is clicked.
+         * @param {gene_data} data;
+         * @return {void}.
+         */
+        function showGeneTip(data) {
+          edgeTip.hide(); // Hide edge-tip window (if any) first.
+          geneTip.show(data);
+        }
+
+        /**
+         * Callback function to show edge tips when an edge is clicked.
          * @param {edge_data} data;
          * @return {void}.
          */
         function showEdgeTip(data) {
+          geneTip.hide(); // Hide gene-tip window (if any) first.
           var rawWeight = data.weight + rawMinWeight;
-          var str = 'Edge weight: ' + rawWeight.toFixed(3);
+          var htmlText = 'Edge weight: ' + rawWeight.toFixed(3);
           var heavyGenes = [data.gene1.id, data.gene2.id].join(',');
           var target = d3.event.target;
           NodeService.get(
             {'heavy_genes': heavyGenes, 'limit': 0},
             function success(response) {
               var i = 0, n = response.objects.length;
-              var uri;
-              str += '<br />' + n + (n > 1 ? ' nodes are ' : ' node is ');
-              str += 'related to both genes' + (n > 0 ? ':' : '.');
+              var anchorTag;
+              htmlText += '<br />' + n + (n > 1 ? ' nodes are ' : ' node is ');
+              htmlText += 'related to both genes' + (n > 0 ? ':' : '.');
               for (; i < n; ++i) {
-                uri = '<a href="#/node/' + response.objects[i].id + '">';
-                str += '<br />* ' + uri + response.objects[i].name + '</a>';
+                anchorTag = '<a href="#/node/' + response.objects[i].id + '">';
+                htmlText += '<br />* ' + anchorTag + response.objects[i].name;
+                htmlText += '</a>';
               }
-              edgeTip.html(str);
+              edgeTip.html(htmlText);
               edgeTip.show(data, target);
             },
             function error(response) {
               var message = 'Failed to get node info for gene edge: ' +
                   response.statusCode + ' ' + response.statusText;
               $log.error(message);
-              str += message + '. Please try again later.';
-              edgeTip.html(str);
+              htmlText += '<br />' + message + '. Please try again later.';
+              edgeTip.html(htmlText);
               edgeTip.show(data, target);
             }
           );
-        }
-
-        /**
-         * Callback function to hide edge tips.
-         * @param {edge_data} data;
-         * @return {void}.
-         * ---------------------------------------------------------------------
-         * FIXME: Since the edge tip is shown asynchronously, when
-         * edgeTip.hide() is called immediately to hide the tip box, the box
-         * won't be hidden if it is shown AFTER mouseout action.  To solve this
-         * problem, edgeTip.hide() is called asynchronously after 100
-         * milliseconds.  This is more like a workaround. Not sure whether there
-         * is a better solution.
-         * ---------------------------------------------------------------------
-         */
-        function hideEdgeTip(data) {
-          setTimeout(function() {
-            edgeTip.hide();
-          }, 100);
         }
 
         network.genes(genes).edges(edges);
@@ -255,7 +248,7 @@ angular.module('adage.gene.network', [
           .call(edgeTip);
 
         geneTip.html(getGeneInfo);
-        network.onGene('click.custom', geneTip.show);
+        network.onGene('click.custom', showGeneTip);
         network.onEdge('click.custom', showEdgeTip);
 
         // Draw network svg with legend and filter.
@@ -276,7 +269,7 @@ angular.module('adage.gene.network', [
           }
         };
         addClickHandler('gene-tip', geneTip.hide);
-        addClickHandler('edge-tip', hideEdgeTip);
+        addClickHandler('edge-tip', edgeTip.hide);
       } // End of drawNetwork()
 
       EdgeService.get(
