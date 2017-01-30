@@ -131,7 +131,9 @@ AWS_CONFIG = {
         '<configure:http://example.com/tribe_client/get_token>',
     'tribe_scope': 'write',
     'tribe_login_redirect': '/#/home',
-    'tribe_logout_redirect': '/#/home'
+    'tribe_logout_redirect': '/#/home',
+    'public_geneset_folder': os.path.join(OS_CONFIG['home_dir'],
+                                        'adage-server', 'data')
 }
 
 # development server deployment credentials and configuration (maybe on VMware)
