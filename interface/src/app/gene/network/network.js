@@ -176,18 +176,18 @@ angular.module('adage.gene.network', [
          */
         function getGeneInfo(data) {
           var result = '<div id="title">' + data.label + '</div>';
-          result += '<br />Entrez ID: ' + data.entrezid;
+          result += '<br>Entrez ID: ' + data.entrezid;
           if (data.systematic_name) {
-            result += '<br />Systematic name: ' + data.systematic_name;
+            result += '<br>Systematic name: ' + data.systematic_name;
           }
           if (data.standard_name) {
-            result += '<br />Standard name: ' + data.standard_name;
+            result += '<br>Standard name: ' + data.standard_name;
           }
           if (data.description) {
-            result += '<br />Description: ' + data.description;
+            result += '<br>Description: ' + data.description;
           }
           if (data.aliases) {
-            result += '<br />aliases: ' + data.aliases;
+            result += '<br>aliases: ' + data.aliases;
           }
           return result;
         }
@@ -210,7 +210,8 @@ angular.module('adage.gene.network', [
         function showEdgeTip(data) {
           geneTip.hide(); // Hide gene-tip window (if any) first.
           var rawWeight = data.weight + rawMinWeight;
-          var htmlText = 'Edge weight: ' + rawWeight.toFixed(3);
+          var weightPrecision = 3;
+          var htmlText = 'Edge weight: ' + rawWeight.toFixed(weightPrecision);
           var heavyGenes = [data.gene1.id, data.gene2.id].join(',');
           var target = d3.event.target;
           NodeService.get(
@@ -218,11 +219,11 @@ angular.module('adage.gene.network', [
             function success(response) {
               var i = 0, n = response.objects.length;
               var anchorTag;
-              htmlText += '<br />' + n + (n > 1 ? ' nodes are ' : ' node is ');
+              htmlText += '<br>' + n + (n > 1 ? ' nodes are ' : ' node is ');
               htmlText += 'related to both genes' + (n > 0 ? ':' : '.');
               for (; i < n; ++i) {
                 anchorTag = '<a href="#/node/' + response.objects[i].id + '">';
-                htmlText += '<br />* ' + anchorTag + response.objects[i].name;
+                htmlText += '<br>* ' + anchorTag + response.objects[i].name;
                 htmlText += '</a>';
               }
               edgeTip.html(htmlText);
@@ -232,7 +233,7 @@ angular.module('adage.gene.network', [
               var message = 'Failed to get node info for gene edge: ' +
                   response.statusCode + ' ' + response.statusText;
               $log.error(message);
-              htmlText += '<br />' + message + '. Please try again later.';
+              htmlText += '<br>' + message + '. Please try again later.';
               edgeTip.html(htmlText);
               edgeTip.show(data, target);
             }
