@@ -5,6 +5,7 @@
 angular.module('adage.gene.network', [
   'ui.router',
   'ui.bootstrap',
+  'ngResource',
   'rzModule'
 ])
 
@@ -16,6 +17,23 @@ angular.module('adage.gene.network', [
         templateUrl: 'gene/network/network.tpl.html',
         controller: 'GeneNetworkCtrl as ctrl'
       }
+    },
+    // When "gene_network" state exits, remove "gene-tip" and "edge-tip"
+    // elements from the DOM. (Without this function, the tips window will
+    // be visible in other states too.)
+    onExit: function() {
+      var removeTips = function(className) {
+        var elements = document.getElementsByClassName(className);
+        var i, n;
+        if (elements) { // This should be always true.
+          n = elements.length;
+          for (i = 0; i < n; ++i) {
+            elements[i].parentNode.removeChild(elements[i]);
+          }
+        }
+      };
+      removeTips('gene-tip');
+      removeTips('edge-tip');
     },
     data: {pageTitle: 'Gene Network'}
   });
@@ -158,72 +176,68 @@ angular.module('adage.gene.network', [
          */
         function getGeneInfo(data) {
           var result = '<div id="title">' + data.label + '</div>';
-          result += '<br />Entrez ID: ' + data.entrezid;
+          result += '<br>Entrez ID: ' + data.entrezid;
           if (data.systematic_name) {
-            result += '<br />Systematic name: ' + data.systematic_name;
+            result += '<br>Systematic name: ' + data.systematic_name;
           }
           if (data.standard_name) {
-            result += '<br />Standard name: ' + data.standard_name;
+            result += '<br>Standard name: ' + data.standard_name;
           }
           if (data.description) {
-            result += '<br />Description: ' + data.description;
+            result += '<br>Description: ' + data.description;
           }
           if (data.aliases) {
-            result += '<br />aliases: ' + data.aliases;
+            result += '<br>aliases: ' + data.aliases;
           }
           return result;
         }
 
         /**
-         * Callback function to show edge tips when mouse is over an edge.
+         * Callback function to show gene tips when a gene is clicked.
+         * @param {gene_data} data;
+         * @return {void}.
+         */
+        function showGeneTip(data) {
+          edgeTip.hide(); // Hide edge-tip window (if any) first.
+          geneTip.show(data);
+        }
+
+        /**
+         * Callback function to show edge tips when an edge is clicked.
          * @param {edge_data} data;
          * @return {void}.
          */
         function showEdgeTip(data) {
+          geneTip.hide(); // Hide gene-tip window (if any) first.
           var rawWeight = data.weight + rawMinWeight;
-          var str = 'Edge weight: ' + rawWeight.toFixed(3);
+          var weightPrecision = 3;
+          var htmlText = 'Edge weight: ' + rawWeight.toFixed(weightPrecision);
           var heavyGenes = [data.gene1.id, data.gene2.id].join(',');
           var target = d3.event.target;
           NodeService.get(
             {'heavy_genes': heavyGenes, 'limit': 0},
             function success(response) {
-              var n = response.objects.length;
-              str += '<br />' + n + (n > 1 ? ' nodes are ' : ' node is ');
-              str += 'related to both genes' + (n > 0 ? ':' : '.');
-              for (var i = 0; i < n; ++i) {
-                str += '<br />* ' + response.objects[i].name + '</li>';
+              var i = 0, n = response.objects.length;
+              var anchorTag;
+              htmlText += '<br>' + n + (n > 1 ? ' nodes are ' : ' node is ');
+              htmlText += 'related to both genes' + (n > 0 ? ':' : '.');
+              for (; i < n; ++i) {
+                anchorTag = '<a href="#/node/' + response.objects[i].id + '">';
+                htmlText += '<br>* ' + anchorTag + response.objects[i].name;
+                htmlText += '</a>';
               }
-
-              edgeTip.html(str);
+              edgeTip.html(htmlText);
               edgeTip.show(data, target);
             },
-            function error(err) {
-              $log.error(
-                'Failed to get node info for gene edge: ' + err.statusText);
-              str += 'Can\'t get node information, please try again later.';
-              edgeTip.html(str);
+            function error(response) {
+              var message = 'Failed to get node info for gene edge: ' +
+                  response.statusCode + ' ' + response.statusText;
+              $log.error(message);
+              htmlText += '<br>' + message + '. Please try again later.';
+              edgeTip.html(htmlText);
               edgeTip.show(data, target);
             }
           );
-        }
-
-        /**
-         * Callback function to hide edge tips.
-         * @param {edge_data} data;
-         * @return {void}.
-         * ---------------------------------------------------------------------
-         * FIXME: Since the edge tip is shown asynchronously, when
-         * edgeTip.hide() is called immediately to hide the tip box, the box
-         * won't be hidden if it is shown AFTER mouseout action.  To solve this
-         * problem, edgeTip.hide() is called asynchronously after 100
-         * milliseconds.  This is more like a workaround. Not sure whether there
-         * is a better solution.
-         * ---------------------------------------------------------------------
-         */
-        function hideEdgeTip(data) {
-          setTimeout(function() {
-            edgeTip.hide();
-          }, 100);
         }
 
         network.genes(genes).edges(edges);
@@ -235,16 +249,29 @@ angular.module('adage.gene.network', [
           .call(edgeTip);
 
         geneTip.html(getGeneInfo);
-        network.onGene('mouseover.custom', geneTip.show);
-        network.onGene('mouseout.custom', geneTip.hide);
-        network.onEdge('mouseover.custom', showEdgeTip);
-        network.onEdge('mouseout.custom', hideEdgeTip);
+        network.onGene('click.custom', showGeneTip);
+        network.onEdge('click.custom', showEdgeTip);
 
         // Draw network svg with legend and filter.
         network.showLegend()
           .filter(0, self.maxNodeNum)
           .draw();
-      }
+
+        // Add event handlers to gene-tip and edge-tip so that they will be
+        // hidden when clicked:
+        var addClickHandler = function(className, handler) {
+          var elements = document.getElementsByClassName(className);
+          var i, n;
+          if (elements) {
+            n = elements.length;
+            for (i = 0; i < n; ++i) {
+              elements[i].onclick = handler;
+            }
+          }
+        };
+        addClickHandler('gene-tip', geneTip.hide);
+        addClickHandler('edge-tip', edgeTip.hide);
+      } // End of drawNetwork()
 
       EdgeService.get(
         {genes: $stateParams.genes, mlmodel: $stateParams.mlmodel, limit: 0},
@@ -263,9 +290,11 @@ angular.module('adage.gene.network', [
           self.statusMessage = '';
           drawNetwork();
         },
-        function error(err) {
-          $log.error('Failed to get edges: ' + err.statusText);
-          self.statusMessage = 'Connection to server failed';
+        function error(response) {
+          var message = 'Failed to get edges: ' + response.statusCode +
+              ' ' + response.statusText;
+          $log.error(message);
+          self.statusMessage = message + '. Please try again later';
         }
       );
     }
