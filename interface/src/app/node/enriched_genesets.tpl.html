@@ -13,7 +13,7 @@
   </thead>
 
   <tr ng-repeat="geneset in enrichedGenesets">
-    <td>{{geneset.name}}</td>
+    <td><a href="{{geneset.url}}">{{geneset.name}}</a></td>
     <td>{{geneset.dbase}}</td>
     <td>{{geneset.pValue}}</td>
     <td><span ng-repeat="gene in geneset.genes"> {{gene.stdName}} </span></td>
