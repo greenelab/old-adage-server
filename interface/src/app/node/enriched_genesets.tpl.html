@@ -1,0 +1,21 @@
+<h4>
+  <b>Enriched gene sets: </b>
+</h4>
+
+<table id="enrichment-table" class="table table-striped table-bordered table-condensed">
+  <thead>
+    <tr>
+      <td>Pathways/Processes/Diseases</td>
+      <td>Databases</td>
+      <td>P-Value</td>
+      <td>Genes</td>
+    </tr>
+  </thead>
+
+  <tr ng-repeat="geneset in enrichedGenesets">
+    <td>{{geneset.name}}</td>
+    <td>{{geneset.dbase}}</td>
+    <td>{{geneset.pValue}}</td>
+    <td><span ng-repeat="gene in geneset.genes"> {{gene.stdName}} </span></td>
+  </tr>
+</table>

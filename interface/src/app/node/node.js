@@ -4,7 +4,9 @@
 
 angular.module('adage.node', [
   'ui.router',
-  'ui.bootstrap'
+  'ui.bootstrap',
+
+  'adage.utils'
 ])
 
 .config(['$stateProvider', function($stateProvider) {
@@ -49,6 +51,8 @@ angular.module('adage.node', [
         self.statusMessage = 'Failed to get node information from server';
       }
     );
+    self.organism = 'Pseudomonas aeruginosa';
+    self.hWGenes = [];
   }
 ])
 
@@ -58,7 +62,8 @@ angular.module('adage.node', [
       templateUrl: 'node/heavy_genes.tpl.html',
       restrict: 'E',
       scope: {
-        nodeId: '@'
+        nodeId: '@',
+        hWGenes: '='
       },
       link: function($scope) {
         $scope.queryStatus = 'Connecting to the server ...';
@@ -73,12 +78,15 @@ angular.module('adage.node', [
               sysName = response.objects[i].gene.systematic_name;
               stdName = response.objects[i].gene.standard_name;
               desc = response.objects[i].gene.description;
+              entrezID = response.objects[i].gene.entrezid;
               if (desc.toLowerCase() === 'hypothetical protein') {
                 ++numHypo;
               }
               $scope.genes.push(
-                {sysName: sysName, stdName: stdName, desc: desc});
+                {sysName: sysName, stdName: stdName, desc: desc,
+                 entrezID: entrezID});
             }
+            $scope.hWGenes = $scope.genes;
             $scope.hypoPercentage = Math.round(numHypo / n * 100);
             $scope.queryStatus = '';
           },
@@ -299,4 +307,123 @@ angular.module('adage.node', [
       };
     }
   };
-}]);
+}])
+
+.directive('enrichedGenesets', ['MathFuncts', 'PickledGenesetsService', '$log',
+  function(MathFuncts, PickledGenesetsService, $log) {
+    return {
+      templateUrl: 'node/enriched_genesets.tpl.html',
+      restrict: 'E',
+      scope: {
+        organism: '=',
+        hWGenes: '=' // hWGenes is an array of high-weight Genes
+      },
+      link: function($scope) {
+        $scope.queryStatus = 'Connecting to the server ...';
+
+        var pValueCutoff = 0.05;
+        var pValueSigDigits = 3;
+
+        // This is an object, where each key is the geneset ID, and each value
+        // is an array of the genes that this geneset contains.
+        var genesetGenes = {};
+
+        // We want to fill out this array with the genesets that score a
+        // p-value of less than the cutoff in the hypergeometric test.
+        // Each geneset in this array will be an object containing just the
+        // desired information.
+        var relevantGenesetArray = [];
+
+        // This is the main function that calculates the geneset enrichments.
+        // It calculates the enrichment for each geneset that has genes
+        // also present in the node high weight genes, and pushes that geneset
+        // into the releventGenesetArray.
+        var calculateEnrichments = function(geneGenesets, allGenesetInfo,
+                                            totalGeneNum, cutoff) {
+          var N = totalGeneNum;
+
+          // This will be the number of genes from the high weight gene list
+          // that are also present in any of the genesets that were returned
+          var m = 0;
+
+          // Fill out the genesetGenes object
+          for (var i = 0; i < $scope.hWGenes.length; i++) {
+            var genesetList = null;
+            var geneEntrezID = $scope.hWGenes[i].entrezID;
+
+            if (geneGenesets.hasOwnProperty(geneEntrezID)) {
+              genesetList = geneGenesets[geneEntrezID];
+
+              if (genesetList && genesetList.length > 0) {
+                m += 1;
+              }
+
+              for (var j = 0; j < genesetList.length; j++) {
+                var genesetID = genesetList[j];
+                if (!genesetGenes[genesetID]) {
+                  genesetGenes[genesetID] = [];
+                }
+                genesetGenes[genesetID].push($scope.hWGenes[i]);
+              }
+            } else {
+              $log.warn('Entrez ID: ' + geneEntrezID + ' not found in ' +
+                        'genesets.');
+            }
+          }
+
+          var enrichedGenesetIDs = Object.keys(genesetGenes);
+
+          for (i = 0; i < enrichedGenesetIDs.length; i++) {
+            var gsID = enrichedGenesetIDs[i];
+            var genesetInfoObj = allGenesetInfo[gsID];
+
+            var k = genesetGenes[gsID].length;
+            var n = genesetInfoObj.size;
+
+            var pValue =
+                1 - MathFuncts.hyperGeometricTest(k, m, n, N);
+            pValue = pValue.toPrecision(pValueSigDigits);
+
+            if (pValue < pValueCutoff) {
+              relevantGenesetArray.push(
+                {'name': genesetInfoObj.name, 'dbase': genesetInfoObj.dbase,
+                 'url': genesetInfoObj.url, 'pValue': pValue,
+                 'genes': genesetGenes[gsID]}
+              );
+            }
+          }
+
+          relevantGenesetArray.sort(function(a, b) {
+            return a.pValue - b.pValue;
+          });
+
+          return relevantGenesetArray;
+        };
+
+        $scope.$watch('hWGenes', function() {
+          if ($scope.hWGenes.length > 0) {
+            PickledGenesetsService.get(
+              {organism: $scope.organism},
+              function success(response) {
+                var gsInfoArray = response.procs;
+                var genesetsPerGene = response.genes;
+                var totGeneNum = response.bgtotal;
+
+                $scope.enrichedGenesets = calculateEnrichments(
+                  genesetsPerGene, gsInfoArray,
+                  totGeneNum, pValueCutoff
+                );
+              },
+              function error(err) {
+                $log.error('Failed to get unpickled genesets: ' +
+                           err.statusText);
+                $scope.queryStatus = 'Failed to get genesets from server';
+              }
+            );
+          }
+        });
+      }
+    };
+  }
+])
+;

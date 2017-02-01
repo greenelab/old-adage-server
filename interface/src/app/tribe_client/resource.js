@@ -32,4 +32,14 @@ angular.module('adage.tribe_client.resource', ['ngResource'])
   );
 }])
 
+.factory('PickledGenesetsService', ['$resource', function($resource) {
+  return $resource(
+    '/tribe_client/return_unpickled_genesets',
+
+    {organism: '@organism'},
+
+    {}
+  );
+}])
+
 ;
