@@ -56,29 +56,29 @@
         <div class="collapse navbar-collapse" collapse="menuCollapsed">
           <ul class="nav navbar-nav">
             <li ui-sref-active="active">
-              <a href ui-sref="home">
+              <a ui-sref="home">
                 <i class="fa fa-home"></i>
                 Home
               </a>
             </li>
             <li ui-sref-active="active">
-              <a href ui-sref="about">
+              <a ui-sref="about">
                 <i class="fa fa-info-circle"></i>
                 About
               </a>
             </li>
             <li ui-sref-active="active">
-              <a href ui-sref="analyze">
+              <a ui-sref="analyze">
                 Analyze
               </a>
             </li>
             <li ui-sref-active="active">
-              <a href ui-sref="download">
+              <a ui-sref="download">
                 Download
               </a>
             </li>
             <li ui-sref-active="active">
-              <a href ui-sref="gene_search">
+              <a ui-sref="gene_search">
                 GeneNetwork
               </a>
             </li>
@@ -87,7 +87,7 @@
           <ul class="nav navbar-nav navbar-right">
             <sample-bin></sample-bin>
             <li ui-sref-active="active">
-              <a href ui-sref="help">Help</a>
+              <a ui-sref="help">Help</a>
             </li>
             <login-button ng-if="!userObj"></login-button>
             <profile-button ng-if="userObj"></profile-button>
