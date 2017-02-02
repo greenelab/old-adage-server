@@ -5,8 +5,10 @@
 angular.module('adage.node', [
   'ui.router',
   'ui.bootstrap',
-
+  'ngResource',
+  // Dependency modules from the 'adage' Angular app
   'adage.utils'
+
 ])
 
 .config(['$stateProvider', function($stateProvider) {
@@ -59,7 +61,7 @@ angular.module('adage.node', [
 .directive('highWeightGenes', ['ParticipationService', '$log',
   function(ParticipationService, $log) {
     return {
-      templateUrl: 'node/heavy_genes.tpl.html',
+      templateUrl: 'node/high_weight_genes.tpl.html',
       restrict: 'E',
       scope: {
         nodeId: '@',

@@ -1,10 +1,9 @@
-<svg id="sample-bin" width="100" height="60" ng-click="show()">
-  <image x="27" y="6" width="45" height="45"
-      xlink:href="static/assets/testtube-expt2.svg">
-  </image>
-  <g ng-if="sb.heatmapData.samples.length">
-    <text text-anchor="left" x="28" y="43">&times;</text>
-    <text text-anchor="left" x="44" y="43">{{
-      sb.heatmapData.samples.length }}</text>
-  </g>
-</svg>
+<li ui-sref-active="active" class="sample-bin">
+  <a ui-sref="analysis-detail">
+    <img src="/static/assets/testtube-expt2.svg" alt="Samples"
+     width="28" height="28">
+    <span ng-if="sb.heatmapData.samples.length" class="badge">{{
+      sb.heatmapData.samples.length }}
+    </span>
+  </a>
+</li>

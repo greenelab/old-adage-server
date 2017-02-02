@@ -10,7 +10,7 @@ import sys
 import logging
 import pprint
 from fabric.api import env, local, run, settings, hide, abort, task
-from fabric.api import cd, prefix, sudo
+from fabric.api import cd, prefix, sudo, shell_env
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG_DIR = os.path.join(BASE_DIR, 'adage', 'adage')
@@ -210,6 +210,7 @@ def init_instance():
 def build_interface():
     """ have grunt perform a deployment build for us """
     with cd(CONFIG['interface_dir']), \
+            shell_env(PHANTOMJS_BIN='/usr/local/bin/phantomjs'), \
             prefix('source {0}/bin/activate'.format(CONFIG['virt_env'])):
         run('grunt --force')
 
