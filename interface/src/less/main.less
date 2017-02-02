@@ -70,10 +70,16 @@ h2 {
  */
 
 .navbar {
-  margin-top: 20px;
+  margin-top: @line-height-computed;
 
   small {
     font-size: 60%;
+  }
+}
+@media (min-width: @grid-float-breakpoint) {
+  .navbar-right {
+    // default style removes this margin (which looks bad) so this restores it
+    margin-right: inherit;
   }
 }
 
@@ -130,4 +136,5 @@ body {
 @import '../app/home/home.less';
 @import '../app/analyze/analyze.less';
 @import '../app/analyze/analysis/analysis.less';
+@import '../app/analyze/analysis/sampleBin.less';
 @import '../app/gene/network/network.less';

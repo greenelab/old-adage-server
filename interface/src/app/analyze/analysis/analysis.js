@@ -7,12 +7,26 @@ angular.module('adage.analyze.analysis', [
   'adage.analyze.sampleBin',
   'adage.analyze.sample',
   'statusBar',
+  'ui.router',
   'ngVega',
   'ngResource'
 ])
 
 .factory('AnnotationType', ['$resource', function($resource) {
   return $resource('/api/v0/annotationtype/');
+}])
+
+.config(['$stateProvider', function($stateProvider) {
+  $stateProvider.state('analysis-detail', {
+    url: '/analysis-detail',
+    views: {
+      main: {
+        controller: 'AnalysisCtrl',
+        templateUrl: 'analyze/analysis/analysisDetail.tpl.html'
+      }
+    },
+    data: {pageTitle: 'Analysis Detail'}
+  });
 }])
 
 .controller('AnalysisCtrl', ['$scope', '$log', '$location', '$q', 'Sample',
@@ -239,12 +253,4 @@ AnnotationType, SampleBin) {
   SampleBin.getActivityForSampleList($scope.analysis);
 }])
 
-.directive('analysisDetail', function() {
-  return {
-    restrict: 'E',
-    // scope: {},
-    templateUrl: 'analyze/analysis/analysisDetail.tpl.html',
-    controller: 'AnalysisCtrl'
-  };
-})
 ;
