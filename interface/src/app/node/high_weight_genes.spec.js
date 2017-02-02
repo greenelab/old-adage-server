@@ -20,8 +20,8 @@ describe('<high-weight-genes> directive', function() {
   it('should render HTML correctly', function() {
     var parentScope = $rootScope.$new();
     parentScope.nodeID = 123;
-    var testHTML = '<high-weight-genes node-id="{{nodeID}}">' +
-        '</high-weight-genes>';
+    var testHTML = '<high-weight-genes node-id="{{nodeID}}" ' +
+        'h-w-genes="ctrl.hWGenes"></high-weight-genes>';
     var uri = '/api/v0/participation?limit=0&node=' + parentScope.nodeID;
     var element = $compile(testHTML)(parentScope);
 
