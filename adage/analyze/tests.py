@@ -366,8 +366,24 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
             **self.test_experiment))
 
         # Create a few annotation types to retrieve with the API
-        self.at_count = 10
-        factory.create(AnnotationType, self.at_count)
+        ann_type = AnnotationType(
+            typename="type name % one",
+            description="description with more words 1",
+        )
+        ann_type.save()
+        ann_type = AnnotationType(
+            typename="type name & two",
+            description="description with more words 2",
+        )
+        ann_type.save()
+        ann_type = AnnotationType(
+            typename="type name # three",
+            description="description with more words 3",
+        )
+        ann_type.save()
+        self.at_count = 3
+        factory.create(AnnotationType, 7)
+        self.at_count += 7
         self.annotationtype_listURI = self.baseURI + 'annotationtype/'
         self.annotationtypeURI = self.annotationtype_listURI + str(
             self.random_object(AnnotationType).id) + '/'
@@ -432,25 +448,25 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         '''
         Helper method: asserts that GET method is allowed via input URI.
         '''
-        resp = self.api_client.get(uri, data={'format': 'json'})
+        resp = self.api_client.get(uri)
         self.assertValidJSONResponse(resp)
 
-    def call_non_get_API(self, uri):
+    def call_non_get_API(self, uri, data={}):
         '''
         Helper method: assert that the methods of POST, PUT, PATCH and DELETE
         are NOT allowed via input URI.
         '''
         # POST
-        resp = self.api_client.post(uri, data={'format': 'json'})
+        resp = self.api_client.post(uri, data=data)
         self.assertHttpMethodNotAllowed(resp)
         # PUT
-        resp = self.api_client.put(uri, data={'format': 'json'})
+        resp = self.api_client.put(uri, data=data)
         self.assertHttpMethodNotAllowed(resp)
         # PATCH
-        resp = self.api_client.patch(uri, data={'format': 'json'})
+        resp = self.api_client.patch(uri, data=data)
         self.assertHttpMethodNotAllowed(resp)
         # DELETE
-        resp = self.api_client.delete(uri, data={'format': 'json'})
+        resp = self.api_client.delete(uri, data=data)
         self.assertHttpMethodNotAllowed(resp)
 
     def test_experiment_get(self):
@@ -459,7 +475,7 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         """
         # TODO is there a good way to run this method on a bootstrapped db?
         # print(self.experimentURI)
-        resp = self.api_client.get(self.experimentURI, data={'format': 'json'})
+        resp = self.api_client.get(self.experimentURI)
         # print("vars: %s" % vars(resp))
         # print("resp: %s" % resp)
         self.assertValidJSONResponse(resp)
@@ -498,7 +514,7 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         self.assertEqual(AnnotationType.objects.count(), self.at_count)
         # Test GET method and ensure we get all records back
         resp = self.api_client.get(self.annotationtype_listURI,
-                                   data={'format': 'json', 'limit': 0})
+                                   data={'limit': 0})
         self.assertValidJSONResponse(resp)
         atresp = self.deserialize(resp)
         self.assertEqual(len(atresp['objects']), self.at_count)
@@ -565,7 +581,8 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
                   for at in random.sample(AnnotationType.objects.all(), 3)]
         atstr = ','.join(atypes)
         resp = self.api_client.get(
-            self.baseURI + 'sample/get_annotations/?annotation_types=' + atstr)
+            self.baseURI + 'sample/get_annotations/',
+            data={'annotation_types': atstr})
         self.check_annotations_param(resp, atypes)
 
     def check_annotations_default(self, resp):
@@ -625,11 +642,13 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         """
         Test "activity/?sample=<id>&mlmodel=<ml_id>" API.
         """
-        uri = (self.baseURI + "activity/?sample=" +
-               str(self.random_object(Sample).id) + "&mlmodel=" +
-               str(self.random_object(MLModel).id))
+        uri = self.baseURI + "activity/"
+        data = {
+            'sample': str(self.random_object(Sample).id),
+            'mlmodel': str(self.random_object(MLModel).id)
+        }
         # Test GET method
-        resp = self.api_client.get(uri)
+        resp = self.api_client.get(uri, data=data)
         self.assertValidJSONResponse(resp)
 
         # Confirm the number of records returned.
@@ -637,7 +656,7 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         self.assertEqual(len(records['objects']), self.node_counter // 2)
 
         # Test non-GET methods
-        self.call_non_get_API(uri)
+        self.call_non_get_API(uri, data=data)
 
     def test_one_edge(self):
         """
@@ -663,8 +682,9 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         # The number of edges in the union of the first and last genes
         # should be: num_gene1 + num_gene2 - 1, "-1" is due to double
         # counting of the edge between the first and last genes.
-        uri = "%sedge/?genes=%s,%s" % (self.baseURI, id1, id2)
-        resp = self.api_client.get(uri)
+        uri = self.baseURI + "edge/"
+        data = {'genes': "%s,%s" % (id1, id2)}
+        resp = self.api_client.get(uri, data=data)
         resp = self.deserialize(resp)
         api_result = len(resp['objects'])
         self.assertEqual(api_result, self.num_gene1 + self.num_gene2 - 1)
@@ -678,8 +698,9 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         # genes.
         random_genes = random.sample(Gene.objects.all(), 100)
         ids_str = ",".join([str(gene.id) for gene in random_genes])
-        uri = "%sedge/?genes=%s" % (self.baseURI, ids_str)
-        resp = self.api_client.get(uri)
+        uri = self.baseURI + "edge/"
+        data = {'genes': ids_str}
+        resp = self.api_client.get(uri, data=data)
         resp = self.deserialize(resp)
         api_result = len(resp['objects'])
 
@@ -700,10 +721,12 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         id1 = Gene.objects.first().id  # First gene
         id2 = Gene.objects.last().id   # Last gene
         ids_str = str(id1) + "," + str(id2)
-        uri = "%sedge/?gene1__in=%s&gene2__in=%s" % (
-            self.baseURI, ids_str, ids_str)
-
-        resp = self.api_client.get(uri)
+        uri = self.baseURI + "edge/"
+        data = {
+            'gene1__in': ids_str,
+            'gene2__in': ids_str
+        }
+        resp = self.api_client.get(uri, data=data)
         resp = self.deserialize(resp)
         api_result = len(resp['objects'])
         self.assertEqual(api_result, 1)
@@ -712,9 +735,12 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         # selected genes.
         random_genes = random.sample(Gene.objects.all(), 100)
         ids_str = ",".join([str(gene.id) for gene in random_genes])
-        uri = "%sedge/?gene1__in=%s&gene2__in=%s" % (
-            self.baseURI, ids_str, ids_str)
-        resp = self.api_client.get(uri)
+        uri = self.baseURI + "edge/"
+        data = {
+            'gene1__in': ids_str,
+            'gene2__in': ids_str
+        }
+        resp = self.api_client.get(uri, data=data)
         resp = self.deserialize(resp)
         api_result = len(resp['objects'])
         query_result = Edge.objects.filter(
@@ -733,8 +759,12 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
 
         # Test edges from the first gene.
         id1 = Gene.objects.first().id  # The first gene
-        uri = "%sedge/?gene1=%s&%s" % (self.baseURI, id1, "order_by=weight")
-        resp = self.api_client.get(uri)
+        uri = self.baseURI + "edge/"
+        data = {
+            'gene1': id1,
+            'order_by': 'weight'
+        }
+        resp = self.api_client.get(uri, data=data)
         resp = self.deserialize(resp)
         edges = resp['objects']
         num_edges = len(edges)
@@ -748,9 +778,12 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
 
         # Test edges to the last gene.
         id2 = Gene.objects.last().id
-        uri = "%sedge/?gene2=%s&%s" % (self.baseURI, id2, "order_by=-weight")
-
-        resp = self.api_client.get(uri)
+        uri = self.baseURI + "edge/"
+        data = {
+            'gene2': id2,
+            'order_by': '-weight'
+        }
+        resp = self.api_client.get(uri, data=data)
         resp = self.deserialize(resp)
         edges = resp['objects']
         num_edges = len(edges)
@@ -780,14 +813,17 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         ModelsTestCase.create_participations(13, 29)
         g1 = Gene.objects.first().id  # The first gene
         g2 = Gene.objects.last().id   # The last gene
-        uri = "%snode/?heavy_genes=%s,%s%s" % (
-            self.baseURI, g1, g2, "&limit=0")
-        resp = self.api_client.get(uri)
+        uri = self.baseURI + "node/"
+        data = {
+            'heavy_genes': "%s,%s" % (g1, g2),
+            'limit': 0
+        }
+        resp = self.api_client.get(uri, data=data)
         resp = self.deserialize(resp)
         api_result = len(resp['objects'])
         self.assertEqual(api_result, Node.objects.count())
 
-        self.call_non_get_API(uri)  # Test non-get methods too.
+        self.call_non_get_API(uri, data=data)  # Test non-get methods too.
 
     def create_extra_experiments(self):
         """
@@ -818,8 +854,12 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         node = self.random_object(Node)
         self.assertEqual(Activity.objects.filter(node=node).count(),
                          self.s_counter)
-        filter_uri = "%sexperiment/?node=%s&limit=0" % (self.baseURI, node.id)
-        resp = self.api_client.get(filter_uri)
+        filter_uri = self.baseURI + "experiment/"
+        data = {
+            'node': node.id,
+            'limit': 0
+        }
+        resp = self.api_client.get(filter_uri, data=data)
         related_experiments = self.deserialize(resp)['objects']
         self.assertEqual(len(related_experiments), 2)
         self.assertEqual(related_experiments[0]['accession'],
@@ -827,7 +867,7 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         self.assertEqual(related_experiments[1]['accession'], exp2.accession)
 
         # Test non-get methods too.
-        self.call_non_get_API(filter_uri)
+        self.call_non_get_API(filter_uri, data=data)
 
     def test_experiment_filter_in_sample(self):
         """
@@ -837,19 +877,25 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
 
         # Confirm that all samples are related to the experiment that is
         # created from ModelsTestCase.experiment_data.
-        filter_uri = "%ssample/?experiment=%s&limit=0" % (
-            self.baseURI, ModelsTestCase.experiment_data['accession'])
-        resp = self.api_client.get(filter_uri)
+        filter_uri = self.baseURI + "sample/"
+        data = {
+            'experiment': ModelsTestCase.experiment_data['accession'],
+            'limit': 0
+        }
+        resp = self.api_client.get(filter_uri, data=data)
         related_samples = self.deserialize(resp)['objects']
         self.assertEqual(len(related_samples), Sample.objects.count())
 
         # Confirm that only the first sample is related to exp2.
-        filter_uri = "%ssample/?experiment=%s&limit=0" % (
-            self.baseURI, exp2.accession)
-        resp = self.api_client.get(filter_uri)
+        filter_uri = self.baseURI + "sample/"
+        data = {
+            'experiment': exp2.accession,
+            'limit': 0
+        }
+        resp = self.api_client.get(filter_uri, data=data)
         related_samples = self.deserialize(resp)['objects']
         self.assertEqual(len(related_samples), 1)
         self.assertEqual(related_samples[0]['id'], Sample.objects.first().id)
 
         # Test non-get methods too.
-        self.call_non_get_API(filter_uri)
+        self.call_non_get_API(filter_uri, data=data)
