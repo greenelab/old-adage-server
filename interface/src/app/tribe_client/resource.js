@@ -36,9 +36,8 @@ angular.module('adage.tribe_client.resource', ['ngResource'])
   return $resource(
     '/tribe_client/return_unpickled_genesets',
 
-    {organism: '@organism'},
+    {organism: '@organism'}
 
-    {}
   );
 }])
 
