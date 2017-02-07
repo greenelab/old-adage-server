@@ -54,7 +54,7 @@ angular.module('adage.node', [
       }
     );
     self.organism = 'Pseudomonas aeruginosa';
-    self.hWGenes = [];
+    self.genes = [];
   }
 ])
 
@@ -65,7 +65,7 @@ angular.module('adage.node', [
       restrict: 'E',
       scope: {
         nodeId: '@',
-        hWGenes: '='
+        genes: '='
       },
       link: function($scope) {
         $scope.queryStatus = 'Connecting to the server ...';
@@ -88,7 +88,6 @@ angular.module('adage.node', [
                 {sysName: sysName, stdName: stdName, desc: desc,
                  entrezID: entrezID});
             }
-            $scope.hWGenes = $scope.genes;
             $scope.hypoPercentage = Math.round(numHypo / n * 100);
             $scope.queryStatus = '';
           },
@@ -317,8 +316,8 @@ angular.module('adage.node', [
       templateUrl: 'node/enriched_genesets.tpl.html',
       restrict: 'E',
       scope: {
-        organism: '=',
-        hWGenes: '=' // hWGenes is an array of high-weight Genes
+        organism: '@',
+        genes: '=' // genes is an array of high-weight genes in the Node page.
       },
       link: function($scope) {
         $scope.queryStatus = 'Connecting to the server ...';
@@ -349,9 +348,9 @@ angular.module('adage.node', [
           var m = 0;
 
           // Fill out the genesetGenes object
-          for (var i = 0; i < $scope.hWGenes.length; i++) {
+          for (var i = 0; i < $scope.genes.length; i++) {
             var genesetList = null;
-            var geneEntrezID = $scope.hWGenes[i].entrezID;
+            var geneEntrezID = $scope.genes[i].entrezID;
 
             if (geneGenesets.hasOwnProperty(geneEntrezID)) {
               genesetList = geneGenesets[geneEntrezID];
@@ -365,7 +364,7 @@ angular.module('adage.node', [
                 if (!genesetGenes[genesetID]) {
                   genesetGenes[genesetID] = [];
                 }
-                genesetGenes[genesetID].push($scope.hWGenes[i]);
+                genesetGenes[genesetID].push($scope.genes[i]);
               }
             } else {
               $log.warn('Entrez ID: ' + geneEntrezID + ' not found in ' +
@@ -402,8 +401,8 @@ angular.module('adage.node', [
           return relevantGenesetArray;
         };
 
-        $scope.$watch('hWGenes', function() {
-          if ($scope.hWGenes.length > 0) {
+        $scope.$watch('genes', function() {
+          if ($scope.genes.length > 0) {
             PickledGenesetsService.get(
               {organism: $scope.organism},
               function success(response) {
