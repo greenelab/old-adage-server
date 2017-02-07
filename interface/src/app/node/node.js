@@ -389,7 +389,10 @@ angular.module('adage.node', [
               relevantGenesetArray.push(
                 {'name': genesetInfoObj.name, 'dbase': genesetInfoObj.dbase,
                  'url': genesetInfoObj.url, 'pValue': pValue,
-                 'genes': genesetGenes[gsID]}
+                 'genes': genesetGenes[gsID].map(function(gene) {
+                   return gene.stdName;
+                 }).join(' ')
+                }
               );
             }
           }
