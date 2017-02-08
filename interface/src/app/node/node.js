@@ -320,7 +320,7 @@ angular.module('adage.node', [
       link: function($scope) {
         $scope.queryStatus = 'Connecting to the server ...';
 
-        var pValueCutoff = 0.05;
+        $scope.pValueCutoff = 0.05;
         var pValueSigDigits = 3;
 
         // This is an object, where each key is the geneset ID, and each value
@@ -383,7 +383,7 @@ angular.module('adage.node', [
                 1 - MathFuncts.hyperGeometricTest(k, m, n, N);
             pValue = pValue.toPrecision(pValueSigDigits);
 
-            if (pValue < pValueCutoff) {
+            if (pValue < $scope.pValueCutoff) {
               relevantGenesetArray.push(
                 {'name': genesetInfoObj.name, 'dbase': genesetInfoObj.dbase,
                  'url': genesetInfoObj.url, 'pValue': pValue,
@@ -413,7 +413,7 @@ angular.module('adage.node', [
 
                 $scope.enrichedGenesets = calculateEnrichments(
                   genesetsPerGene, gsInfoArray,
-                  totGeneNum, pValueCutoff
+                  totGeneNum, $scope.pValueCutoff
                 );
               },
               function error(err) {

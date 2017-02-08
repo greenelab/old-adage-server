@@ -18,4 +18,10 @@
     <td>{{geneset.pValue}}</td>
     <td>{{geneset.genes}}</td>
   </tr>
+
 </table>
+
+<div ng-if="enrichedGenesets.length === 0">
+  No gene sets were found to be enriched with a P-Value of less than
+  {{pValueCutoff}}.
+</div>
