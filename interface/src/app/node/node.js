@@ -84,7 +84,7 @@ angular.module('adage.node', [
               }
               $scope.genes.push(
                 {sysName: sysName, stdName: stdName, desc: desc,
-                 entrezID: entrezID});
+                  entrezID: entrezID});
             }
             $scope.hypoPercentage = Math.round(numHypo / n * 100);
             $scope.queryStatus = '';
