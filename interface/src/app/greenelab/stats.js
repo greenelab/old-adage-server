@@ -1,4 +1,4 @@
-angular.module('adage.utils', [
+angular.module('greenelab.stats', [
 
 ])
 

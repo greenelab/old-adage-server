@@ -6,9 +6,7 @@ angular.module('adage.node', [
   'ui.router',
   'ui.bootstrap',
   'ngResource',
-  // Dependency modules from the 'adage' Angular app
-  'adage.utils'
-
+  'greenelab.stats'
 ])
 
 .config(['$stateProvider', function($stateProvider) {

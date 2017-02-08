@@ -3,8 +3,8 @@
  */
 
 // Test the hyperGeometricTest function
-describe('Test for hypergeometric test function in utils.js', function() {
-  beforeEach(module('adage.utils'));
+describe('Test the hypergeometric test function in stats.js', function() {
+  beforeEach(module('greenelab.stats'));
 
   var MathFuncts;
 
