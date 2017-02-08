@@ -11,9 +11,9 @@ angular.module('greenelab.stats', [
      * https://bitbucket.org/cgreene/integrator/src/1194f7ae1b11057a4649114e1f55570542acbcde/integrator/static/js/imp.js?at=giant&fileviewer=file-view-default
     */
     binomLog: function(n, k) {
-      // The 'n' and 'k' arguments are the same as the 'n' and 'k' arguments
-      // arguments for the hyperGeometricTest function below (the number of
-      // items in the sample and the number of successes in the sample,
+      // The 'n' and 'k' arguments are the same as the 'n' and 'k'
+      // arguments for the hyperGeometricTest function below (the number
+      // of items in the sample and the number of successes in the sample,
       // respectively).
       var coeff = 0;
       for (var i = n - k + 1; i <= n; i++) {
