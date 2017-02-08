@@ -8,11 +8,9 @@ describe('Test the hypergeometric test function in stats.js', function() {
 
   var MathFuncts;
 
-  beforeEach(function() {
-    inject(function($injector) {
-      MathFuncts = $injector.get('MathFuncts');
-    });
-  });
+  beforeEach(inject(function(_MathFuncts_) {
+    MathFuncts = _MathFuncts_;
+  }));
 
   it('should be defined', function() {
     expect(MathFuncts).toBeDefined();
