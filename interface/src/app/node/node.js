@@ -384,14 +384,13 @@ angular.module('adage.node', [
             pValue = pValue.toPrecision(pValueSigDigits);
 
             if (pValue < $scope.pValueCutoff) {
-              relevantGenesetArray.push(
-                {'name': genesetInfoObj.name, 'dbase': genesetInfoObj.dbase,
-                 'url': genesetInfoObj.url, 'pValue': pValue,
-                 'genes': genesetGenes[gsID].map(function(gene) {
-                   return gene.stdName;
-                 }).join(' ')
-                }
-              );
+              relevantGenesetArray.push({
+                'name': genesetInfoObj.name, 'dbase': genesetInfoObj.dbase,
+                'url': genesetInfoObj.url, 'pValue': pValue,
+                'genes': genesetGenes[gsID].map(function(gene) {
+                  return gene.stdName;
+                }).join(' ')
+              });
             }
           }
 
