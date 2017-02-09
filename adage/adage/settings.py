@@ -204,3 +204,9 @@ TRIBE_REDIRECT_URI = CONFIG['tribe_redirect_uri']
 TRIBE_SCOPE = CONFIG['tribe_scope']
 TRIBE_LOGIN_REDIRECT = CONFIG['tribe_login_redirect']
 TRIBE_LOGOUT_REDIRECT = CONFIG['tribe_logout_redirect']
+
+# The public_geneset_folder setting is used by the tribe-client, as
+# the location of the folder where pickled genesets files will be
+# saved to. tribe-client will also refer to this setting when it is
+# time to unpickle the genesets from these files and serve them.
+PUBLIC_GENESET_FOLDER = CONFIG['public_geneset_folder']
