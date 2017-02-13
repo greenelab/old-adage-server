@@ -2,6 +2,7 @@ from django.conf.urls import url
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 from django.http import HttpResponse
+from organisms.api import OrganismResource
 from genes.api import GeneResource
 from tastypie import fields, http
 from tastypie.resources import Resource, ModelResource
@@ -258,6 +259,8 @@ class SampleResource(ModelResource):
 
 
 class MLModelResource(ModelResource):
+    organism = fields.ForeignKey(OrganismResource, "organism", full=True)
+
     class Meta:
         queryset = MLModel.objects.all()
         allowed_methods = ['get']
