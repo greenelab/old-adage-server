@@ -1,7 +1,8 @@
 angular.module('adage.gene.searchMany', [
   'adage.gene.resource',
   'adage.gene.utils',
-  'adage.gene.selected'
+  'adage.gene.selected',
+  'adage.mlmodel.components'
 ])
 
 .config(function($stateProvider) {
@@ -17,14 +18,6 @@ angular.module('adage.gene.searchMany', [
             UserFactory.getPromise().$promise.then(function() {
               self.userObj = UserFactory.getUser();
             });
-
-            // TODO: Right now, we are hard-coding this organism
-            // as Pseudomonas (since it is the only one currently
-            // supported by ADAGE). However, as we incorporate
-            // multi-species support, this organism will have to
-            // be obtained from the ML model. This is the same as
-            // the issue in geneSearchForm (also with $scope.organism).
-            self.organism = 'Pseudomonas aeruginosa';
 
             // 'self.autocomplete' holds a boolean value, of whether or
             // not the user wants to use autocomplete search to look up a
@@ -67,7 +60,7 @@ angular.module('adage.gene.searchMany', [
     }],
     restrict: 'E',
     scope: {
-      organism: '=',
+      organism: '@',
       autocomplete: '='
     },
     templateUrl: 'gene/searchMany/gene-search-panel.tpl.html'
@@ -82,9 +75,9 @@ angular.module('adage.gene.searchMany', [
       $scope.errors = null;
 
       $scope.searchGenes = function() {
-        // Gene.search will query for all of the search terms in qparams
+        // Gene.search will query for all of the search terms in qparams,
         // returning a list of objects containing each search term and the
-        // gene results for that term in each objects. If the search
+        // gene results for that term in each object. If the search
         // contained terms already found in our cache of searchResults,
         // those results are ignored while terms not already present will
         // be added to the cache.
@@ -98,14 +91,7 @@ angular.module('adage.gene.searchMany', [
         $scope.loadingSearchResults = true;
 
         if ($scope.organism) {
-          // TODO: adage doesn't currently support multiple organisms.
-          // Therefore, when retrieving gene objects from the API gene
-          // search endpoint, this will return *all* gene objects it finds,
-          // without filtering for organism. At the point when we add
-          // genes for more than one species to the database, we will
-          // need to set this $scope.organism to whatever organism is in
-          // the ML model (or genes for many organisms will be returned).
-          // qparams['organism'] = $scope.organism;
+          qparams['organism'] = $scope.organism;
         }
 
         Gene.search(qparams,
@@ -130,7 +116,8 @@ angular.module('adage.gene.searchMany', [
     }],
     scope: {
       searchResults: '=',
-      queries: '='
+      queries: '=',
+      organism: '@'
     },
     restrict: 'E',
     templateUrl: 'gene/searchMany/gene-search-form.tpl.html'
