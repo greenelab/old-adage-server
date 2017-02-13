@@ -79,6 +79,7 @@ module.exports = {
       'vendor/angularjs-slider/dist/rzslider.min.js',
       'vendor/d3-tip/index.js',
       'node_modules/hclusterjs/hcluster.js',
+      'node_modules/ttest/ttest.js',  // note: generated via browserify & babel
       'vendor/placeholders/angular-placeholders-0.0.1-SNAPSHOT.min.js'
     ],
     css: [
