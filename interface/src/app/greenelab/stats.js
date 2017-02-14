@@ -42,7 +42,14 @@ angular.module('greenelab.stats', [
         sum += Math.exp(logSum);
       }
       return sum;
-    }
+    },
+
+    /*
+     * This tTest function simply exposes the ttest library we have repackaged
+     * from npm: https://www.npmjs.com/package/ttest .
+     * Source is at: https://github.com/AndreasMadsen/ttest .
+     */
+    tTest: ttest
 
   };
 }])
