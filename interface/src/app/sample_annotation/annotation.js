@@ -106,13 +106,12 @@ angular.module('adage.sampleAnnotation', [
       Object.keys(sampleDict).map(function(key) {
         self.samples.push(sampleDict[key]);
       });
+      self.uniqueAnnotationTypes.sort(); // Sort the annotation types
       self.queryStatus = '';
     }, function error(response) {
       var errMessage = errGen('Failed to get sample annotations', response);
       $log.error(errMessage);
       self.queryStatus = errMessage + '. Please try again later.';
     }); // end of sidPromise.then().then() chaining
-
-    self.uniqueAnnotationTypes.sort(); // Sort the annotation types
   }
 ]);
