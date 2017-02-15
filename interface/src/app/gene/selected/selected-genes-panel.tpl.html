@@ -16,9 +16,7 @@
         <table class="table table-striped"> 
           <tr ng-repeat="gene in selectedGenes">
             <td>
-              <selected-gene-button>
-                {{ gene.standard_name }}
-              </selected-gene-button>
+              <selected-gene-button gene="gene"></selected-gene-button>
             </td>
           </tr>     
         </table>

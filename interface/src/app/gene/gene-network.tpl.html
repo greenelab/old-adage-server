@@ -7,21 +7,23 @@
   </m-l-model-selector>
 
   <autocomplete-search-panel
-    organism="{{searchCtrl.selectedMLModel.organism.resource_uri}}"
+    ng-if="searchCtrl.autocomplete"
     autocomplete="searchCtrl.autocomplete"
-    ng-if="searchCtrl.autocomplete">
+    organism="{{searchCtrl.selectedMLModel.organism.resource_uri}}"
+    m-l-model="{{searchCtrl.selectedMLModel.id}}">
   </autocomplete-search-panel>
 
   <div class="well" ng-if="!searchCtrl.autocomplete">
     <gene-search-panel
-      organism="{{searchCtrl.selectedMLModel.organism.resource_uri}}"
-      autocomplete="searchCtrl.autocomplete">
+      autocomplete="searchCtrl.autocomplete"
+      organism="{{searchCtrl.selectedMLModel.organism.resource_uri}}">
     </gene-search-panel>
 
-    <selected-genes-panel>
+    <selected-genes-panel m-l-model="{{searchCtrl.selectedMLModel.id}}">
     </selected-genes-panel>
   </div>
   <geneset-search-form ng-if="searchCtrl.userObj"
-    organism="{{searchCtrl.selectedMLModel.organism.scientific_name}}">
+    organism="{{searchCtrl.selectedMLModel.organism.scientific_name}}"
+    m-l-model="{{searchCtrl.selectedMLModel.id}}">
   </geneset-search-form>
 </div>
