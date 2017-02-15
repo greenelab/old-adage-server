@@ -104,7 +104,7 @@ module.exports = function ( grunt ) {
     browserify: {
       dist: {
         src: 'node_modules/ttest/hypothesis.js',
-        dest: 'node_modules/ttest/ttest.js',
+        dest: 'node_modules/ttest/greenelab.stats.ttest.js',
         options: {
           browserifyOptions: {
             standalone: 'ttest'
@@ -123,7 +123,8 @@ module.exports = function ( grunt ) {
       dist: {
         files: {
           // this takes browserify output and just transpiles in place
-          'node_modules/ttest/ttest.js': 'node_modules/ttest/ttest.js'
+          'node_modules/ttest/greenelab.stats.ttest.js':
+            'node_modules/ttest/greenelab.stats.ttest.js'
         }
       }
     },
