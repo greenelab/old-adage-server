@@ -143,6 +143,7 @@ class SampleResource(ModelResource):
         experiments_allowed_methods = allowed_methods
         annotations_allowed_methods = allowed_methods
         filtering = {
+            'id': ('in',),
             'experiment': ('exact', ),  # Implemented in apply_filters()
         }
 

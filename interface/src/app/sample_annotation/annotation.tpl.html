@@ -1,0 +1,27 @@
+<h1>ADAGE: Sample Annotations</h1>
+
+<h3 class="text-warning" ng-bind="ctrl.queryStatus"></h3>
+
+<table ng-hide="ctrl.queryStatus"
+       class="table table-bordered table-striped table-hover table-condensed">
+  <thead>
+    <th ng-if="ctrl.hasNode">Activity</th>
+    <th>Sample Name</th>
+    <th ng-repeat="typeName in ctrl.uniqueAnnotationTypes">
+      {{typeName}}
+    </th>
+  </thead>
+
+  <tbody>
+    <tr ng-repeat=
+        "sample in ctrl.samples | orderBy: ctrl.hasNode ? '-activity' : 'name'">
+      <td ng-if="ctrl.hasNode">
+        <strong>{{sample.activity | number: 5}}</strong>
+      </td>
+      <td>{{sample.name}}</td>
+      <td ng-repeat="typeName in ctrl.uniqueAnnotationTypes">
+        {{sample.annotations[typeName] ? sample.annotations[typeName] : ""}}
+      </td>
+    </tr>
+  </tbody>
+</table>
