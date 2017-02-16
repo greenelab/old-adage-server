@@ -7,8 +7,10 @@
 
   <div class="panel-body">
     <label for="title">Search Tribe gene sets</label>
-    <geneset-search-bar organism="organism" limit="limit" genesets="genesets"></geneset-search-bar>
+    <geneset-search-bar organism="{{organism}}" limit="{{limit}}"
+      genesets="genesets">
+    </geneset-search-bar>
     <hr>
-    <geneset-result-table limit="limit" genesets="genesets"></geneset-result-table>
+    <geneset-result-table limit="{{limit}}" genesets="genesets"></geneset-result-table>
   </div>
 </div>

@@ -12,7 +12,7 @@ angular.module('adage.tribe_client.genesets', [
     replace: true,
     restrict: 'E',
     scope: {
-      organism: '='
+      organism: '@'
     },
     templateUrl: 'tribe_client/geneset-search-form.tpl.html'
   };
@@ -38,8 +38,8 @@ angular.module('adage.tribe_client.genesets', [
     replace: true,
     restrict: 'E',
     scope: {
-      limit: '=',
-      organism: '=',
+      limit: '@',
+      organism: '@',
       genesets: '='
     },
     templateUrl: 'tribe_client/geneset-search-bar.tpl.html'
@@ -56,8 +56,8 @@ angular.module('adage.tribe_client.genesets', [
       // case the number of results ($scope.genesetResultCount above)
       // is greater than this 'limit' parameter (the maximum number of
       // geneset results that the Tribe API should return at once).
-      limit: '=',
-      organism: '=',
+      limit: '@',
+      organism: '@',
       genesets: '='
     },
     templateUrl: 'tribe_client/geneset-result-table.tpl.html'
