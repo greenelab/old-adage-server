@@ -11,7 +11,7 @@ angular.module('adage.mlmodel.components', [
     var self = this;
 
     // apiReturnLimit is what the 'limit' parameter will be set to in the
-    // MLModel resource's GET request. By setting it to 0, we are actually
+    // MlModel resource's GET request. By setting it to 0, we are actually
     // telling the Tastypie API that we want it to return ALL objects from
     // this endpoint (i.e. that we do not want a maximum limit to how many
     // objects it returns).
