@@ -3,27 +3,27 @@
     Gene Network
   </h1>
 
-  <m-l-model-selector selected-m-l-model="searchCtrl.selectedMLModel">
-  </m-l-model-selector>
+  <ml-model-selector selected-ml-model="searchCtrl.selectedMlModel">
+  </ml-model-selector>
 
   <autocomplete-search-panel
     ng-if="searchCtrl.autocomplete"
     autocomplete="searchCtrl.autocomplete"
-    organism="{{searchCtrl.selectedMLModel.organism.resource_uri}}"
-    m-l-model="{{searchCtrl.selectedMLModel.id}}">
+    organism="{{searchCtrl.selectedMlModel.organism.resource_uri}}"
+    ml-model="{{searchCtrl.selectedMlModel.id}}">
   </autocomplete-search-panel>
 
   <div class="well" ng-if="!searchCtrl.autocomplete">
     <gene-search-panel
       autocomplete="searchCtrl.autocomplete"
-      organism="{{searchCtrl.selectedMLModel.organism.resource_uri}}">
+      organism="{{searchCtrl.selectedMlModel.organism.resource_uri}}">
     </gene-search-panel>
 
-    <selected-genes-panel m-l-model="{{searchCtrl.selectedMLModel.id}}">
+    <selected-genes-panel ml-model="{{searchCtrl.selectedMlModel.id}}">
     </selected-genes-panel>
   </div>
   <geneset-search-form ng-if="searchCtrl.userObj"
-    organism="{{searchCtrl.selectedMLModel.organism.scientific_name}}"
-    m-l-model="{{searchCtrl.selectedMLModel.id}}">
+    organism="{{searchCtrl.selectedMlModel.organism.scientific_name}}"
+    ml-model="{{searchCtrl.selectedMlModel.id}}">
   </geneset-search-form>
 </div>

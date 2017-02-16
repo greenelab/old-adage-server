@@ -2,12 +2,12 @@ angular.module('adage.mlmodel.components', [
   'adage.mlmodel.resource'
 ])
 
-.component('mLModelSelector', {
+.component('mlModelSelector', {
   templateUrl: 'mlmodel/selector.tpl.html',
   bindings: {
-    selectedMLModel: '='
+    selectedMlModel: '='
   },
-  controller: ['MLModel', '$log', function(MLModel, $log) {
+  controller: ['MlModel', '$log', function(MlModel, $log) {
     var self = this;
 
     // apiReturnLimit is what the 'limit' parameter will be set to in the
@@ -17,9 +17,9 @@ angular.module('adage.mlmodel.components', [
     // objects it returns).
     var apiReturnLimit = 0;
 
-    MLModel.get({limit: apiReturnLimit},
+    MlModel.get({limit: apiReturnLimit},
       function success(response) {
-        self.availableMLModels = response.objects;
+        self.availableMlModels = response.objects;
       },
       function error(err) {
         $log.error('Failed to get MLModels from REST API: ' + err.statusText);

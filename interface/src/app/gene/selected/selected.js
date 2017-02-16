@@ -39,7 +39,7 @@ angular.module('adage.gene.selected', [
     ],
     restrict: 'E',
     scope: {
-      mLModel: '@'
+      mlModel: '@'
     },
     templateUrl: 'gene/selected/selected-genes-panel.tpl.html'
   };

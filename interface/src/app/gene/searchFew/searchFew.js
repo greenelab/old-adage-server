@@ -15,7 +15,7 @@ angular.module('adage.gene.searchFew', [
     restrict: 'E',
     scope: {
       organism: '@',
-      mLModel: '@',
+      mlModel: '@',
       autocomplete: '='
     },
     templateUrl: 'gene/searchFew/autocomplete-search-panel.tpl.html'
@@ -77,7 +77,7 @@ angular.module('adage.gene.searchFew', [
     ],
     scope: {
       organism: '@',
-      mLModel: '@'
+      mlModel: '@'
     },
     restrict: 'E',
     templateUrl: 'gene/searchFew/autocomplete-search-form.tpl.html'

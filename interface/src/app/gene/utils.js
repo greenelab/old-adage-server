@@ -22,7 +22,7 @@ angular.module('adage.gene.utils', [
 
       state.go('gene_network', {
         'genes': geneString,
-        'mlmodel': scope.mLModel
+        'mlmodel': scope.mlModel
       });
     }
   };
