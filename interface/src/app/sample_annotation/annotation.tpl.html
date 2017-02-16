@@ -16,7 +16,7 @@
     <tr ng-repeat=
         "sample in ctrl.samples | orderBy: ctrl.hasNode ? '-activity' : 'name'">
       <td ng-if="ctrl.hasNode">
-        <strong>{{sample.activity | number: 5}}</strong>
+        <strong>{{sample.activity | number: ctrl.precision}}</strong>
       </td>
       <td>{{sample.name}}</td>
       <td ng-repeat="typeName in ctrl.uniqueAnnotationTypes">
