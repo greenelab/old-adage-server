@@ -1,13 +1,8 @@
-<div class="well">
-  <h3>
-    Machine Learning Model
-  </h3>
-  <div class="alert alert-danger" role="alert" ng-if="$ctrl.errorMessage">
-    {{$ctrl.errorMessage}}
-  </div>
-  <select
-    ng-options="option as option.title for option in $ctrl.availableMlModels"
-    ng-model="$ctrl.selectedMlModel">
-    <option value="">--- Please select a machine learning model ---</option>
-  </select>
+<div class="alert alert-danger" role="alert" ng-if="$ctrl.errorMessage">
+  {{$ctrl.errorMessage}}
 </div>
+<select
+  ng-options="option as option.title for option in $ctrl.availableMlModels"
+  ng-model="$ctrl.selectedMlModel">
+  <option value="">--- Please select a machine learning model ---</option>
+</select>

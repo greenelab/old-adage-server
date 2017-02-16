@@ -3,8 +3,11 @@
     Gene Network
   </h1>
 
-  <ml-model-selector selected-ml-model="searchCtrl.selectedMlModel">
-  </ml-model-selector>
+  <div class="well">
+    <h3>Machine Learning Model</h3>
+    <ml-model-selector selected-ml-model="searchCtrl.selectedMlModel">
+    </ml-model-selector>
+  </div>
 
   <autocomplete-search-panel
     ng-if="searchCtrl.autocomplete"
