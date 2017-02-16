@@ -3,50 +3,48 @@
   <br>
   <div class="lead" id="Genes">
     <h3><u>Genes</u></h3>
-    Gene content goes here. Lorem ipsum dolor sit amet, consectetur adipiscing
-    elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-    Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-    aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in
-    voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
-    occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit
-    anim id est laborum.
+    ADAGE model is built with genes in Pseudomonas aeruginosa PAO1 strain.
+    Information about genes are obtained from the following NCBI website:
+    ftp://ftp.ncbi.nih.gov/gene/DATA/GENE_INFO/Archaea_Bacteria/Pseudomonas_aeruginosa_PAO1.gene_info.gz
   </div>
   <br>
 
   <div class="lead" id="Samples">
     <h3><u>Samples</u></h3>
-    Sample content goes here. Lorem ipsum dolor sit amet, consectetur adipiscing
-    elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-    Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-    aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in
-    voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
-    occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit
-    anim id est laborum.
+    We include samples measured on the Affymetrix Pseudomonas aeruginosa Array
+    "Pae_G1a" (labeled as A-AFFY-30 in ArrayExpress database).
   </div>
   <br>
 
   <div class="lead" id="Experiments">
     <h3><u>Experiments</u></h3>
-    Experiment content goes here. Lorem ipsum dolor sit amet, consectetur
-    adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
-    aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
-    nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
-    reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-    Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia
-    deserunt mollit anim id est laborum.
+    Experiments are obtained from the ArrayExpress database. Each experiment
+    has a “E-XXXX-number” accession number defined by ArrayExpress.
+  </div>
+  <br>
+
+  <div class="lead" id="Expression compendium">
+    <h3><u>Expression compendium?</u></h3>
+    The webserver is currently using P.a. expression compendium <!--(version
+    number here?) -->. It is built on July 31 2015 and contains 125 datasets
+    with 1051 individual samples.
   </div>
   <br>
 
   <div class="lead" id="Nodes">
     <h3><u>Nodes</u></h3>
-    Node content goes here. Lorem ipsum dolor sit amet, consectetur adipiscing
-    elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-    Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-    aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in
-    voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
-    occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit
-    anim id est laborum.
+    Nodes are building units in an ADAGE model. Each node is defined by a
+    weight vector storing weight value of each gene in that node.
   </div>
   <br>
+
+  <div class="lead" id="Signatures">
+    <h3><u>Signatures</u></h3>
+    Signatures are functional gene sets extracted by an ADAGE model. A
+    signature contains genes contributing extremely positive high or
+    negative high weights to a specific node. One node results in two
+    signatures on positive and negative sides. The positive and negative
+    signatures are treated independently.
+  </div>
 
 </div>
