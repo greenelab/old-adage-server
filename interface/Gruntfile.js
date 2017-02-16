@@ -18,6 +18,8 @@ module.exports = function ( grunt ) {
   grunt.loadNpmTasks('grunt-karma');
   grunt.loadNpmTasks('grunt-ng-annotate');
   grunt.loadNpmTasks('grunt-html2js');
+  grunt.loadNpmTasks('grunt-babel');
+  grunt.loadNpmTasks('grunt-browserify');
   grunt.loadNpmTasks('grunt-protractor-runner');
   grunt.loadNpmTasks('grunt-protractor-webdriver');
   grunt.loadNpmTasks('grunt-eslint');
@@ -94,6 +96,38 @@ module.exports = function ( grunt ) {
       '<%= build_dir %>',
       '<%= compile_dir %>'
     ],
+
+    /**
+     * Browserify the ttest library since it's written just for node
+     * Note: this must be run before the copy step (see `build` below).
+     */
+    browserify: {
+      dist: {
+        src: 'node_modules/ttest/hypothesis.js',
+        dest: 'node_modules/ttest/greenelab.stats.ttest.js',
+        options: {
+          browserifyOptions: {
+            standalone: 'ttest'
+          }
+        }
+      }
+    },
+    /**
+     * The ttest library is written in ES2015 (ES6), so we use babel to
+     * transpile back to ES5 for compatibility with the rest of our tools
+     */
+    babel: {
+      options: {
+        presets: ['babel-preset-es2015']
+      },
+      dist: {
+        files: {
+          // this takes browserify output and just transpiles in place
+          'node_modules/ttest/greenelab.stats.ttest.js':
+            'node_modules/ttest/greenelab.stats.ttest.js'
+        }
+      }
+    },
 
     /**
      * The `copy` task just copies files from A to B. We use it here to copy
@@ -613,10 +647,10 @@ module.exports = function ( grunt ) {
    * The `build` task gets your app ready to run for development and testing.
    */
   grunt.registerTask( 'build', [
-    'clean', 'html2js', 'jshint', 'coffeelint', 'coffee', 'less:build',
-    'concat:build_css', 'copy:build_app_assets', 'copy:build_vendor_assets',
-    'copy:build_appjs', 'copy:build_vendorjs', 'copy:build_vendorcss',
-    'index:build',
+    'clean', 'browserify', 'babel', 'html2js', 'jshint', 'coffeelint', 'coffee',
+    'less:build', 'concat:build_css', 'copy:build_app_assets',
+    'copy:build_vendor_assets', 'copy:build_appjs', 'copy:build_vendorjs',
+    'copy:build_vendorcss', 'index:build',
   ]);
 
   /**
