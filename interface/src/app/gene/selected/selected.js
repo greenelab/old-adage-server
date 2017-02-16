@@ -37,9 +37,10 @@ angular.module('adage.gene.selected', [
         };
       }
     ],
-    replace: true,
     restrict: 'E',
-    scope: true,
+    scope: {
+      mlModel: '@'
+    },
     templateUrl: 'gene/selected/selected-genes-panel.tpl.html'
   };
 }])
@@ -59,7 +60,9 @@ angular.module('adage.gene.selected', [
       }
     ],
     restrict: 'E',
-    replace: true,
+    scope: {
+      gene: '='
+    },
     templateUrl: 'gene/selected/selected-gene-button.tpl.html'
   };
 }])

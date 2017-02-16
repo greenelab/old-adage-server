@@ -14,7 +14,8 @@ angular.module('adage.gene.searchFew', [
     }],
     restrict: 'E',
     scope: {
-      organism: '=',
+      organism: '@',
+      mlModel: '@',
       autocomplete: '='
     },
     templateUrl: 'gene/searchFew/autocomplete-search-panel.tpl.html'
@@ -34,10 +35,9 @@ angular.module('adage.gene.searchFew', [
         $scope.searchGenes = function(val) {
           $scope.loadingGenes = true;
           var qparams = {
-            query: val,
-            limit: numResultsToReturn
-            // TODO: Whenever we add multi-organism support, we should
-            // add the desired organism to qparams.
+            'query': val,
+            'limit': numResultsToReturn,
+            'organism': $scope.organism
           };
 
           return Gene.autocomplete(qparams,
@@ -76,7 +76,8 @@ angular.module('adage.gene.searchFew', [
       }
     ],
     scope: {
-      organism: '='
+      organism: '@',
+      mlModel: '@'
     },
     restrict: 'E',
     templateUrl: 'gene/searchFew/autocomplete-search-form.tpl.html'

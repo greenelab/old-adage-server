@@ -1,0 +1,8 @@
+<div class="alert alert-danger" role="alert" ng-if="$ctrl.errorMessage">
+  {{$ctrl.errorMessage}}
+</div>
+<select
+  ng-options="option as option.title for option in $ctrl.availableMlModels"
+  ng-model="$ctrl.selectedMlModel">
+  <option value="">--- Please select a machine learning model ---</option>
+</select>

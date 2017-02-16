@@ -2,17 +2,31 @@
   <h1 class="page-header">
     Gene Network
   </h1>
-  <autocomplete-search-panel organism="searchCtrl.organism" autocomplete="searchCtrl.autocomplete"
-    ng-if="searchCtrl.autocomplete">
+
+  <div class="well">
+    <h3>Machine Learning Model</h3>
+    <ml-model-selector selected-ml-model="searchCtrl.selectedMlModel">
+    </ml-model-selector>
+  </div>
+
+  <autocomplete-search-panel
+    ng-if="searchCtrl.autocomplete"
+    autocomplete="searchCtrl.autocomplete"
+    organism="{{searchCtrl.selectedMlModel.organism.resource_uri}}"
+    ml-model="{{searchCtrl.selectedMlModel.id}}">
   </autocomplete-search-panel>
 
   <div class="well" ng-if="!searchCtrl.autocomplete">
-    <gene-search-panel organism="searchCtrl.organism" autocomplete="searchCtrl.autocomplete">
+    <gene-search-panel
+      autocomplete="searchCtrl.autocomplete"
+      organism="{{searchCtrl.selectedMlModel.organism.resource_uri}}">
     </gene-search-panel>
 
-    <selected-genes-panel>
+    <selected-genes-panel ml-model="{{searchCtrl.selectedMlModel.id}}">
     </selected-genes-panel>
   </div>
-  <geneset-search-form ng-if="searchCtrl.userObj" organism="searchCtrl.organism">
+  <geneset-search-form ng-if="searchCtrl.userObj"
+    organism="{{searchCtrl.selectedMlModel.organism.scientific_name}}"
+    ml-model="{{searchCtrl.selectedMlModel.id}}">
   </geneset-search-form>
 </div>

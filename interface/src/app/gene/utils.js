@@ -21,7 +21,8 @@ angular.module('adage.gene.utils', [
       var geneString = geneIds.join();
 
       state.go('gene_network', {
-        'genes': geneString
+        'genes': geneString,
+        'mlmodel': scope.mlModel
       });
     }
   };
