@@ -3,14 +3,14 @@
  * modules to avoid duplicate codes.
  */
 
-angular.module('greenelab.utils', [])
+angular.module('adage.utils', [])
 .constant('ApiBasePath', '/api/v0/')
 
 // A service function that returns a string of error message based on input
 // context and response.
 .value('errGen', function(context, response) {
-  if (response.statusCode && response.statusText) {
-    return context + ': ' + response.statusCode + ' ' + response.statusText;
+  if (response.status && response.statusText) {
+    return context + ': ' + response.status + ' ' + response.statusText;
   }
   return context;
 });
