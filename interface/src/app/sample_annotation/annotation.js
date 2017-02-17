@@ -21,21 +21,21 @@ angular.module('adage.sampleAnnotation', [
   });
 }])
 
-.factory('ActivityService', ['$resource', 'ApiBasePath',
+.factory('Activity', ['$resource', 'ApiBasePath',
   function($resource, ApiBasePath) {
     return $resource(ApiBasePath + 'activity');
   }
 ])
 
-.factory('SampleService', ['$resource', 'ApiBasePath',
+.factory('Sample', ['$resource', 'ApiBasePath',
   function($resource, ApiBasePath) {
     return $resource(ApiBasePath + 'sample');
   }
 ])
 
 .controller('SampleAnnotationCtrl', [
-  '$stateParams', '$q', '$log', 'errGen', 'ActivityService', 'SampleService',
-  function($stateParams, $q, $log, errGen, ActivityService, SampleService) {
+  '$stateParams', '$q', '$log', 'errGen', 'Activity', 'Sample',
+  function($stateParams, $q, $log, errGen, Activity, Sample) {
     var self = this;
     self.queryStatus = 'Connecting to the server ...';
 
@@ -62,7 +62,7 @@ angular.module('adage.sampleAnnotation', [
         self.hasNode = true;
         self.precision = 5;
         var nodeID = $stateParams.node;
-        ActivityService.get(
+        Activity.get(
           {'node': nodeID, 'sample__in': samplesInUrl},  // parameters of GET
           function success(response) {
             var validSamples = [];
@@ -88,7 +88,7 @@ angular.module('adage.sampleAnnotation', [
     // The following then() block only includes a success handler function,
     // because the error has been reported by setting self.queryStatus.
     sidPromise.then(function success(validSamples) {
-      SampleService.get(
+      Sample.get(
         {'id__in': validSamples, 'limit': 0}, // parameters of GET
         function success(response) {
           // If no valid sample records are found, report the error.
