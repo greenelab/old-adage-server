@@ -60,7 +60,7 @@ angular.module('adage.sampleAnnotation', [
       // and sample(s):
       if ($stateParams.node) {
         self.hasNode = true;
-        self.precision = 5;
+        self.activityPrecision = 5;
         var nodeID = $stateParams.node;
         Activity.get(
           {'node': nodeID, 'sample__in': samplesInUrl},  // parameters of GET
