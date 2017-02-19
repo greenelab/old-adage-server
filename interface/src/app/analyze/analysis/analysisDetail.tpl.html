@@ -16,6 +16,48 @@
       }}</td>
     </tr>
   </thead>
+  <tbody class="sample-group-a" ng-model="sb.heatmapData.samplesA" as-sortable="sortableOptions">
+    <tr as-sortable-item>
+      <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+    </tr>
+    <tr ng-repeat="id in sb.heatmapData.samplesA" as-sortable-item>
+      <td>
+        <button type="button" class="btn close"
+        ng-click="sb.removeSample(id)" aria-label="Delete">
+          <i class="fa fa-times" aria-hidden="true"></i>
+        </button>
+      </td>
+      <td>{{id}}</td>
+      <td as-sortable-item-handle>{{
+        sb.sampleData[id].ml_data_source
+      }}</td>
+      <td>{{sb.sampleData[id].name}}</td>
+      <td ng-repeat="at in analysis.exampleCols">{{
+        sb.sampleData[id].annotations[at.typename]
+      }}</td>
+    </tr>
+  </tbody>
+  <tbody class="sample-group-b" ng-model="sb.heatmapData.samplesB" as-sortable="sortableOptions">
+    <tr as-sortable-item>
+      <td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+    </tr>
+    <tr ng-repeat="id in sb.heatmapData.samplesB" as-sortable-item>
+      <td>
+        <button type="button" class="btn close"
+        ng-click="sb.removeSample(id)" aria-label="Delete">
+          <i class="fa fa-times" aria-hidden="true"></i>
+        </button>
+      </td>
+      <td>{{id}}</td>
+      <td as-sortable-item-handle>{{
+        sb.sampleData[id].ml_data_source
+      }}</td>
+      <td>{{sb.sampleData[id].name}}</td>
+      <td ng-repeat="at in analysis.exampleCols">{{
+        sb.sampleData[id].annotations[at.typename]
+      }}</td>
+    </tr>
+  </tbody>
   <tbody ng-model="sb.heatmapData.samples" as-sortable="sortableOptions">
     <tr ng-repeat="id in sb.heatmapData.samples" as-sortable-item>
       <td>

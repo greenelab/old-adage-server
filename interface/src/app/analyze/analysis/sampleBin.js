@@ -18,6 +18,8 @@ function($log, $cacheFactory, $q, Sample, Activity) {
   var SampleBin = {
     heatmapData: {
       samples: [],
+      samplesA: [],
+      samplesB: [],
       nodeOrder: []
     },
     sampleData: {},
