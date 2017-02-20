@@ -13,6 +13,7 @@ angular.module('adage', [
   'adage.gene.network',
   'adage.node',
   'adage.help',
+  'adage.sampleAnnotation',
   'ui.router',
   'ngResource'
 ])
