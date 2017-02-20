@@ -7,7 +7,7 @@
   <button class="btn btn-primary" ng-click="setMode()"
           ng-show="topMode">Show All</button>
 
-  <br />
+  <br>
   (Click
   <i class="fa fa-plus-square fa-lg" aria-hidden="true"></i> or
   <i class="fa fa-minus-square fa-lg" aria-hidden="true"></i>
@@ -30,15 +30,43 @@
           <!-- Location of vega-lite widget -->
           <div id="{{ 'exp-' + $index }}"></div>
 
-          <ol ng-if="exp.isExpanded">
-            <li ng-if="!exp.sampleStatus"
-                ng-repeat="sample in exp.samples | orderBy: '-activity'">
-              Activity Value: <b>{{sample.activity.toFixed(5)}}</b><br/>
-              Sample Name: <b>{{sample.name}}</b><br/>
-              Data Source: <b>{{sample.ml_data_source}}</b>
-            </li>
+          <div ng-if="exp.isExpanded">
+            <div ng-if="!exp.sampleStatus">
+              <table class="table table-bordered table-condensed table-hover">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Activity</th>
+                    <th>Sample Name</th>
+                    <th>Data Source</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-repeat="sample in exp.samples | orderBy: '-activity'"
+                      ng-class="{success: sample.selected}">
+                    <td>
+                      <label>
+                        <input type="checkbox" ng-model="sample.selected"
+                               ng-change="toggleSelection(exp, sample.selected)">
+                        {{$index + 1}}
+                      </label>
+                    </td>
+                    <td>{{sample.activity.toFixed(5)}}</td>
+                    <td>{{sample.name}}</td>
+                    <td>{{sample.ml_data_source}}</td>
+                  </tr>
+                </tbody>
+              </table>
+              <div style="text-align: center">
+                <button class="btn btn-md btn-success"
+                        ng-disabled="exp.numSelections === 0"
+                        ng-click="showAnnotations(exp)">
+                  Show Annotations of Selected Samples
+                </button>
+              </div>
+            </div>
             <div ng-bind="exp.sampleStatus"></div>
-          </ol>
+          </div>
         </td>
       </tr>
     </tbody>
