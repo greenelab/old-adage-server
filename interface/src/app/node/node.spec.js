@@ -1,7 +1,8 @@
 /**
+ * 'adage.node' module unit tests
+ *
  * Test <high-weight-genes> directive.
  **/
-
 describe('<high-weight-genes> directive', function() {
   beforeEach(module('adage.node'));
 
