@@ -5,6 +5,7 @@
 angular.module('adage.sampleAnnotation', [
   'ui.router',
   'ui.bootstrap',
+  'ngResource',
   'adage.utils'
 ])
 
@@ -77,7 +78,8 @@ angular.module('adage.sampleAnnotation', [
             $log.error(errMessage);
             self.queryStatus = errMessage + '. Please try again later.';
             deferred.reject(errMessage);
-          });
+          }
+        );
       } else { // If 'node' is not in the URL, include all input sample IDs.
         deferred.resolve(samplesInUrl);
       }
@@ -112,18 +114,20 @@ angular.module('adage.sampleAnnotation', [
 
           // Convert sampleDict from an object literal to an array and save
           // it as self.samples. (It has to be an array so that the order of
-          // samples can be customized on web UI with "orderBy" filter.
+          // samples can be customized on web UI with "orderBy" filter.)
           self.samples = [];
           Object.keys(sampleDict).map(function(key) {
             self.samples.push(sampleDict[key]);
           });
           self.uniqueAnnotationTypes.sort(); // Sort the annotation types
           self.queryStatus = '';
-        }, function error(response) {
+        },
+        function error(response) {
           var errMessage = errGen('Failed to get sample annotations', response);
           $log.error(errMessage);
           self.queryStatus = errMessage + '. Please try again later.';
-        });
+        }
+      );
     }); // end of sidPromise.then()
   }
 ]);
