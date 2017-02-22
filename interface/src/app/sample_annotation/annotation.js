@@ -6,7 +6,8 @@ angular.module('adage.sampleAnnotation', [
   'ui.router',
   'ui.bootstrap',
   'ngResource',
-  'adage.utils'
+  'adage.utils',
+  'adage.sample.services'
 ])
 
 .config(['$stateProvider', function($stateProvider) {
@@ -25,12 +26,6 @@ angular.module('adage.sampleAnnotation', [
 .factory('Activity', ['$resource', 'ApiBasePath',
   function($resource, ApiBasePath) {
     return $resource(ApiBasePath + 'activity');
-  }
-])
-
-.factory('Sample', ['$resource', 'ApiBasePath',
-  function($resource, ApiBasePath) {
-    return $resource(ApiBasePath + 'sample');
   }
 ])
 

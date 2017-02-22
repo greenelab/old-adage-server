@@ -1,44 +1,12 @@
-describe('Sample', function() {
-  var $httpBackend, $log, mockSample;
-  var mockSampleResponse = {
-    'meta': {
-      'limit': 1000,
-      'next': null,
-      'offset': 0,
-      'previous': null,
-      'total_count': 1
-    },
-    'objects': [
-      {
-        'annotations': {
-          'additional_notes': '9.5 h biofilms',
-          'biotic_int_lv_1': 'Human',
-          'biotic_int_lv_2': 'Lung epithelial cells (CFBE41o- cells)',
-          'description':
-            'Pseudomonas aeruginosa 9.5 hour static coculture with human blah…',
-          'genotype': 'WT',
-          'growth_setting_1': 'Biofilm',
-          'growth_setting_2': 'Static',
-          'medium': 'MEM, 0.4% arginine',
-          'nucleic_acid': 'RNA',
-          'od': '9.5 hours',
-          'strain': 'PA14',
-          'temperature': '37'
-        },
-        'id': 1,
-        'ml_data_source': 'GSM252496.CEL',
-        'name': 'GSE9989GSM252496',
-        'resource_uri': '/api/v0/sample/1/'
-      }
-    ]
-  };
-
+describe('sample_annotation', function() {
+  var $httpBackend, $log, SampleMocks;
 
   beforeEach(module('adage.sampleAnnotation'));
-  beforeEach(inject(function(_$httpBackend_, _$log_, Sample) {
+  beforeEach(module('adage.mocks.sample'));
+  beforeEach(inject(function(_$httpBackend_, _$log_, _SampleMocks_) {
     $httpBackend = _$httpBackend_;
     $log = _$log_;
-    mockSample = Sample;
+    SampleMocks = _SampleMocks_;
   }));
 
   // Ensure no outstanding expectation or request at the end.
@@ -50,21 +18,6 @@ describe('Sample', function() {
     if ($log.debug.logs.length > 0) {
       console.log($log.debug.logs);
     }
-  });
-
-  describe('get', function() {
-    it('should call sample with id and limit=0', function() {
-      $httpBackend.expectGET('/api/v0/sample?id=1').respond(
-        mockSampleResponse.objects[0]
-      );
-      var resp = mockSample.get({id: 1});
-      $httpBackend.flush();
-      // $log.debug('Sample.get resp is: ' + JSON.stringify(resp));
-
-      expect(resp.id).toEqual(1);
-      expect(resp.ml_data_source).toEqual('GSM252496.CEL');
-      expect(resp.annotations.additional_notes).toEqual('9.5 h biofilms');
-    });
   });
 
   describe('SampleAnnotationCtrl', function() {
@@ -88,7 +41,7 @@ describe('Sample', function() {
     it('should pass a dummy test', inject(function() {
       $httpBackend.expectGET(
         '/api/v0/sample?id__in=1&limit=0'
-      ).respond(mockSampleResponse);
+      ).respond(SampleMocks.sample1Paginated);
       $httpBackend.flush();
 
       expect(SampleAnnotationCtrl).toBeTruthy();
@@ -98,7 +51,7 @@ describe('Sample', function() {
       function() {
         $httpBackend.expectGET(
           '/api/v0/sample?id__in=1&limit=0'
-        ).respond(mockSampleResponse);
+        ).respond(SampleMocks.sample1Paginated);
         expect(SampleAnnotationCtrl.queryStatus).toEqual(
           'Connecting to the server ...'
         );
@@ -107,7 +60,7 @@ describe('Sample', function() {
         expect(SampleAnnotationCtrl.queryStatus).toEqual('');
         expect(SampleAnnotationCtrl.uniqueAnnotationTypes.length).toEqual(12);
         expect(SampleAnnotationCtrl.samples[0].name).toEqual(
-          'GSE9989GSM252496'
+          SampleMocks.sample1Paginated.objects[0].name
         );
       }
     ));
