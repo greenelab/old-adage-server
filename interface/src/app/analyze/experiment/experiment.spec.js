@@ -76,60 +76,58 @@ describe('Experiment', function() {
   });
 
   describe('ExperimentCtrl', function() {
-    describe('isCurrentUrl', function() {
-      var ExperimentCtrl, $location, $scope;
+    var ExperimentCtrl, $location, $scope;
 
-      beforeEach(inject(function($controller, _$location_, $rootScope) {
-        $location = _$location_;
-        $scope = $rootScope.$new();
-        ExperimentCtrl = $controller(
-          'ExperimentCtrl',
-          {$location: $location, $scope: $scope}
+    beforeEach(inject(function($controller, _$location_, $rootScope) {
+      $location = _$location_;
+      $scope = $rootScope.$new();
+      ExperimentCtrl = $controller(
+        'ExperimentCtrl',
+        {$location: $location, $scope: $scope}
+      );
+    }));
+
+    it('should pass a dummy test', inject(function() {
+      expect(ExperimentCtrl).toBeTruthy();
+    }));
+
+    it('should render the experimentDetail for an experiment', inject(
+      function() {
+        $httpBackend.expectGET(
+          '/api/v0/experiment/E-GEOD-9989?limit=0'
+        ).respond(mockExperimentResponse);
+        $httpBackend.expectGET('/api/v0/sample/1/').respond(
+          mockSampleResponses[0]
         );
-      }));
+        $httpBackend.expectGET('/api/v0/sample/2/').respond(
+          mockSampleResponses[1]
+        );
+        $httpBackend.expectGET('/api/v0/sample/3/').respond(
+          mockSampleResponses[2]
+        );
+        $httpBackend.expectGET('/api/v0/sample/4/').respond(
+          mockSampleResponses[3]
+        );
+        $httpBackend.expectGET('/api/v0/sample/5/').respond(
+          mockSampleResponses[4]
+        );
+        $httpBackend.expectGET('/api/v0/sample/6/').respond(
+          mockSampleResponses[5]
+        );
+        $scope.show('E-GEOD-9989');
+        expect($scope.experiment.status).toEqual('retrieving...');
+        $httpBackend.flush();
 
-      it('should pass a dummy test', inject(function() {
-        expect(ExperimentCtrl).toBeTruthy();
-      }));
-
-      it('should render the experimentDetail for an experiment', inject(
-        function() {
-          $httpBackend.expectGET(
-            '/api/v0/experiment/E-GEOD-9989?limit=0'
-          ).respond(mockExperimentResponse);
-          $httpBackend.expectGET('/api/v0/sample/1/').respond(
-            mockSampleResponses[0]
-          );
-          $httpBackend.expectGET('/api/v0/sample/2/').respond(
-            mockSampleResponses[1]
-          );
-          $httpBackend.expectGET('/api/v0/sample/3/').respond(
-            mockSampleResponses[2]
-          );
-          $httpBackend.expectGET('/api/v0/sample/4/').respond(
-            mockSampleResponses[3]
-          );
-          $httpBackend.expectGET('/api/v0/sample/5/').respond(
-            mockSampleResponses[4]
-          );
-          $httpBackend.expectGET('/api/v0/sample/6/').respond(
-            mockSampleResponses[5]
-          );
-          $scope.show('E-GEOD-9989');
-          expect($scope.experiment.status).toEqual('retrieving...');
-          $httpBackend.flush();
-
-          expect($scope.experiment.status).toEqual('');
-          expect($scope.experiment.results.name).toEqual(
-            'Transcription profiling of P. aeruginosa biofilms treated blah…'
-          );
-          expect($scope.experiment.relatedSamples.length).toEqual(6);
-          expect(
-            $scope.experiment.relatedSamples[0].name
-          ).toEqual('GSE9989GSM252496');
-        }
-      ));
-    });
+        expect($scope.experiment.status).toEqual('');
+        expect($scope.experiment.results.name).toEqual(
+          'Transcription profiling of P. aeruginosa biofilms treated blah…'
+        );
+        expect($scope.experiment.relatedSamples.length).toEqual(6);
+        expect(
+          $scope.experiment.relatedSamples[0].name
+        ).toEqual('GSE9989GSM252496');
+      }
+    ));
   });
 });
 
