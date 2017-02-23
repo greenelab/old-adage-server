@@ -123,9 +123,9 @@ describe('Experiment', function() {
           expect($scope.experiment.results.name).toEqual(
             'Transcription profiling of P. aeruginosa biofilms treated blah…'
           );
-          expect($scope.experiment.related_samples.length).toEqual(6);
+          expect($scope.experiment.relatedSamples.length).toEqual(6);
           expect(
-            $scope.experiment.related_samples[0].name
+            $scope.experiment.relatedSamples[0].name
           ).toEqual('GSE9989GSM252496');
         }
       ));

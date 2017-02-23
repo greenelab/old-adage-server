@@ -43,14 +43,14 @@ angular.module('adage.analyze.experiment', [
     $scope.show = function(id) {
       $scope.experiment = {
         status: 'retrieving...',
-        related_samples: []
+        relatedSamples: []
       };
       var getSampleDetails = function(uri) {
         Sample.getUri(uri).then(
           function(responseObject) {
             if (responseObject) {
               $scope.experiment.status = '';
-              $scope.experiment.related_samples.push(responseObject.data);
+              $scope.experiment.relatedSamples.push(responseObject.data);
             }
           },
           queryError
