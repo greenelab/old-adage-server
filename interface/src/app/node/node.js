@@ -99,7 +99,8 @@ angular.module('adage.node', [
   }]
 )
 
-.directive('highRangeExp', ['$http', '$log', function($http, $log) {
+.directive('highRangeExp', ['$http', '$log', '$state',
+function($http, $log, $state) {
   return {
     templateUrl: 'node/high_range_exp.tpl.html',
     restrict: 'E',
@@ -281,11 +282,13 @@ angular.module('adage.node', [
           $http.get(sampleURI, {params: {experiment: exp.accession}})
             .then(function success(response) {
               exp.samples = [];
+              exp.numSelections = 0;
               // Add "activity" property to each sample that is related to the
               // current node. (It will be used to order samples on web UI.)
               response.data.objects.forEach(function(element) {
                 if (element.id in $scope.activities) {
                   element.activity = $scope.activities[element.id];
+                  element.selected = false; // default: sample not selected.
                   exp.samples.push(element);
                 }
               });
@@ -303,6 +306,32 @@ angular.module('adage.node', [
         $scope.topMode = !$scope.topMode;
         $scope.numExpShown =
           $scope.topMode ? $scope.topNum : $scope.experiments.length;
+      };
+
+      // Event handler when user clicks the checkbox in front of each sample.
+      // It keeps track of the number of selected samples in each experiment
+      // to indicate whether the "show annotations" button should be enabled.
+      $scope.toggleSelection = function(exp, selected) {
+        if (selected) {
+          ++exp.numSelections;
+        } else {
+          --exp.numSelections;
+        }
+      };
+
+      // Event handler when user clicks the "show annotations" button:
+      $scope.showAnnotations = function(exp) {
+        var selectedSampleIDs = [];
+        exp.samples.forEach(function(sample) {
+          if (sample.selected) {
+            selectedSampleIDs.push(sample.id);
+          }
+        });
+        var stateParams = {
+          node: $scope.nodeId,
+          samples: selectedSampleIDs.join()
+        };
+        $state.go('sampleAnnotation', stateParams);
       };
     }
   };
