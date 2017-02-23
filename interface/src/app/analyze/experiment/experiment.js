@@ -9,11 +9,7 @@ angular.module('adage.analyze.experiment', [
     '/api/v0/experiment/:accession/',
     // TODO need to add logic for handling pagination of results.
     // then, can change "limit" below to something sensible
-    {accession: '@accession', limit: 0},
-    // Angular expects a query service to give only a list but our Tastypie
-    // interface wraps the response list with pagination so we tell Angular to
-    // expect an object instead via isArray: false
-    {'get': {method: 'GET', isArray: false}}
+    {limit: 0}
   );
   Experiment.makeHref = {
     // These functions create formatted URLs for direct linking to source
@@ -47,14 +43,14 @@ angular.module('adage.analyze.experiment', [
     $scope.show = function(id) {
       $scope.experiment = {
         status: 'retrieving...',
-        related_samples: []
+        relatedSamples: []
       };
       var getSampleDetails = function(uri) {
         Sample.getUri(uri).then(
           function(responseObject) {
             if (responseObject) {
               $scope.experiment.status = '';
-              $scope.experiment.related_samples.push(responseObject.data);
+              $scope.experiment.relatedSamples.push(responseObject.data);
             }
           },
           queryError
