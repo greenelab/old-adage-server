@@ -2,6 +2,9 @@
   <div class="panel-heading">
     <h4>
       Have a Tribe gene set you want to use?
+      <button class="btn btn-success pull-right" ng-click="sendToNetwork()">
+        View Genes as Network <i class="fa fa-check"></i>
+      </button>
     </h4>
   </div>
 
@@ -11,6 +14,8 @@
       genesets="genesets">
     </geneset-search-bar>
     <hr>
-    <geneset-result-table limit="{{limit}}" genesets="genesets"></geneset-result-table>
+    <geneset-result-table limit="{{limit}}" genesets="genesets"
+      selected-geneset="selectedGeneset">
+    </geneset-result-table>
   </div>
 </div>

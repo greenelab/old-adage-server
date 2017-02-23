@@ -4,11 +4,16 @@ angular.module('adage.tribe_client.genesets', [
 
 .directive('genesetSearchForm', [function() {
   return {
-    controller: ['$scope', function($scope) {
-      // Number of results (in this case genesets) to come back
-      // in each response page.
-      $scope.limit = 10;
-    }],
+    controller: ['$scope', 'CommonGeneFuncts',
+      function($scope, CommonGeneFuncts) {
+        // Number of results (in this case genesets) to come back
+        // in each response page.
+        $scope.limit = 10;
+        $scope.sendToNetwork = function() {
+          CommonGeneFuncts.sendToNetwork($scope, $state);
+        };
+      }
+    ],
     replace: true,
     restrict: 'E',
     scope: {
@@ -25,12 +30,14 @@ angular.module('adage.tribe_client.genesets', [
   return {
     controller: ['$scope', function($scope) {
       $scope.search = {};
-      $scope.search['organism__scientific_name'] = $scope.organism;
-      $scope.search['limit'] = $scope.limit;
 
       $scope.searchGenesets = function() {
-        Genesets.query($scope.search, function(data) {
-          $scope.genesetResultCount = data.meta.total_count;
+        var qparams = {};
+        qparams['query'] = $scope.search.query;
+        qparams['organism__scientific_name'] = $scope.organism;
+        qparams['limit'] = $scope.limit;
+
+        Genesets.query(qparams, function(data) {
           $scope.genesets = data.objects;
         });
       };
@@ -49,18 +56,21 @@ angular.module('adage.tribe_client.genesets', [
 // Directive for table containing search results
 .directive('genesetResultTable', [function() {
   return {
-    replace: true,
     restrict: 'E',
     scope: {
+      limit: '@',
+      organism: '@',
+      genesets: '=',
+      selectedGeneset: '='
+    },
+    templateUrl: 'tribe_client/geneset-result-table.tpl.html',
+    link: function($scope) {
+      $scope.selectedGeneset = {};
       // TODO: Implement pagination for geneset search results in
       // case the number of results ($scope.genesetResultCount above)
       // is greater than this 'limit' parameter (the maximum number of
       // geneset results that the Tribe API should return at once).
-      limit: '@',
-      organism: '@',
-      genesets: '='
-    },
-    templateUrl: 'tribe_client/geneset-result-table.tpl.html'
+    }
   };
 }])
 
