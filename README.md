@@ -202,6 +202,16 @@ Documentation for using each command is available by typing:
 > python manage.py help <command>
 ```
 
+### Pickle Tribe gene sets
+
+This step downloads and pickles all the public Tribe gene sets for every
+organism that has been loaded into the database. These pickled files are
+necessary for doing gene set enrichment analyses.
+
+```shell
+python manage.py tribe_client_pickle_public_genesets
+```
+
 ### Build adage-server web interface
 
 ```shell
