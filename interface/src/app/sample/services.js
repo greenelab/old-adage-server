@@ -9,15 +9,8 @@ angular.module('adage.sample.services', [
       ApiBasePath + 'sample/:id/',
       // TODO need to add logic for handling pagination of results.
       // then, can change "limit" below to something sensible
-      {id: '@id', limit: 0},
-      // Angular expects a query service to give only a list but our Tastypie
-      // interface wraps the response list with pagination so we tell Angular to
-      // expect an object instead via isArray: false
+      {limit: 0},
       {
-        'get': {
-          method: 'GET',
-          isArray: false
-        },
         'getExperiments': {
           url: ApiBasePath + 'sample/:id/get_experiments/',
           method: 'GET',

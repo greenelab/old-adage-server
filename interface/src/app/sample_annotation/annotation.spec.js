@@ -21,22 +21,14 @@ describe('sample_annotation', function() {
   });
 
   describe('SampleAnnotationCtrl', function() {
-    var SampleAnnotationCtrl, $location, $scope, mockStateParams, $log;
+    var SampleAnnotationCtrl, mockStateParams;
 
-    beforeEach(inject(
-      function($controller, _$location_, _$q_, _$log_, $rootScope) {
-        $location = _$location_;
-        $log = _$log_;
-        $scope = $rootScope.$new();
-        mockStateParams = {samples: '1'};
-        SampleAnnotationCtrl = $controller('SampleAnnotationCtrl', {
-          $location: $location,
-          $scope: $scope,
-          $log: $log,
-          $stateParams: mockStateParams
-        });
-      }
-    ));
+    beforeEach(inject(function($controller) {
+      mockStateParams = {samples: '1'};
+      SampleAnnotationCtrl = $controller('SampleAnnotationCtrl', {
+        $stateParams: mockStateParams
+      });
+    }));
 
     it('should pass a dummy test', inject(function() {
       $httpBackend.expectGET(
@@ -47,7 +39,7 @@ describe('sample_annotation', function() {
       expect(SampleAnnotationCtrl).toBeTruthy();
     }));
 
-    it('should render the SampleAnnotationCtrl for a sample', inject(
+    it('should render the SampleAnnotationCtrl for a sample',
       function() {
         $httpBackend.expectGET(
           '/api/v0/sample?id__in=1&limit=0'
@@ -63,6 +55,6 @@ describe('sample_annotation', function() {
           SampleMocks.sample1Paginated.objects[0].name
         );
       }
-    ));
+    );
   });
 });
