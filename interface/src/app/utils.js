@@ -13,4 +13,8 @@ angular.module('adage.utils', [])
     return context + ': ' + response.status + ' ' + response.statusText;
   }
   return context;
-});
+})
+
+// Number of digits in activity value shown on frontend:
+.constant('ActivityDigits', 5)
+;
