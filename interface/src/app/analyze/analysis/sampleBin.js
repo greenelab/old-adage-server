@@ -18,10 +18,9 @@ function($log, $cacheFactory, $q, Sample, Activity) {
   var SampleBin = {
     heatmapData: {
       samples: [],
-      samplesA: [],
-      samplesB: [],
       nodeOrder: []
     },
+    sampleGroups: {}, // this is a hash from sample id to group name
     sampleData: {},
     sampleCache: $cacheFactory('sample'),
     activityCache: $cacheFactory('activity'),
@@ -33,6 +32,7 @@ function($log, $cacheFactory, $q, Sample, Activity) {
             ' already in the sample list; ignoring.');
       } else {
         this.heatmapData.samples.push(+id);
+        this.sampleGroups[+id] = 'other';
         // TODO when cache generalized: start pre-fetching sample data here
         this.heatmapData.nodeOrder = [];  // reset to default order
       }
@@ -41,6 +41,7 @@ function($log, $cacheFactory, $q, Sample, Activity) {
     removeSample: function(id) {
       var pos = this.heatmapData.samples.indexOf(+id);
       this.heatmapData.samples.splice(pos, 1);
+      delete this.sampleGroups[+id];
       this.heatmapData.nodeOrder = [];  // reset to default order
       this.rebuildHeatmapActivity(this.heatmapData.samples);
     },

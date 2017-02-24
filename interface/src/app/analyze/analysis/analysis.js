@@ -78,13 +78,14 @@ AnnotationType, SampleBin) {
           {'type': 'formula', 'field': 'normval', 'expr': 'abs(datum.value)'}
         ]
       }, {
-        // this dataset "streamed" in via ngVega from heatmapData
+        // these datasets "streamed" in via ngVega from heatmapData
         'name': 'samples'
+      // }, {
+      // FIXME: this dataset must fit a vega-compatible format to be included
+      //   'name': 'sampleGroups'
       }, {
-        // this dataset "streamed" in via ngVega from heatmapData
         'name': 'nodeOrder'
       }, {
-        // this dataset "streamed" in via ngVega from heatmapData
         'name': 'sample_objects'
       }, {
         // compute minimum normalized value for each node (across samples)
