@@ -51,7 +51,7 @@
                         {{$index + 1}}
                       </label>
                     </td>
-                    <td>{{sample.activity.toFixed(5)}}</td>
+                    <td>{{sample.activity | number: activityDigits}}</td>
                     <td>{{sample.name}}</td>
                     <td>{{sample.ml_data_source}}</td>
                   </tr>
