@@ -26,7 +26,8 @@ describe('sample_annotation', function() {
     beforeEach(inject(function($controller) {
       mockStateParams = {samples: '1'};
       SampleAnnotationCtrl = $controller('SampleAnnotationCtrl', {
-        $stateParams: mockStateParams
+        $stateParams: mockStateParams,
+        ActivityDigits: 5
       });
     }));
 
