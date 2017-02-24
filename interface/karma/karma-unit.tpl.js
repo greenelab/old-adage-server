@@ -35,6 +35,8 @@ module.exports = function ( karma ) {
      * How to report, by default.
      */
     reporters: 'dots',
+    // This option is handy for sorting out some kinds of testing errors
+    // logLevel: karma.LOG_DEBUG,
 
     /**
      * On which port should the browser connect, on which port is the test
