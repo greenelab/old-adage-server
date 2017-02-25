@@ -38,9 +38,11 @@ AnnotationType, SampleBin) {
     // TODO these exampleCols are temporarily hard-coded until a column chooser
     // feature can be added
     exampleCols: [
+      {'typename': 'strain'},
       {'typename': 'genotype'},
       {'typename': 'medium'},
-      {'typename': 'strain'}
+      {'typename': 'temperature'},
+      {'typename': 'treatment'}
     ]
   };
 

@@ -1,27 +1,35 @@
 <!--
   TODO each sample should be built using a reusable Angular directive
 -->
-<h1>Samples <small>(drag to reorder)</small></h1>
+<h1>Samples
+  <small>(drag <i class="fa fa-bars" aria-hidden="true"></i> to reorder,
+    click <i class="fa fa-times" aria-hidden="true"></i> to delete,
+    choose <input type="radio" disabled> to set group)</small>
+</h1>
 <status-bar msg-text="analysis.status"></status-bar>
 <!-- TODO need a tool to select and order annotation columns -->
 <table class="table table-hover">
   <thead>
     <tr>
-      <td>
-        group
-      </td>
-      <td>id</td>
-      <td>ML Data Source</td>
-      <td>Sample Name</td>
-      <td ng-repeat="at in analysis.exampleCols">{{
+      <th> </th>
+      <th>
+        <span class="row-control">
+          <i class="fa fa-bars" aria-hidden="true"></i>
+        </span>
+        ML Data Source
+      </th>
+      <th>id</th>
+      <th>Sample Name</th>
+      <th ng-repeat="at in analysis.exampleCols">{{
         at.typename
-      }}</td>
-      <td>&nbsp;</td>
+      }}</th>
     </tr>
   </thead>
   <tbody ng-model="sb.heatmapData.samples" as-sortable="sortableOptions">
-    <tr ng-repeat="id in sb.heatmapData.samples" as-sortable-item>
-      <td>
+    <tr ng-repeat="id in sb.heatmapData.samples"
+        ng-mouseover="showControls = true" ng-mouseleave="showControls = false"
+        ng-class="'sample-' + sb.sampleGroups[id]" as-sortable-item>
+      <td class="row-control">
         <input type="radio" ng-model="sb.sampleGroups[id]"
             name="{{id}}-group" value="group-a"
             class="sample-group-a" aria-label="group a">
@@ -30,22 +38,24 @@
             class="sample-group-b" aria-label="group b">
         <input type="radio" ng-model="sb.sampleGroups[id]"
             name="{{id}}-group" value="other"
-            class="sample-group-o" aria-label="other" checked>
-      </td>
-      <td>{{id}}</td>
-      <td as-sortable-item-handle>{{
-        sb.sampleData[id].ml_data_source
-      }}</td>
-      <td>{{sb.sampleData[id].name}}</td>
-      <td ng-repeat="at in analysis.exampleCols">{{
-        sb.sampleData[id].annotations[at.typename]
-      }}</td>
-      <td>
-        <button type="button" class="btn close"
+            class="sample-other" aria-label="other">
+        &nbsp;
+        <button type="button" class="btn row-control"
             ng-click="sb.removeSample(id)" aria-label="Delete">
           <i class="fa fa-times" aria-hidden="true"></i>
         </button>
       </td>
+      <td as-sortable-item-handle>
+        <span class="row-control">
+          <i class="fa fa-bars" aria-hidden="true"></i>
+        </span>
+        {{sb.sampleData[id].ml_data_source}}
+      </td>
+      <td>{{id}}</td>
+      <td>{{sb.sampleData[id].name}}</td>
+      <td ng-repeat="at in analysis.exampleCols">{{
+        sb.sampleData[id].annotations[at.typename]
+      }}</td>
     </tr>
   </tbody>
 </table>
@@ -66,5 +76,3 @@
     </button>
   </div>
 </nav>
-
-<pre>{{sb.sampleGroups | json}}</pre>
