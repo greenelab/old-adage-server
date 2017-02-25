@@ -80,6 +80,26 @@ function($log, $cacheFactory, $q, Sample, Activity) {
       }
     },
 
+    getSampleGroups: function() {
+      var keys = Object.keys(this.sampleGroups);
+      var samplesByGroup = {};
+      var i;
+
+      // each distinct value in sampleGroups becomes a key in samplesByGroup,
+      // and the keys of sampleGroups are collected in a list within each
+      // corresponding value of samplesByGroup
+      for (i = 0; i < keys.length; i++) {
+        if (samplesByGroup[this.sampleGroups[+keys[i]]]) {
+          samplesByGroup[this.sampleGroups[+keys[i]]].push(+keys[i]);
+        } else {
+          samplesByGroup[this.sampleGroups[+keys[i]]] = [];
+          samplesByGroup[this.sampleGroups[+keys[i]]].push(+keys[i]);
+        }
+      }
+
+      return samplesByGroup;
+    },
+
     getSampleData: function(id) {
       var sampleObj = this.sampleData[id];
       sampleObj.activity = this.activityCache.get(id).map(
