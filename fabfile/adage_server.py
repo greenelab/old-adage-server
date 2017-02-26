@@ -73,7 +73,8 @@ def pull(opts=''):
         if k in (
             'django_key', 'haystack', 'databases',
             'tribe_id', 'tribe_secret', 'tribe_redirect_uri', 'tribe_scope',
-            'tribe_login_redirect', 'tribe_logout_redirect'
+            'tribe_login_redirect', 'tribe_logout_redirect',
+            'public_geneset_folder'
         )
     }
     run(('echo "CONFIG = {0}" > '
