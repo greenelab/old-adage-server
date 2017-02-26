@@ -283,9 +283,8 @@ function($log, $cacheFactory, $q, Sample, Activity) {
   return SampleBin;
 }])
 
-.controller('SampleBinCtrl', ['$scope', '$log', '$uibModal', 'Sample',
-'SampleBin',
-function SampleBinCtrl($scope, $log, $uibModal, Sample, SampleBin) {
+.controller('SampleBinCtrl', ['$scope', '$log', 'SampleBin',
+function SampleBinCtrl($scope, $log, SampleBin) {
   // give our templates a way to access the SampleBin service
   $scope.sb = SampleBin;
 }])
@@ -300,11 +299,4 @@ function SampleBinCtrl($scope, $log, $uibModal, Sample, SampleBin) {
   };
 })
 
-.controller('AnalysisModalCtrl', ['$scope', '$uibModalInstance', 'analysis',
-function($scope, $uibModalInstance, analysis) {
-  $scope.analysis = analysis;
-  $scope.close = function() {
-    $uibModalInstance.dismiss('close');
-  };
-}])
 ;
