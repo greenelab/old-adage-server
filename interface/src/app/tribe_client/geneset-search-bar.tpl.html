@@ -1,10 +1,11 @@
 <div>
   <form class="form-inline">
     <label>Organism:</label>
-    <i>{{organism}}</i>
+    <i>{{$ctrl.organism}}</i>&nbsp;
+    <input ng-model="$ctrl.search.query" placeholder="Search text">
 
-    <input ng-model="search.query" placeholder="Search text">
-
-    <button class="btn btn-default" ng-click="searchGenesets()">Search</button>
+    <button class="btn btn-default" ng-click="$ctrl.searchGenesets()">
+      Search
+    </button>
   </form>
 </div>

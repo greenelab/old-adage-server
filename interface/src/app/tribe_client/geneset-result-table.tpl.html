@@ -1,4 +1,4 @@
-<table class="table table-striped" name="searchResults">
+<table class="table table-striped">
   <tr>
     <th></th>
     <th>Title</th>
@@ -7,12 +7,12 @@
     <th>Genes</th>
   </tr>
 
-  <tr ng-repeat="geneset in genesets">
-    <td><input type="radio" ng-model="selectedGeneset.geneset"
+  <tr ng-repeat="geneset in $ctrl.genesets">
+    <td><input type="radio" ng-model="$ctrl.selectedGeneset"
       ng-value="{{geneset}}"></td>
     <td>{{ geneset.title }}</td>
     <td><i>{{ geneset.organism.scientific_name }}</i></td>
     <td>{{ geneset.creator.username }}</td>
-    <td>{{ geneset.tip.genes.join(' ') }}</td>
+    <td>{{ $ctrl.getGeneLabelList(geneset.geneObjs) }}</td>
   </tr>
 </table>
