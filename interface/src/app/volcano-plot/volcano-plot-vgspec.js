@@ -1,8 +1,8 @@
 angular.module('adage.volcano-plot-vgspec', [])
 
 .constant('VolcanoPlotSpec', {
-  width: 500,
-  height: 350,
+  "width": 500,
+  "height": 350,
   "padding": "auto",
   "data": [
     {

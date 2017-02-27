@@ -18,6 +18,7 @@ engines:
     exclude_paths:
     - "interface/Gruntfile.js"
     - "interface/eslint.google.js"
+    - "interface/**/*-vgspec.js"
   fixme:
     enabled: false
   radon:
