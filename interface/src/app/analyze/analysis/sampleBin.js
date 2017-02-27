@@ -291,7 +291,7 @@ function($log, $cacheFactory, $q, Sample, Activity, NodeInfo, MathFuncts) {
       //   node = the node name as supplied by NodeInfo
       //   diff = mean(group-a activity values) - mean(group-b activity values)
       //   logsig = -log10(p-value from 2-sample t-test on group-a vs. group-b)
-      var sg = this.getSampleGroups();
+      var sg = this.getSamplesByGroup();
 
       // verify that we have at least one sample each in group-a and group-b
       if (!sg['group-a'] || sg['group-a'].length === 0) {
