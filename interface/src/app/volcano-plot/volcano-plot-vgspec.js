@@ -88,7 +88,7 @@ angular.module('adage.volcano-plot-vgspec', [])
         "update": {
           "x": {"value": 502},
           "y": {"scale": "y", "value": 1.3010299956639813},
-          "text": {"value": "q = 0.05"},
+          "text": {"value": "p = 0.05"},
           "baseline": {"value": "middle"},
           "fontStyle": {"value": "italic"},
           "fill": {"value": "#ff7f0e"}

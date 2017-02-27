@@ -29,9 +29,9 @@ angular.module('adage.analyze.analysis', [
   });
 }])
 
-.controller('AnalysisCtrl', ['$scope', '$log', '$location', '$q', 'Sample',
-'Activity', 'AnnotationType', 'SampleBin',
-function AnalysisCtrl($scope, $log, $location, $q, Sample, Activity,
+.controller('AnalysisCtrl', ['$scope', '$log', '$location', '$q', '$state',
+'Sample', 'Activity', 'AnnotationType', 'SampleBin',
+function AnalysisCtrl($scope, $log, $location, $q, $state, Sample, Activity,
 AnnotationType, SampleBin) {
   $scope.analysis = {
     status: '',
@@ -55,6 +55,10 @@ AnnotationType, SampleBin) {
     SampleBin.clusterNodes().then(function() {
       $scope.analysis.status = '';
     });
+  };
+
+  $scope.showVolcanoPlot = function() {
+    $state.go('volcano');
   };
 
   // these options are important for making ngSortable work with tables

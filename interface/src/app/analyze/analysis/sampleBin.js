@@ -5,8 +5,10 @@
  * information and activity levels required for drawing the heatmap.
  */
 angular.module('adage.analyze.sampleBin', [
+  'ngResource',
+  'greenelab.stats',
   'adage.analyze.sample',
-  'ngResource'
+  'adage.node'
 ])
 
 .factory('Activity', ['$resource', function($resource) {
@@ -14,7 +16,8 @@ angular.module('adage.analyze.sampleBin', [
 }])
 
 .factory('SampleBin', ['$log', '$cacheFactory', '$q', 'Sample', 'Activity',
-function($log, $cacheFactory, $q, Sample, Activity) {
+'MathFuncts',
+function($log, $cacheFactory, $q, Sample, Activity, MathFuncts) {
   var SampleBin = {
     heatmapData: {
       samples: [],
@@ -277,6 +280,65 @@ function($log, $cacheFactory, $q, Sample, Activity) {
       //  note: progress can be reported by returning a $promise to the caller
       // respObj.queryStatus = 'Retrieving sample activity...';
       this.rebuildHeatmapActivity(this.heatmapData.samples);
+    },
+
+    // volcano plot methods
+    getVolcanoPlotData: function() {
+      // use sample lists for group-a and group-b to produce output for
+      // the volcano plot of the form:
+      //   node - diff - logsig,
+      // where:
+      //   node = the node name as supplied by NodeInfo
+      //   diff = mean(group-a activity values) - mean(group-b activity values)
+      //   logsig = -log10(p-value from 2-sample t-test on group-a vs. group-b)
+      var sg = this.getSampleGroups();
+
+      // verify that we have at least one sample each in group-a and group-b
+      if (!sg['group-a'] || sg['group-a'].length === 0) {
+        return null;
+      }
+      if (!sg['group-b'] || sg['group-b'].length === 0) {
+        return null;
+      }
+
+      // (1) we obtain a list of nodes by retrieving node activity
+      //     for the first sample in our volcano plot
+      var firstSampleNodes = this.activityCache.get(sg['group-a'][0]);
+      // (2a) next, we build a new array (`retval`) comprised of `nodeObject`s
+      //      by walking through the `firstSampleNodes` and constructing a
+      //      `nodeObject` for each. [outer .map()]
+      var retval = firstSampleNodes.map(function(val, i, arr) {
+        var nodeObject = {
+          'node': val.node, // TODO: map this to node name
+          'activityA': sg['group-a'].map(
+            // (2b) the array of activity for each node is built by plucking the
+            //      activity `.value` for each sample within this node from the
+            //      `activityCache` [inner .map()]
+            function(sampId, i, arr) {
+              // FIXME: counting on array order to match node order here
+              return this.activityCache.get(sampId)[val.node - 1].value;
+            },
+            this
+          ),
+          'activityB': sg['group-b'].map(
+            function(sampId, i, arr) {
+              // FIXME: counting on array order to match node order here
+              return this.activityCache.get(sampId)[val.node - 1].value;
+            },
+            this
+          )
+        };
+        nodeObject.diff = (
+          MathFuncts.mean(nodeObject.activityA) -
+          MathFuncts.mean(nodeObject.activityB)
+        );
+        nodeObject.logsig = -Math.log10(MathFuncts.tTest(
+          nodeObject.activityA, nodeObject.activityB
+        ).pValue());
+
+        return nodeObject;
+      }, this);
+      return retval;
     }
   };
 
