@@ -6,6 +6,7 @@ angular.module('adage.node', [
   'ui.router',
   'ui.bootstrap',
   'ngResource',
+  'adage.utils',
   'greenelab.stats'
 ])
 
@@ -99,8 +100,8 @@ angular.module('adage.node', [
   }]
 )
 
-.directive('highRangeExp', ['$http', '$log', '$state',
-  function($http, $log, $state) {
+.directive('highRangeExp', ['$http', '$log', '$state', 'ActivityDigits',
+  function($http, $log, $state, ActivityDigits) {
     return {
       templateUrl: 'node/high_range_exp.tpl.html',
       restrict: 'E',
@@ -111,6 +112,7 @@ angular.module('adage.node', [
       link: function($scope) {
         $scope.queryStatus = 'Connecting to the server ...';
         $scope.activities = {};
+        $scope.activityDigits = ActivityDigits;
         $scope.experiments = [];
         $scope.topMode = true;
         // If "top-exp" tag is not found, or its value is not a finite positive
