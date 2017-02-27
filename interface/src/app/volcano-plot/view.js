@@ -9,7 +9,7 @@ angular.module('adage.volcano-plot.view', [
     url: '/volcano',
     views: {
       main: {
-        templateUrl: 'volcano-plot/testView.tpl.html',
+        templateUrl: 'volcano-plot/view.tpl.html',
         controller: 'VolcanoPlotViewCtrl as ctrl'
       }
     },
