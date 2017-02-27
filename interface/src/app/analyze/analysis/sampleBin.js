@@ -16,8 +16,8 @@ angular.module('adage.analyze.sampleBin', [
 }])
 
 .factory('SampleBin', ['$log', '$cacheFactory', '$q', 'Sample', 'Activity',
-'MathFuncts',
-function($log, $cacheFactory, $q, Sample, Activity, MathFuncts) {
+'NodeInfo', 'MathFuncts',
+function($log, $cacheFactory, $q, Sample, Activity, NodeInfo, MathFuncts) {
   var SampleBin = {
     heatmapData: {
       samples: [],
@@ -309,7 +309,7 @@ function($log, $cacheFactory, $q, Sample, Activity, MathFuncts) {
       //      `nodeObject` for each. [outer .map()]
       var retval = firstSampleNodes.map(function(val, i, arr) {
         var nodeObject = {
-          'node': val.node, // TODO: map this to node name
+          'id': val.node, // TODO: map this id to node name (via vega spec?)
           'activityA': sg['group-a'].map(
             // (2b) the array of activity for each node is built by plucking the
             //      activity `.value` for each sample within this node from the
