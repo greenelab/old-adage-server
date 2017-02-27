@@ -20,7 +20,7 @@ function($log, $cacheFactory, $q, Sample, Activity) {
       samples: [],
       nodeOrder: []
     },
-    sampleGroups: {}, // this is a hash from sample id to group name
+    sampleToGroup: {}, // this is a hash from sample id to group name
     sampleData: {},
     sampleCache: $cacheFactory('sample'),
     activityCache: $cacheFactory('activity'),
@@ -32,7 +32,7 @@ function($log, $cacheFactory, $q, Sample, Activity) {
             ' already in the sample list; ignoring.');
       } else {
         this.heatmapData.samples.push(+id);
-        this.sampleGroups[+id] = 'other';
+        this.sampleToGroup[+id] = 'other';
         // TODO when cache generalized: start pre-fetching sample data here
         this.heatmapData.nodeOrder = [];  // reset to default order
       }
@@ -41,7 +41,7 @@ function($log, $cacheFactory, $q, Sample, Activity) {
     removeSample: function(id) {
       var pos = this.heatmapData.samples.indexOf(+id);
       this.heatmapData.samples.splice(pos, 1);
-      delete this.sampleGroups[+id];
+      delete this.sampleToGroup[+id];
       this.heatmapData.nodeOrder = [];  // reset to default order
       this.rebuildHeatmapActivity(this.heatmapData.samples);
     },
@@ -80,21 +80,20 @@ function($log, $cacheFactory, $q, Sample, Activity) {
       }
     },
 
-    getSampleGroups: function() {
-      var keys = Object.keys(this.sampleGroups);
+    getSamplesByGroup: function() {
+      var keys = Object.keys(this.sampleToGroup);
       var samplesByGroup = {};
-      var i;
+      var i, groupForThisKey;
 
-      // each distinct value in sampleGroups becomes a key in samplesByGroup,
-      // and the keys of sampleGroups are collected in a list within each
+      // each distinct value in sampleToGroup becomes a key in samplesByGroup,
+      // and the keys of sampleToGroup are collected in a list within each
       // corresponding value of samplesByGroup
       for (i = 0; i < keys.length; i++) {
-        if (samplesByGroup[this.sampleGroups[+keys[i]]]) {
-          samplesByGroup[this.sampleGroups[+keys[i]]].push(+keys[i]);
-        } else {
-          samplesByGroup[this.sampleGroups[+keys[i]]] = [];
-          samplesByGroup[this.sampleGroups[+keys[i]]].push(+keys[i]);
+        groupForThisKey = this.sampleToGroup[+keys[i]];
+        if (!samplesByGroup[groupForThisKey]) {
+          samplesByGroup[groupForThisKey] = [];
         }
+        samplesByGroup[groupForThisKey].push(+keys[i]);
       }
 
       return samplesByGroup;

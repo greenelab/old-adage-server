@@ -28,15 +28,15 @@
   <tbody ng-model="sb.heatmapData.samples" as-sortable="sortableOptions">
     <tr ng-repeat="id in sb.heatmapData.samples"
         ng-mouseover="showControls = true" ng-mouseleave="showControls = false"
-        ng-class="'sample-' + sb.sampleGroups[id]" as-sortable-item>
+        ng-class="'sample-' + sb.sampleToGroup[id]" as-sortable-item>
       <td class="row-control">
-        <input type="radio" ng-model="sb.sampleGroups[id]"
+        <input type="radio" ng-model="sb.sampleToGroup[id]"
             name="{{id}}-group" value="group-a"
             class="sample-group-a" aria-label="group a">
-        <input type="radio" ng-model="sb.sampleGroups[id]"
+        <input type="radio" ng-model="sb.sampleToGroup[id]"
             name="{{id}}-group" value="group-b"
             class="sample-group-b" aria-label="group b">
-        <input type="radio" ng-model="sb.sampleGroups[id]"
+        <input type="radio" ng-model="sb.sampleToGroup[id]"
             name="{{id}}-group" value="other"
             class="sample-other" aria-label="other">
         &nbsp;
