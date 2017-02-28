@@ -308,25 +308,17 @@ function($log, $cacheFactory, $q, Sample, Activity, NodeInfo, MathFuncts) {
       //      by walking through the `firstSampleNodes` and constructing a
       //      `nodeObject` for each. [outer .map()]
       var retval = firstSampleNodes.map(function(val, i, arr) {
+        var mapSampleIdsToActivity = function(sampId, i, arr) {
+          // (2b) the array of activity for each node is built by plucking the
+          //      activity `.value` for each sample within this node from the
+          //      `activityCache` [inner .map()]
+          // FIXME: counting on array order to match node order here
+          return this.activityCache.get(sampId)[val.node - 1].value;
+        };
         var nodeObject = {
           'id': val.node, // TODO: map this id to node name (via vega spec?)
-          'activityA': sg['group-a'].map(
-            // (2b) the array of activity for each node is built by plucking the
-            //      activity `.value` for each sample within this node from the
-            //      `activityCache` [inner .map()]
-            function(sampId, i, arr) {
-              // FIXME: counting on array order to match node order here
-              return this.activityCache.get(sampId)[val.node - 1].value;
-            },
-            this
-          ),
-          'activityB': sg['group-b'].map(
-            function(sampId, i, arr) {
-              // FIXME: counting on array order to match node order here
-              return this.activityCache.get(sampId)[val.node - 1].value;
-            },
-            this
-          )
+          'activityA': sg['group-a'].map(mapSampleIdsToActivity, this),
+          'activityB': sg['group-b'].map(mapSampleIdsToActivity, this)
         };
         nodeObject.diff = (
           MathFuncts.mean(nodeObject.activityA) -
