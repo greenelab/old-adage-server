@@ -18,7 +18,10 @@ angular.module('adage.volcano-plot.view', [
 }])
 
 .controller('VolcanoPlotViewCtrl', ['SampleBin', '$stateParams',
-  // TODO make use of $stateParams (hard coded for initial tests)
+  // TODO make use of $stateParams (pulling from SampleBin for initial tests,
+  //      but the right way to do this is to refactor so view.js pulls params
+  //      for sample-group-a and sample-group-b and does what's necessary to
+  //      make a plot from those lists)
   function VolcanoPlotViewCtrl(SampleBin, $stateParams) {
     // give our templates a way to access the SampleBin service
     this.sb = SampleBin;

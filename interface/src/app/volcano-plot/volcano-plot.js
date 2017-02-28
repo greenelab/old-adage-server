@@ -13,15 +13,23 @@ angular.module('adage.volcano-plot', [
 
 .controller('VolcanoPlotCtrl', ['$scope', 'VolcanoPlotSpec', 'SampleBin',
   function VolcanoPlotCtrl($scope, VolcanoPlotSpec, SampleBin) {
-    // define a controller instance variable that links with vega
+    // retrieve the nodeInfo map (for node names) via the SampleBin service
+    // $scope.nodeInfo = SampleBin.getNodeInfo(); // TBD
+    $scope.nodeInfo = [
+      {'id': 1, 'name': 'Node1pos'},
+      {'id': 2, 'name': 'Node2pos'},
+      {'id': 518, 'name': 'test name'}
+    ];
+
+    // define controller instance variables that link with vega
     this.data = {
-      source: $scope.plotData,
-      selectedNodes: $scope.selectedNodes
+      source: $scope.plotData
+      // FIXME: this is not working as it should to bring in node names
+      // nodes: $scope.nodeInfo
+      // FIXME: can't get selectedNodes out this way... need to use view api?
+      // selectedNodes: $scope.selectedNodes
     };
     this.spec = VolcanoPlotSpec;
-
-    // give our templates a way to access the SampleBin service
-    this.sb = SampleBin;
   }
 ])
 
