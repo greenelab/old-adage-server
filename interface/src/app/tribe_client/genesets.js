@@ -1,6 +1,7 @@
 angular.module('adage.tribe_client.genesets', [
   'adage.tribe_client.resource',
-  'adage.gene.resource'
+  'adage.gene.resource',
+  'adage.utils'
 ])
 
 // Wrapping component that houses the genesetSearchBar and the
@@ -41,36 +42,50 @@ angular.module('adage.tribe_client.genesets', [
     organism: '@',
     genesets: '='
   },
-  controller: ['$log', 'Genesets', 'Gene', function($log, Genesets, Gene) {
-    var self = this;
+  controller: ['$log', 'Genesets', 'Gene', 'errGen',
+    function($log, Genesets, Gene, errGen) {
+      var self = this;
 
-    self.search = {};
+      self.search = {};
 
-    self.searchGenesets = function() {
-      var qparams = {};
-      qparams['query'] = self.search.query;
-      qparams['organism__scientific_name'] = self.organism;
-      qparams['limit'] = self.limit;
+      self.searchGenesets = function() {
+        var qparams = {
+          'query': self.search.query,
+          'organism__scientific_name': self.organism,
+          'limit': self.limit
+        };
 
-      Genesets.query(qparams, function(data) {
-        self.genesets = [];
-        var returnedGenesets = data.objects;
-        angular.forEach(returnedGenesets, function(geneset) {
-          var entrezIds = geneset.tip.genes.join(',');
-          Gene.get({'entrezid__in': entrezIds},
-            function success(response) {
-              geneset.geneObjs = response.objects;
-              self.genesets.push(geneset);
-            },
-            function error(err) {
-              $log.error('Failed to get gene information: ' + err);
-              self.errorMessage = 'Failed to get gene information from server';
-            }
-          );
-        });
-      });
-    };
-  }]
+        Genesets.query(qparams,
+          function success(data) {
+            self.genesets = [];
+            var returnedGenesets = data.objects;
+            angular.forEach(returnedGenesets, function(geneset) {
+              var entrezIds = geneset.tip.genes.join(',');
+              Gene.get({'entrezid__in': entrezIds},
+                function success(response) {
+                  geneset.geneObjs = response.objects;
+                  self.genesets.push(geneset);
+                },
+                function error(errResponse) {
+                  var errMessage = errGen('Failed to get Gene information',
+                                          errResponse);
+                  $log.error(errMessage);
+                  self.geneQueryStatus = errMessage +
+                                         '. Please try again later.';
+                }
+              );
+            });
+          },
+          function error(errResponse) {
+            var errMessage = errGen('Failed to retrieve gene sets from Tribe',
+                                    errResponse);
+            $log.error(errMessage);
+            self.genesetQueryStatus = errMessage + '. Please try again later.';
+          }
+        );
+      };
+    }
+  ]
 })
 
 // Directive for table containing search results

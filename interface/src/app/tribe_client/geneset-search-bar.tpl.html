@@ -4,8 +4,15 @@
     <i>{{$ctrl.organism}}</i>&nbsp;
     <input ng-model="$ctrl.search.query" placeholder="Search text">
 
-    <button class="btn btn-default" ng-click="$ctrl.searchGenesets()">
+    <button class="btn btn-default" ng-click="$ctrl.searchGenesets()"
+      ng-disabled="!$ctrl.organism">
       Search
     </button>
   </form>
+  <div class="alert alert-danger" ng-if="$ctrl.genesetQueryStatus" role="alert">
+    {{$ctrl.genesetQueryStatus}}
+  </div>
+  <div class="alert alert-danger" ng-if="$ctrl.geneQueryStatus" role="alert">
+    {{$ctrl.geneQueryStatus}}
+  </div>
 </div>
