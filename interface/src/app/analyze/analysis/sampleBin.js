@@ -337,8 +337,8 @@ function($log, $cacheFactory, $q, Sample, Activity, NodeInfo, MathFuncts) {
   return SampleBin;
 }])
 
-.controller('SampleBinCtrl', ['$scope', '$log', 'SampleBin',
-function SampleBinCtrl($scope, $log, SampleBin) {
+.controller('SampleBinCtrl', ['$scope', 'SampleBin',
+function SampleBinCtrl($scope, SampleBin) {
   // give our templates a way to access the SampleBin service
   $scope.sb = SampleBin;
 }])

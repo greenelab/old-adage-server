@@ -12,10 +12,6 @@ angular.module('adage.analyze.analysis', [
   'ngResource'
 ])
 
-.factory('AnnotationType', ['$resource', function($resource) {
-  return $resource('/api/v0/annotationtype/');
-}])
-
 .config(['$stateProvider', function($stateProvider) {
   $stateProvider.state('analysis-detail', {
     url: '/analysis-detail',
@@ -29,10 +25,8 @@ angular.module('adage.analyze.analysis', [
   });
 }])
 
-.controller('AnalysisCtrl', ['$scope', '$log', '$location', '$q', '$state',
-'Sample', 'Activity', 'AnnotationType', 'SampleBin',
-function AnalysisCtrl($scope, $log, $location, $q, $state, Sample, Activity,
-AnnotationType, SampleBin) {
+.controller('AnalysisCtrl', ['$scope', '$log', '$q', '$state', 'SampleBin',
+function AnalysisCtrl($scope, $log, $q, $state, SampleBin) {
   $scope.analysis = {
     status: '',
     // TODO these exampleCols are temporarily hard-coded until a column chooser
