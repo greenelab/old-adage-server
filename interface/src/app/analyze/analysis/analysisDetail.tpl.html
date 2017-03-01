@@ -64,15 +64,19 @@
 <div vega spec="heatmapSpec" vega-data="sb.heatmapData"></div>
 
 <nav class="navbar navbar-default">
-  <p class="navbar-text">Cluster</p>
+  <p class="navbar-text">Visualize</p>
   <div class="btn-group" role="group" aria-label="clustering">
     <button type="button" class="btn btn-default navbar-btn"
     ng-click="sb.clusterSamples()">
-      Samples
+      Cluster Samples
     </button>
     <button type="button" class="btn btn-default navbar-btn"
     ng-click="clusterNodes()">
-      Nodes
+      Cluster Nodes
     </button>
   </div>
+  <button type="button" class="btn btn-default navbar-btn"
+  ng-click="showVolcanoPlot()">
+    Volcano Plot
+  </button>
 </nav>

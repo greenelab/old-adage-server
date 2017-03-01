@@ -277,6 +277,7 @@ class NodeResource(ModelResource):
         filtering = {
             'name': ('exact', 'in', ),
             'heavy_genes': ('exact', ),  # New filter, see apply_filters().
+            'mlmodel': ('exact', ),
         }
 
     def apply_filters(self, request, applicable_filters):
