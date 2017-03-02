@@ -1,3 +1,35 @@
+/*
+ * styles to make sampleBin editing controls more user-friendly
+ */
+.row-control {
+  float: none;
+  .opacity(.2);
+
+  &:hover,
+  &:focus {
+    text-decoration: none;
+    cursor: pointer;
+    .opacity(.5);
+  }
+
+  button& {
+    padding: 0;
+    cursor: pointer;
+    background: transparent;
+    border: 0;
+    -webkit-appearance: none;
+  }
+}
+// allow us to use controls to help align headers, but don't show them
+th .row-control, thead .row-control {
+  visibility: hidden;
+}
+
+// use special colors for highlighting sample groups (see less/variables.less)
+.table-row-variant(sample-group-a; @sample-group-a);
+.table-row-variant(sample-group-b; @sample-group-b);
+
+// helper styles for as-sortable control
 .as-sortable-item, .as-sortable-placeholder {
   display: table-row;
 }

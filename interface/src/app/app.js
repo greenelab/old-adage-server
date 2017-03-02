@@ -14,6 +14,7 @@ angular.module('adage', [
   'adage.node',
   'adage.help',
   'adage.sampleAnnotation',
+  'adage.volcano-plot.view',
   'ui.router',
   'ngResource'
 ])

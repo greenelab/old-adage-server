@@ -31,7 +31,8 @@ angular.module('adage.sampleAnnotation', [
 
 .controller('SampleAnnotationCtrl', [
   '$stateParams', '$q', '$log', 'errGen', 'Activity', 'Sample',
-  function($stateParams, $q, $log, errGen, Activity, Sample) {
+  'ActivityDigits',
+  function($stateParams, $q, $log, errGen, Activity, Sample, ActivityDigits) {
     var self = this;
     self.queryStatus = 'Connecting to the server ...';
 
@@ -56,7 +57,7 @@ angular.module('adage.sampleAnnotation', [
       // and sample(s):
       if ($stateParams.node) {
         self.hasNode = true;
-        self.activityPrecision = 5;
+        self.activityDigits = ActivityDigits;
         var nodeID = $stateParams.node;
         Activity.get(
           {'node': nodeID, 'sample__in': samplesInUrl},  // parameters of GET

@@ -5,8 +5,10 @@
  * information and activity levels required for drawing the heatmap.
  */
 angular.module('adage.analyze.sampleBin', [
+  'ngResource',
+  'greenelab.stats',
   'adage.analyze.sample',
-  'ngResource'
+  'adage.node'
 ])
 
 .factory('Activity', ['$resource', function($resource) {
@@ -14,12 +16,14 @@ angular.module('adage.analyze.sampleBin', [
 }])
 
 .factory('SampleBin', ['$log', '$cacheFactory', '$q', 'Sample', 'Activity',
-function($log, $cacheFactory, $q, Sample, Activity) {
+'NodeInfo', 'MathFuncts',
+function($log, $cacheFactory, $q, Sample, Activity, NodeInfo, MathFuncts) {
   var SampleBin = {
     heatmapData: {
       samples: [],
       nodeOrder: []
     },
+    sampleToGroup: {}, // this is a hash from sample id to group name
     sampleData: {},
     sampleCache: $cacheFactory('sample'),
     activityCache: $cacheFactory('activity'),
@@ -31,6 +35,7 @@ function($log, $cacheFactory, $q, Sample, Activity) {
             ' already in the sample list; ignoring.');
       } else {
         this.heatmapData.samples.push(+id);
+        this.sampleToGroup[+id] = 'other';
         // TODO when cache generalized: start pre-fetching sample data here
         this.heatmapData.nodeOrder = [];  // reset to default order
       }
@@ -39,6 +44,7 @@ function($log, $cacheFactory, $q, Sample, Activity) {
     removeSample: function(id) {
       var pos = this.heatmapData.samples.indexOf(+id);
       this.heatmapData.samples.splice(pos, 1);
+      delete this.sampleToGroup[+id];
       this.heatmapData.nodeOrder = [];  // reset to default order
       this.rebuildHeatmapActivity(this.heatmapData.samples);
     },
@@ -75,6 +81,25 @@ function($log, $cacheFactory, $q, Sample, Activity) {
         }
         return true;
       }
+    },
+
+    getSamplesByGroup: function() {
+      var keys = Object.keys(this.sampleToGroup);
+      var samplesByGroup = {};
+      var i, groupForThisKey;
+
+      // each distinct value in sampleToGroup becomes a key in samplesByGroup,
+      // and the keys of sampleToGroup are collected in a list within each
+      // corresponding value of samplesByGroup
+      for (i = 0; i < keys.length; i++) {
+        groupForThisKey = this.sampleToGroup[+keys[i]];
+        if (!samplesByGroup[groupForThisKey]) {
+          samplesByGroup[groupForThisKey] = [];
+        }
+        samplesByGroup[groupForThisKey].push(+keys[i]);
+      }
+
+      return samplesByGroup;
     },
 
     getSampleData: function(id) {
@@ -255,15 +280,65 @@ function($log, $cacheFactory, $q, Sample, Activity) {
       //  note: progress can be reported by returning a $promise to the caller
       // respObj.queryStatus = 'Retrieving sample activity...';
       this.rebuildHeatmapActivity(this.heatmapData.samples);
+    },
+
+    // volcano plot methods
+    getVolcanoPlotData: function() {
+      // use sample lists for group-a and group-b to produce output for
+      // the volcano plot of the form:
+      //   node - diff - logsig,
+      // where:
+      //   node = the node name as supplied by NodeInfo
+      //   diff = mean(group-a activity values) - mean(group-b activity values)
+      //   logsig = -log10(p-value from 2-sample t-test on group-a vs. group-b)
+      var sg = this.getSamplesByGroup();
+
+      // verify that we have at least one sample each in group-a and group-b
+      if (!sg['group-a'] || sg['group-a'].length === 0) {
+        return null;
+      }
+      if (!sg['group-b'] || sg['group-b'].length === 0) {
+        return null;
+      }
+
+      // (1) we obtain a list of nodes by retrieving node activity
+      //     for the first sample in our volcano plot
+      var firstSampleNodes = this.activityCache.get(sg['group-a'][0]);
+      // (2a) next, we build a new array (`retval`) comprised of `nodeObject`s
+      //      by walking through the `firstSampleNodes` and constructing a
+      //      `nodeObject` for each. [outer .map()]
+      var retval = firstSampleNodes.map(function(val, i, arr) {
+        var mapSampleIdsToActivity = function(sampId, i, arr) {
+          // (2b) the array of activity for each node is built by plucking the
+          //      activity `.value` for each sample within this node from the
+          //      `activityCache` [inner .map()]
+          // FIXME: counting on array order to match node order here
+          return this.activityCache.get(sampId)[val.node - 1].value;
+        };
+        var nodeObject = {
+          'id': val.node, // TODO: map this id to node name (via vega spec?)
+          'activityA': sg['group-a'].map(mapSampleIdsToActivity, this),
+          'activityB': sg['group-b'].map(mapSampleIdsToActivity, this)
+        };
+        nodeObject.diff = (
+          MathFuncts.mean(nodeObject.activityA) -
+          MathFuncts.mean(nodeObject.activityB)
+        );
+        nodeObject.logsig = -Math.log10(MathFuncts.tTest(
+          nodeObject.activityA, nodeObject.activityB
+        ).pValue());
+
+        return nodeObject;
+      }, this);
+      return retval;
     }
   };
 
   return SampleBin;
 }])
 
-.controller('SampleBinCtrl', ['$scope', '$log', '$uibModal', 'Sample',
-'SampleBin',
-function SampleBinCtrl($scope, $log, $uibModal, Sample, SampleBin) {
+.controller('SampleBinCtrl', ['$scope', 'SampleBin',
+function SampleBinCtrl($scope, SampleBin) {
   // give our templates a way to access the SampleBin service
   $scope.sb = SampleBin;
 }])
@@ -278,11 +353,4 @@ function SampleBinCtrl($scope, $log, $uibModal, Sample, SampleBin) {
   };
 })
 
-.controller('AnalysisModalCtrl', ['$scope', '$uibModalInstance', 'analysis',
-function($scope, $uibModalInstance, analysis) {
-  $scope.analysis = analysis;
-  $scope.close = function() {
-    $uibModalInstance.dismiss('close');
-  };
-}])
 ;

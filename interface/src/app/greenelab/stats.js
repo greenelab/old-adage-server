@@ -49,7 +49,24 @@ angular.module('greenelab.stats', [
      * from npm: https://www.npmjs.com/package/ttest .
      * Source is at: https://github.com/AndreasMadsen/ttest .
      */
-    tTest: ttest
+    tTest: ttest,
+
+    mean: function(arr) {
+      // TODO: the ttest library above embeds a Summary library that can
+      //       compute means and we should use that (have to figure out how to
+      //       expose it and ttest without too much redundant packaging)
+
+      // don't do a divide by 0...
+      if (arr.length === 0) {
+        return 0;
+      }
+      // compute the mean of the elements in arr
+      var sum = arr.reduce(function(acc, val) {
+        return acc + val;
+      }, 0);
+
+      return sum / arr.length;
+    }
 
   };
 }])
