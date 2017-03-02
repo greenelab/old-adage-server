@@ -32,7 +32,6 @@ angular.module('adage.tribe_client.genesets', [
   ]
 })
 
-
 // Search box for users to enter their search text into
 // and go search Tribe genesets.
 .component('genesetSearchBar', {
@@ -49,6 +48,7 @@ angular.module('adage.tribe_client.genesets', [
       self.search = {};
 
       self.searchGenesets = function() {
+        self.searchStatus = 'Searching for gene sets...';
         var qparams = {
           'query': self.search.query,
           'organism__scientific_name': self.organism,
@@ -63,10 +63,12 @@ angular.module('adage.tribe_client.genesets', [
               var entrezIds = geneset.tip.genes.join(',');
               Gene.get({'entrezid__in': entrezIds},
                 function success(response) {
+                  self.searchStatus = null;
                   geneset.geneObjs = response.objects;
                   self.genesets.push(geneset);
                 },
                 function error(errResponse) {
+                  self.searchStatus = null;
                   var errMessage = errGen('Failed to get Gene information',
                                           errResponse);
                   $log.error(errMessage);
@@ -77,6 +79,7 @@ angular.module('adage.tribe_client.genesets', [
             });
           },
           function error(errResponse) {
+            self.searchStatus = null;
             var errMessage = errGen('Failed to retrieve gene sets from Tribe',
                                     errResponse);
             $log.error(errMessage);
@@ -93,12 +96,16 @@ angular.module('adage.tribe_client.genesets', [
   templateUrl: 'tribe_client/geneset-result-table.tpl.html',
   bindings: {
     limit: '@',
-    organism: '@',
     genesets: '=',
     selectedGeneset: '='
   },
   controller: ['CommonGeneFuncts', function(CommonGeneFuncts) {
     var self = this;
+    // TODO: Implement pagination for geneset search results in
+    // case the number of results ($scope.genesetResultCount above)
+    // is greater than this 'limit' parameter (the maximum number of
+    // geneset results that the Tribe API should return at once).
+
     self.selectedGeneset = {};
 
     self.getGeneLabelList = function(geneList) {

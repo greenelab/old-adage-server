@@ -1,14 +1,19 @@
 <div>
-  <form class="form-inline">
-    <label>Organism:</label>
-    <i>{{$ctrl.organism}}</i>&nbsp;
-    <input ng-model="$ctrl.search.query" placeholder="Search text">
+  <label>Organism:</label>
+  <i>{{$ctrl.organism}}</i>
+  <span ng-if="!$ctrl.organism" class="text-muted">
+    No organism yet. Please select a <b>Machine Learning Model</b> above
+  </span>
+  <br>
 
-    <button class="btn btn-default" ng-click="$ctrl.searchGenesets()"
-      ng-disabled="!$ctrl.organism">
-      Search
-    </button>
-  </form>
+  <input ng-model="$ctrl.search.query" placeholder="Search gene set titles">
+  <button class="btn btn-default" ng-click="$ctrl.searchGenesets()"
+    ng-disabled="!$ctrl.organism">
+    Search
+  </button>
+  &nbsp;
+
+  {{$ctrl.searchStatus}}
   <div class="alert alert-danger" ng-if="$ctrl.genesetQueryStatus" role="alert">
     {{$ctrl.genesetQueryStatus}}
   </div>
