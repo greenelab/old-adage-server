@@ -16,8 +16,9 @@ angular.module('adage.analyze.sampleBin', [
 }])
 
 .factory('SampleBin', ['$log', '$cacheFactory', '$q', 'Sample', 'Activity',
-'NodeInfo', 'MathFuncts',
-function($log, $cacheFactory, $q, Sample, Activity, NodeInfo, MathFuncts) {
+'NodeInfo', 'MathFuncts', 'errGen',
+function($log, $cacheFactory, $q, Sample, Activity, NodeInfo, MathFuncts,
+errGen) {
   var SampleBin = {
     heatmapData: {
       samples: [],
@@ -27,6 +28,7 @@ function($log, $cacheFactory, $q, Sample, Activity, NodeInfo, MathFuncts) {
     sampleData: {},
     sampleCache: $cacheFactory('sample'),
     activityCache: $cacheFactory('activity'),
+    nodeCache: $cacheFactory('node'),
 
     addSample: function(id) {
       if (this.heatmapData.samples.indexOf(+id) !== -1) {
@@ -182,6 +184,34 @@ function($log, $cacheFactory, $q, Sample, Activity, NodeInfo, MathFuncts) {
         }
       ).$promise;
       return pSample;
+    },
+    getNodeInfoPromise: function(pk) {
+      // Retrieve NodeInfo data for node id=pk from a cache, if available,
+      // returning a promise that is already fulfilled. If node `pk` is not
+      // cached, use the API to get it and add it to the cache.
+      var cbSampleBin = this; // closure link to SampleBin for callbacks
+      var defer = $q.defer();
+
+      // check the cache first and return what's there, if found
+      var cachedNode = this.nodeCache.get(pk);
+      if (cachedNode) {
+        defer.resolve(cachedNode);
+        return defer.promise;
+      }
+
+      // we didn't return above, so pk is not in the cache => fetch it
+      NodeInfo.get({id: pk},
+        function success(responseObject) {
+          cbSampleBin.nodeCache.put(pk, responseObject);
+          defer.resolve(responseObject);
+        },
+        function error(httpResponse) {
+          // TODO log an error message (see Issue #79)
+          $log.error(errGen('Error retrieving NodeInfo', httpResponse));
+          defer.reject(httpResponse);
+        }
+      );
+      return defer.promise;
     },
 
     _getIDs: function(val, i, arr) {
