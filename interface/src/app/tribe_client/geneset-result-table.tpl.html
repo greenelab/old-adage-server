@@ -1,15 +1,18 @@
-<div>
-  <table class="table table-striped" name="searchResults">
-    <tr>
-      <th>Title</th>
-      <th>Species</th>
-      <th>Creator</th>
-    </tr>
+<table class="table table-striped">
+  <tr>
+    <th></th>
+    <th>Title</th>
+    <th>Species</th>
+    <th>Creator</th>
+    <th>Genes</th>
+  </tr>
 
-    <tr ng-repeat="geneset in genesets">
-      <td>{{ geneset.title }}</td>
-      <td>{{ geneset.organism.scientific_name }}</td>
-      <td>{{ geneset.creator.username }}</td>
-    </tr>
-  </table>
-</div>
+  <tr ng-repeat="geneset in $ctrl.genesets">
+    <td><input type="radio" ng-model="$ctrl.selectedGeneset"
+      ng-value="{{geneset}}"></td>
+    <td>{{ geneset.title }}</td>
+    <td><i>{{ geneset.organism.scientific_name }}</i></td>
+    <td>{{ geneset.creator.username }}</td>
+    <td>{{ $ctrl.getGeneLabelList(geneset.geneObjs) }}</td>
+  </tr>
+</table>
