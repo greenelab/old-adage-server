@@ -12,10 +12,6 @@ angular.module('adage.analyze.analysis', [
   'ngResource'
 ])
 
-.factory('AnnotationType', ['$resource', function($resource) {
-  return $resource('/api/v0/annotationtype/');
-}])
-
 .config(['$stateProvider', function($stateProvider) {
   $stateProvider.state('analysis-detail', {
     url: '/analysis-detail',
@@ -29,18 +25,18 @@ angular.module('adage.analyze.analysis', [
   });
 }])
 
-.controller('AnalysisCtrl', ['$scope', '$log', '$location', '$q', 'Sample',
-'Activity', 'AnnotationType', 'SampleBin',
-function AnalysisCtrl($scope, $log, $location, $q, Sample, Activity,
-AnnotationType, SampleBin) {
+.controller('AnalysisCtrl', ['$scope', '$log', '$q', '$state', 'SampleBin',
+function AnalysisCtrl($scope, $log, $q, $state, SampleBin) {
   $scope.analysis = {
     status: '',
     // TODO these exampleCols are temporarily hard-coded until a column chooser
     // feature can be added
     exampleCols: [
+      {'typename': 'strain'},
       {'typename': 'genotype'},
       {'typename': 'medium'},
-      {'typename': 'strain'}
+      {'typename': 'temperature'},
+      {'typename': 'treatment'}
     ]
   };
 
@@ -53,6 +49,10 @@ AnnotationType, SampleBin) {
     SampleBin.clusterNodes().then(function() {
       $scope.analysis.status = '';
     });
+  };
+
+  $scope.showVolcanoPlot = function() {
+    $state.go('volcano');
   };
 
   // these options are important for making ngSortable work with tables
@@ -78,13 +78,14 @@ AnnotationType, SampleBin) {
           {'type': 'formula', 'field': 'normval', 'expr': 'abs(datum.value)'}
         ]
       }, {
-        // this dataset "streamed" in via ngVega from heatmapData
+        // these datasets "streamed" in via ngVega from heatmapData
         'name': 'samples'
+      // }, {
+      // FIXME: this dataset must fit a vega-compatible format to be included
+      //   'name': 'sampleGroups'
       }, {
-        // this dataset "streamed" in via ngVega from heatmapData
         'name': 'nodeOrder'
       }, {
-        // this dataset "streamed" in via ngVega from heatmapData
         'name': 'sample_objects'
       }, {
         // compute minimum normalized value for each node (across samples)

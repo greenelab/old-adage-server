@@ -2,13 +2,20 @@
   <div class="panel-heading">
     <h4>
       Have a Tribe gene set you want to use?
+      <button class="btn btn-success pull-right" ng-click="$ctrl.sendToNetwork()">
+        View Genes as Network <i class="fa fa-check"></i>
+      </button>
     </h4>
   </div>
 
   <div class="panel-body">
     <label for="title">Search Tribe gene sets</label>
-    <geneset-search-bar organism="organism" limit="limit" genesets="genesets"></geneset-search-bar>
+    <geneset-search-bar organism="{{$ctrl.organism}}" limit="{{$ctrl.limit}}"
+      genesets="$ctrl.genesets">
+    </geneset-search-bar>
     <hr>
-    <geneset-result-table limit="limit" genesets="genesets"></geneset-result-table>
+    <geneset-result-table limit="{{$ctrl.limit}}" genesets="$ctrl.genesets"
+      selected-geneset="$ctrl.selectedGeneset">
+    </geneset-result-table>
   </div>
 </div>

@@ -51,3 +51,4 @@ ratings:
   - "**.py"
 exclude_paths:
 - "adage/**/migrations/"
+- "interface/**/*-vgspec.js"
