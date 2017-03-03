@@ -191,8 +191,9 @@ def import_data_and_index():
         CONFIG['data']['gene_history_file'])
     run('python manage.py import_gene_network  %s "Ensemble ADAGE 300"' %
         CONFIG['data']['gene_network_file'])
-    run('./manage.py import_node_gene_network %s "Ensemble ADAGE 300"' %
+    run('python manage.py import_node_gene_network %s "Ensemble ADAGE 300"' %
         CONFIG['data']['node_gene_network_file'])
+    run('python manage.py tribe_client_pickle_public_genesets')
     rebuild_search_index()
 
 
