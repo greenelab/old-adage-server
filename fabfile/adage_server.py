@@ -73,7 +73,8 @@ def pull(opts=''):
         if k in (
             'django_key', 'haystack', 'databases',
             'tribe_id', 'tribe_secret', 'tribe_redirect_uri', 'tribe_scope',
-            'tribe_login_redirect', 'tribe_logout_redirect'
+            'tribe_login_redirect', 'tribe_logout_redirect',
+            'public_geneset_folder'
         )
     }
     run(('echo "CONFIG = {0}" > '
@@ -190,8 +191,9 @@ def import_data_and_index():
         CONFIG['data']['gene_history_file'])
     run('python manage.py import_gene_network  %s "Ensemble ADAGE 300"' %
         CONFIG['data']['gene_network_file'])
-    run('./manage.py import_node_gene_network %s "Ensemble ADAGE 300"' %
+    run('python manage.py import_node_gene_network %s "Ensemble ADAGE 300"' %
         CONFIG['data']['node_gene_network_file'])
+    run('python manage.py tribe_client_pickle_public_genesets')
     rebuild_search_index()
 
 
