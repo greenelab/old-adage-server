@@ -1,6 +1,40 @@
 <div>
   <h1>ADAGE: Home</h1>
-  <p class="lead">
-    This shell is the framework into which the ADAGE server will grow.
-  </p>
+  <div class="lead">
+    <h2>ADAGE introduction</h2>
+    <p>
+      ADAGE (or eADAGE) models are neural networks trained in an unsupervise
+      manner on large publically available gene expression compendia. ADAGE
+      aims at building essential features that can reconstruct a compendium.
+      We derived gene expression signatures from ADAGE neural network nodes
+      and found that these signatures resemble human-annotated biological
+      pathways and cover many existing pathways [1,2]. In addition to
+      signatures that match known pathways, ADAGE also extracts signatures
+      that may group genes in novel data-driven ways.
+    </p>
+    <p>
+      Please refer to the following papers if you want to learn more about
+      ADAGE:
+      <br>
+      <a href="https://doi.org/10.1128/mSystems.00025-15">
+        1. ADAGE-Based Integration of Publicly Available Pseudomonas
+        aeruginosa Gene Expression Data with Denoising Autoencoders
+        Illuminates Microbe-Host Interactions
+      </a>
+      <br>
+      <a href="https://doi.org/10.1101/078659">
+      2. Unsupervised extraction of functional gene expression signatures in
+      the bacterial pathogen Pseudomonas aeruginosa with eADAGE
+    </p>
+
+    <h2>ADAGE signature analysis</h2>
+    <p>
+      Signatures are gene sets derived from an ADAGE model. They are formed
+      because their genes are expressed coordinately in some samples in the
+      compendium. An ADAGE signature analysis aims to identify signatures in
+      which the expression of constiuent genes are altered by an experimental
+      treatment. Such signatures may represent biological processes that are
+      perturbed by the treatment.
+    </p>
+  </div>
 </div>
