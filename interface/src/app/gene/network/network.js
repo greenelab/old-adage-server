@@ -57,9 +57,15 @@ angular.module('adage.gene.network', [
    ['$stateParams', 'EdgeService', 'NodeService', '$log',
     function GeneNetworkController($stateParams, EdgeService, NodeService,
                                    $log) {
+      var self = this;
+      // Do nothing if no genes are specified in URL.
+      if (!$stateParams.genes || !$stateParams.genes.split(',').length) {
+        self.statusMessage = 'No genes are specified.';
+        return;
+      }
+
       var rawMinWeight = -1.0;
       var rawMaxWeight = 1.0;
-      var minCorrelation = rawMinWeight;
       var scaledMaxWeight = rawMaxWeight - rawMinWeight;
       var setEdgeColor = d3.scale.linear()
           .domain([0, scaledMaxWeight / 2.0, scaledMaxWeight])
@@ -76,33 +82,26 @@ angular.module('adage.gene.network', [
           .legendEnd(rawMaxWeight)
           .legendText('Correlation');
 
-      var self = this;
       // The following properties of "self" will be available to HTML.
       self.maxNodeNum = Number.MAX_SAFE_INTEGER;
       self.statusMessage = 'Connecting to the server ...';
       self.slider = {  // Slider configuration
-        position: minCorrelation,
+        minValue: rawMinWeight,
+        maxValue: rawMaxWeight,
         options: {
           floor: rawMinWeight,
           ceil: rawMaxWeight,
           step: 0.01,
           precision: 2,
-          showSelectionBarEnd: true,
           showTicks: 0.5,
           showTicksValues: true,
-          onEnd: function(id, value) {
-            minCorrelation = value;
-            network.filter(minCorrelation - rawMinWeight, self.maxNodeNum)
+          onEnd: function(id, low, high) {
+            network.filter(low - rawMinWeight, high - rawMinWeight,
+                           self.maxNodeNum)
               .draw();
           }
         }
       };
-
-      // Do nothing if no genes are specified in URL.
-      if (!$stateParams.genes || !$stateParams.genes.split(',').length) {
-        self.statusMessage = 'No genes are specified.';
-        return;
-      }
 
       var urlGenes = $stateParams.genes.split(',');
       var genes = [];
