@@ -82,6 +82,8 @@ angular.module('adage.gene.network', [
           .legendEnd(rawMaxWeight)
           .legendText('Correlation');
 
+      var geneTip, edgeTip;
+
       // The following properties of "self" will be available to HTML.
       self.maxNodeNum = Number.MAX_SAFE_INTEGER;
       self.statusMessage = 'Connecting to the server ...';
@@ -96,6 +98,8 @@ angular.module('adage.gene.network', [
           showTicks: 0.5,
           showTicksValues: true,
           onEnd: function(id, low, high) {
+            geneTip.hide();
+            edgeTip.hide();
             network.filter(low - rawMinWeight, high - rawMinWeight,
                            self.maxNodeNum)
               .draw();
@@ -167,10 +171,10 @@ angular.module('adage.gene.network', [
         }
 
         // Initialize tips on gene and edge.
-        var geneTip = d3.tip()
+        geneTip = d3.tip()
             .attr('class', 'gene-tip')
             .offset([-20, 0]);
-        var edgeTip = d3.tip()
+        edgeTip = d3.tip()
             .attr('class', 'edge-tip')
             .offset([-20, 0]);
 
