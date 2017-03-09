@@ -30,14 +30,12 @@ angular.module('adage.volcano-plot', [
     });
 
     // define controller instance variables that link with vega
-    this.data = {
-      source: $scope.plotData
-      // FIXME: this is not working as it should to bring in node names
-      // nodes: $scope.nodeInfo
-      // FIXME: can't get selectedNodes out this way... need to use view api?
-      // selectedNodes: $scope.selectedNodes
-    };
     this.spec = VolcanoPlotSpec;
+    this.data = $scope.plotData;
+    // FIXME: this is not working as it should to bring in node names
+    // $scope.plotData.nodes: $scope.nodeInfo
+    // FIXME: can't get selectedNodes out this way... need to use view api?
+    // $scope.plotData.selectedNodes: $scope.selectedNodes
   }
 ])
 

@@ -23,7 +23,8 @@ angular.module('adage.volcano-plot.view', [
   //      for sample-group-a and sample-group-b and does what's necessary to
   //      make a plot from those lists)
   function VolcanoPlotViewCtrl(SampleBin, $stateParams) {
-    this.data = SampleBin.getVolcanoPlotData();
+    SampleBin.getVolcanoPlotData();
+    this.data = SampleBin.volcanoData;
     // FIXME need to dig into vega internal data format to make selection work
     this.selection = [];
   }

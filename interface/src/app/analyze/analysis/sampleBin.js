@@ -24,6 +24,9 @@ errGen) {
       samples: [],
       nodeOrder: []
     },
+    volcanoData: {
+      source: []
+    },
     sampleToGroup: {}, // this is a hash from sample id to group name
     sampleData: {},
     sampleCache: $cacheFactory('sample'),
@@ -185,15 +188,25 @@ errGen) {
       ).$promise;
       return pSample;
     },
+    getCachedNodeInfo: function(pk) {
+      return this.nodeCache.get(pk);
+    },
     getNodeInfoPromise: function(pk) {
       // Retrieve NodeInfo data for node id=pk from a cache, if available,
       // returning a promise that is already fulfilled. If node `pk` is not
       // cached, use the API to get it and add it to the cache.
+      if (pk === 1) {
+        $log.debug('getNodeInfoPromise: pk=' + pk);
+      }
       var cbSampleBin = this; // closure link to SampleBin for callbacks
       var defer = $q.defer();
 
       // check the cache first and return what's there, if found
-      var cachedNode = this.nodeCache.get(pk);
+      var cachedNode = this.getCachedNodeInfo(pk);
+      if (pk === 1) {
+        $log.debug('getNodeInfoPromise: cachedNode=' +
+          JSON.stringify(cachedNode));
+      }
       if (cachedNode) {
         defer.resolve(cachedNode);
         return defer.promise;
@@ -202,7 +215,14 @@ errGen) {
       // we didn't return above, so pk is not in the cache => fetch it
       NodeInfo.get({id: pk},
         function success(responseObject) {
+          if (pk === 1) {
+            $log.debug('getNodeInfoPromise, .get success: pk=' + pk);
+            $log.debug('getNodeInfoPromise: resp=' +
+              JSON.stringify(responseObject));
+          }
           cbSampleBin.nodeCache.put(pk, responseObject);
+          // $log.debug('caching nodeInfo for ' + pk + ': ' +
+          //   JSON.stringify(responseObject));
           defer.resolve(responseObject);
         },
         function error(httpResponse) {
@@ -216,6 +236,9 @@ errGen) {
 
     _getIDs: function(val, i, arr) {
       return val.id;
+    },
+    logError: function(httpResponse) {
+      $log.error(errGen('Query errored', httpResponse));
     },
     clusterSamples: function() {
       // TODO implement non-blocking response here as done for clusterNodes()
@@ -284,9 +307,6 @@ errGen) {
         }
         cbSampleBin.heatmapData.activity = newActivity;
       };
-      var logError = function(errObject) {
-        $log.error('Query errored with: ' + errObject);
-      };
 
       // preflight the cache and request anything missing
       var activityPromises = [];
@@ -297,11 +317,11 @@ errGen) {
           // cache miss, so populate the entry
           var p = Activity.get({'sample': samples[i]}).$promise;
           activityPromises.push(p);
-          p.then(loadCache).catch(logError);
+          p.then(loadCache).catch(this.logError);
         }
       }
       // when the cache is ready, update the heatmap activity data
-      $q.all(activityPromises).then(updateHeatmapActivity).catch(logError);
+      $q.all(activityPromises).then(updateHeatmapActivity).catch(this.logError);
     },
 
     getActivityForSampleList: function(respObj) {
@@ -322,6 +342,7 @@ errGen) {
       //   diff = mean(group-a activity values) - mean(group-b activity values)
       //   logsig = -log10(p-value from 2-sample t-test on group-a vs. group-b)
       var sg = this.getSamplesByGroup();
+      var cbSampleBin = this;
 
       // verify that we have at least one sample each in group-a and group-b
       if (!sg['group-a'] || sg['group-a'].length === 0) {
@@ -331,36 +352,59 @@ errGen) {
         return null;
       }
 
-      // (1) we obtain a list of nodes by retrieving node activity
-      //     for the first sample in our volcano plot
+      // (1a) we obtain a list of nodes by retrieving node activity
+      //      for the first sample in our volcano plot
       var firstSampleNodes = this.activityCache.get(sg['group-a'][0]);
-      // (2a) next, we build a new array (`retval`) comprised of `nodeObject`s
-      //      by walking through the `firstSampleNodes` and constructing a
-      //      `nodeObject` for each. [outer .map()]
-      var retval = firstSampleNodes.map(function(val, i, arr) {
-        var mapSampleIdsToActivity = function(sampId, i, arr) {
-          // (2b) the array of activity for each node is built by plucking the
-          //      activity `.value` for each sample within this node from the
-          //      `activityCache` [inner .map()]
-          // FIXME: counting on array order to match node order here
-          return this.activityCache.get(sampId)[val.node - 1].value;
-        };
-        var nodeObject = {
-          'id': val.node, // TODO: map this id to node name (via vega spec?)
-          'activityA': sg['group-a'].map(mapSampleIdsToActivity, this),
-          'activityB': sg['group-b'].map(mapSampleIdsToActivity, this)
-        };
-        nodeObject.diff = (
-          MathFuncts.mean(nodeObject.activityB) -
-          MathFuncts.mean(nodeObject.activityA)
-        );
-        nodeObject.logsig = -Math.log10(MathFuncts.tTest(
-          nodeObject.activityA, nodeObject.activityB
-        ).pValue());
-
-        return nodeObject;
+      // (1b) now obtain (and cache) a name for each node id
+      var nodeInfoPromises = firstSampleNodes.map(function(val, i, arr) {
+        return this.getNodeInfoPromise(val.node);
       }, this);
-      return retval;
+      var mapNodesToNodeInfo = function() {
+        $log.debug('mapNodesToNodeInfo: mapping started...');
+        // (2a) next, we build an array (replacing `volcanoData.source`)
+        //      comprised of `nodeObject`s by walking through the
+        //      `firstSampleNodes` and constructing a `nodeObject` for
+        //      each. [outer .map()]
+        cbSampleBin.volcanoData.source = firstSampleNodes.map(function(val) {
+          var mapSampleIdsToActivity = function(sampId) {
+            // (2b) the array of activity for each node is built by plucking the
+            //      activity `.value` for each sample within this node from the
+            //      `activityCache` [inner .map()]
+            // FIXME: counting on array order to match node order here
+            return cbSampleBin.activityCache.get(sampId)[val.node - 1].value;
+          };
+          $log.debug('mapNodes: val.node = ' + val.node);
+          $log.debug('mapNodes: getCachedNodeInfo() = ' + JSON.stringify(
+            cbSampleBin.getCachedNodeInfo(val.node))
+          );
+          var nodeObject = {
+            'id': val.node,
+            'name': cbSampleBin.getCachedNodeInfo(val.node).name,
+            'activityA': sg['group-a'].map(mapSampleIdsToActivity),
+            'activityB': sg['group-b'].map(mapSampleIdsToActivity)
+          };
+          nodeObject.diff = (
+            MathFuncts.mean(nodeObject.activityA) -
+            MathFuncts.mean(nodeObject.activityB)
+          );
+          nodeObject.logsig = -Math.log10(MathFuncts.tTest(
+            nodeObject.activityA, nodeObject.activityB
+          ).pValue());
+
+          return nodeObject;
+        });
+        // no return needed here: we've updated `cbSampleBin.volcanoData`
+        $log.debug('mapNodesToNodeInfo: mapping complete.');
+        $log.debug('mapNodesToNodeInfo: volcanoData=' +
+          JSON.stringify(cbSampleBin.volcanoData));
+      };
+      $log.debug('getVolcanoPlotData: nodeInfo requested, waiting for ' +
+        nodeInfoPromises.length + ' promises...');
+      $q.all(nodeInfoPromises)
+        .then(mapNodesToNodeInfo)
+        .catch(this.logError);
+      $log.debug('getVolcanoPlotData: returning ' +
+        JSON.stringify(cbSampleBin.volcanoData));
     }
   };
 
