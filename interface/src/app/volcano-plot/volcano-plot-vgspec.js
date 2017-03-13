@@ -140,11 +140,11 @@ angular.module('adage.volcano-plot-vgspec', [])
     {
       "type": "x",
       "scale": "x",
-      "format": "s",
+      "format": ".2f",
       "grid": true,
       "layer": "back",
       "ticks": 5,
-      "title": "diff"
+      "title": "difference in mean activity"
     },
     {
       "type": "y",
