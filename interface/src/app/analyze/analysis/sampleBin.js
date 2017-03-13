@@ -321,8 +321,8 @@ function($log, $cacheFactory, $q, Sample, Activity, NodeInfo, MathFuncts) {
           'activityB': sg['group-b'].map(mapSampleIdsToActivity, this)
         };
         nodeObject.diff = (
-          MathFuncts.mean(nodeObject.activityA) -
-          MathFuncts.mean(nodeObject.activityB)
+          MathFuncts.mean(nodeObject.activityB) -
+          MathFuncts.mean(nodeObject.activityA)
         );
         nodeObject.logsig = -Math.log10(MathFuncts.tTest(
           nodeObject.activityA, nodeObject.activityB
