@@ -14,21 +14,6 @@ angular.module('adage.volcano-plot', [
 .controller('VolcanoPlotCtrl', ['$scope', 'VolcanoPlotSpec', 'SampleBin',
   'errGen',
   function VolcanoPlotCtrl($scope, VolcanoPlotSpec, SampleBin, errGen) {
-    // retrieve the nodeInfo map (for node names) via the SampleBin service
-    // $scope.nodeInfo = SampleBin.getNodeInfoPromise(); // TBD
-    $scope.nodeInfo = [
-      {'id': 1, 'name': 'Node1pos'},
-      {'id': 2, 'name': 'Node2pos'},
-      {'id': 518, 'name': 'loading...'}
-    ];
-    SampleBin.getNodeInfoPromise(518).then(function success(respObj) {
-      $scope.nodeInfo[2].name = respObj.name;
-      console.log(JSON.stringify($scope.nodeInfo));
-    }).catch(function error(errResp) {
-      $scope.nodeInfo[2].name = errGen('Error retrieving NodeInfo', errResp);
-      console.log(JSON.stringify($scope.nodeInfo));
-    });
-
     // define controller instance variables that link with vega
     this.spec = VolcanoPlotSpec;
     this.data = $scope.plotData;

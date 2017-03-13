@@ -195,18 +195,11 @@ errGen) {
       // Retrieve NodeInfo data for node id=pk from a cache, if available,
       // returning a promise that is already fulfilled. If node `pk` is not
       // cached, use the API to get it and add it to the cache.
-      if (pk === 1) {
-        $log.debug('getNodeInfoPromise: pk=' + pk);
-      }
       var cbSampleBin = this; // closure link to SampleBin for callbacks
       var defer = $q.defer();
 
       // check the cache first and return what's there, if found
       var cachedNode = this.getCachedNodeInfo(pk);
-      if (pk === 1) {
-        $log.debug('getNodeInfoPromise: cachedNode=' +
-          JSON.stringify(cachedNode));
-      }
       if (cachedNode) {
         defer.resolve(cachedNode);
         return defer.promise;
@@ -215,14 +208,7 @@ errGen) {
       // we didn't return above, so pk is not in the cache => fetch it
       NodeInfo.get({id: pk},
         function success(responseObject) {
-          if (pk === 1) {
-            $log.debug('getNodeInfoPromise, .get success: pk=' + pk);
-            $log.debug('getNodeInfoPromise: resp=' +
-              JSON.stringify(responseObject));
-          }
           cbSampleBin.nodeCache.put(pk, responseObject);
-          // $log.debug('caching nodeInfo for ' + pk + ': ' +
-          //   JSON.stringify(responseObject));
           defer.resolve(responseObject);
         },
         function error(httpResponse) {
@@ -360,7 +346,6 @@ errGen) {
         return this.getNodeInfoPromise(val.node);
       }, this);
       var mapNodesToNodeInfo = function() {
-        $log.debug('mapNodesToNodeInfo: mapping started...');
         // (2a) next, we build an array (replacing `volcanoData.source`)
         //      comprised of `nodeObject`s by walking through the
         //      `firstSampleNodes` and constructing a `nodeObject` for
@@ -373,10 +358,6 @@ errGen) {
             // FIXME: counting on array order to match node order here
             return cbSampleBin.activityCache.get(sampId)[val.node - 1].value;
           };
-          $log.debug('mapNodes: val.node = ' + val.node);
-          $log.debug('mapNodes: getCachedNodeInfo() = ' + JSON.stringify(
-            cbSampleBin.getCachedNodeInfo(val.node))
-          );
           var nodeObject = {
             'id': val.node,
             'name': cbSampleBin.getCachedNodeInfo(val.node).name,
@@ -394,17 +375,10 @@ errGen) {
           return nodeObject;
         });
         // no return needed here: we've updated `cbSampleBin.volcanoData`
-        $log.debug('mapNodesToNodeInfo: mapping complete.');
-        $log.debug('mapNodesToNodeInfo: volcanoData=' +
-          JSON.stringify(cbSampleBin.volcanoData));
       };
-      $log.debug('getVolcanoPlotData: nodeInfo requested, waiting for ' +
-        nodeInfoPromises.length + ' promises...');
       $q.all(nodeInfoPromises)
         .then(mapNodesToNodeInfo)
         .catch(this.logError);
-      $log.debug('getVolcanoPlotData: returning ' +
-        JSON.stringify(cbSampleBin.volcanoData));
     }
   };
 
