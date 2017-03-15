@@ -1,3 +1,8 @@
+/*
+ * Simple view embedding a volcano-plot. Requires samples to be grouped in the
+ * adage.analyze.sampleBin in order to function properly -- if no samples are
+ * chosen or placed into groups, an error will be displayed.
+ */
 angular.module('adage.volcano-plot.view', [
   'ui.router',
   'adage.analyze.sampleBin',

@@ -1,19 +1,16 @@
 /*
  * The volcano-plot module provides a directive and controller for embedding
- * volcano plots in other views. Requires samples to be grouped in the
- * adage.analyze.sampleBin in order to function properly -- if no samples are
- * chosen or placed into groups, an error will be displayed.
+ * volcano plots in other views. Requires properly prepared data to be specified
+ * via plotData.
  */
 angular.module('adage.volcano-plot', [
   'ngVega',
   'greenelab.stats',
-  'adage.analyze.sampleBin',
   'adage.volcano-plot-vgspec'
 ])
 
-.controller('VolcanoPlotCtrl', ['$scope', 'VolcanoPlotSpec', 'SampleBin',
-  'errGen',
-  function VolcanoPlotCtrl($scope, VolcanoPlotSpec, SampleBin, errGen) {
+.controller('VolcanoPlotCtrl', ['$scope', 'VolcanoPlotSpec',
+  function VolcanoPlotCtrl($scope, VolcanoPlotSpec) {
     // define controller instance variables that link with vega
     this.spec = VolcanoPlotSpec;
     this.data = $scope.plotData;
