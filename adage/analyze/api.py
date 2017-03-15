@@ -268,7 +268,8 @@ class MLModelResource(ModelResource):
 
 
 class NodeResource(ModelResource):
-    mlmodel = fields.ForeignKey(MLModelResource, "mlmodel", full=True)
+    mlmodel = fields.ForeignKey(MLModelResource, "mlmodel",
+                                full=True, full_list=False)
 
     class Meta:
         queryset = Node.objects.all()

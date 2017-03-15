@@ -7,18 +7,27 @@
 angular.module('adage.analyze.sampleBin', [
   'ngResource',
   'greenelab.stats',
+  'adage.utils',
   'adage.analyze.sample',
   'adage.node'
 ])
 
-.factory('Activity', ['$resource', function($resource) {
-  return $resource('/api/v0/activity/');
-}])
+.factory('Activity', ['$resource', 'ApiBasePath',
+  function($resource, ApiBasePath) {
+    return $resource(ApiBasePath + 'activity/');
+  }
+])
+
+.factory('NodeInfoSet', ['$resource', 'ApiBasePath',
+  function($resource, ApiBasePath) {
+    return $resource(ApiBasePath + 'node/set/:ids/');
+  }
+])
 
 .factory('SampleBin', ['$log', '$cacheFactory', '$q', 'Sample', 'Activity',
-'NodeInfo', 'MathFuncts', 'errGen',
-function($log, $cacheFactory, $q, Sample, Activity, NodeInfo, MathFuncts,
-errGen) {
+'NodeInfo', 'NodeInfoSet', 'MathFuncts', 'errGen',
+function($log, $cacheFactory, $q, Sample, Activity, NodeInfo, NodeInfoSet,
+MathFuncts, errGen) {
   var SampleBin = {
     heatmapData: {
       samples: [],
@@ -191,6 +200,48 @@ errGen) {
     getCachedNodeInfo: function(pk) {
       return this.nodeCache.get(pk);
     },
+    getNodeInfoSetPromise: function(pkArr) {
+      // Check for any pk already cached, then retrieve what's missing in
+      // bulk via the set endpoint on the node API. Return a promise and
+      // supply a callback that populates the cache when the API returns.
+      var cbSampleBin = this; // closure link to SampleBin for callbacks
+      var defer = $q.defer();
+      var cachedNodeInfoSet = [];
+
+      var uncachedPkArr = pkArr.reduce(function(acc, val) {
+        var cachedVal = cbSampleBin.getCachedNodeInfo(val);
+        if (!cachedVal) {
+          // cache does not have this pk, so keep it in our accumulator
+          acc.push(val);
+        } else {
+          cachedNodeInfoSet.push(cachedVal);
+        }
+        return acc;
+      }, []);
+      if (uncachedPkArr.length === 0) {
+        // we've got everything cached already; return before calling the API
+        defer.resolve(cachedNodeInfoSet);
+        return defer.promise;
+      }
+      NodeInfoSet.get(
+        {ids: uncachedPkArr.join(';')},
+        function success(responseObject) {
+          var i;
+          var nodeInfoArr = responseObject.objects;
+          for (i = 0; i < nodeInfoArr.length; i++) {
+            // populate the cache with what came back
+            cbSampleBin.nodeCache.put(nodeInfoArr[i].id, nodeInfoArr[i]);
+          }
+          defer.resolve(cachedNodeInfoSet.concat(nodeInfoArr));
+        },
+        function error(httpResponse) {
+          $log.error(errGen('Error retrieving NodeInfoSet', httpResponse));
+          defer.reject(httpResponse);
+        }
+      );
+
+      return defer.promise;
+    },
     getNodeInfoPromise: function(pk) {
       // Retrieve NodeInfo data for node id=pk from a cache, if available,
       // returning a promise that is already fulfilled. If node `pk` is not
@@ -340,27 +391,29 @@ errGen) {
 
       // (1a) we obtain a list of nodes by retrieving node activity
       //      for the first sample in our volcano plot
-      var firstSampleNodes = this.activityCache.get(sg['group-a'][0]);
+      var firstSampleNodes = this.activityCache.get(sg['group-a'][0]).map(
+        function(val) {
+          return val.node;  // extract just the node IDs
+        }
+      );
       // (1b) now obtain (and cache) a name for each node id
-      var nodeInfoPromises = firstSampleNodes.map(function(val, i, arr) {
-        return this.getNodeInfoPromise(val.node);
-      }, this);
+      var nodeInfoSetPromise = this.getNodeInfoSetPromise(firstSampleNodes);
       var mapNodesToNodeInfo = function() {
         // (2a) next, we build an array (replacing `volcanoData.source`)
         //      comprised of `nodeObject`s by walking through the
         //      `firstSampleNodes` and constructing a `nodeObject` for
         //      each. [outer .map()]
-        cbSampleBin.volcanoData.source = firstSampleNodes.map(function(val) {
+        cbSampleBin.volcanoData.source = firstSampleNodes.map(function(id) {
           var mapSampleIdsToActivity = function(sampId) {
             // (2b) the array of activity for each node is built by plucking the
             //      activity `.value` for each sample within this node from the
             //      `activityCache` [inner .map()]
             // FIXME: counting on array order to match node order here
-            return cbSampleBin.activityCache.get(sampId)[val.node - 1].value;
+            return cbSampleBin.activityCache.get(sampId)[id - 1].value;
           };
           var nodeObject = {
-            'id': val.node,
-            'name': cbSampleBin.getCachedNodeInfo(val.node).name,
+            'id': id,
+            'name': cbSampleBin.getCachedNodeInfo(id).name,
             'activityA': sg['group-a'].map(mapSampleIdsToActivity),
             'activityB': sg['group-b'].map(mapSampleIdsToActivity)
           };
@@ -376,7 +429,8 @@ errGen) {
         });
         // no return needed here: we've updated `cbSampleBin.volcanoData`
       };
-      $q.all(nodeInfoPromises)
+      // invoke mapNodesToNodeInfo only after nodeInfoSetPromise is fulfilled
+      nodeInfoSetPromise
         .then(mapNodesToNodeInfo)
         .catch(this.logError);
     }
