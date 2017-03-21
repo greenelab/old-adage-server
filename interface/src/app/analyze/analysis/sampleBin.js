@@ -120,7 +120,7 @@ MathFuncts, errGen) {
       var sampleObj = this.sampleData[id];
       sampleObj.activity = this.activityCache.get(id).map(
         // distill .activity to an array of just "value"s
-        function(val, i, arr) {
+        function(val) {
           return val.value;
         }
       );
@@ -135,7 +135,7 @@ MathFuncts, errGen) {
     getSampleObjects: function() {
       // reformat data from heatmapData.activity to a form that can be used
       // by hcluster.js: need a separate array of objects for each sample
-      return this.heatmapData.samples.map(function(val, i, arr) {
+      return this.heatmapData.samples.map(function(val) {
         return this.getSampleData(val) || {id: val};
       }, this);
     },
@@ -157,16 +157,16 @@ MathFuncts, errGen) {
       // (2a) next, we build a new array (`retval`) comprised of `nodeObject`s
       //      by walking through the `firstSampleNodes` and constructing a
       //      `nodeObject` for each. [outer .map()]
-      var retval = firstSampleNodes.map(function(val, i, arr) {
+      var retval = firstSampleNodes.map(function(val) {
         var nodeObject = {
           'id': val.node,
           'activity': this.heatmapData.samples.map(
             // (2b) the array of activity for each node is built by plucking the
             //      activity `.value` for each sample within this node from the
             //      `activityCache` [inner .map()]
-            function(sampId, i, arr) {
+            function(sampleId) {
               // FIXME: counting on array order to match node order here
-              return this.activityCache.get(sampId)[val.node - 1].value;
+              return this.activityCache.get(sampleId)[val.node - 1].value;
             },
             this
           )
@@ -271,7 +271,7 @@ MathFuncts, errGen) {
       return defer.promise;
     },
 
-    _getIDs: function(val, i, arr) {
+    _getIDs: function(val) {
       return val.id;
     },
     logError: function(httpResponse) {
@@ -336,7 +336,7 @@ MathFuncts, errGen) {
           // re-initialize nodeOrder, if needed
           if (i === 0 && cbSampleBin.heatmapData.nodeOrder.length === 0) {
             cbSampleBin.heatmapData.nodeOrder = sampleActivity.map(
-              function(val, i, arr) {
+              function(val) {
                 return val.node;
               }
             );
@@ -403,17 +403,17 @@ MathFuncts, errGen) {
         //      comprised of `nodeObject`s by walking through the
         //      `firstSampleNodes` and constructing a `nodeObject` for
         //      each. [outer .map()]
-        cbSampleBin.volcanoData.source = firstSampleNodes.map(function(id) {
-          var mapSampleIdsToActivity = function(sampId) {
+        cbSampleBin.volcanoData.source = firstSampleNodes.map(function(nodeId) {
+          var mapSampleIdsToActivity = function(sampleId) {
             // (2b) the array of activity for each node is built by plucking the
             //      activity `.value` for each sample within this node from the
             //      `activityCache` [inner .map()]
             // FIXME: counting on array order to match node order here
-            return cbSampleBin.activityCache.get(sampId)[id - 1].value;
+            return cbSampleBin.activityCache.get(sampleId)[nodeId - 1].value;
           };
           var nodeObject = {
-            'id': id,
-            'name': cbSampleBin.getCachedNodeInfo(id).name,
+            'id': nodeId,
+            'name': cbSampleBin.getCachedNodeInfo(nodeId).name,
             'activityA': sg['group-a'].map(mapSampleIdsToActivity),
             'activityB': sg['group-b'].map(mapSampleIdsToActivity)
           };
