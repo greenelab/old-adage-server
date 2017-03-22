@@ -6,7 +6,8 @@ angular.module('adage.gene.network', [
   'ui.router',
   'ui.bootstrap',
   'ngResource',
-  'rzModule'
+  'rzModule',
+  'adage.utils'
 ])
 
 .config(['$stateProvider', function($stateProvider) {
@@ -39,24 +40,26 @@ angular.module('adage.gene.network', [
   });
 }])
 
-.factory('EdgeService', ['$resource', function($resource) {
+.factory('EdgeService', ['$resource', 'ApiBasePath',
+function($resource, ApiBasePath) {
   // Possible parameters for this endpoint when making a query are:
   // {
   //   genes: Database IDs of genes associated with the edge,
   //   mlmodel: Database ID of MLModel associated with the edge,
   //   limit: Maximum number of results to return
   //  }
-  return $resource('/api/v0/edge/');
+  return $resource(ApiBasePath + 'edge');
 }])
 
-.factory('NodeService', ['$resource', function($resource) {
-  return $resource('/api/v0/node/');
+.factory('NodeService', ['$resource', 'ApiBasePath',
+function($resource, ApiBasePath) {
+  return $resource(ApiBasePath + 'node');
 }])
 
 .controller('GeneNetworkCtrl',
-   ['$stateParams', 'EdgeService', 'NodeService', '$log',
+   ['$stateParams', 'EdgeService', 'NodeService', '$log', 'errGen',
     function GeneNetworkController($stateParams, EdgeService, NodeService,
-                                   $log) {
+                                   $log, errGen) {
       var self = this;
       // Do nothing if no genes are specified in URL.
       if (!$stateParams.genes || !$stateParams.genes.split(',').length) {
@@ -64,45 +67,59 @@ angular.module('adage.gene.network', [
         return;
       }
 
-      var rawMinWeight = -1.0;
-      var rawMaxWeight = 1.0;
-      var scaledMaxWeight = rawMaxWeight - rawMinWeight;
+      // The following properties of "self" will be available to HTML.
+      self.includePositive = true;
+      self.includeNegative = true;
+      self.statusMessage = 'Connecting to the server ...';
+
+      var minCorrelation = -1.0, maxCorrelation = 1.0;
       var setEdgeColor = d3.scale.linear()
-          .domain([0, scaledMaxWeight / 2.0, scaledMaxWeight])
+          .domain([minCorrelation, (minCorrelation + maxCorrelation) / 2.0,
+                   maxCorrelation])
           .range(['green', 'orange', 'red']);
 
       var network = d3.network()  // Initialize the network.
-          .minEdge(0)
-          .maxEdge(rawMaxWeight - rawMinWeight)
+          .minEdge(minCorrelation)
+          .maxEdge(maxCorrelation)
           .edgeColor(setEdgeColor)
           .geneText(function(d) {
             return d.label;
           })
-          .legendStart(rawMinWeight)
-          .legendEnd(rawMaxWeight)
+          .legendStart(minCorrelation)
+          .legendEnd(maxCorrelation)
           .legendText('Correlation');
 
       var geneTip, edgeTip;
 
-      // The following properties of "self" will be available to HTML.
-      self.maxNodeNum = Number.MAX_SAFE_INTEGER;
-      self.statusMessage = 'Connecting to the server ...';
-      self.slider = {  // Slider configuration
-        minValue: rawMinWeight,
-        maxValue: rawMaxWeight,
+      self.updateSvg = function() {
+        geneTip.hide();
+        edgeTip.hide();
+        var correlationSign;
+        if (self.includeNegative && self.includePositive) {
+          correlationSign = 0;
+        } else if (self.includeNegative) {
+          correlationSign = -1;
+        } else {
+          correlationSign = 1;
+        }
+        network.filterEdgeWeight(self.slider.min, self.slider.max,
+                                 correlationSign);
+        network.draw();
+      };
+
+      self.slider = {  // range slider configuration
+        min: maxCorrelation / 2.0, // initial position of slider on the left
+        max: maxCorrelation,       // initial position of slider on the right
         options: {
-          floor: rawMinWeight,
-          ceil: rawMaxWeight,
+          floor: 0,                // minimum of the slider bar
+          ceil: maxCorrelation,    // maximum of the slider bar
           step: 0.01,
           precision: 2,
           showTicks: 0.5,
           showTicksValues: true,
+          noSwitching: true,
           onEnd: function(id, low, high) {
-            geneTip.hide();
-            edgeTip.hide();
-            network.filter(low - rawMinWeight, high - rawMinWeight,
-                           self.maxNodeNum)
-              .draw();
+            self.updateSvg();
           }
         }
       };
@@ -218,9 +235,9 @@ angular.module('adage.gene.network', [
          */
         function showEdgeTip(data) {
           geneTip.hide(); // Hide gene-tip window (if any) first.
-          var rawWeight = data.weight + rawMinWeight;
           var weightPrecision = 3;
-          var htmlText = 'Edge weight: ' + rawWeight.toFixed(weightPrecision);
+          var htmlText = 'Edge weight: ';
+          htmlText += data.weight.toFixed(weightPrecision);
           var heavyGenes = [data.gene1.id, data.gene2.id].join(',');
           var target = d3.event.target;
           NodeService.get(
@@ -239,8 +256,8 @@ angular.module('adage.gene.network', [
               edgeTip.show(data, target);
             },
             function error(response) {
-              var message = 'Failed to get node info for gene edge: ' +
-                  response.statusCode + ' ' + response.statusText;
+              var message = errGen('Failed to get node info for gene edge: ',
+                                   response);
               $log.error(message);
               htmlText += '<br>' + message + '. Please try again later.';
               edgeTip.html(htmlText);
@@ -262,9 +279,8 @@ angular.module('adage.gene.network', [
         network.onEdge('click.custom', showEdgeTip);
 
         // Draw network svg with legend and filter.
-        network.showLegend()
-          .filter(0, self.maxNodeNum)
-          .draw();
+        network.showLegend();
+        self.updateSvg();
 
         // Add event handlers to gene-tip and edge-tip so that they will be
         // hidden when clicked:
@@ -287,7 +303,6 @@ angular.module('adage.gene.network', [
         function success(responseObject) {
           for (var i = 0, n = responseObject.objects.length; i < n; ++i) {
             var currEdge = responseObject.objects[i];
-            currEdge.weight = currEdge.weight - rawMinWeight;
             updateData(currEdge, currEdge.gene1);
             updateData(currEdge, currEdge.gene2);
             edges.push(currEdge);
@@ -300,8 +315,7 @@ angular.module('adage.gene.network', [
           drawNetwork();
         },
         function error(response) {
-          var message = 'Failed to get edges: ' + response.statusCode +
-              ' ' + response.statusText;
+          var message = errGen('Failed to get edges: ', response);
           $log.error(message);
           self.statusMessage = message + '. Please try again later';
         }

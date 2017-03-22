@@ -1,12 +1,24 @@
 <h1>ADAGE: Gene-Gene Network</h1>
 
 <div ng-hide="ctrl.statusMessage">
-  <div>
-    <strong>Minimum Correlation:</strong>
-  </div>
+  <form>
+    <strong>Correlation Range:</strong>
+    <label>
+      <input type="checkbox" ng-model="ctrl.includeNegative"
+             ng-disabled="!ctrl.includePositive" ng-change="ctrl.updateSvg()">
+      Include negative correlation
+    </label>
+    &nbsp;
+    <label>
+      <input type="checkbox" ng-model="ctrl.includePositive"
+             ng-disabled="!ctrl.includeNegative"  ng-change="ctrl.updateSvg()">
+      Include positive correlation
+    </label>
+  </form>
+</div>
   <rzslider
-     rz-slider-model="ctrl.slider.minValue"
-     rz-slider-high="ctrl.slider.maxValue"
+     rz-slider-model="ctrl.slider.min"
+     rz-slider-high="ctrl.slider.max"
      rz-slider-options="ctrl.slider.options">
   </rzslider>
 </div>
