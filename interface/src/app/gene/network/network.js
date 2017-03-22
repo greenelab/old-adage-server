@@ -41,19 +41,19 @@ angular.module('adage.gene.network', [
 }])
 
 .factory('EdgeService', ['$resource', 'ApiBasePath',
-function($resource, ApiBasePath) {
-  // Possible parameters for this endpoint when making a query are:
-  // {
-  //   genes: Database IDs of genes associated with the edge,
-  //   mlmodel: Database ID of MLModel associated with the edge,
-  //   limit: Maximum number of results to return
-  //  }
-  return $resource(ApiBasePath + 'edge');
+  function($resource, ApiBasePath) {
+    // Possible parameters for this endpoint when making a query are:
+    // {
+    //   genes: Database IDs of genes associated with the edge,
+    //   mlmodel: Database ID of MLModel associated with the edge,
+    //   limit: Maximum number of results to return
+    //  }
+    return $resource(ApiBasePath + 'edge');
 }])
 
 .factory('NodeService', ['$resource', 'ApiBasePath',
-function($resource, ApiBasePath) {
-  return $resource(ApiBasePath + 'node');
+  function($resource, ApiBasePath) {
+    return $resource(ApiBasePath + 'node');
 }])
 
 .controller('GeneNetworkCtrl',
@@ -73,9 +73,9 @@ function($resource, ApiBasePath) {
       self.statusMessage = 'Connecting to the server ...';
 
       var minCorrelation = -1.0, maxCorrelation = 1.0;
+      var midPoint = (minCorrelation + maxCorrelation) / 2.0;
       var setEdgeColor = d3.scale.linear()
-          .domain([minCorrelation, (minCorrelation + maxCorrelation) / 2.0,
-                   maxCorrelation])
+          .domain([minCorrelation, midPoint, maxCorrelation])
           .range(['green', 'orange', 'red']);
 
       var network = d3.network()  // Initialize the network.
