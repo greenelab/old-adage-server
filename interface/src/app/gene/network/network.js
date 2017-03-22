@@ -41,23 +41,25 @@ angular.module('adage.gene.network', [
 }])
 
 .factory('EdgeService', ['$resource', 'ApiBasePath',
-function($resource, ApiBasePath) {
+  function($resource, ApiBasePath) {
   // Possible parameters for this endpoint when making a query are:
   // {
   //   genes: Database IDs of genes associated with the edge,
   //   mlmodel: Database ID of MLModel associated with the edge,
   //   limit: Maximum number of results to return
   //  }
-  return $resource(ApiBasePath + 'edge');
-}])
+    return $resource(ApiBasePath + 'edge');
+  }
+])
 
 .factory('NodeService', ['$resource', 'ApiBasePath',
-function($resource, ApiBasePath) {
-  return $resource(ApiBasePath + 'node');
-}])
+  function($resource, ApiBasePath) {
+    return $resource(ApiBasePath + 'node');
+  }
+])
 
 .controller('GeneNetworkCtrl',
-   ['$stateParams', 'EdgeService', 'NodeService', '$log', 'errGen',
+  ['$stateParams', 'EdgeService', 'NodeService', '$log', 'errGen',
     function GeneNetworkController($stateParams, EdgeService, NodeService,
                                    $log, errGen) {
       var self = this;
@@ -321,4 +323,5 @@ function($resource, ApiBasePath) {
         }
       );
     }
-]);
+  ]
+);
