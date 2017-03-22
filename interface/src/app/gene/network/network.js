@@ -278,7 +278,7 @@ function($resource, ApiBasePath) {
         network.onGene('click.custom', showGeneTip);
         network.onEdge('click.custom', showEdgeTip);
 
-        // Draw network svg with legend and filter.
+        // Draw network svg with legend.
         network.showLegend();
         self.updateSvg();
 
