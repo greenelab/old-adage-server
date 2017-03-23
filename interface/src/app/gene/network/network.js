@@ -93,7 +93,7 @@ angular.module('adage.gene.network', [
 
       var geneTip, edgeTip;
 
-      self.updateSvg = function() {
+      self.renderNetwork = function() {
         geneTip.hide();
         edgeTip.hide();
         var correlationSign;
@@ -121,7 +121,7 @@ angular.module('adage.gene.network', [
           showTicksValues: true,
           noSwitching: true,
           onEnd: function(id, low, high) {
-            self.updateSvg();
+            self.renderNetwork();
           }
         }
       };
@@ -282,7 +282,7 @@ angular.module('adage.gene.network', [
 
         // Draw network svg with legend.
         network.showLegend();
-        self.updateSvg();
+        self.renderNetwork();
 
         // Add event handlers to gene-tip and edge-tip so that they will be
         // hidden when clicked:
