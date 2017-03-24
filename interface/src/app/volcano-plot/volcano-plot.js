@@ -16,6 +16,26 @@ angular.module('adage.volcano-plot', [
     this.data = $scope.plotData;
     // FIXME: can't get selectedNodes out this way... need to use view api?
     // $scope.plotData.selectedNodes: $scope.selectedNodes
+    this.viewListener = function(view) {
+      console.log('viewListener fired');
+      view.on('click', function(event, item) {
+        var selectedNodes = view.data('selectedNodes').values();
+        // console.log(JSON.stringify(selectedNodes));
+        selectedNodes = selectedNodes.reduce(
+          function(acc, datum) {
+            if (datum['id']) {
+              var datumCopy = angular.copy(datum);
+              delete datumCopy['_id'];
+              delete datumCopy['_prev'];
+              acc.push(datumCopy);
+            }
+            return acc;
+          },
+          []
+        );
+        console.log(JSON.stringify(selectedNodes));
+      });
+    };
   }
 ])
 
