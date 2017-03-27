@@ -146,9 +146,9 @@ describe('multTest in stats.js', function() {
     // p.adjust(c(0.689437218, 0.2581000208, 0.0482603032, 0.0040835205,
     // 0.0001189375), "fdr"). These decimal values were copied from the unit
     // test for the hypergeometric test above.
-    correctedPValues = MathFuncts.multTest.fdr(
-      [0.689437218, 0.2581000208, 0.0482603032, 0.0040835205, 0.0001189375]
-    );
+    correctedPValues = MathFuncts.multTest.fdr([
+      0.689437218, 0.2581000208, 0.0482603032, 0.0040835205, 0.0001189375
+    ]);
 
     correctedPValues = correctedPValues.map(function(pVal) {
       return +pVal.toFixed(10);
@@ -201,8 +201,8 @@ describe('multTest in stats.js', function() {
       0.35820879, 0.20795287, 0.60731184, 0.40967885, 0.57542731, 0.13704495,
       0.01209222, 0.51657558, 0.45194966, 0.65708676, 0.95112352, 0.28213190,
       0.51589586, 0.64646605, 0.21931969, 0.35188851, 0.94193562, 0.61266120,
-      0.38419469, 0.74500034, 0.65281975, 0.02519793]
-    );
+      0.38419469, 0.74500034, 0.65281975, 0.02519793
+    ]);
 
     correctedPValues = correctedPValues.map(function(pVal) {
       return +pVal.toFixed(7);
