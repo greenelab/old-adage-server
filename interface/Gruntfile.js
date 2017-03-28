@@ -98,16 +98,26 @@ module.exports = function ( grunt ) {
     ],
 
     /**
-     * Browserify the ttest library since it's written just for node
+     * Browserify the ttest and multtest libraries since they are written just
+     * for node, and are written to use 'require()'.
      * Note: this must be run before the copy step (see `build` below).
      */
     browserify: {
-      dist: {
+      ttest: {
         src: 'node_modules/ttest/hypothesis.js',
         dest: 'node_modules/ttest/greenelab.stats.ttest.js',
         options: {
           browserifyOptions: {
             standalone: 'ttest'
+          }
+        }
+      },
+      multtest: {
+        src: 'node_modules/multtest/lib/main.js',
+        dest: 'node_modules/multtest/greenelab.stats.multtest.js',
+        options: {
+          browserifyOptions: {
+            standalone: 'multtest'
           }
         }
       }

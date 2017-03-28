@@ -1,52 +1,110 @@
 <div>
   <h1>Help</h1>
   <br>
-  <div class="lead" id="Genes">
-    <h3><u>Genes</u></h3>
-    Gene content goes here. Lorem ipsum dolor sit amet, consectetur adipiscing
-    elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-    Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-    aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in
-    voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
-    occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit
-    anim id est laborum.
-  </div>
-  <br>
 
-  <div class="lead" id="Samples">
-    <h3><u>Samples</u></h3>
-    Sample content goes here. Lorem ipsum dolor sit amet, consectetur adipiscing
-    elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-    Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-    aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in
-    voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
-    occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit
-    anim id est laborum.
+  <div class="lead" id="Expression compendium">
+    <h3><u>Expression compendium</u></h3>
+    The webserver is currently using <i>P.a.</i> expression compendium. It was
+    built on July 31 2015 and contains 125 datasets with 1051 individual
+    samples. Each dataset is an experiment and all samples are collected in a
+    non-redundant way into the compendium. If a sample is part of multiple
+    experiments, it is only represented once in the compendium. It did not
+    include any data sets uploaded after the build date. It was manually
+    annotated by biologists into easily queried fields including strain,
+    medium, genotype and more. By including all samples in a unified compendium
+    (as opposed to separated by experiment) it allows for cross-experiment
+    comparisons that reveal interesting trends that weren’t directly probed for
+    in a previous controlled experiment.
   </div>
   <br>
 
   <div class="lead" id="Experiments">
     <h3><u>Experiments</u></h3>
-    Experiment content goes here. Lorem ipsum dolor sit amet, consectetur
-    adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna
-    aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris
-    nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
-    reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-    Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia
-    deserunt mollit anim id est laborum.
+    Experiments are obtained from the ArrayExpress database. Each experiment
+    has a “E-XXXX-number” accession number defined by ArrayExpress. Each
+    experiment consists of samples deposited together, designed and annotated
+    as the authors chose. Experiments vary in the number of samples they
+    contain. Samples may be from different conditions or replicates. The
+    annotations that accompany each experiment can help interpret the samples
+    and node activities within each experiment.
+  </div>
+  <br>
+
+  <div class="lead" id="Samples">
+    <h3><u>Samples</u></h3>
+    We include samples measured on the Affymetrix Pseudomonas aeruginosa Array
+    "Pae_G1a" (labeled as A-AFFY-30 in ArrayExpress database). Built from
+    accessible data sets from the ArrayExpress database. Samples come
+    from a variety of labs, conditions, genotypes, and growth phases.
+  </div>
+  <br>
+
+  <div class="lead" id="Genes">
+    <h3><u>Genes</u></h3>
+    The ADAGE model is built with genes represented by probes on the Affymetrix
+    microarray gene chip "Pae_G1a" and annotated as the <i>Pseudomonas
+    aeruginosa</i> PAO1 reference strain. Genes are labeled with PA numbers or
+    gene names, if available. Further annotations, PA14 homologs and information
+    about gene function can be found at:
+    <a href="http://pseudomonas.com">http://pseudomonas.com</a>
+    <br>
+    Information about the PAO1 genes used to build this server was obtained
+    from the following NCBI website:
+    <a href="ftp://ftp.ncbi.nih.gov/gene/DATA/GENE_INFO/Archaea_Bacteria/Pseudomonas_aeruginosa_PAO1.gene_info.gz"
+    target="_blank">NCBI</a>.
   </div>
   <br>
 
   <div class="lead" id="Nodes">
     <h3><u>Nodes</u></h3>
-    Node content goes here. Lorem ipsum dolor sit amet, consectetur adipiscing
-    elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-    Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-    aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in
-    voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint
-    occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit
-    anim id est laborum.
+    Nodes are building units in an ADAGE model. Each node is defined by a
+    weight vector storing the weight value of each gene in that node. The
+    number of nodes in the model (300) was predetermined using empirical
+    evaluation of models built using a range of sizes [1]. On the
+    other hand, the weights for each gene in each node were learned by the
+    model in an unsupervised way. Each node is characterized by two signatures.
   </div>
   <br>
+
+  <div class="lead" id="Signatures">
+    <h3><u>Signatures</u></h3>
+    Signatures are functional gene sets extracted by an ADAGE model. A
+    signature contains genes contributing extremely positive high or negative
+    high weights to a specific node. One node results in two signatures on
+    positive and negative sides. The positive and negative signatures are
+    treated independently. Signatures are trained to reconstruct the compendium
+    of gene expression data and thus the genes in a signature are likely to
+    have correlated expression values across the compendium. Such correlations
+    can suggest mechanisms of Pseudomonas biology. For example, signatures
+    typically contain co-operonic genes, which are examples of meaningful
+    correlated expression. Further, genes that are annotated as functionally
+    related using KEGG pathways or GO terms are often found grouped in
+    signatures. However, many signatures contain genes whose interactions are
+    yet undetermined, and these can help generate hypotheses.
+  </div>
+  <br>
+
+  <div class="lead" id="High Weight Gene">
+    <h3><u>High Weight Gene</u></h3>
+    A high weight gene in a signature is a genes whose weight is more than 2.5
+    standard deviations away from the mean weight of genes in that node.
+    Because the weight vectors of nodes have different distributions, different
+    nodes have different numbers of high weight genes. High weight genes are
+    used to characterize a node because their expression levels have the
+    largest influence on the activity of the node. A signature is composed of
+    high weight genes on one side of a node.
+  </div>
+  <br>
+
+  <div class="lead" id="References">
+    <h3><b>References:</b></h3>
+    1. Tan J, Doing G, Lewis KA, Price CE, Chen KM, Cady KC, Perchuk B, Laub MT,
+    Hogan DA, Greene CS.
+    <a href="http://dx.doi.org/10.1101/078659">
+      System-wide automatic extraction of functional signatures in Pseudomonas
+      aeruginosa with eADAGE.
+    </a>
+    <i>bioRxiv.</i> 2016. doi:10.1101/078659
+  </div>
 
 </div>
