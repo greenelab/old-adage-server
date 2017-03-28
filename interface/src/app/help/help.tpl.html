@@ -8,7 +8,7 @@
     built on July 31 2015 and contains 125 datasets with 1051 individual
     samples. Each dataset is an experiment and all samples are collected in a
     non-redundant way into the compendium. If a sample is part of multiple
-    experiments, it is only represented once in the compendium. It will not
+    experiments, it is only represented once in the compendium. It did not
     include any data sets uploaded after the build date. It was manually
     annotated by biologists into easily queried fields including strain,
     medium, genotype and more. By including all samples in a unified compendium
@@ -22,11 +22,11 @@
     <h3><u>Experiments</u></h3>
     Experiments are obtained from the ArrayExpress database. Each experiment
     has a “E-XXXX-number” accession number defined by ArrayExpress. Each
-    experiment consists of samples deposited into the NCBI database together,
-    designed and annotated as the authors chose. Experiments vary in the number
-    of samples they contain. Samples may be from different conditions or
-    replicates. The annotations that accompany each experiment can help
-    interpret the samples and node activities within each experiment.
+    experiment consists of samples deposited together, designed and annotated
+    as the authors chose. Experiments vary in the number of samples they
+    contain. Samples may be from different conditions or replicates. The
+    annotations that accompany each experiment can help interpret the samples
+    and node activities within each experiment.
   </div>
   <br>
 
@@ -34,8 +34,24 @@
     <h3><u>Samples</u></h3>
     We include samples measured on the Affymetrix Pseudomonas aeruginosa Array
     "Pae_G1a" (labeled as A-AFFY-30 in ArrayExpress database). Built from
-    accessible data sets from the NCBI Gene Expression Omnibus. Samples come
+    accessible data sets from the ArrayExpress database. Samples come
     from a variety of labs, conditions, genotypes, and growth phases.
+  </div>
+  <br>
+
+  <div class="lead" id="Genes">
+    <h3><u>Genes</u></h3>
+    The ADAGE model is built with genes represented by probes on the Affymetrix
+    microarray gene chip "Pae_G1a" and annotated as the <i>Pseudomonas
+    aeruginosa</i> PAO1 reference strain. Genes are labeled with PA numbers or
+    gene names, if available. Further annotations, PA14 homologs and information
+    about gene function can be found at:
+    <a href="http://pseudomonas.com">http://pseudomonas.com</a>
+    <br>
+    Information about the PAO1 genes used to build this server was obtained
+    from the following NCBI website:
+    <a href="ftp://ftp.ncbi.nih.gov/gene/DATA/GENE_INFO/Archaea_Bacteria/Pseudomonas_aeruginosa_PAO1.gene_info.gz"
+    target="_blank">NCBI</a>.
   </div>
   <br>
 
@@ -59,12 +75,12 @@
     treated independently. Signatures are trained to reconstruct the compendium
     of gene expression data and thus the genes in a signature are likely to
     have correlated expression values across the compendium. Such correlations
-    can suggest mechanisms of Pseudomonas biology. Signatures that contain
-    co-operonic genes are examples of meaningful correlated expression.
-    Further, genes that are annotated as functionally related using KEGG
-    pathways or GO terms are often found grouped in signatures. However, many
-    signatures contain genes whose interactions are yet undetermined, and these
-    can help generate hypotheses.
+    can suggest mechanisms of Pseudomonas biology. For example, signatures
+    typically contain co-operonic genes, which are examples of meaningful
+    correlated expression. Further, genes that are annotated as functionally
+    related using KEGG pathways or GO terms are often found grouped in
+    signatures. However, many signatures contain genes whose interactions are
+    yet undetermined, and these can help generate hypotheses.
   </div>
   <br>
 
@@ -75,23 +91,8 @@
     Because the weight vectors of nodes have different distributions, different
     nodes have different numbers of high weight genes. High weight genes are
     used to characterize a node because their expression levels have the
-    largest influence on the activity of the node.
-  </div>
-  <br>
-
-  <div class="lead" id="Genes">
-    <h3><u>Genes</u></h3>
-    The ADAGE model is built with genes represented by probes on the Affymetrix
-    microarray gene chip "Pae_G1a" and annotated as the <i>Pseudomonas
-    aeruginosa</i> PAO1 reference strain. Genes are labeled with PA numbers or
-    gene names, if available. Further annotations, PA14 homologs and information
-    about gene function can be found at:
-    <a href="http://pseudomonas.com">http://pseudomonas.com</a>
-    <br>
-    Information about the PAO1 genes used to build this server was obtained
-    from the following NCBI website:
-    <a href="ftp://ftp.ncbi.nih.gov/gene/DATA/GENE_INFO/Archaea_Bacteria/Pseudomonas_aeruginosa_PAO1.gene_info.gz"
-    target="_blank">NCBI</a>.
+    largest influence on the activity of the node. A signature is composed of
+    high weight genes on one side of a node.
   </div>
   <br>
 
