@@ -80,9 +80,11 @@ module.exports = {
       'vendor/d3-tip/index.js',
       'node_modules/hclusterjs/hcluster.js',
 
-      // note: greenelab.stats.ttest.js and greenelab.stats.multtest.js are
-      // generated via browserify. greenelab.stats.ttest.js also needs to use
-      // babel to be able to be browserified.
+      // Note: greenelab.stats.ttest.js and greenelab.stats.multtest.js are
+      // generated via browserify.
+      // Additionally, we use 'babel' (http://babeljs.io/) to transpile
+      // greenelab.stats.ttest.js from ES6 to ES5 to fit with the rest of
+      // our tools.
       'node_modules/ttest/greenelab.stats.ttest.js',
       'node_modules/multtest/greenelab.stats.multtest.js',
 
