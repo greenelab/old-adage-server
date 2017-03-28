@@ -79,8 +79,15 @@ module.exports = {
       'vendor/angularjs-slider/dist/rzslider.min.js',
       'vendor/d3-tip/index.js',
       'node_modules/hclusterjs/hcluster.js',
+
+      // Note: greenelab.stats.ttest.js and greenelab.stats.multtest.js are
+      // generated via browserify.
+      // Additionally, we use 'babel' (http://babeljs.io/) to transpile
+      // greenelab.stats.ttest.js from ES6 to ES5 to fit with the rest of
+      // our tools.
       'node_modules/ttest/greenelab.stats.ttest.js',
-        // note: greenelab.stats.ttest.js is generated via browserify & babel
+      'node_modules/multtest/greenelab.stats.multtest.js',
+
       'vendor/placeholders/angular-placeholders-0.0.1-SNAPSHOT.min.js'
     ],
     css: [

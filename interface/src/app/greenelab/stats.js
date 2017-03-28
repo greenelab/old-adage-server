@@ -51,6 +51,13 @@ angular.module('greenelab.stats', [
      */
     tTest: ttest,
 
+    /*
+     * Similarly, the multTest function exposes the multtest library we have
+     * repackaged from npm: https://www.npmjs.com/package/multtest .
+     * Source is at: https://github.com/Planeshifter/multtest .
+     */
+    multTest: multtest,
+
     mean: function(arr) {
       // TODO: the ttest library above embeds a Summary library that can
       //       compute means and we should use that (have to figure out how to
