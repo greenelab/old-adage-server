@@ -407,23 +407,31 @@ angular.module('adage.node', [
             }
           }
 
+          var pValueArray = [];
+
           var enrichedGenesetIDs = Object.keys(genesetGenes);
 
           for (i = 0; i < enrichedGenesetIDs.length; i++) {
-            var gsID = enrichedGenesetIDs[i];
-            var genesetInfoObj = allGenesetInfo[gsID];
+            var k = genesetGenes[enrichedGenesetIDs[i]].length;
+            var n = allGenesetInfo[enrichedGenesetIDs[i]].size;
 
-            var k = genesetGenes[gsID].length;
-            var n = genesetInfoObj.size;
+            var pValue = 1 - MathFuncts.hyperGeometricTest(k, m, n, N);
+            pValueArray.push(pValue);
+          }
 
-            var pValue =
-                1 - MathFuncts.hyperGeometricTest(k, m, n, N);
-            pValue = pValue.toPrecision(pValueSigDigits);
+          var correctedPValues = MathFuncts.multTest.fdr(pValueArray);
 
-            if (pValue < $scope.pValueCutoff) {
+          for (i = 0; i < enrichedGenesetIDs.length; i++) {
+            var correctedPValue = correctedPValues[i].toPrecision(
+              pValueSigDigits);
+
+            if (correctedPValue < $scope.pValueCutoff) {
+              var gsID = enrichedGenesetIDs[i];
+              var genesetInfoObj = allGenesetInfo[gsID];
+
               relevantGenesetArray.push({
                 'name': genesetInfoObj.name, 'dbase': genesetInfoObj.dbase,
-                'url': genesetInfoObj.url, 'pValue': pValue,
+                'url': genesetInfoObj.url, 'pValue': correctedPValue,
                 'genes': genesetGenes[gsID].map(function(gene) {
                   return gene.stdName;
                 }).join(' ')
