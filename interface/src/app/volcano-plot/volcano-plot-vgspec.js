@@ -105,7 +105,7 @@ angular.module('adage.volcano-plot-vgspec', [])
         "update": {
           "x": {"scale": "x", "signal": "tooltip.diff"},
           "y": {"scale": "y", "signal": "tooltip.logsig", "offset": -5},
-          "text": {"signal": "tooltip.id"},
+          "text": {"signal": "tooltip.name"},
           "fillOpacity": [
             {"test": "!tooltip._id", "value": 0},
             {"value": 1}
