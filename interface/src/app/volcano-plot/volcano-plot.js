@@ -70,4 +70,14 @@ angular.module('adage.volcano-plot', [
   };
 })
 
+.directive('volcanoPlotSelection', function() {
+  return {
+    restrict: 'E',
+    scope: {
+      selectedNodes: '='
+    },
+    templateUrl: 'volcano-plot/volcano-plot-selection.tpl.html'
+  };
+})
+
 ;
