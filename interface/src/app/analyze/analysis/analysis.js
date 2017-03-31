@@ -80,9 +80,6 @@ function AnalysisCtrl($scope, $log, $q, $state, SampleBin) {
       }, {
         // these datasets "streamed" in via ngVega from heatmapData
         'name': 'samples'
-      // }, {
-      // FIXME: this dataset must fit a vega-compatible format to be included
-      //   'name': 'sampleGroups'
       }, {
         'name': 'nodeOrder'
       }, {

@@ -1,7 +1,9 @@
 <h1>Volcano Plot</h1>
 
 <div class="col-sm-8">
-  <volcano-plot plot-data="ctrl.data" selected-nodes="ctrl.selection">
+  <volcano-plot
+    plot-data="ctrl.data"
+    on-click="ctrl.updateSelection(selectedNodes)">
   </volcano-plot>
 </div>
 <div class="col-sm-4">

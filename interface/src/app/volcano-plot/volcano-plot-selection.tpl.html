@@ -1,1 +1,5 @@
-<pre>{{$ctrl.selectedNodes | json}}</pre>
+<ul class="list-group">
+  <li ng-repeat="node in $ctrl.selectedNodes" class="list-group-item">
+    {{node.name}}
+  </li>
+</ul>

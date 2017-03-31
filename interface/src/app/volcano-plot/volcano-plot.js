@@ -12,54 +12,55 @@ angular.module('adage.volcano-plot', [
 .component('volcanoPlot', {
   bindings: {
     plotData: '<',
-      // plotData is a json list with the following format:
+      // plotData is a json array with the following format:
       // [
-      //   {
-      //     'node': "<node-name-1>",
-      //     'diff': "<difference-in-mean-activity>",
-      //     'logsig': "<-log10(p-value-of-difference)>",
+      //   {id: <nodeid-1>,
+      //    name: "<node-name-1>",
+      //    diff: <difference-in-mean-activity>,
+      //    logsig: <-log10(p-value-of-difference)>
+      //   },
+      //   {id: <nodeid-2>,
+      //    name: "<node-name-2>",
+      //    ...
       //   },
       //   {...repeat for each node...}
       // ]
-    selectedNodes: '='
-      // selectedNodes is a json list with the following format:
-      // [
-      //   {
-      //     'node': "<node-name-1>"
-      //   },
-      //   {
-      //     'node': "<node-name-2>"
-      //   },
-      //   {...repeat for each node...}
-      // ]
+    onClick: '&'
+      // onClick (optional): supply a callback function to receive
+      // notification when clicks are received within the plot. This is a
+      // good way to check if the user has selected any nodes, so the
+      // onClick function is called with a selectedNodes parameter
+      // containing an array of node objects listing which nodes in the plot
+      // have been selected. This list uses the same format as plotData.
   },
   templateUrl: 'volcano-plot/volcano-plot.tpl.html',
   controllerAs: 'vp',
-  controller: ['VolcanoPlotSpec',
-    function VolcanoPlotCtrl(VolcanoPlotSpec) {
+  controller: ['$scope', 'VolcanoPlotSpec',
+    function VolcanoPlotCtrl($scope, VolcanoPlotSpec) {
+      var vp = this;
       // define controller instance variables that link with vega
       this.spec = VolcanoPlotSpec;
       this.data = this.plotData;
-      // FIXME: can't get selectedNodes out this way... need to use view api?
-      // $scope.plotData.selectedNodes: $scope.selectedNodes
-      this.viewListener = function(view) {
-        console.log('viewListener fired');
-        view.on('click', function(event, item) {
-          selectedNodes = view.data('selectedNodes').values();
-          // console.log(JSON.stringify(selectedNodes));
-          selectedNodes = selectedNodes.reduce(
-            function(acc, datum) {
-              if (datum['id']) {
-                var datumCopy = angular.copy(datum);
-                delete datumCopy['_id'];
-                delete datumCopy['_prev'];
-                acc.push(datumCopy);
-              }
-              return acc;
-            },
-            []
-          );
-          console.log(JSON.stringify(selectedNodes));
+      this.viewParsed = function viewParsed(view) {
+        // register a callback with vega to receive click events
+        view.on('click', function viewClick(event, item) {
+          $scope.$apply(function() {
+            var selectedNodes = view.data('selectedNodes').values().reduce(
+              function reduceSelectedNodes(acc, datum) {
+                // vega maintains some private state information in this array
+                // so we need to strip it out before passing a copy back
+                if (datum['id']) {
+                  var datumCopy = angular.copy(datum);
+                  delete datumCopy['_id'];
+                  delete datumCopy['_prev'];
+                  acc.push(datumCopy);
+                }
+                return acc;
+              },
+              []
+            );
+            vp.onClick({selectedNodes: selectedNodes});
+          });
         });
       };
     }
@@ -70,12 +71,7 @@ angular.module('adage.volcano-plot', [
   bindings: {
     selectedNodes: '<'
   },
-  templateUrl: 'volcano-plot/volcano-plot-selection.tpl.html',
-  controller: function volcanoPlotSelectionCtrl() {
-    this.$onInit = function() {
-      console.log('volcanoPlotSelectionCtrl init');
-    };
-  }
+  templateUrl: 'volcano-plot/volcano-plot-selection.tpl.html'
 })
 
 ;
