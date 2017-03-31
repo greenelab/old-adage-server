@@ -2,11 +2,11 @@
 
 """
 This management command reads an input file of gene-sample expression values
-and load the valild data into the database.  It should be invoked like this:
+and loads the valid data into the database.  It should be invoked like this:
 
   python manage.py import_gene_sample_expr <expression_filename>
 
-If a data source (on the first row) or gene name (on the c=first column) is
+If a data source (on the first row) or gene name (on the first column) is
 not found in the database, a warning message will be generated and the
 corresponding rows or columns will be skipped.
 """
