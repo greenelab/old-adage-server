@@ -70,7 +70,7 @@ def import_expr(file_handle, organism_tax_id):
     except Organism.DoesNotExist:
         raise Exception("Input organism_tax_id is not found in the database. "
                         "Please use the management command "
-                        "'organism_create_or_update.py' in djago-organism "
+                        "'organism_create_or_update.py' in django-organisms "
                         "package to create this organism.")
 
     # Enclose reading/importing process in a transaction context manager.
@@ -114,7 +114,7 @@ def read_header(tokens, samples):
                 samples.append(sample)
             except Sample.DoesNotExist:
                 samples.append(None)
-                logger.warn(
+                logger.warning(
                     "Input file line #1: data_source in column #%d not found "
                     "in the database: %s", index + 2, data_source)
 
@@ -148,7 +148,7 @@ def import_data_line(line_num, tokens, samples, organism):
     except Gene.DoesNotExist:
         # If a gene is not found in database, generate a warning message
         # and skip this line.
-        logger.warn(
+        logger.warning(
             "Input file line #%d: gene name %s (column #1) not found in "
             "database", line_num, gene_name)
         return
