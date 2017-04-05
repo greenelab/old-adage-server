@@ -69,7 +69,7 @@ def add_ml_model(ml_model_name, organism_tax_id, directed_edge):
     except Organism.DoesNotExist:
         raise Exception("Input organism_tax_id is not found in the database. "
                         "Please use the management command "
-                        "'organism_create_or_update.py' in djago-organism "
+                        "'organism_create_or_update.py' in django-organisms "
                         "package to create this organism.")
 
     MLModel.objects.create(title=ml_model_name,
