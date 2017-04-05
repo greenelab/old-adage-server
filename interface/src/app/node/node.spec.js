@@ -118,13 +118,13 @@ describe('<high-range-exp> directive', function() {
     ];
 
     // Mocked experiment response data:
-    var mockExperiment = [
-      {'accession': 'E-GEOD-00001',
-       'description': 'Sample description',
-       'name': 'Sample experiment name',
-       'resource_uri': '/api/v0/experiment/E-GEOD-00001/',
-       'sample_set': ['/api/v0/sample/1/', '/api/v0/sample/2/']}
-    ];
+    var mockExperiment = [{
+      'accession': 'E-GEOD-00001',
+      'description': 'Sample description',
+      'name': 'Sample experiment name',
+      'resource_uri': '/api/v0/experiment/E-GEOD-00001/',
+      'sample_set': ['/api/v0/sample/1/', '/api/v0/sample/2/']
+    }];
 
     $httpBackend.expectGET(uri1).respond({objects: mockActivity});
     $httpBackend.expectGET(uri2).respond({objects: mockExperiment});
@@ -188,13 +188,13 @@ describe('<high-range-exp> directive', function() {
     ];
 
     // Mocked experiment response data:
-    var mockExperiment = [
-      {'accession': 'E-GEOD-00001',
-       'description': 'Sample description',
-       'name': 'Sample experiment name',
-       'resource_uri': '/api/v0/experiment/E-GEOD-00001/',
-       'sample_set': ['/api/v0/sample/1/', '/api/v0/sample/2/']}
-    ];
+    var mockExperiment = [{
+      'accession': 'E-GEOD-00001',
+      'description': 'Sample description',
+      'name': 'Sample experiment name',
+      'resource_uri': '/api/v0/experiment/E-GEOD-00001/',
+      'sample_set': ['/api/v0/sample/1/', '/api/v0/sample/2/']
+    }];
 
     $httpBackend.expectGET(uri1).respond({objects: mockActivity});
     $httpBackend.expectGET(uri2).respond({objects: mockExperiment});
