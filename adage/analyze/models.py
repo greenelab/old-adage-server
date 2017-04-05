@@ -218,3 +218,21 @@ class Participation(models.Model):
         return "Model: %s, Node: %s, Gene: %s" % (self.node.mlmodel.title,
                                                   self.node.name,
                                                   self.gene.entrezid)
+
+
+class ExpressionValue(models.Model):
+    """
+    ExpressionValue models the many-to-many relationship between Gene and
+    Sample.  For each ExpressionValue, Gene 'gene' has RMA processed and
+    zero-one normalized gene expression 'value' in Sample 'sample'.
+    """
+    sample = models.ForeignKey(Sample, on_delete=models.PROTECT)
+    gene = models.ForeignKey(Gene, on_delete=models.PROTECT)
+    value = models.FloatField()
+
+    class Meta:
+        unique_together = ('sample', 'gene')
+
+    def __unicode__(self):
+        return "Expression value %f for Sample %s and Gene %s" % (
+            self.value, self.sample.name, self.gene.entrezid)
