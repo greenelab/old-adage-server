@@ -30,6 +30,7 @@ angular.module('adage.volcano-plot.view', [
   function VolcanoPlotViewCtrl(SampleBin, $stateParams) {
     var ctrl = this;
     SampleBin.getVolcanoPlotData();
+    this.sampleGroups = SampleBin.getSamplesByGroup();
     this.data = SampleBin.volcanoData;
     this.selection = [];
     this.updateSelection = function updateSelection(selectedNodes) {
