@@ -94,7 +94,8 @@ describe('<high-range-exp> directive', function() {
   beforeEach(module('node/high_range_exp.tpl.html'));
 
   var $compile, $httpBackend, $rootScope;
-  var parentScope, element, testHTML, activityUri, experimentUri;
+  var parentScope, element, testHTML, activityUri, experimentUri,
+    mockExperiment;
   beforeEach(inject(function(_$compile_, _$httpBackend_, _$rootScope_) {
     $compile = _$compile_;
     $httpBackend = _$httpBackend_;
@@ -110,6 +111,14 @@ describe('<high-range-exp> directive', function() {
     element = $compile(testHTML)(parentScope);
     activityUri = '/api/v0/activity/?limit=0&node=' + parentScope.nodeID;
     experimentUri = '/api/v0/experiment/?limit=0&node=' + parentScope.nodeID;
+
+    mockExperiment = [{
+      'accession': 'E-GEOD-00001',
+      'description': 'Sample description',
+      'name': 'Sample experiment name',
+      'resource_uri': '/api/v0/experiment/E-GEOD-00001/',
+      'sample_set': ['/api/v0/sample/1/', '/api/v0/sample/2/']
+    }];
   }));
 
   it('should render HTML correctly', function() {
@@ -117,15 +126,6 @@ describe('<high-range-exp> directive', function() {
     var mockActivity = [
       {id: 1, node: 123, sample: 1001, value: 0.0854334209211516}
     ];
-
-    // Mocked experiment response data:
-    var mockExperiment = [{
-      'accession': 'E-GEOD-00001',
-      'description': 'Sample description',
-      'name': 'Sample experiment name',
-      'resource_uri': '/api/v0/experiment/E-GEOD-00001/',
-      'sample_set': ['/api/v0/sample/1/', '/api/v0/sample/2/']
-    }];
 
     $httpBackend.expectGET(activityUri).respond({objects: mockActivity});
     $httpBackend.expectGET(experimentUri).respond({objects: mockExperiment});
@@ -140,7 +140,6 @@ describe('<high-range-exp> directive', function() {
     // Confirm the text in rendered html too:
     var divElement = element.find('div');
     expect(divElement.text()).toBe('Connecting to the server ...');
-
 
     // Make backend data available to the directive.
     $httpBackend.flush();
@@ -175,15 +174,6 @@ describe('<high-range-exp> directive', function() {
       {id: 20, node: 123, sample: 1020, value: 0.0783672660119669},
       {id: 21, node: 123, sample: 1021, value: 0.0769023791604038}
     ];
-
-    // Mocked experiment response data:
-    var mockExperiment = [{
-      'accession': 'E-GEOD-00001',
-      'description': 'Sample description',
-      'name': 'Sample experiment name',
-      'resource_uri': '/api/v0/experiment/E-GEOD-00001/',
-      'sample_set': ['/api/v0/sample/1/', '/api/v0/sample/2/']
-    }];
 
     $httpBackend.expectGET(activityUri).respond({objects: mockActivity});
     $httpBackend.expectGET(experimentUri).respond({objects: mockExperiment});
