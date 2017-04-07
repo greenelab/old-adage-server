@@ -1,8 +1,9 @@
 /**
  * 'adage.node' module unit tests
  *
- * Test <high-weight-genes> directive.
  **/
+
+// Test <high-weight-genes> directive.
 describe('<high-weight-genes> directive', function() {
   beforeEach(module('adage.node'));
 
@@ -48,7 +49,7 @@ describe('<high-weight-genes> directive', function() {
     $httpBackend.expectGET(uri).respond({objects: mockGenes});
     parentScope.$digest(); // Start Angular's digest cycle manually.
 
-    // Get isolated scope of <high-weight-genes> directive:
+    // Get isolate scope of <high-weight-genes> directive:
     var elementScope = element.isolateScope();
 
     // Before $httpBackend.flush() is called, no backend data is available;
@@ -86,32 +87,32 @@ describe('<high-weight-genes> directive', function() {
   });
 });
 
-
+// Test <high-range-exp> directive.
 describe('<high-range-exp> directive', function() {
   beforeEach(module('adage.node'));
 
   beforeEach(module('node/high_range_exp.tpl.html'));
 
   var $compile, $httpBackend, $rootScope;
+  var parentScope, element, testHTML, activityUri, experimentUri;
   beforeEach(inject(function(_$compile_, _$httpBackend_, _$rootScope_) {
     $compile = _$compile_;
     $httpBackend = _$httpBackend_;
     $rootScope = _$rootScope_;
+
+    parentScope = $rootScope.$new();
+    parentScope.nodeID = 123;
+    parentScope.topExp = 20;
+
+    testHTML = '<high-range-exp node-id="{{nodeID}}" ' +
+      ' top-exp="{{topExp}}"></high-range-exp>';
+
+    element = $compile(testHTML)(parentScope);
+    activityUri = '/api/v0/activity/?limit=0&node=' + parentScope.nodeID;
+    experimentUri = '/api/v0/experiment/?limit=0&node=' + parentScope.nodeID;
   }));
 
   it('should render HTML correctly', function() {
-    var parentScope = $rootScope.$new();
-    parentScope.nodeID = 123;
-    parentScope.topExp = 20;
-    var testHTML = '<high-range-exp node-id="{{nodeID}}" ' +
-        ' top-exp="{{topExp}}"></high-range-exp>';
-
-
-    var uri1 = '/api/v0/activity/?limit=0&node=' + parentScope.nodeID;
-    var uri2 = '/api/v0/experiment/?limit=0&node=' + parentScope.nodeID;
-
-    var element = $compile(testHTML)(parentScope);
-
     // Mocked activity response data:
     var mockActivity = [
       {id: 1, node: 123, sample: 1001, value: 0.0854334209211516}
@@ -126,11 +127,11 @@ describe('<high-range-exp> directive', function() {
       'sample_set': ['/api/v0/sample/1/', '/api/v0/sample/2/']
     }];
 
-    $httpBackend.expectGET(uri1).respond({objects: mockActivity});
-    $httpBackend.expectGET(uri2).respond({objects: mockExperiment});
+    $httpBackend.expectGET(activityUri).respond({objects: mockActivity});
+    $httpBackend.expectGET(experimentUri).respond({objects: mockExperiment});
     parentScope.$digest(); // Start Angular's digest cycle manually.
 
-    // Get isolated scope of <high-range-exp> directive:
+    // Get isolate scope of <high-range-exp> directive:
     var elementScope = element.isolateScope();
 
     // Confirm that the queryStatus is 'Connecting to the server ...' if
@@ -150,18 +151,6 @@ describe('<high-range-exp> directive', function() {
   });
 
   it('should get the appropriate activity values', function() {
-    var parentScope = $rootScope.$new();
-    parentScope.nodeID = 123;
-    parentScope.topExp = 20;
-    var testHTML = '<high-range-exp node-id="{{nodeID}}" ' +
-        ' top-exp="{{topExp}}"></high-range-exp>';
-
-
-    var uri1 = '/api/v0/activity/?limit=0&node=' + parentScope.nodeID;
-    var uri2 = '/api/v0/experiment/?limit=0&node=' + parentScope.nodeID;
-
-    var element = $compile(testHTML)(parentScope);
-
     // Mocked activity response data:
     var mockActivity = [
       {id: 1, node: 123, sample: 1001, value: 0.0854334209211516},
@@ -196,13 +185,12 @@ describe('<high-range-exp> directive', function() {
       'sample_set': ['/api/v0/sample/1/', '/api/v0/sample/2/']
     }];
 
-    $httpBackend.expectGET(uri1).respond({objects: mockActivity});
-    $httpBackend.expectGET(uri2).respond({objects: mockExperiment});
+    $httpBackend.expectGET(activityUri).respond({objects: mockActivity});
+    $httpBackend.expectGET(experimentUri).respond({objects: mockExperiment});
     parentScope.$digest(); // Start Angular's digest cycle manually.
 
-    // Get isolated scope of <high-range-exp> directive:
+    // Get isolate scope of <high-range-exp> directive:
     var elementScope = element.isolateScope();
-
 
     // Make backend data available to the directive.
     $httpBackend.flush();
