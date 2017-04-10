@@ -20,7 +20,7 @@ angular.module('adage.volcano-plot', [
 
     // public methods for NodeService
     return {
-      getGenesForNodesPromise: function getGenesForNodesPromise(nodes) {
+      getGenesForNodesPromise: function(nodes) {
         var promise = Participation.get(
           {'node__in': nodes.join(), 'limit': 0}
         ).$promise.then(
@@ -74,7 +74,7 @@ angular.module('adage.volcano-plot', [
       // define controller instance variables that link with vega
       this.spec = VolcanoPlotSpec;
       this.data = this.plotData;
-      this.viewParsed = function viewParsed(view) {
+      this.viewParsed = function(view) {
         // register a callback with vega to receive click events
         view.on('click', function viewClick(event, item) {
           $scope.$apply(function() {
@@ -109,7 +109,7 @@ angular.module('adage.volcano-plot', [
   controller: ['$log', '$location', 'errGen', 'NodeService',
     function VolcanoPlotSelectionCtrl($log, $location, errGen, NodeService) {
       var $ctrl = this;
-      this.showNetwork = function showNetwork() {
+      this.showNetwork = function() {
         // genes, mlmodel, base_group, comp_group
         var nodeIds = this.selectedNodes.map(function nodesToIds(nodeObj) {
           return nodeObj.id;

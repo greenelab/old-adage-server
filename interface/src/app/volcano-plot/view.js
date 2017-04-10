@@ -33,7 +33,7 @@ angular.module('adage.volcano-plot.view', [
     this.sampleGroups = SampleBin.getSamplesByGroup();
     this.data = SampleBin.volcanoData;
     this.selection = [];
-    this.updateSelection = function updateSelection(selectedNodes) {
+    this.updateSelection = function(selectedNodes) {
       ctrl.selection = selectedNodes;
     };
   }
