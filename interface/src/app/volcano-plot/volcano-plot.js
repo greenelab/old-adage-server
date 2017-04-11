@@ -109,7 +109,7 @@ angular.module('adage.volcano-plot', [
   templateUrl: 'volcano-plot/volcano-plot-selection.tpl.html',
   controller: ['$log', '$location', 'errGen', 'NodeService',
     function VolcanoPlotSelectionCtrl($log, $location, errGen, NodeService) {
-      var $ctrl = this;
+      var cbVolcanoPlotSelection = this;
       this.showNetwork = function() {
         // genes, mlmodel, base_group, comp_group
         var nodeIds = this.selectedNodes.map(function nodesToIds(nodeObj) {
@@ -118,10 +118,12 @@ angular.module('adage.volcano-plot', [
         NodeService.getGenesForNodesPromise(nodeIds).then(
           function success(genes) {
             $location.path('/gene_network/').search({
-              'mlmodel': $ctrl.mlModel,
+              'mlmodel': cbVolcanoPlotSelection.mlModel,
               'genes': genes.join(),
-              'base_group': $ctrl.sampleGroups['base-group'].join(),
-              'comp_group': $ctrl.sampleGroups['comp-group'].join()
+              'base_group':
+                cbVolcanoPlotSelection.sampleGroups['base-group'].join(),
+              'comp_group':
+                cbVolcanoPlotSelection.sampleGroups['comp-group'].join()
             });
           },
           function error(httpResponse) {
