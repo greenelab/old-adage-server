@@ -30,7 +30,7 @@ angular.module('adage.volcano-plot.view', [
   function VolcanoPlotViewCtrl(SampleBin, $stateParams) {
     var ctrl = this;
     console.log('VolcanoPlotView $stateParams:', $stateParams);
-    this.mlmodel = $stateParams.mlmodel;
+    this.mlModel = $stateParams.mlmodel;
     SampleBin.getVolcanoPlotData();
     this.sampleGroups = SampleBin.getSamplesByGroup();
     this.data = SampleBin.volcanoData;
