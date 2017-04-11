@@ -52,7 +52,8 @@ function AnalysisCtrl($scope, $log, $q, $state, SampleBin) {
   };
 
   $scope.showVolcanoPlot = function() {
-    $state.go('volcano');
+    // FIXME MLModel is hard-coded until heatmap has a selector added
+    $state.go('volcano', {'mlmodel': 1});
   };
 
   // these options are important for making ngSortable work with tables

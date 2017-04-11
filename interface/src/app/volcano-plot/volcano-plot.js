@@ -102,6 +102,7 @@ angular.module('adage.volcano-plot', [
 
 .component('volcanoPlotSelection', {
   bindings: {
+    mlModel: '<',
     selectedNodes: '<',
     sampleGroups: '<'   // network view needs this context for annotation
   },
@@ -117,7 +118,7 @@ angular.module('adage.volcano-plot', [
         NodeService.getGenesForNodesPromise(nodeIds).then(
           function success(genes) {
             $location.path('/gene_network/').search({
-              'mlmodel': 1,
+              'mlmodel': $ctrl.mlModel,
               'genes': genes.join(),
               'base_group': $ctrl.sampleGroups['base-group'].join(),
               'comp_group': $ctrl.sampleGroups['comp-group'].join()
