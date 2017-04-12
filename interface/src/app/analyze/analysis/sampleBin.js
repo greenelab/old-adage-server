@@ -406,7 +406,8 @@ MathFuncts, errGen) {
         //      comprised of `nodeObject`s by walking through the
         //      `firstSampleNodes` and constructing a `nodeObject` for
         //      each. [outer .map()]
-        cbSampleBin.volcanoData.source = firstSampleNodes.map(function(nodeId) {
+        var nodeInfoSet = firstSampleNodes.map(function(nodeId) {
+          // build the raw nodeInfoSet
           var mapSampleIdsToActivity = function(sampleId) {
             // (2b) the array of activity for each node is built by plucking the
             //      activity `.value` for each sample within this node from the
@@ -424,12 +425,25 @@ MathFuncts, errGen) {
             MathFuncts.mean(nodeObject.activityA) -
             MathFuncts.mean(nodeObject.activityB)
           );
-          nodeObject.logsig = -Math.log10(MathFuncts.tTest(
+          nodeObject.rawPValue = MathFuncts.tTest(
             nodeObject.activityA, nodeObject.activityB
-          ).pValue());
+          ).pValue();
 
           return nodeObject;
         });
+
+        // use FDR on the raw p-values from nodeInfoSet to get adjustedPValues
+        var rawPValues = nodeInfoSet.map(function getRawPValue(nodeObject) {
+          return nodeObject.rawPValue;
+        });
+        var adjustedPValues = MathFuncts.multTest.fdr(rawPValues);
+
+        // map the adjustedPValues back into the nodeInfoSet
+        nodeInfoSet = nodeInfoSet.map(function(nodeObject, i) {
+          nodeObject.logsig = -Math.log10(adjustedPValues[i]);
+          return nodeObject;
+        });
+        cbSampleBin.volcanoData.source = nodeInfoSet;
         // no return needed here: we've updated `cbSampleBin.volcanoData`
       };
       // invoke mapNodesToNodeInfo only after nodeInfoSetPromise is fulfilled
