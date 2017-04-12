@@ -52,7 +52,8 @@ function AnalysisCtrl($scope, $log, $q, $state, SampleBin) {
   };
 
   $scope.showVolcanoPlot = function() {
-    $state.go('volcano');
+    // FIXME MLModel is hard-coded until heatmap has a selector added
+    $state.go('volcano', {'mlmodel': 1});
   };
 
   // these options are important for making ngSortable work with tables
@@ -80,9 +81,6 @@ function AnalysisCtrl($scope, $log, $q, $state, SampleBin) {
       }, {
         // these datasets "streamed" in via ngVega from heatmapData
         'name': 'samples'
-      // }, {
-      // FIXME: this dataset must fit a vega-compatible format to be included
-      //   'name': 'sampleGroups'
       }, {
         'name': 'nodeOrder'
       }, {

@@ -371,27 +371,30 @@ MathFuncts, errGen) {
 
     // volcano plot methods
     getVolcanoPlotData: function() {
-      // use sample lists for group-a and group-b to produce output for
+      // use sample lists for base-group and comp-group to produce output for
       // the volcano plot of the form:
       //   node - diff - logsig,
       // where:
       //   node = the node name as supplied by NodeInfo
-      //   diff = mean(group-a activity values) - mean(group-b activity values)
-      //   logsig = -log10(p-value from 2-sample t-test on group-a vs. group-b)
+      //   diff = mean(base-group activity values) -
+      //          mean(comp-group activity values)
+      //   logsig = -log10(p-value from 2-sample t-test on
+      //                   base-group vs. comp-group)
       var sg = this.getSamplesByGroup();
       var cbSampleBin = this;
 
-      // verify that we have at least one sample each in group-a and group-b
-      if (!sg['group-a'] || sg['group-a'].length === 0) {
+      // verify that we have at least one sample each in base-group
+      // and comp-group
+      if (!sg['base-group'] || sg['base-group'].length === 0) {
         return null;
       }
-      if (!sg['group-b'] || sg['group-b'].length === 0) {
+      if (!sg['comp-group'] || sg['comp-group'].length === 0) {
         return null;
       }
 
       // (1a) we obtain a list of nodes by retrieving node activity
       //      for the first sample in our volcano plot
-      var firstSampleNodes = this.activityCache.get(sg['group-a'][0]).map(
+      var firstSampleNodes = this.activityCache.get(sg['base-group'][0]).map(
         function(val) {
           return val.node;  // extract just the node IDs
         }
@@ -414,8 +417,8 @@ MathFuncts, errGen) {
           var nodeObject = {
             'id': nodeId,
             'name': cbSampleBin.getCachedNodeInfo(nodeId).name,
-            'activityA': sg['group-a'].map(mapSampleIdsToActivity),
-            'activityB': sg['group-b'].map(mapSampleIdsToActivity)
+            'activityA': sg['base-group'].map(mapSampleIdsToActivity),
+            'activityB': sg['comp-group'].map(mapSampleIdsToActivity)
           };
           nodeObject.diff = (
             MathFuncts.mean(nodeObject.activityA) -

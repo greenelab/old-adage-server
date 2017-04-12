@@ -31,11 +31,11 @@
         ng-class="'sample-' + sb.sampleToGroup[id]" as-sortable-item>
       <td class="row-control">
         <input type="radio" ng-model="sb.sampleToGroup[id]"
-            name="{{id}}-group" value="group-a"
-            class="sample-group-a" aria-label="group a">
+            name="{{id}}-group" value="base-group"
+            class="sample-base-group" aria-label="group a">
         <input type="radio" ng-model="sb.sampleToGroup[id]"
-            name="{{id}}-group" value="group-b"
-            class="sample-group-b" aria-label="group b">
+            name="{{id}}-group" value="comp-group"
+            class="sample-comp-group" aria-label="group b">
         <input type="radio" ng-model="sb.sampleToGroup[id]"
             name="{{id}}-group" value="other"
             class="sample-other" aria-label="other">

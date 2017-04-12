@@ -11,7 +11,7 @@ angular.module('adage.volcano-plot.view', [
 
 .config(['$stateProvider', function($stateProvider) {
   $stateProvider.state('volcano', {
-    url: '/volcano',
+    url: '/volcano?mlmodel',
     views: {
       main: {
         templateUrl: 'volcano-plot/view.tpl.html',
@@ -25,13 +25,18 @@ angular.module('adage.volcano-plot.view', [
 .controller('VolcanoPlotViewCtrl', ['SampleBin', '$stateParams',
   // TODO make use of $stateParams (pulling from SampleBin for initial tests,
   //      but the right way to do this is to refactor so view.js pulls params
-  //      for sample-group-a and sample-group-b and does what's necessary to
-  //      make a plot from those lists)
+  //      for sample-base-group and sample-comp-group and does what's necessary
+  //      to make a plot from those lists)
   function VolcanoPlotViewCtrl(SampleBin, $stateParams) {
+    var ctrl = this;
+    this.mlModel = $stateParams.mlmodel;
     SampleBin.getVolcanoPlotData();
+    this.sampleGroups = SampleBin.getSamplesByGroup();
     this.data = SampleBin.volcanoData;
-    // FIXME need to dig into vega internal data format to make selection work
     this.selection = [];
+    this.updateSelection = function(selectedNodes) {
+      ctrl.selection = selectedNodes;
+    };
   }
 ])
 ;

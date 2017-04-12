@@ -1,0 +1,9 @@
+<ul class="list-group">
+  <li ng-repeat="node in $ctrl.selectedNodes" class="list-group-item">
+    {{node.name}}
+  </li>
+</ul>
+<button type="button" class="btn btn-default" ng-if="$ctrl.selectedNodes.length"
+  ng-click="$ctrl.showNetwork()">
+  View in Gene Network
+</button>

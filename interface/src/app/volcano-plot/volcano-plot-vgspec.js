@@ -30,7 +30,7 @@ angular.module('adage.volcano-plot-vgspec', [])
       "name": "clickedPoint",
       "init": 0,
       "verbose": true,
-      "streams": [{"type": "click", "expr": "datum._id"}]
+      "streams": [{"type": "click", "expr": "datum"}]
     },
     {
       "name": "shift",
@@ -62,7 +62,7 @@ angular.module('adage.volcano-plot-vgspec', [])
           "opacity": {"value": 0.7},
           "fill": [
             {
-              "test": "indata('selectedNodes', datum._id, 'id')",
+              "test": "indata('selectedNodes', datum._id, '_id')",
               "value": "red"
             },
             {"value": "#4682b4"}
