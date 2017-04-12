@@ -29,7 +29,6 @@ angular.module('adage.volcano-plot.view', [
   //      to make a plot from those lists)
   function VolcanoPlotViewCtrl(SampleBin, $stateParams) {
     var ctrl = this;
-    console.log('VolcanoPlotView $stateParams:', $stateParams);
     this.mlModel = $stateParams.mlmodel;
     SampleBin.getVolcanoPlotData();
     this.sampleGroups = SampleBin.getSamplesByGroup();
