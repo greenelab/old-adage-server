@@ -13,7 +13,7 @@ The two required arguments are:
 
 For example, to load the sample-gene expression values for the organism
 "Pseudomonas aeruginosa" (whose taxonomy ID is 208964), the command will be:
-  python manage.py input_filename 208964
+  python manage.py import_gene_sample_expr input_filename 208964
 
 IMPORTANT:
 (1) Before running this command, please make sure that "django-organisms"
