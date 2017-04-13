@@ -13,7 +13,7 @@ from haystack.query import SearchQuerySet
 from haystack.inputs import AutoQuery
 from models import (
     Experiment, Sample, SampleAnnotation, AnnotationType, MLModel, Node,
-    Activity, Edge, Participation
+    Activity, Edge, Participation, ExpressionValue
 )
 
 # Many helpful hints for this implementation came from:
@@ -424,3 +424,21 @@ class ParticipationResource(ModelResource):
             'node': ('exact', 'in', ),
             'gene': ('exact', 'in', ),
         }
+
+
+class ExpressionValueResource(ModelResource):
+    gene = fields.IntegerField(attribute='gene_id', null=False)
+    sample = fields.IntegerField(attribute='sample_id', null=False)
+
+    class Meta:
+        queryset = ExpressionValue.objects.all()
+        include_resource_uri = False
+        allowed_methods = ['get']
+        limit = 0
+        max_limit = 0
+        filtering = {
+            'gene': ('exact', 'in', ),
+            'sample': ('exact', 'in', ),
+        }
+        # Allow ordering by gene ID.
+        ordering = ['gene']

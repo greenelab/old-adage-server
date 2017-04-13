@@ -22,7 +22,8 @@ from genes.api import GeneResource
 from analyze.api import (SearchResource, ExperimentResource,
                          AnnotationTypeResource, SampleResource,
                          MLModelResource, NodeResource, ActivityResource,
-                         EdgeResource, ParticipationResource)
+                         EdgeResource, ParticipationResource,
+                         ExpressionValueResource)
 
 v0_api = Api(api_name='v0')
 v0_api.register(SearchResource())
@@ -36,6 +37,7 @@ v0_api.register(NodeResource())
 v0_api.register(ActivityResource())
 v0_api.register(EdgeResource())
 v0_api.register(ParticipationResource())
+v0_api.register(ExpressionValueResource())
 
 urlpatterns = [
     url(r'^$', TemplateView.as_view(template_name="index.html"), name='home'),
