@@ -438,10 +438,9 @@ MathFuncts, errGen) {
         });
         var adjustedPValues = MathFuncts.multTest.fdr(rawPValues);
 
-        // map the adjustedPValues back into the nodeInfoSet
-        nodeInfoSet = nodeInfoSet.map(function(nodeObject, i) {
+        // compute logsig from the adjustedPValues & update the nodeInfoSet
+        nodeInfoSet.forEach(function(nodeObject, i) {
           nodeObject.logsig = -Math.log10(adjustedPValues[i]);
-          return nodeObject;
         });
         cbSampleBin.volcanoData.source = nodeInfoSet;
         // no return needed here: we've updated `cbSampleBin.volcanoData`
