@@ -349,8 +349,8 @@ class ActivityResource(ModelResource):
 
 
 class EdgeResource(ModelResource):
-    gene1 = fields.ForeignKey(GeneResource, "gene1", full=True)
-    gene2 = fields.ForeignKey(GeneResource, "gene2", full=True)
+    gene1 = fields.IntegerField(attribute='gene1_id', null=False)
+    gene2 = fields.IntegerField(attribute='gene2_id', null=False)
     mlmodel = fields.IntegerField(attribute='mlmodel_id', null=False)
 
     class Meta:
