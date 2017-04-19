@@ -172,7 +172,7 @@ angular.module('adage.gene.network', [
         // by both genesInURL and edgeList, because even if a gene in the URL
         // doesn't have any edge in the database, it still should be displayed
         // in the network.
-        var geneList = genesInURL.slice(0); // Copy all genes ID in the URL.
+        var geneList = genesInURL.slice(0); // Copy all gene IDs in the URL.
         // Collect unique gene IDs in edgeList.
         edgeList.forEach(function(val) {
           if (geneList.indexOf(val.gene1) === -1) {
