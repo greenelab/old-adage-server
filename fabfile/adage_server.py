@@ -193,6 +193,8 @@ def import_data_and_index():
         CONFIG['data']['gene_network_file'])
     run('python manage.py import_node_gene_network %s "Ensemble ADAGE 300"' %
         CONFIG['data']['node_gene_network_file'])
+    run('python manage.py import_gene_sample_expr %s 208964' %
+        CONFIG['data']['gene_sample_expr_file'])
     run('python manage.py tribe_client_pickle_public_genesets')
     rebuild_search_index()
 
