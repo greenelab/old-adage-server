@@ -82,6 +82,8 @@ DATA_CONFIG.update({
         'eADAGE_net300_allNodes_ADAGEnet_PAID_corCutoff0.4.txt'),
     'node_gene_network_file': os.path.join(
         DATA_CONFIG['data_dir'], 'node_gene_network.txt')
+    'gene_sample_expr_file': os.path.join(
+        DATA_CONFIG['data_dir'], 'all-pseudomonas-gene-normalized.pcl')
 })
 
 # deployment server credentials and configuration (for AWS)
