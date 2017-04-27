@@ -4,12 +4,13 @@
  * contains the heatmap, which is the primary feature of the analysis view.
 */
 angular.module('adage.analyze.analysis', [
-  'adage.analyze.sampleBin',
-  'adage.analyze.sample',
-  'statusBar',
   'ui.router',
   'ngVega',
-  'ngResource'
+  'ngResource',
+  'statusBar',
+  'adage.analyze.sampleBin',
+  'adage.analyze.sample',
+  'adage.mlmodel.components'
 ])
 
 .config(['$stateProvider', function($stateProvider) {
@@ -52,8 +53,11 @@ function AnalysisCtrl($scope, $log, $q, $state, SampleBin) {
   };
 
   $scope.showVolcanoPlot = function() {
-    // FIXME MLModel is hard-coded until heatmap has a selector added
-    $state.go('volcano', {'mlmodel': 1});
+    if (SampleBin.selectedMlModel.id === null) {
+      $scope.analysis.status = 'Please select a machine learning model.';
+      return;
+    }
+    $state.go('volcano', {'mlmodel': SampleBin.selectedMlModel.id});
   };
 
   // these options are important for making ngSortable work with tables
@@ -249,7 +253,7 @@ function AnalysisCtrl($scope, $log, $q, $state, SampleBin) {
     $log.error('Sample detail retrieval errored with: ' + errObject);
   });
 
-  SampleBin.getActivityForSampleList($scope.analysis);
+  SampleBin.getActivityForSampleList();
 }])
 
 ;

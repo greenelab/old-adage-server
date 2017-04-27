@@ -29,6 +29,9 @@ angular.module('adage.analyze.sampleBin', [
 function($log, $cacheFactory, $q, Sample, Activity, NodeInfo, NodeInfoSet,
 MathFuncts, errGen) {
   var SampleBin = {
+    selectedMlModel: {
+      id: null
+    },
     heatmapData: {
       samples: [],
       nodeOrder: []
@@ -60,7 +63,9 @@ MathFuncts, errGen) {
       this.heatmapData.samples.splice(pos, 1);
       delete this.sampleToGroup[+id];
       this.heatmapData.nodeOrder = [];  // reset to default order
-      this.rebuildHeatmapActivity(this.heatmapData.samples);
+      this.rebuildHeatmapActivity(
+        this.selectedMlModel.id, this.heatmapData.samples
+      );
     },
 
     addExperiment: function(sampleIdList) {
@@ -311,9 +316,13 @@ MathFuncts, errGen) {
       });
     },
 
-    rebuildHeatmapActivity: function(samples) {
+    rebuildHeatmapActivity: function(mlmodel, samples) {
       // FIXME need a "reloading..." spinner or something while this happens
       //  note: progress can be reported by returning a $promise to the caller
+      if (!mlmodel) {
+        // ignore "rebuild" requests until a model is specified
+        return;
+      }
       var cbSampleBin = this; // closure link to SampleBin for callbacks
       var loadCache = function(responseObject) {
         if (responseObject) {
@@ -352,7 +361,10 @@ MathFuncts, errGen) {
         if (!sampleActivity) {
           $log.info('cache miss for ' + samples[i]);
           // cache miss, so populate the entry
-          var p = Activity.get({'sample': samples[i]}).$promise;
+          var p = Activity.get({
+            'mlmodel': mlmodel,
+            'sample': samples[i]
+          }).$promise;
           activityPromises.push(p);
           p.then(loadCache).catch(this.logError);
         }
@@ -361,12 +373,14 @@ MathFuncts, errGen) {
       $q.all(activityPromises).then(updateHeatmapActivity).catch(this.logError);
     },
 
-    getActivityForSampleList: function(respObj) {
+    getActivityForSampleList: function() {
       // retrieve activity data for heatmap to display
       // FIXME restore query progress messages (see rebuildHeatmapActivity)
       //  note: progress can be reported by returning a $promise to the caller
       // respObj.queryStatus = 'Retrieving sample activity...';
-      this.rebuildHeatmapActivity(this.heatmapData.samples);
+      this.rebuildHeatmapActivity(
+        this.selectedMlModel.id, this.heatmapData.samples
+      );
     },
 
     // volcano plot methods
