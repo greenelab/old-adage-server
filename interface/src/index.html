@@ -77,9 +77,7 @@
                 Download
               </a>
             </li>
-            <li ng-class="{active:
-                          state.current.name === 'gene_search' ||
-                          state.current.name === 'gene_network'}">
+            <li ng-class="{active: inGeneStates()}">
               <a ui-sref="gene_search">
                 GeneNetwork
               </a>
