@@ -29,8 +29,16 @@ angular.module('adage', [
   $resourceProvider.defaults.stripTrailingSlashes = false;
 }])
 
-.controller('AppCtrl', ['$scope', 'UserFactory',
-  function AppCtrl($scope, UserFactory) {
+.controller('AppCtrl', ['$scope', '$state', 'UserFactory',
+  function AppCtrl($scope, $state, UserFactory) {
+    // Function that indicates whether the current state is 'gene_search'
+    // or 'gene_network'. It will be used in index.html to highlight the
+    // 'GeneNetwork' tab on web UI in either state.
+    $scope.inGeneStates = function() {
+      var currState = $state.current.name;
+      return currState === 'gene_search' || currState === 'gene_network';
+    };
+
     $scope.$on('$stateChangeSuccess',
       function(event, toState, toParams, fromState, fromParams) {
         if (angular.isDefined(toState.data.pageTitle)) {
