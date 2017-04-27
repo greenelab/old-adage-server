@@ -78,8 +78,8 @@
               </a>
             </li>
             <li ng-class="{active:
-                          state.current.name.indexOf('gene_search') !== -1 ||
-                          state.current.name.indexOf('gene_network') !== -1}">
+                          state.current.name === 'gene_search' ||
+                          state.current.name === 'gene_network'}">
               <a ui-sref="gene_search">
                 GeneNetwork
               </a>

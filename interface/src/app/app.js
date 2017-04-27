@@ -29,8 +29,9 @@ angular.module('adage', [
   $resourceProvider.defaults.stripTrailingSlashes = false;
 }])
 
-.controller('AppCtrl', ['$scope', 'UserFactory',
-  function AppCtrl($scope, UserFactory) {
+.controller('AppCtrl', ['$scope', '$state', 'UserFactory',
+  function AppCtrl($scope, $state, UserFactory) {
+    $scope.state = $state;
     $scope.$on('$stateChangeSuccess',
       function(event, toState, toParams, fromState, fromParams) {
         if (angular.isDefined(toState.data.pageTitle)) {
