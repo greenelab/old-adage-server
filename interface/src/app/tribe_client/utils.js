@@ -7,7 +7,7 @@ angular.module('adage.tribe_client.utils', [
 
     updateUser: function(scope, element, attr) {
       scope.$on('user.update', function() {
-        UserFactory.resetAndGetPromise().$promise.then(function() {
+        UserFactory.resetAndGetPromise().then(function() {
           scope.userObj = UserFactory.getUser();
         });
       });
