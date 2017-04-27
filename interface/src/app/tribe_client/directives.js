@@ -8,7 +8,7 @@ angular.module('adage.tribe_client.directives', [
   function(UserFactory, CommonFuncts) {
     return {
       controller: ['$scope', 'UserFactory', function($scope, UserFactory) {
-        UserFactory.getPromise().$promise.then(function() {
+        UserFactory.getPromise().then(function() {
           $scope.userObj = UserFactory.getUser();
         });
       }],
@@ -26,7 +26,7 @@ angular.module('adage.tribe_client.directives', [
       controller: [
         '$scope', 'UserFactory', '$uibModal', '$rootScope', '$window',
         function($scope, UserFactory, $uibModal, $rootScope, $window) {
-          UserFactory.getPromise().$promise.then(function() {
+          UserFactory.getPromise().then(function() {
             $scope.userObj = UserFactory.getUser();
           });
 

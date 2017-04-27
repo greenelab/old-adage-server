@@ -15,7 +15,7 @@ angular.module('adage.gene.searchMany', [
           controller: ['UserFactory', function(UserFactory) {
             var self = this;
             self.userObj = null;
-            UserFactory.getPromise().$promise.then(function() {
+            UserFactory.getPromise().then(function() {
               self.userObj = UserFactory.getUser();
             });
 

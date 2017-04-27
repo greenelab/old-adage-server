@@ -38,7 +38,7 @@ angular.module('adage', [
         }
       });
 
-    UserFactory.getPromise().$promise.then(function() {
+    UserFactory.getPromise().then(function() {
       $scope.userObj = UserFactory.getUser();
     });
   }
