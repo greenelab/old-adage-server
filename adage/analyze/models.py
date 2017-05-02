@@ -199,6 +199,19 @@ class Edge(models.Model):
         unique_together = ('mlmodel', 'gene1', 'gene2')
 
 
+class ParticipationType(models.Model):
+    """
+    A model to keep track to the types of gene participation in nodes
+    that are available. The 'Participation' objects in the database
+    (see below) will have a Foreign Key to this model.
+    """
+    name = models.CharField(max_length=256, unique=True, blank=False)
+    description = models.TextField()
+
+    def __unicode__(self):
+        return self.name
+
+
 class Participation(models.Model):
     """
     This class models the many-to-many relationship between Node and
@@ -210,6 +223,8 @@ class Participation(models.Model):
     """
     node = models.ForeignKey(Node, on_delete=models.PROTECT)
     gene = models.ForeignKey(Gene, on_delete=models.PROTECT)
+    participation_type = models.ForeignKey(ParticipationType, null=True,
+                                           on_delete=models.PROTECT)
 
     class Meta:
         unique_together = ('node', 'gene')
