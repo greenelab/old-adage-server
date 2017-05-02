@@ -22,8 +22,8 @@ from genes.api import GeneResource
 from analyze.api import (SearchResource, ExperimentResource,
                          AnnotationTypeResource, SampleResource,
                          MLModelResource, NodeResource, ActivityResource,
-                         EdgeResource, ParticipationResource,
-                         ExpressionValueResource)
+                         EdgeResource, ParticipationTypeResource,
+                         ParticipationResource, ExpressionValueResource)
 
 v0_api = Api(api_name='v0')
 v0_api.register(SearchResource())
@@ -36,6 +36,7 @@ v0_api.register(MLModelResource())
 v0_api.register(NodeResource())
 v0_api.register(ActivityResource())
 v0_api.register(EdgeResource())
+v0_api.register(ParticipationTypeResource())
 v0_api.register(ParticipationResource())
 v0_api.register(ExpressionValueResource())
 
