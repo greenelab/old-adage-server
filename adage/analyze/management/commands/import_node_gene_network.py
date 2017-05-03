@@ -7,29 +7,37 @@ followed by systematic names of genes that are related to this node.
 Here is an example input file:
   adage-server/data/node_gene_network.txt
 
-The command requires two arguments:
+The command requires three arguments:
   (1) node_gene_network_file: the name of input node-gene network file;
   (2) ml_model_name: the name of machine learning model of the nodes in
       node_gene_network_file. (This argument is needed because a node's
       name may not be unique in the database, but its name and ml_model
       are unique together.)
+  (3) participation_type_name: the name of the type of participation of
+      the genes in the nodes. A couple of examples are:
+      "High weight genes", and "PatternMarker".
+
 
 For example, to import the data lines in an input file "node_gene_network.txt"
 whose machine leaning model is "Ensemble ADAGE 300", we will type:
   python manage.py import_node_gene_network /path/of/node_gene_network.txt \
-"Ensemble ADAGE 300"
+"Ensemble ADAGE 300" "High weight genes"
 
 IMPORTANT:
-Before running this command, please make sure that ml_model_name already
-exists in the database.  If it doesn't, you can use the management
-command "add_ml_model.py" to add it into the database.
+Before running this command, please:
+  (1) Make sure that ml_model_name already exists in the database.
+      If it doesn't, you can use the management command "add_ml_model.py"
+      to add it into the database.
+  (2) Make sure that the participation_type_name already exists in the
+      database. If it doesn't, you can use the management command
+      "create_or_update_participation_type.py" to add it into the database.
 """
 
 from __future__ import print_function
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 from genes.models import Gene
-from analyze.models import MLModel, Node, Participation
+from analyze.models import MLModel, Node, Participation, ParticipationType
 
 import logging
 logger = logging.getLogger(__name__)
@@ -43,11 +51,13 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('node_gene_network_file', type=file)
         parser.add_argument('ml_model_name', type=str)
+        parser.add_argument('participation_type_name', type=str)
 
     def handle(self, **options):
         try:
             import_network(options['node_gene_network_file'],
-                           options['ml_model_name'])
+                           options['ml_model_name'],
+                           options['participation_type_name'])
             self.stdout.write(self.style.NOTICE(
                 "Node-gene network data imported successfully"))
         except Exception as e:
@@ -55,7 +65,7 @@ class Command(BaseCommand):
                 "Failed to import Node-gene network data: %s" % e)
 
 
-def import_network(file_handle, ml_model_name):
+def import_network(file_handle, ml_model_name, participation_type_name):
     """
     This function tries to import node-gene network data in the database.
     It first validates input ml_model_name, then reads each valid data
@@ -73,12 +83,21 @@ def import_network(file_handle, ml_model_name):
     except MLModel.DoesNotExist:
         raise Exception("%s does NOT exist in the database" % ml_model_name)
 
+    # Raise an exception if participation_type_name does not exist in
+    # the database.
+    try:
+        participation_type = ParticipationType.objects.get(
+            name=participation_type_name)
+    except ParticipationType.DoesNotExist:
+        raise Exception("%s does NOT exist in the database" %
+                        participation_type_name)
+
     # Enclose reading/importing process in a transaction.
     with transaction.atomic():
-        check_and_import(file_handle, ml_model)
+        check_and_import(file_handle, ml_model, participation_type)
 
 
-def check_and_import(file_handle, ml_model):
+def check_and_import(file_handle, ml_model, participation_type):
     """
     Read valid data lines into the database.  An exception will be raised
     if any errors are detected in file_handle.
@@ -103,7 +122,6 @@ def check_and_import(file_handle, ml_model):
             raise Exception("Input file line #%s: Node name %s not found in "
                             "database" % (line_index + 1, node_name))
 
-
         records = []
         for sys_name in gene_names:
             try:
@@ -123,17 +141,26 @@ def check_and_import(file_handle, ml_model):
                 continue
 
             # Raise an exception if the combination of (node, gene)
-            # already exists in Particapation table.  Instead of relying
+            # already exists in Participation table. Instead of relying
             # on the IntegrityError exception implicitly, we raise an
             # explicit exception that includes the input file's line
             # number where the error is detected, and node name and gene
             # name involved.
+            # * Note: We do not need to check if the Participation's
+            # participation_type matches with our participation_type when
+            # we check if the Participation obj already exists,
+            # since a unique node AND a unique gene should yield at most
+            # *one* Participation object.
             if Participation.objects.filter(node=node, gene=gene).exists():
                 raise Exception("Input file line #%s: (%s, %s) already exists "
                                 "in Participation table."
                                 % (line_index + 1, node_name, sys_name))
             else:
-                records.append(Participation(node=node, gene=gene))
+                records.append(
+                    Participation(node=node,
+                                  gene=gene,
+                                  participation_type=participation_type)
+                )
 
         # Create database records in bulk.
         Participation.objects.bulk_create(records)
