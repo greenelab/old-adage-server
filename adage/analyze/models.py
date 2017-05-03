@@ -223,7 +223,7 @@ class Participation(models.Model):
     """
     node = models.ForeignKey(Node, on_delete=models.PROTECT)
     gene = models.ForeignKey(Gene, on_delete=models.PROTECT)
-    participation_type = models.ForeignKey(ParticipationType, null=True,
+    participation_type = models.ForeignKey(ParticipationType,
                                            on_delete=models.PROTECT)
 
     class Meta:
