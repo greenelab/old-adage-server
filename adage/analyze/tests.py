@@ -14,7 +14,8 @@ from django.test import TestCase
 from organisms.models import Organism
 from genes.models import Gene
 from analyze.models import Experiment, Sample, AnnotationType, SampleAnnotation
-from analyze.models import MLModel, Node, Activity, Edge, Participation
+from analyze.models import (
+    MLModel, Node, Activity, Edge, Participation, ParticipationType)
 from analyze.management.commands.import_data import (
     bootstrap_database, JSON_CACHE_FILE_NAME)
 from datetime import datetime
@@ -215,6 +216,11 @@ class ModelsTestCase(TestCase):
         else:
             ml_model = factory.create(MLModel)
 
+        if ParticipationType.objects.exists():
+            participation_type = ParticipationType.objects.first()
+        else:
+            participation_type = factory.create(ParticipationType)
+
         # Create nodes manually instead of calling factory.create(),
         # because the latter does not respect database constraint.
         for i in range(num_nodes):
@@ -231,7 +237,9 @@ class ModelsTestCase(TestCase):
         # Build a complete node-gene network.
         for node in Node.objects.all():
             for gene in Gene.objects.all():
-                Participation.objects.create(node=node, gene=gene)
+                Participation.objects.create(
+                    node=node, gene=gene, participation_type=participation_type
+                )
 
     def test_participations(self):
         num_nodes = 23
