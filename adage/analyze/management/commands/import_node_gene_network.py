@@ -141,21 +141,19 @@ def check_and_import(file_handle, ml_model, participation_type):
                                "database", line_index + 1, sys_name)
                 continue
 
-            # Raise an exception if the combination of (node, gene)
-            # already exists in Participation table.  Instead of relying
-            # on the IntegrityError exception implicitly, we raise an
-            # explicit exception that includes the input file's line
-            # number where the error is detected, and node name and gene
-            # name involved.
-            # * Note: We do not need to check if the Participation's
-            # participation_type matches with our participation_type when
-            # we check if the Participation obj already exists,
-            # since a unique node AND a unique gene should yield at most
-            # *one* Participation object.
-            if Participation.objects.filter(node=node, gene=gene).exists():
-                raise Exception("Input file line #%s: (%s, %s) already exists "
-                                "in Participation table."
-                                % (line_index + 1, node_name, sys_name))
+            # Raise an exception if the combination of (node, gene,
+            # participation_type) already exists in Participation table.
+            # Instead of relying on the IntegrityError exception
+            # implicitly, we raise an explicit exception that includes the
+            # input file's line number where the error is detected, and
+            # node name, gene name, and participation_type name involved.
+            if Participation.objects.filter(
+                    node=node, gene=gene,
+                    participation_type=participation_type).exists():
+                raise Exception("Input file line #%s: (%s, %s, %s) already "
+                                "exists in Participation table." %
+                                (line_index + 1, node_name, sys_name,
+                                 participation_type.name))
             else:
                 records.append(
                     Participation(node=node,
