@@ -227,7 +227,7 @@ class Participation(models.Model):
                                            on_delete=models.PROTECT)
 
     class Meta:
-        unique_together = ('node', 'gene')
+        unique_together = ('node', 'gene', 'participation_type')
 
     def __unicode__(self):
         return "Model: %s, Node: %s, Gene: %s" % (self.node.mlmodel.title,
