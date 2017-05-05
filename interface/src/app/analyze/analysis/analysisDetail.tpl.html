@@ -59,7 +59,10 @@
     </tr>
   </tbody>
 </table>
-<ml-model-selector selected-ml-model="sb.selectedMlModel">
+<label>Machine learning model:</label>
+<ml-model-selector
+  selected-ml-model="sb.selectedMlModel"
+  on-change="analysis.updateMlModel(value)">
 </ml-model-selector>
 <p>Note: scroll to the right to see all nodes in the heatmap. Zooming
    feature to come in a future update.</p>

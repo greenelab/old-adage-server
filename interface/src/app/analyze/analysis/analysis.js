@@ -38,7 +38,12 @@ function AnalysisCtrl($scope, $log, $q, $state, SampleBin) {
       {'typename': 'medium'},
       {'typename': 'temperature'},
       {'typename': 'treatment'}
-    ]
+    ],
+    updateMlModel: function(value) {
+      if (value !== null && value.id !== null) {
+        SampleBin.getActivityForSampleList(value.id);
+      }
+    }
   };
 
   // give our templates a way to access the SampleBin service

@@ -3,5 +3,6 @@
 </div>
 <select name="selectMlModel"
   ng-options="opt.title for opt in $ctrl.availableMlModels track by opt.id"
-  ng-model="$ctrl.selectedMlModel">
+  ng-model="$ctrl.selectedMlModel"
+  ng-change="$ctrl.onChange({value: $ctrl.selectedMlModel})">
 </select>

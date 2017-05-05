@@ -321,6 +321,9 @@ MathFuncts, errGen) {
       //  note: progress can be reported by returning a $promise to the caller
       if (!mlmodel) {
         // ignore "rebuild" requests until a model is specified
+        $log.info(
+          'rebuildHeatmapActivity: skipping because mlmodel=', mlmodel
+        );
         return;
       }
       var cbSampleBin = this; // closure link to SampleBin for callbacks
@@ -373,14 +376,20 @@ MathFuncts, errGen) {
       $q.all(activityPromises).then(updateHeatmapActivity).catch(this.logError);
     },
 
-    getActivityForSampleList: function() {
+    getActivityForSampleList: function(mlModelId) {
       // retrieve activity data for heatmap to display
+      if (!mlModelId && !this.selectedMlModel.id) {
+        $log.warn('getActivityForSampleList called before setting mlmodel');
+        return;
+      }
+      if (!mlModelId) {
+        // default to the current selectedMlModel
+        mlModelId = this.selectedMlModel.id;
+      }
       // FIXME restore query progress messages (see rebuildHeatmapActivity)
       //  note: progress can be reported by returning a $promise to the caller
       // respObj.queryStatus = 'Retrieving sample activity...';
-      this.rebuildHeatmapActivity(
-        this.selectedMlModel.id, this.heatmapData.samples
-      );
+      this.rebuildHeatmapActivity(mlModelId, this.heatmapData.samples);
     },
 
     // volcano plot methods
