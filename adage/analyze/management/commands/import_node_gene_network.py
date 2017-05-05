@@ -81,7 +81,8 @@ def import_network(file_handle, ml_model_name, participation_type_name):
     try:
         ml_model = MLModel.objects.get(title=ml_model_name)
     except MLModel.DoesNotExist:
-        raise Exception("%s does NOT exist in the database" % ml_model_name)
+        raise Exception("Input machine learning model (%s) does NOT exist "
+                        "in the database" % ml_model_name)
 
     # Raise an exception if participation_type_name does not exist in
     # the database.
@@ -89,8 +90,8 @@ def import_network(file_handle, ml_model_name, participation_type_name):
         participation_type = ParticipationType.objects.get(
             name=participation_type_name)
     except ParticipationType.DoesNotExist:
-        raise Exception("%s does NOT exist in the database" %
-                        participation_type_name)
+        raise Exception("Input participation type (%s) does NOT exist in the "
+                        "database" % participation_type_name)
 
     # Enclose reading/importing process in a transaction.
     with transaction.atomic():
@@ -141,7 +142,7 @@ def check_and_import(file_handle, ml_model, participation_type):
                 continue
 
             # Raise an exception if the combination of (node, gene)
-            # already exists in Participation table. Instead of relying
+            # already exists in Participation table.  Instead of relying
             # on the IntegrityError exception implicitly, we raise an
             # explicit exception that includes the input file's line
             # number where the error is detected, and node name and gene

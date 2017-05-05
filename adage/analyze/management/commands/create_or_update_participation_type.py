@@ -1,5 +1,5 @@
 """
-This management command will save new ParticipationType objects to the
+This management command will save a new ParticipationType object to the
 database with the 'name' and 'description' that are passed in the
 command-line arguments. First argument after the command is the 'name'
 argument and the second is the 'description' argument.
@@ -54,5 +54,5 @@ class Command(BaseCommand):
                         "successfully." % name))
 
         except Exception as e:
-            raise CommandError(
-                "Failed to create participation type with data: %s" % e)
+            raise CommandError("Failed to create or update participation "
+                               "type with data: %s" % e)

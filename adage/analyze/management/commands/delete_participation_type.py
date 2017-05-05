@@ -1,6 +1,8 @@
 """
-Management command that only serves to delete ParticipationType objects in
-the database that match a certain 'name'.
+Management command that deletes a ParticipationType object in the
+database that matches a certain 'name'. If there are no existing
+ParticipationType objects with that 'name' in the database, a message
+will be printed to the terminal stating this.
 
 Example usage:
 python manage.py delete_participation_type "High weight genes"
