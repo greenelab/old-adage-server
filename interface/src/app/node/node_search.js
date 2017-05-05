@@ -2,12 +2,11 @@
  * "adage.node_search" module.
  */
 
-angular.module('adage.node_search', [
+angular.module('adage.nodeSearch', [
   'ui.router',
   'ui.bootstrap',
-  'ngResource',
-  'adage.mlmodel.components',
-  'adage.utils'
+  'adage.node.resources',
+  'adage.mlmodel.components'
 ])
 
 .config(['$stateProvider', function($stateProvider) {
@@ -23,12 +22,6 @@ angular.module('adage.node_search', [
     data: {pageTitle: 'Node Search'}
   });
 }])
-
-.factory('Node', ['$resource', 'ApiBasePath',
-  function($resource, ApiBasePath) {
-    return $resource(ApiBasePath + 'node');
-  }
-])
 
 // "controllerAs" syntax is not used here because we are using "$scope" to
 // watch the mlModel selected by user, and a combination of both seems weird.
@@ -49,7 +42,12 @@ angular.module('adage.node_search', [
         function success(response) {
           $scope.nodes = response.objects;
           $scope.nodes.sort(function(n1, n2) { // Sort nodes by name
-            return (n1.name < n2.name) ? -1 : (n1.name === n2.name) ? 0 : 1;
+            if (n1.name < n2.name) {
+              return -1;
+            } else if (n1.name === n2.name) {
+              return 0;
+            }
+            return 1;
           });
           $scope.statusMessage = '';
         },

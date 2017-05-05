@@ -5,7 +5,7 @@
 angular.module('adage.node', [
   'ui.router',
   'ui.bootstrap',
-  'ngResource',
+  'adage.node.resources',
   'adage.utils',
   'greenelab.stats'
 ])
@@ -21,14 +21,6 @@ angular.module('adage.node', [
     },
     data: {pageTitle: 'Node Information'}
   });
-}])
-
-.factory('NodeInfo', ['$resource', function($resource) {
-  return $resource('/api/v0/node/:id');
-}])
-
-.factory('ParticipationService', ['$resource', function($resource) {
-  return $resource('/api/v0/participation/');
 }])
 
 .controller('NodeCtrl', ['NodeInfo', '$stateParams', '$log',
@@ -57,8 +49,8 @@ angular.module('adage.node', [
   }
 ])
 
-.directive('highWeightGenes', ['ParticipationService', '$log',
-  function(ParticipationService, $log) {
+.directive('highWeightGenes', ['Participation', '$log',
+  function(Participation, $log) {
     return {
       templateUrl: 'node/high_weight_genes.tpl.html',
       restrict: 'E',
@@ -68,7 +60,7 @@ angular.module('adage.node', [
       },
       link: function($scope) {
         $scope.queryStatus = 'Connecting to the server ...';
-        ParticipationService.get(
+        Participation.get(
           {node: $scope.nodeId, limit: 0},
           function success(response) {
             $scope.genes = [];

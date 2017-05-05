@@ -12,7 +12,7 @@ angular.module('adage', [
   'adage.gene.searchMany',
   'adage.gene.network',
   'adage.node',
-  'adage.node_search',
+  'adage.nodeSearch',
   'adage.help',
   'adage.sampleAnnotation',
   'adage.volcano-plot.view',
