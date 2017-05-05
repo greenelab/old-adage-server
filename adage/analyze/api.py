@@ -423,8 +423,7 @@ class ParticipationResource(ModelResource):
     node = fields.IntegerField(attribute='node_id', null=False)
     gene = fields.ForeignKey(GeneResource, "gene", full=True)
     participation_type = fields.ForeignKey(ParticipationTypeResource,
-                                           "participation_type", null=True,
-                                           full=True)
+                                           "participation_type", full=True)
 
     class Meta:
         queryset = Participation.objects.all()
