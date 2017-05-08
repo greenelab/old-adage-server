@@ -13,7 +13,7 @@ from haystack.query import SearchQuerySet
 from haystack.inputs import AutoQuery
 from models import (
     Experiment, Sample, SampleAnnotation, AnnotationType, MLModel, Node,
-    Activity, Edge, Participation, ExpressionValue
+    Activity, Edge, ParticipationType, Participation, ExpressionValue
 )
 
 # Many helpful hints for this implementation came from:
@@ -403,6 +403,15 @@ class EdgeResource(ModelResource):
         return object_list
 
 
+class ParticipationTypeResource(ModelResource):
+
+    class Meta:
+        queryset = ParticipationType.objects.all()
+        allowed_methods = ['get']
+        limit = 0      # Disable default pagination
+        max_limit = 0  # Disable default pagination
+
+
 class ParticipationResource(ModelResource):
     """
     To avoid unnecessary table joins and improve the query performance, only
@@ -413,6 +422,8 @@ class ParticipationResource(ModelResource):
     """
     node = fields.IntegerField(attribute='node_id', null=False)
     gene = fields.ForeignKey(GeneResource, "gene", full=True)
+    participation_type = fields.ForeignKey(ParticipationTypeResource,
+                                           "participation_type", full=True)
 
     class Meta:
         queryset = Participation.objects.all()
