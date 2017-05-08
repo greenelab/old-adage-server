@@ -1,6 +1,6 @@
 <ul class="list-group">
   <li ng-repeat="node in $ctrl.selectedNodes" class="list-group-item">
-    {{node.name}}
+    <a ui-sref="node({id: node.id})">{{node.name}}</a>
   </li>
 </ul>
 <button type="button" class="btn btn-default" ng-if="$ctrl.selectedNodes.length"
