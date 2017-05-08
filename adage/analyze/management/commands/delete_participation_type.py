@@ -5,7 +5,7 @@ ParticipationType objects with that 'name' in the database, a message
 will be printed to the terminal stating this.
 
 Example usage:
-python manage.py delete_participation_type "High weight genes"
+python manage.py delete_participation_type "High-weight genes"
 """
 
 from __future__ import print_function

@@ -5,8 +5,8 @@ command-line arguments. First argument after the command is the 'name'
 argument and the second is the 'description' argument.
 
 Example usage:
-python manage.py create_or_update_participation_type "High weight genes" \
-    "A high weight gene in a signature is a genes whose weight is ..."
+python manage.py create_or_update_participation_type "High-weight genes" \
+    "High-weight genes are those that most strongly influence the node's ..."
 """
 
 from __future__ import print_function

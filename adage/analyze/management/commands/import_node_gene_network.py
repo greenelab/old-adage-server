@@ -21,7 +21,7 @@ The command requires three arguments:
 For example, to import the data lines in an input file "node_gene_network.txt"
 whose machine leaning model is "Ensemble ADAGE 300", we will type:
   python manage.py import_node_gene_network /path/of/node_gene_network.txt \
-"Ensemble ADAGE 300" "High weight genes"
+"Ensemble ADAGE 300" "High-weight genes"
 
 IMPORTANT:
 Before running this command, please:

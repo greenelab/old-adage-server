@@ -14,9 +14,10 @@ def create_participation_type_if_nonexistent(apps, schema_editor):
     """
     if not ParticipationType.objects.exists():
         new_participation_type = ParticipationType.objects.create(
-            name="High weight genes", description="A high weight gene in a "
-            "signature is a genes whose weight is more than 2.5 standard "
-            "deviations away from the mean weight of genes in that node."
+            name="High-weight genes", description="High-weight genes are "
+            "those that most strongly influence the node's activity, and we "
+            "have found that they often reveal the underlying process(es) "
+            "captured by the node."
         )
 
         for participation_obj in Participation.objects.all():
