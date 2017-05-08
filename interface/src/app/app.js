@@ -12,6 +12,7 @@ angular.module('adage', [
   'adage.gene.searchMany',
   'adage.gene.network',
   'adage.node',
+  'adage.nodeSearch',
   'adage.help',
   'adage.sampleAnnotation',
   'adage.volcano-plot.view',
@@ -32,11 +33,19 @@ angular.module('adage', [
 .controller('AppCtrl', ['$scope', '$state', 'UserFactory',
   function AppCtrl($scope, $state, UserFactory) {
     // Function that indicates whether the current state is 'gene_search'
-    // or 'gene_network'. It will be used in index.html to highlight the
-    // 'GeneNetwork' tab on web UI in either state.
+    // or 'gene_network'. (Used by index.html to highlight the 'GeneNetwork'
+    // tab on web UI in either state.)
     $scope.inGeneStates = function() {
       var currState = $state.current.name;
       return currState === 'gene_search' || currState === 'gene_network';
+    };
+
+    // Function that indicates whether the current state is 'node' or
+    // 'node_search'. (Used by index.html to highlight the 'Node' tab on
+    // web UI in either state.)
+    $scope.inNodeStates = function() {
+      var currState = $state.current.name;
+      return currState === 'node' || currState === 'node_search';
     };
 
     $scope.$on('$stateChangeSuccess',
