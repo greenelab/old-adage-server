@@ -12,7 +12,7 @@ angular.module('adage.sampleAnnotation', [
 
 .config(['$stateProvider', function($stateProvider) {
   $stateProvider.state('sampleAnnotation', {
-    url: '/sample_annotation?node&samples',
+    url: '/sample_annotation?signature&samples',
     views: {
       main: {
         templateUrl: 'sample_annotation/annotation.tpl.html',
@@ -47,20 +47,20 @@ angular.module('adage.sampleAnnotation', [
     // Note: Ideally self.uniqueAnnotationTypes should be a hashtable (such as
     // an object of Set) instead of Array, but Set is only available since ES6.
 
-    self.hasNode = false;
+    self.hasSignature = false;
     var sampleDict = {};
 
     // Function that sets valid sample IDs asynchronously:
     var getSampleIDPromise = function() {
       var deferred = $q.defer();
-      // If 'node' is found in the URL, get the activity values based on node
-      // and sample(s):
-      if ($stateParams.node) {
-        self.hasNode = true;
+      // If 'signature' is found in the URL, get the activity values based on
+      // signature and sample(s):
+      if ($stateParams.signature) {
+        self.hasSignature = true;
         self.activityDigits = ActivityDigits;
-        var nodeID = $stateParams.node;
+        var signatureID = $stateParams.signature;
         Activity.get(
-          {'node': nodeID, 'sample__in': samplesInUrl},  // parameters of GET
+          {'node': signatureID, 'sample__in': samplesInUrl},
           function success(response) {
             var validSamples = [];
             response.objects.forEach(function(element) {
@@ -76,7 +76,8 @@ angular.module('adage.sampleAnnotation', [
             deferred.reject(errMessage);
           }
         );
-      } else { // If 'node' is not in the URL, include all input sample IDs.
+      } else {
+        // If 'signature' is not in the URL, include all input sample IDs.
         deferred.resolve(samplesInUrl);
       }
       return deferred.promise;
@@ -95,7 +96,8 @@ angular.module('adage.sampleAnnotation', [
             return;
           }
           response.objects.forEach(function(element) {
-            if (!self.hasNode) { // If node is not in URL, create the object.
+            // If signature is not in URL, create the object.
+            if (!self.hasSignature) {
               sampleDict[element.id] = {};
             }
             sampleDict[element.id].name = element.name;
