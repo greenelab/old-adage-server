@@ -12,17 +12,17 @@ angular.module('adage.volcano-plot', [
 ])
 
 // TODO when refactoring for issue #76, this service belongs in the top-level
-//      src/app/ module called `node` in its `services.js` file
-.factory('NodeService', ['$resource', 'ApiBasePath',
+//      src/app/ module called `signature` in its `services.js` file
+.factory('SignatureService', ['$resource', 'ApiBasePath',
   function($resource, ApiBasePath) {
-    // private methods for NodeService
+    // private methods for SignatureService
     var Participation = $resource(ApiBasePath + 'participation/');
 
-    // public methods for NodeService
+    // public methods for SignatureService
     return {
-      getGenesForNodesPromise: function(nodes) {
+      getGenesForSignaturesPromise: function(signatures) {
         var promise = Participation.get(
-          {'node__in': nodes.join(), 'limit': 0}
+          {'node__in': signatures.join(), 'limit': 0}
         ).$promise.then(
           function success(value) {
             // when the data come back, condense the reponse into a flat list
@@ -47,24 +47,25 @@ angular.module('adage.volcano-plot', [
     plotData: '<',
       // plotData is a json array with the following format:
       // [
-      //   {id: <nodeid-1>,
-      //    name: "<node-name-1>",
+      //   {id: <signatureid-1>,
+      //    name: "<signature-name-1>",
       //    diff: <difference-in-mean-activity>,
       //    logsig: <-log10(p-value-of-difference)>
       //   },
-      //   {id: <nodeid-2>,
-      //    name: "<node-name-2>",
+      //   {id: <signatureid-2>,
+      //    name: "<signature-name-2>",
       //    ...
       //   },
-      //   {...repeat for each node...}
+      //   {...repeat for each signature...}
       // ]
     onClick: '&'
       // onClick (optional): supply a callback function to receive
       // notification when clicks are received within the plot. This is a
-      // good way to check if the user has selected any nodes, so the
-      // onClick function is called with a selectedNodes parameter
-      // containing an array of node objects listing which nodes in the plot
-      // have been selected. This list uses the same format as plotData.
+      // good way to check if the user has selected any signatures, so the
+      // onClick function is called with a selectedSignatures parameter
+      // containing an array of signature objects listing which signatures in
+      // the plot have been selected. This list uses the same format as
+      // plotData.
   },
   templateUrl: 'volcano-plot/volcano-plot.tpl.html',
   controllerAs: 'vp',
@@ -78,8 +79,8 @@ angular.module('adage.volcano-plot', [
         // register a callback with vega to receive click events
         view.on('click', function viewClick(event, item) {
           $scope.$apply(function() {
-            var selectedNodes = view.data('selectedNodes').values().reduce(
-              function reduceSelectedNodes(acc, datum) {
+            var selectedSignatures = view.data('selectedSignatures').values().reduce(
+              function reduceSelectedSignatures(acc, datum) {
                 // vega maintains some private state information in this array
                 // so we need to strip it out before passing a copy back
                 if (datum['id']) {
@@ -92,7 +93,7 @@ angular.module('adage.volcano-plot', [
               },
               []
             );
-            vp.onClick({selectedNodes: selectedNodes});
+            vp.onClick({selectedSignatures: selectedSignatures});
           });
         });
       };
@@ -103,19 +104,22 @@ angular.module('adage.volcano-plot', [
 .component('volcanoPlotSelection', {
   bindings: {
     mlModel: '<',
-    selectedNodes: '<',
+    selectedSignatures: '<',
     sampleGroups: '<'   // network view needs this context for annotation
   },
   templateUrl: 'volcano-plot/volcano-plot-selection.tpl.html',
-  controller: ['$log', '$location', 'errGen', 'NodeService',
-    function VolcanoPlotSelectionCtrl($log, $location, errGen, NodeService) {
+  controller: ['$log', '$location', 'errGen', 'SignatureService',
+    function VolcanoPlotSelectionCtrl($log, $location, errGen,
+                                      SignatureService) {
       var cbVolcanoPlotSelection = this;
       this.showNetwork = function() {
         // genes, mlmodel, base_group, comp_group
-        var nodeIds = this.selectedNodes.map(function nodesToIds(nodeObj) {
-          return nodeObj.id;
-        });
-        NodeService.getGenesForNodesPromise(nodeIds).then(
+        var signatureIds = this.selectedSignatures.map(
+          function signaturesToIds(signatureObj) {
+            return signatureObj.id;
+          }
+        );
+        SignatureService.getGenesForSignaturesPromise(signatureIds).then(
           function success(genes) {
             $location.path('/gene_network/').search({
               'mlmodel': cbVolcanoPlotSelection.mlModel,
@@ -128,7 +132,7 @@ angular.module('adage.volcano-plot', [
           },
           function error(httpResponse) {
             $log.error(
-              errGen('Failed to retrieve genes for nodes', httpResponse)
+              errGen('Failed to retrieve genes for signatures', httpResponse)
             );
           }
         );
