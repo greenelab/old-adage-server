@@ -11,8 +11,8 @@ angular.module('adage', [
   'adage.gene.searchFew',
   'adage.gene.searchMany',
   'adage.gene.network',
-  'adage.node',
-  'adage.nodeSearch',
+  'adage.signature',
+  'adage.signatureSearch',
   'adage.help',
   'adage.sampleAnnotation',
   'adage.volcano-plot.view',
@@ -40,12 +40,12 @@ angular.module('adage', [
       return currState === 'gene_search' || currState === 'gene_network';
     };
 
-    // Function that indicates whether the current state is 'node' or
-    // 'node_search'. (Used by index.html to highlight the 'Node' tab on
-    // web UI in either state.)
-    $scope.inNodeStates = function() {
+    // Function that indicates whether the current state is 'signature' or
+    // 'signature_search'. (Used by index.html to highlight the 'signature' tab
+    // on web UI in either state.)
+    $scope.inSignatureStates = function() {
       var currState = $state.current.name;
-      return currState === 'node' || currState === 'node_search';
+      return currState === 'signature' || currState === 'signature_search';
     };
 
     $scope.$on('$stateChangeSuccess',
