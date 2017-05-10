@@ -427,7 +427,7 @@ MathFuncts, errGen) {
       // (1b) now obtain (and cache) a name for each signature id
       var signatureSetPromise = this.getSignatureSetPromise(
         firstSampleSignatures);
-      var mapSignaturesToSigInfo = function() {
+      var mapSignaturesToSignatureInfo = function() {
         // (2a) next, we build an array (replacing `volcanoData.source`)
         //      comprised of `signatureObject`s by walking through the
         //      `firstSampleSignatures` and constructing a `signatureObject` for
