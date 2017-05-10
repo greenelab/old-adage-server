@@ -1,38 +1,38 @@
 /**
- * "adage.node" module.
+ * "adage.signature" module.
  */
 
-angular.module('adage.node', [
+angular.module('adage.signature', [
   'ui.router',
   'ui.bootstrap',
-  'adage.node.resources',
+  'adage.signature.resources',
   'adage.utils',
   'greenelab.stats'
 ])
 
 .config(['$stateProvider', function($stateProvider) {
-  $stateProvider.state('node', {
-    url: '/node/{id:int}',
+  $stateProvider.state('signature', {
+    url: '/signature/{id:int}',
     views: {
       main: {
-        templateUrl: 'node/node.tpl.html',
-        controller: 'NodeCtrl as ctrl'
+        templateUrl: 'signature/signature.tpl.html',
+        controller: 'SignatureCtrl as ctrl'
       }
     },
-    data: {pageTitle: 'Node Information'}
+    data: {pageTitle: 'Signature Information'}
   });
 }])
 
-.controller('NodeCtrl', ['NodeInfo', '$stateParams', '$log',
-  function NodeController(NodeInfo, $stateParams, $log) {
+.controller('SignatureCtrl', ['Signature', '$stateParams', '$log',
+  function SignatureController(Signature, $stateParams, $log) {
     var self = this;
     if (!$stateParams.id) {
-      self.statusMessage = 'Please specify node ID in the URL.';
+      self.statusMessage = 'Please specify signature ID in the URL.';
       return;
     }
     self.id = $stateParams.id;
     self.statusMessage = 'Connecting to the server ...';
-    NodeInfo.get(
+    Signature.get(
       {id: self.id},
       function success(response) {
         self.name = response.name;
@@ -40,8 +40,8 @@ angular.module('adage.node', [
         self.statusMessage = '';
       },
       function error(err) {
-        $log.error('Failed to get node information: ' + err.statusText);
-        self.statusMessage = 'Failed to get node information from server';
+        $log.error('Failed to get signature information: ' + err.statusText);
+        self.statusMessage = 'Failed to get signature information from server';
       }
     );
     self.organism = 'Pseudomonas aeruginosa';
@@ -52,16 +52,16 @@ angular.module('adage.node', [
 .directive('highWeightGenes', ['Participation', '$log',
   function(Participation, $log) {
     return {
-      templateUrl: 'node/high_weight_genes.tpl.html',
+      templateUrl: 'signature/high_weight_genes.tpl.html',
       restrict: 'E',
       scope: {
-        nodeId: '@',
+        signatureId: '@',
         genes: '='
       },
       link: function($scope) {
         $scope.queryStatus = 'Connecting to the server ...';
         Participation.get(
-          {node: $scope.nodeId, limit: 0},
+          {node: $scope.signatureId, limit: 0},
           function success(response) {
             $scope.genes = [];
             var i = 0, n = response.objects.length;
@@ -95,10 +95,10 @@ angular.module('adage.node', [
 .directive('highRangeExp', ['$http', '$log', '$state', 'ActivityDigits',
   function($http, $log, $state, ActivityDigits) {
     return {
-      templateUrl: 'node/high_range_exp.tpl.html',
+      templateUrl: 'signature/high_range_exp.tpl.html',
       restrict: 'E',
       scope: {
-        nodeId: '@',
+        signatureId: '@',
         inputTopNum: '@topExp'
       },
       link: function($scope) {
@@ -126,8 +126,8 @@ angular.module('adage.node', [
         // Current number of experiments on web UI:
         $scope.numExpShown = $scope.topNum;
 
-        // Get activities that are related to the current node:
-        var httpConfig = {params: {node: $scope.nodeId, limit: 0}};
+        // Get activities that are related to the current signature:
+        var httpConfig = {params: {node: $scope.signatureId, limit: 0}};
         $http.get('/api/v0/activity/', httpConfig)
           .then(function success(response) {
             var sampleID;
@@ -140,18 +140,18 @@ angular.module('adage.node', [
             $log.error('Failed to get activities: ' + err.statusText);
             $scope.queryStatus = 'Failed to get related activities from server';
           })
-          // Get experiments that are related to the current node:
+          // Get experiments that are related to the current signature:
           .then(function success(response) {
             // enhanceExpData: a function that enhances the given experiment.
             // The enhancements include:
             // (1) Add a new key "isExpanded", whose default is false;
             // (2) Convert entries in sample_set from sample URI to sample ID,
-            //     and delete samples that are not related to current node;
+            //     and delete samples that are not related to current signature;
             // (3) Add a new "range" key, which is the range of activity values.
             //     (This key will be used to order experiments on web UI.)
             var enhanceExpData = function(exp) {
               exp.isExpanded = false;  // Enhancement (1)
-              var nodeRelatedSamples = [];
+              var signatureRelatedSamples = [];
               exp.sample_set.forEach(function(element) { // Enhancement (2)
                 var parts = element.split('/');
                 // The format of exp.sample_set[i] is "/api/v0/sample/1234/",
@@ -159,10 +159,10 @@ angular.module('adage.node', [
                 // ["", "api", "v0", "sample", "1234", ""]
                 var sampleID = parts[parts.length - 2];
                 if (sampleID in $scope.activities) {
-                  nodeRelatedSamples.push(sampleID);
+                  signatureRelatedSamples.push(sampleID);
                 }
               });
-              exp['sample_set'] = nodeRelatedSamples;
+              exp['sample_set'] = signatureRelatedSamples;
               // Enhancement (3): Add activity range
               var minActivity = null;
               var maxActivity = null;
@@ -282,7 +282,7 @@ angular.module('adage.node', [
                 exp.samples = [];
                 exp.numSelections = 0;
                 // Add "activity" property to each sample that is related to the
-                // current node. (It will be used to order samples on web UI.)
+                // current signature. (It will be used to order samples on web UI.)
                 response.data.objects.forEach(function(element) {
                   if (element.id in $scope.activities) {
                     element.activity = $scope.activities[element.id];
@@ -327,7 +327,7 @@ angular.module('adage.node', [
             }
           });
           var stateParams = {
-            node: $scope.nodeId,
+            signature: $scope.signatureId,
             samples: selectedSampleIDs.join()
           };
           $state.go('sampleAnnotation', stateParams);
@@ -340,11 +340,11 @@ angular.module('adage.node', [
 .directive('enrichedGenesets', ['MathFuncts', 'PickledGenesetsService', '$log',
   function(MathFuncts, PickledGenesetsService, $log) {
     return {
-      templateUrl: 'node/enriched_genesets.tpl.html',
+      templateUrl: 'signature/enriched_genesets.tpl.html',
       restrict: 'E',
       scope: {
         organism: '@',
-        genes: '=' // genes is an array of high-weight genes in the Node page.
+        genes: '=' // an array of high-weight genes in the Signature page.
       },
       link: function($scope) {
         $scope.queryStatus = 'Connecting to the server ...';
@@ -364,8 +364,8 @@ angular.module('adage.node', [
 
         // This is the main function that calculates the geneset enrichments.
         // It calculates the enrichment for each geneset that has genes
-        // also present in the node high weight genes, and pushes that geneset
-        // into the releventGenesetArray.
+        // also present in the signature high weight genes, and pushes that
+        // geneset into the releventGenesetArray.
         var calculateEnrichments = function(geneGenesets, allGenesetInfo,
                                             totalGeneNum, cutoff) {
           var N = totalGeneNum;

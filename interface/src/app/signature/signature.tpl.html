@@ -7,16 +7,19 @@
   <div class="container">
     <div class="row">
       <div class="col-xs-6">
-        <high-weight-genes node-id="{{ctrl.id}}" genes="ctrl.genes"></high-weight-genes>
+        <high-weight-genes signature-id="{{ctrl.id}}" genes="ctrl.genes">
+        </high-weight-genes>
       </div>
 
       <div class="col-xs-6">
-        <high-range-exp node-id="{{ctrl.id}}" top-exp="20"></high-range-exp>
+        <high-range-exp signature-id="{{ctrl.id}}" top-exp="20">
+        </high-range-exp>
       </div>
     </div>
     <div class="row">
       <div class="col-xs-6">
-        <enriched-genesets organism="{{ctrl.organism}}" genes="ctrl.genes"></enriched-genesets>
+        <enriched-genesets organism="{{ctrl.organism}}" genes="ctrl.genes">
+        </enriched-genesets>
       </div>
 
       <div class="col-xs-6">

@@ -22,7 +22,7 @@
   </div>
 
   <div class="col-sm-3"
-       ng-repeat="node in nodes | filter: {name: nameFilter}">
-    <h4><a ui-sref="node({id: node.id})">{{node.name}}</a></h4>
+       ng-repeat="signature in signatures | filter: {name: nameFilter}">
+    <h4><a ui-sref="signature({id: signature.id})">{{signature.name}}</a></h4>
   </div>
 </div>
