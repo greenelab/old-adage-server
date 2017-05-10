@@ -290,7 +290,7 @@ MathFuncts, errGen) {
         .linkage('avg')
         .posKey('activity')
         .data(this.getSampleObjects());
-      this.heatmapData.samples = sampleClust.orderedSignatures().map(
+      this.heatmapData.samples = sampleClust.orderedNodes().map(
         this._getIDs);
     },
     clusterSignatures: function() {
@@ -314,7 +314,7 @@ MathFuncts, errGen) {
           .data(cbSampleBin.getSignatureObjects());
         // update the heatmap
         cbSampleBin.heatmapData.signatureOrder =
-          signatureClust.orderedSignatures().map(cbSampleBin._getIDs);
+          signatureClust.orderedNodes().map(cbSampleBin._getIDs);
       });
     },
 

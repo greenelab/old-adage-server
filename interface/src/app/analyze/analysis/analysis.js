@@ -101,7 +101,7 @@ function AnalysisCtrl($scope, $log, $q, $state, SampleBin) {
         'transform': [
           {
             'type': 'aggregate',
-            'groupby': ['signature'],
+            'groupby': ['node'],
             'summarize': [{'field': 'normval', 'ops': ['min']}]
           }
         ]
@@ -114,8 +114,8 @@ function AnalysisCtrl($scope, $log, $q, $state, SampleBin) {
           {
             'type': 'lookup',
             'on': 'signature_summary',
-            'onKey': 'signature',
-            'keys': ['signature'],
+            'onKey': 'node',
+            'keys': ['node'],
             'as': ['signature_summary']
           }, {
             'type': 'formula',
@@ -131,7 +131,7 @@ function AnalysisCtrl($scope, $log, $q, $state, SampleBin) {
             'type': 'lookup',
             'on': 'signatureOrder',
             'onKey': 'data',
-            'keys': ['signature'],
+            'keys': ['node'],
             'as': ['signature_order']
           }
         ]
@@ -202,7 +202,7 @@ function AnalysisCtrl($scope, $log, $q, $state, SampleBin) {
         'properties': {
           'enter': {
             // TODO dynamic layout: compute these constants also (see above)
-            'text': {'value': 'signature'},
+            'text': {'value': 'node'},
             'x': {'value': 1200},
             'y': {'value': 220},
             'fontWeight': {'value': 'bold'},
