@@ -8,6 +8,7 @@ angular.module('adage.gene.network', [
   'ngResource',
   'rzModule',
   'adage.utils',
+  'adage.signature.resources',
   'adage.gene.resource'
 ])
 
@@ -53,12 +54,6 @@ angular.module('adage.gene.network', [
   }
 ])
 
-.factory('Node', ['$resource', 'ApiBasePath',
-  function($resource, ApiBasePath) {
-    return $resource(ApiBasePath + 'node');
-  }
-])
-
 .factory('ExpressionValue', ['$resource', 'ApiBasePath',
   function($resource, ApiBasePath) {
     return $resource(ApiBasePath + 'expressionvalue');
@@ -66,9 +61,10 @@ angular.module('adage.gene.network', [
 ])
 
 .controller('GeneNetworkCtrl',
-  ['$stateParams', 'Edge', 'Node', 'Gene', 'ExpressionValue', '$log', 'errGen',
-    function GeneNetworkController($stateParams, Edge, Node, Gene,
-                                   ExpressionValue, $log, errGen) {
+  ['$stateParams', 'Edge', 'Signature', 'Gene', 'ExpressionValue', '$log',
+    'errGen',
+    function GeneNetworkController($stateParams, Edge, Signature, Gene,
+                                 ExpressionValue, $log, errGen) {
       var self = this;
       // Do nothing if no genes are specified in URL.
       if (!$stateParams.genes || !$stateParams.genes.split(',').length) {
@@ -289,15 +285,17 @@ angular.module('adage.gene.network', [
           htmlText += data.weight.toFixed(weightPrecision);
           var heavyGenes = [data.gene1.id, data.gene2.id].join(',');
           var target = d3.event.target;
-          Node.get(
+          Signaure.get(
             {'heavy_genes': heavyGenes, 'limit': 0},
             function success(response) {
               var i = 0, n = response.objects.length;
               var anchorTag;
-              htmlText += '<br>' + n + (n > 1 ? ' nodes are ' : ' node is ');
+              htmlText += '<br>' + n +
+                (n > 1 ? ' signatures are ' : ' signature is ');
               htmlText += 'related to both genes' + (n > 0 ? ':' : '.');
               for (; i < n; ++i) {
-                anchorTag = '<a href="#/node/' + response.objects[i].id + '">';
+                anchorTag = '<a href="#/signature/' + response.objects[i].id +
+                  '">';
                 htmlText += '<br>* ' + anchorTag + response.objects[i].name;
                 htmlText += '</a>';
               }
@@ -305,8 +303,8 @@ angular.module('adage.gene.network', [
               edgeTip.show(data, target);
             },
             function error(response) {
-              var message = errGen('Failed to get node info for gene edge: ',
-                                   response);
+              var message = errGen(
+                'Failed to get signature info for gene edge: ', response);
               $log.error(message);
               htmlText += '<br>' + message + '. Please try again later.';
               edgeTip.html(htmlText);
