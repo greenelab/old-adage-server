@@ -79,8 +79,8 @@ angular.module('adage.volcano-plot', [
         // register a callback with vega to receive click events
         view.on('click', function viewClick(event, item) {
           $scope.$apply(function() {
-            var selectedSignatures = view.data('selectedSignatures').values().reduce(
-              function reduceSelectedSignatures(acc, datum) {
+            var selectedSignatures = view.data('selectedSignatures').values()
+              .reduce(function reduceSelectedSignatures(acc, datum) {
                 // vega maintains some private state information in this array
                 // so we need to strip it out before passing a copy back
                 if (datum['id']) {
