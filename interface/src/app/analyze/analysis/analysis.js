@@ -50,9 +50,9 @@ function AnalysisCtrl($scope, $log, $q, $state, SampleBin) {
   $scope.sb = SampleBin;
 
   // wrap some SampleBin features to implement status updates
-  $scope.clusterNodes = function() {
-    $scope.analysis.status = 'clustering nodes (this will take a minute)';
-    SampleBin.clusterNodes().then(function() {
+  $scope.clusterSignatures = function() {
+    $scope.analysis.status = 'clustering signatures (this will take a minute)';
+    SampleBin.clusterSignatures().then(function() {
       $scope.analysis.status = '';
     });
   };
@@ -73,7 +73,7 @@ function AnalysisCtrl($scope, $log, $q, $state, SampleBin) {
 
   // Vega objects
   $scope.heatmapSpec = {
-    // TODO dynamic layout: compute constants w=numNodes*4, h=numSamples*12
+    // TODO dynamic layout: compute constants w=numSignatures*4, h=numSamples*12
     'width': 2400,
     'height': 200,
     'padding': {'left': 50, 'right': 10, 'top': 10, 'bottom': 20},
@@ -91,12 +91,12 @@ function AnalysisCtrl($scope, $log, $q, $state, SampleBin) {
         // these datasets "streamed" in via ngVega from heatmapData
         'name': 'samples'
       }, {
-        'name': 'nodeOrder'
+        'name': 'signatureOrder'
       }, {
         'name': 'sample_objects'
       }, {
-        // compute minimum normalized value for each node (across samples)
-        'name': 'node_summary',
+        // compute minimum normalized value for each signature (across samples)
+        'name': 'signature_summary',
         'source': 'activity',
         'transform': [
           {
@@ -106,21 +106,21 @@ function AnalysisCtrl($scope, $log, $q, $state, SampleBin) {
           }
         ]
       }, {
-        // now subtract the minimum sample value from each node and
-        // lookup the order for drawing samples and nodes
+        // now subtract the minimum sample value from each signature and
+        // lookup the order for drawing samples and signatures
         'name': 'activity_normalized',
         'source': 'activity',
         'transform': [
           {
             'type': 'lookup',
-            'on': 'node_summary',
+            'on': 'signature_summary',
             'onKey': 'node',
             'keys': ['node'],
-            'as': ['node_summary']
+            'as': ['signature_summary']
           }, {
             'type': 'formula',
             'field': 'normval',
-            'expr': 'datum.normval - datum.node_summary.min_normval'
+            'expr': 'datum.normval - datum.signature_summary.min_normval'
           }, {
             'type': 'lookup',
             'on': 'samples',
@@ -129,10 +129,10 @@ function AnalysisCtrl($scope, $log, $q, $state, SampleBin) {
             'as': ['sample_order']
           }, {
             'type': 'lookup',
-            'on': 'nodeOrder',
+            'on': 'signatureOrder',
             'onKey': 'data',
             'keys': ['node'],
-            'as': ['node_order']
+            'as': ['signature_order']
           }
         ]
       }
@@ -140,11 +140,11 @@ function AnalysisCtrl($scope, $log, $q, $state, SampleBin) {
 
     'scales': [
       {
-        'name': 'nodes',
+        'name': 'signatures',
         'type': 'ordinal',
         'domain': {
           'data': 'activity_normalized',
-          'field': 'node_order._id',
+          'field': 'signature_order._id',
           'sort': true
         },
         'range': 'width'
@@ -160,7 +160,7 @@ function AnalysisCtrl($scope, $log, $q, $state, SampleBin) {
       }, {
         'name': 'minvals',
         'type': 'linear',
-        'domain': {'data': 'node_summary', 'field': 'min_normval'},
+        'domain': {'data': 'signature_summary', 'field': 'min_normval'},
         'range': 'height'
       }, {
         'name': 's',
@@ -185,11 +185,11 @@ function AnalysisCtrl($scope, $log, $q, $state, SampleBin) {
     ],
 
     // These default axes are not helpful, so we make our own in marks below.
-    // x-axis: there are so many nodes, the labels overlap each other
+    // x-axis: there are so many signatures, the labels overlap each other
     // y-axis: can only seem to label using data from the 'samples' scale,
     //         which now uses internal _id -- not useful information for users
     // 'axes': [
-    //   {"type": "x", "scale": "nodes", "title": "Node ID"},
+    //   {"type": "x", "scale": "signatures", "title": "Signature ID"},
     //   {'type': 'y', 'scale': 'samples', 'title': 'sample'}
     // ],
 
@@ -214,8 +214,8 @@ function AnalysisCtrl($scope, $log, $q, $state, SampleBin) {
         'from': {'data': 'activity_normalized'},
         'properties': {
           'enter': {
-            'x': {'scale': 'nodes', 'field': 'node_order._id'},
-            'width': {'scale': 'nodes', 'band': true},
+            'x': {'scale': 'signatures', 'field': 'signature_order._id'},
+            'width': {'scale': 'signatures', 'band': true},
             'y': {'scale': 'samples', 'field': 'sample_order._id'},
             'height': {'scale': 'samples', 'band': true},
             'fill': {'scale': 's', 'field': 'normval'}

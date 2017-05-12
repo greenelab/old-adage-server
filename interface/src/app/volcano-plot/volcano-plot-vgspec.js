@@ -9,7 +9,7 @@ angular.module('adage.volcano-plot-vgspec', [])
       "name": "source"
     },
     {
-      "name": "selectedNodes",
+      "name": "selectedSignatures",
       "modify": [
         {"type": "clear", "test": "!shift"},
         {"type": "toggle", "signal": "clickedPoint", "field": "id"}
@@ -62,7 +62,7 @@ angular.module('adage.volcano-plot-vgspec', [])
           "opacity": {"value": 0.7},
           "fill": [
             {
-              "test": "indata('selectedNodes', datum._id, '_id')",
+              "test": "indata('selectedSignatures', datum._id, '_id')",
               "value": "red"
             },
             {"value": "#4682b4"}

@@ -7,7 +7,9 @@ describe('AnalyzeCtrl', function() {
     beforeEach(inject(function($controller, _$location_, $rootScope) {
       $location = _$location_;
       $scope = $rootScope.$new();
-      AnalyzeCtrl = $controller('AnalyzeCtrl', {$location: $location, $scope: $scope});
+      AnalyzeCtrl = $controller(
+        'AnalyzeCtrl', {$location: $location, $scope: $scope}
+      );
     }));
 
     it('should pass a dummy test', inject(function() {

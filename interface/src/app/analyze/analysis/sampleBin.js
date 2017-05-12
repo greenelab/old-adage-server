@@ -9,7 +9,7 @@ angular.module('adage.analyze.sampleBin', [
   'greenelab.stats',
   'adage.utils',
   'adage.analyze.sample',
-  'adage.node'
+  'adage.signature.resources'
 ])
 
 .factory('Activity', ['$resource', 'ApiBasePath',
@@ -18,15 +18,15 @@ angular.module('adage.analyze.sampleBin', [
   }
 ])
 
-.factory('NodeInfoSet', ['$resource', 'ApiBasePath',
+.factory('SignatureSet', ['$resource', 'ApiBasePath',
   function($resource, ApiBasePath) {
     return $resource(ApiBasePath + 'node/set/:ids/');
   }
 ])
 
 .factory('SampleBin', ['$log', '$cacheFactory', '$q', 'Sample', 'Activity',
-'NodeInfo', 'NodeInfoSet', 'MathFuncts', 'errGen',
-function($log, $cacheFactory, $q, Sample, Activity, NodeInfo, NodeInfoSet,
+  'Signature', 'SignatureSet', 'MathFuncts', 'errGen',
+function($log, $cacheFactory, $q, Sample, Activity, Signature, SignatureSet,
 MathFuncts, errGen) {
   var SampleBin = {
     selectedMlModel: {
@@ -34,7 +34,7 @@ MathFuncts, errGen) {
     },
     heatmapData: {
       samples: [],
-      nodeOrder: []
+      signatureOrder: []
     },
     volcanoData: {
       source: []
@@ -43,7 +43,7 @@ MathFuncts, errGen) {
     sampleData: {},
     sampleCache: $cacheFactory('sample'),
     activityCache: $cacheFactory('activity'),
-    nodeCache: $cacheFactory('node'),
+    signatureCache: $cacheFactory('signature'),
 
     addSample: function(id) {
       if (this.heatmapData.samples.indexOf(+id) !== -1) {
@@ -54,7 +54,7 @@ MathFuncts, errGen) {
         this.heatmapData.samples.push(+id);
         this.sampleToGroup[+id] = 'other';
         // TODO when cache generalized: start pre-fetching sample data here
-        this.heatmapData.nodeOrder = [];  // reset to default order
+        this.heatmapData.signatureOrder = [];  // reset to default order
       }
     },
 
@@ -62,7 +62,7 @@ MathFuncts, errGen) {
       var pos = this.heatmapData.samples.indexOf(+id);
       this.heatmapData.samples.splice(pos, 1);
       delete this.sampleToGroup[+id];
-      this.heatmapData.nodeOrder = [];  // reset to default order
+      this.heatmapData.signatureOrder = [];  // reset to default order
       this.rebuildHeatmapActivity(
         this.selectedMlModel.id, this.heatmapData.samples
       );
@@ -144,39 +144,39 @@ MathFuncts, errGen) {
         return this.getSampleData(val) || {id: val};
       }, this);
     },
-    getNodeObjects: function() {
+    getSignatureObjects: function() {
       // The heatmapData.activity array organizes activity data in a
       // representation convenient to render using vega.js: each element of the
       // array corresponds to one mark on the heatmap. For clustering by
       // hcluster.js, on the other hand, we need to reorganize the data so that
-      // all activity for each *node* is collected in an array. The result is
-      // essentially the same as that from `getSampleObjects` above, but
+      // all activity for each *signature* is collected in an array. The result
+      // is essentially the same as that from `getSampleObjects` above, but
       // transposed. We achieve this without too many intermediate steps via
       // two nested Array.prototype.map() operations:
 
-      // (1) first, we obtain a list of nodes by retrieving node activity
-      //     for the first sample in our heatmap
-      var firstSampleNodes = this.activityCache.get(
+      // (1) first, we obtain a list of signatures by retrieving signature
+      //     activity for the first sample in our heatmap
+      var firstSampleSignatures = this.activityCache.get(
         this.heatmapData.samples[0]
       );
-      // (2a) next, we build a new array (`retval`) comprised of `nodeObject`s
-      //      by walking through the `firstSampleNodes` and constructing a
-      //      `nodeObject` for each. [outer .map()]
-      var retval = firstSampleNodes.map(function(val) {
-        var nodeObject = {
+      // (2a) next, we build a new array (`retval`) comprised of
+      //      `signatureObject`s by walking through the `firstSampleSignatures`
+      //       and constructing a signatureObject` for each. [outer .map()]
+      var retval = firstSampleSignatures.map(function(val) {
+        var signatureObject = {
           'id': val.node,
           'activity': this.heatmapData.samples.map(
-            // (2b) the array of activity for each node is built by plucking the
-            //      activity `.value` for each sample within this node from the
-            //      `activityCache` [inner .map()]
+            // (2b) the array of activity for each signature is built by
+            //      plucking the activity `.value` for each sample within this
+            //      signature from the `activityCache` [inner .map()]
             function(sampleId) {
-              // FIXME: counting on array order to match node order here
+              // FIXME: counting on array order to match signature order here
               return this.activityCache.get(sampleId)[val.node - 1].value;
             },
             this
           )
         };
-        return nodeObject;
+        return signatureObject;
       }, this);
 
       // (3) the two nested .map()s are all we need to do to organize the
@@ -202,74 +202,74 @@ MathFuncts, errGen) {
       ).$promise;
       return pSample;
     },
-    getCachedNodeInfo: function(pk) {
-      return this.nodeCache.get(pk);
+    getCachedSignature: function(pk) {
+      return this.signatureCache.get(pk);
     },
-    getNodeInfoSetPromise: function(pkArr) {
+    getSignatureSetPromise: function(pkArr) {
       // Check for any pk already cached, then retrieve what's missing in
-      // bulk via the set endpoint on the node API. Return a promise and
+      // bulk via the set endpoint on the signature API. Return a promise and
       // supply a callback that populates the cache when the API returns.
       var cbSampleBin = this; // closure link to SampleBin for callbacks
       var defer = $q.defer();
-      var cachedNodeInfoSet = [];
+      var cachedSignatureSet = [];
 
       var uncachedPkArr = pkArr.reduce(function(acc, val) {
-        var cachedVal = cbSampleBin.getCachedNodeInfo(val);
+        var cachedVal = cbSampleBin.getCachedSignature(val);
         if (!cachedVal) {
           // cache does not have this pk, so keep it in our accumulator
           acc.push(val);
         } else {
-          cachedNodeInfoSet.push(cachedVal);
+          cachedSignatureSet.push(cachedVal);
         }
         return acc;
       }, []);
       if (uncachedPkArr.length === 0) {
         // we've got everything cached already; return before calling the API
-        defer.resolve(cachedNodeInfoSet);
+        defer.resolve(cachedSignatureSet);
         return defer.promise;
       }
-      NodeInfoSet.get(
+      SignatureSet.get(
         {ids: uncachedPkArr.join(';')},
         function success(responseObject) {
           var i;
-          var nodeInfoArr = responseObject.objects;
-          for (i = 0; i < nodeInfoArr.length; i++) {
+          var signatureArr = responseObject.objects;
+          for (i = 0; i < signatureArr.length; i++) {
             // populate the cache with what came back
-            cbSampleBin.nodeCache.put(nodeInfoArr[i].id, nodeInfoArr[i]);
+            cbSampleBin.signatureCache.put(signatureArr[i].id, signatureArr[i]);
           }
-          defer.resolve(cachedNodeInfoSet.concat(nodeInfoArr));
+          defer.resolve(cachedSignatureSet.concat(signatureArr));
         },
         function error(httpResponse) {
-          $log.error(errGen('Error retrieving NodeInfoSet', httpResponse));
+          $log.error(errGen('Error retrieving SignatureSet', httpResponse));
           defer.reject(httpResponse);
         }
       );
 
       return defer.promise;
     },
-    getNodeInfoPromise: function(pk) {
-      // Retrieve NodeInfo data for node id=pk from a cache, if available,
-      // returning a promise that is already fulfilled. If node `pk` is not
+    getSignaturePromise: function(pk) {
+      // Retrieve Signature data for signature id=pk from a cache, if available,
+      // returning a promise that is already fulfilled. If signature `pk` is not
       // cached, use the API to get it and add it to the cache.
       var cbSampleBin = this; // closure link to SampleBin for callbacks
       var defer = $q.defer();
 
       // check the cache first and return what's there, if found
-      var cachedNode = this.getCachedNodeInfo(pk);
-      if (cachedNode) {
-        defer.resolve(cachedNode);
+      var cachedSignature = this.getCachedSignature(pk);
+      if (cachedSignature) {
+        defer.resolve(cachedSignature);
         return defer.promise;
       }
 
       // we didn't return above, so pk is not in the cache => fetch it
-      NodeInfo.get({id: pk},
+      Signature.get({id: pk},
         function success(responseObject) {
-          cbSampleBin.nodeCache.put(pk, responseObject);
+          cbSampleBin.signatureCache.put(pk, responseObject);
           defer.resolve(responseObject);
         },
         function error(httpResponse) {
           // TODO log an error message (see Issue #79)
-          $log.error(errGen('Error retrieving NodeInfo', httpResponse));
+          $log.error(errGen('Error retrieving Signature', httpResponse));
           defer.reject(httpResponse);
         }
       );
@@ -283,15 +283,17 @@ MathFuncts, errGen) {
       $log.error(errGen('Query errored', httpResponse));
     },
     clusterSamples: function() {
-      // TODO implement non-blocking response here as done for clusterNodes()
+      // TODO implement non-blocking response here as done for
+      // clusterSignatures()
       var sampleClust = hcluster()
         .distance('euclidean')
         .linkage('avg')
         .posKey('activity')
         .data(this.getSampleObjects());
-      this.heatmapData.samples = sampleClust.orderedNodes().map(this._getIDs);
+      this.heatmapData.samples = sampleClust.orderedNodes().map(
+        this._getIDs);
     },
-    clusterNodes: function() {
+    clusterSignatures: function() {
       // declare some closure variables our callbacks will need
       var cbSampleBin = this,
         defer = $q.defer();
@@ -305,14 +307,14 @@ MathFuncts, errGen) {
 
       return defer.promise.then(function() {
         // do the actual clustering (in the .data call here)
-        var nodeClust = hcluster()
+        var signatureClust = hcluster()
           .distance('euclidean')
           .linkage('avg')
           .posKey('activity')
-          .data(cbSampleBin.getNodeObjects());
+          .data(cbSampleBin.getSignatureObjects());
         // update the heatmap
-        cbSampleBin.heatmapData.nodeOrder =
-          nodeClust.orderedNodes().map(cbSampleBin._getIDs);
+        cbSampleBin.heatmapData.signatureOrder =
+          signatureClust.orderedNodes().map(cbSampleBin._getIDs);
       });
     },
 
@@ -345,9 +347,9 @@ MathFuncts, errGen) {
         for (var i = 0; i < samples.length; i++) {
           var sampleActivity = cbSampleBin.activityCache.get(samples[i]);
           newActivity = newActivity.concat(sampleActivity);
-          // re-initialize nodeOrder, if needed
-          if (i === 0 && cbSampleBin.heatmapData.nodeOrder.length === 0) {
-            cbSampleBin.heatmapData.nodeOrder = sampleActivity.map(
+          // re-initialize signatureOrder, if needed
+          if (i === 0 && cbSampleBin.heatmapData.signatureOrder.length === 0) {
+            cbSampleBin.heatmapData.signatureOrder = sampleActivity.map(
               function(val) {
                 return val.node;
               }
@@ -396,9 +398,9 @@ MathFuncts, errGen) {
     getVolcanoPlotData: function() {
       // use sample lists for base-group and comp-group to produce output for
       // the volcano plot of the form:
-      //   node - diff - logsig,
+      //   signature - diff - logsig,
       // where:
-      //   node = the node name as supplied by NodeInfo
+      //   signature = the signature name as supplied by Signature
       //   diff = mean(base-group activity values) -
       //          mean(comp-group activity values)
       //   logsig = -log10(p-value from 2-sample t-test on
@@ -415,62 +417,67 @@ MathFuncts, errGen) {
         return null;
       }
 
-      // (1a) we obtain a list of nodes by retrieving node activity
+      // (1a) we obtain a list of signatures by retrieving signature activity
       //      for the first sample in our volcano plot
-      var firstSampleNodes = this.activityCache.get(sg['base-group'][0]).map(
-        function(val) {
-          return val.node;  // extract just the node IDs
+      var firstSampleSignatures = this.activityCache.get(sg['base-group'][0])
+        .map(function(val) {
+          return val.node;  // extract just the signature IDs
         }
       );
-      // (1b) now obtain (and cache) a name for each node id
-      var nodeInfoSetPromise = this.getNodeInfoSetPromise(firstSampleNodes);
-      var mapNodesToNodeInfo = function() {
+      // (1b) now obtain (and cache) a name for each signature id
+      var signatureSetPromise = this.getSignatureSetPromise(
+        firstSampleSignatures);
+      var mapSignaturesToSignatureInfo = function() {
         // (2a) next, we build an array (replacing `volcanoData.source`)
-        //      comprised of `nodeObject`s by walking through the
-        //      `firstSampleNodes` and constructing a `nodeObject` for
+        //      comprised of `signatureObject`s by walking through the
+        //      `firstSampleSignatures` and constructing a `signatureObject` for
         //      each. [outer .map()]
-        var nodeInfoSet = firstSampleNodes.map(function(nodeId) {
-          // build the raw nodeInfoSet
+        var signatureSet = firstSampleSignatures.map(function(signatureId) {
+          // build the raw signatureSet
           var mapSampleIdsToActivity = function(sampleId) {
-            // (2b) the array of activity for each node is built by plucking the
-            //      activity `.value` for each sample within this node from the
-            //      `activityCache` [inner .map()]
-            // FIXME: counting on array order to match node order here
-            return cbSampleBin.activityCache.get(sampleId)[nodeId - 1].value;
+            // (2b) the array of activity for each signature is built by
+            //      plucking the activity `.value` for each sample within this
+            //      signature from the `activityCache` [inner .map()]
+            // FIXME: counting on array order to match signature order here
+            return cbSampleBin.activityCache.get(sampleId)[signatureId - 1]
+              .value;
           };
-          var nodeObject = {
-            'id': nodeId,
-            'name': cbSampleBin.getCachedNodeInfo(nodeId).name,
+          var signatureObject = {
+            'id': signatureId,
+            'name': cbSampleBin.getCachedSignature(signatureId).name,
             'activityA': sg['base-group'].map(mapSampleIdsToActivity),
             'activityB': sg['comp-group'].map(mapSampleIdsToActivity)
           };
-          nodeObject.diff = (
-            MathFuncts.mean(nodeObject.activityA) -
-            MathFuncts.mean(nodeObject.activityB)
+          signatureObject.diff = (
+            MathFuncts.mean(signatureObject.activityA) -
+            MathFuncts.mean(signatureObject.activityB)
           );
-          nodeObject.rawPValue = MathFuncts.tTest(
-            nodeObject.activityA, nodeObject.activityB
+          signatureObject.rawPValue = MathFuncts.tTest(
+            signatureObject.activityA, signatureObject.activityB
           ).pValue();
 
-          return nodeObject;
+          return signatureObject;
         });
 
-        // use FDR on the raw p-values from nodeInfoSet to get adjustedPValues
-        var rawPValues = nodeInfoSet.map(function getRawPValue(nodeObject) {
-          return nodeObject.rawPValue;
-        });
+        // use FDR on the raw p-values from signatureSet to get adjustedPValues
+        var rawPValues = signatureSet.map(
+          function getRawPValue(signatureObject) {
+            return signatureObject.rawPValue;
+          }
+        );
         var adjustedPValues = MathFuncts.multTest.fdr(rawPValues);
 
-        // compute logsig from the adjustedPValues & update the nodeInfoSet
-        nodeInfoSet.forEach(function(nodeObject, i) {
-          nodeObject.logsig = -Math.log10(adjustedPValues[i]);
+        // compute logsig from the adjustedPValues & update the signatureSet
+        signatureSet.forEach(function(signatureObject, i) {
+          signatureObject.logsig = -Math.log10(adjustedPValues[i]);
         });
-        cbSampleBin.volcanoData.source = nodeInfoSet;
+        cbSampleBin.volcanoData.source = signatureSet;
         // no return needed here: we've updated `cbSampleBin.volcanoData`
       };
-      // invoke mapNodesToNodeInfo only after nodeInfoSetPromise is fulfilled
-      nodeInfoSetPromise
-        .then(mapNodesToNodeInfo)
+      // invoke mapSignaturesToSignatureInfo only after signatureSetPromise is
+      // fulfilled
+      signatureSetPromise
+        .then(mapSignaturesToSignatureInfo)
         .catch(this.logError);
     }
   };

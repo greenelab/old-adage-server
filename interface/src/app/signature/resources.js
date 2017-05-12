@@ -1,11 +1,11 @@
-/* Resource classes used in node modules. */
+/* Resource classes used in signature modules. */
 
-angular.module('adage.node.resources', [
+angular.module('adage.signature.resources', [
   'ngResource',
   'adage.utils'
 ])
 
-.factory('NodeInfo', ['$resource', 'ApiBasePath',
+.factory('Signature', ['$resource', 'ApiBasePath',
   function($resource, ApiBasePath) {
     return $resource(ApiBasePath + 'node/:id');
   }

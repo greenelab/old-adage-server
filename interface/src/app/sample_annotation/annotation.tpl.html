@@ -5,7 +5,7 @@
 <table ng-hide="ctrl.queryStatus"
        class="table table-bordered table-striped table-hover table-condensed">
   <thead>
-    <th ng-if="ctrl.hasNode">Activity</th>
+    <th ng-if="ctrl.hasSignature">Activity</th>
     <th>Sample Name</th>
     <th ng-repeat="typeName in ctrl.uniqueAnnotationTypes">
       {{typeName}}
@@ -14,8 +14,8 @@
 
   <tbody>
     <tr ng-repeat=
-        "sample in ctrl.samples | orderBy: ctrl.hasNode ? '-activity' : 'name'">
-      <td ng-if="ctrl.hasNode">
+        "sample in ctrl.samples | orderBy: ctrl.hasSignature ? '-activity' : 'name'">
+      <td ng-if="ctrl.hasSignature">
         <strong>{{sample.activity | number: ctrl.activityDigits}}</strong>
       </td>
       <td>{{sample.name}}</td>
