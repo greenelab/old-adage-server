@@ -282,7 +282,7 @@ angular.module('adage.signature', [
                 exp.samples = [];
                 exp.numSelections = 0;
                 // Add "activity" property to each sample that is related to the
-                // current signature. (It will be used to order samples on web UI.)
+                // current signature (to order samples on web UI later).
                 response.data.objects.forEach(function(element) {
                   if (element.id in $scope.activities) {
                     element.activity = $scope.activities[element.id];
