@@ -161,17 +161,25 @@ MathFuncts, errGen) {
       );
       // (2a) next, we build a new array (`retval`) comprised of
       //      `signatureObject`s by walking through the `firstSampleSignatures`
-      //       and constructing a signatureObject` for each. [outer .map()]
-      var retval = firstSampleSignatures.map(function(val) {
+      //      and constructing a `signatureObject` for each. [outer .map()]
+      var retval = firstSampleSignatures.map(function(val, index) {
         var signatureObject = {
           'id': val.node,
           'activity': this.heatmapData.samples.map(
             // (2b) the array of activity for each signature is built by
-            //      plucking the activity `.value` for each sample within this
-            //      signature from the `activityCache` [inner .map()]
+            //      plucking the activity `.value` for each sample within the
+            //      `index`th signature from the `activityCache` [inner .map()]
             function(sampleId) {
-              // FIXME: counting on array order to match signature order here
-              return this.activityCache.get(sampleId)[val.node - 1].value;
+              var cachedActivity = this.activityCache.get(sampleId);
+              if (cachedActivity[index].node !== val.node) {
+                // ensure we're pulling out the right node (aka signature)
+                $log.error(
+                  'getSignatureObjects: signature IDs do not match. First ' +
+                  ' sample = ', val, ', but sample ' + sampleId + ' =',
+                  cachedActivity[index]
+                );
+              }
+              return cachedActivity[index].value;
             },
             this
           )
@@ -368,7 +376,8 @@ MathFuncts, errGen) {
           // cache miss, so populate the entry
           var p = Activity.get({
             'mlmodel': mlmodel,
-            'sample': samples[i]
+            'sample': samples[i],
+            'order_by': 'node'
           }).$promise;
           activityPromises.push(p);
           p.then(loadCache).catch(this.logError);
@@ -432,32 +441,42 @@ MathFuncts, errGen) {
         //      comprised of `signatureObject`s by walking through the
         //      `firstSampleSignatures` and constructing a `signatureObject` for
         //      each. [outer .map()]
-        var signatureSet = firstSampleSignatures.map(function(signatureId) {
-          // build the raw signatureSet
-          var mapSampleIdsToActivity = function(sampleId) {
-            // (2b) the array of activity for each signature is built by
-            //      plucking the activity `.value` for each sample within this
-            //      signature from the `activityCache` [inner .map()]
-            // FIXME: counting on array order to match signature order here
-            return cbSampleBin.activityCache.get(sampleId)[signatureId - 1]
-              .value;
-          };
-          var signatureObject = {
-            'id': signatureId,
-            'name': cbSampleBin.getCachedSignature(signatureId).name,
-            'activityA': sg['base-group'].map(mapSampleIdsToActivity),
-            'activityB': sg['comp-group'].map(mapSampleIdsToActivity)
-          };
-          signatureObject.diff = (
-            MathFuncts.mean(signatureObject.activityA) -
-            MathFuncts.mean(signatureObject.activityB)
-          );
-          signatureObject.rawPValue = MathFuncts.tTest(
-            signatureObject.activityA, signatureObject.activityB
-          ).pValue();
+        var signatureSet = firstSampleSignatures.map(
+          function(signatureId, index) {
+            // build the raw signatureSet
+            var mapSampleIdsToActivity = function(sampleId) {
+              // (2b) the array of activity for each signature is built by
+              //      plucking the activity `.value` for each sample within the
+              //      `index`th signature from the `activityCache`
+              //      [inner .map()]
+              var cachedActivity = cbSampleBin.activityCache.get(sampleId);
+              if (cachedActivity[index].node !== signatureId) {
+                // ensure we're pulling out the right node
+                $log.error(
+                  'mapSignaturesToSignatureInfo: signature IDs do not match.' +
+                  ' First sample = ' + signatureId + ', but sample ' +
+                  sampleId + ' =', cachedActivity[index]
+                );
+              }
+              return cachedActivity[index].value;
+            };
+            var signatureObject = {
+              'id': signatureId,
+              'name': cbSampleBin.getCachedSignature(signatureId).name,
+              'activityA': sg['base-group'].map(mapSampleIdsToActivity),
+              'activityB': sg['comp-group'].map(mapSampleIdsToActivity)
+            };
+            signatureObject.diff = (
+              MathFuncts.mean(signatureObject.activityA) -
+              MathFuncts.mean(signatureObject.activityB)
+            );
+            signatureObject.rawPValue = MathFuncts.tTest(
+              signatureObject.activityA, signatureObject.activityB
+            ).pValue();
 
-          return signatureObject;
-        });
+            return signatureObject;
+          }
+        );
 
         // use FDR on the raw p-values from signatureSet to get adjustedPValues
         var rawPValues = signatureSet.map(

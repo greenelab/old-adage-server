@@ -168,8 +168,8 @@ class Node(models.Model):
 
 
 class Activity(models.Model):
-    sample = models.ForeignKey(Sample, on_delete=models.PROTECT)
-    node = models.ForeignKey(Node, on_delete=models.PROTECT)
+    sample = models.ForeignKey(Sample, db_index=True, on_delete=models.PROTECT)
+    node = models.ForeignKey(Node, db_index=True, on_delete=models.PROTECT)
     value = models.FloatField()
 
     def __unicode__(self):

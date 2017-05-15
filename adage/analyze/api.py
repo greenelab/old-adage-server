@@ -324,6 +324,9 @@ class ActivityResource(ModelResource):
             'node': ('exact', 'in', ),
             'mlmodel': ('exact', ),  # See apply_filters()
         }
+        ordering = [
+            'sample', 'node'
+        ]
 
     def apply_filters(self, request, applicable_filters):
         """
