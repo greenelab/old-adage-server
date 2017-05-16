@@ -463,15 +463,15 @@ MathFuncts, errGen) {
             var signatureObject = {
               'id': signatureId,
               'name': cbSampleBin.getCachedSignature(signatureId).name,
-              'activityA': sg['base-group'].map(mapSampleIdsToActivity),
-              'activityB': sg['comp-group'].map(mapSampleIdsToActivity)
+              'activityBase': sg['base-group'].map(mapSampleIdsToActivity),
+              'activityComp': sg['comp-group'].map(mapSampleIdsToActivity)
             };
             signatureObject.diff = (
-              MathFuncts.mean(signatureObject.activityA) -
-              MathFuncts.mean(signatureObject.activityB)
+              MathFuncts.mean(signatureObject.activityBase) -
+              MathFuncts.mean(signatureObject.activityComp)
             );
             signatureObject.rawPValue = MathFuncts.tTest(
-              signatureObject.activityA, signatureObject.activityB
+              signatureObject.activityBase, signatureObject.activityComp
             ).pValue();
 
             return signatureObject;
