@@ -304,7 +304,7 @@ angular.module('adage.gene.network', [
             },
             function error(response) {
               var message = errGen(
-                'Failed to get signature info for gene edge: ', response);
+                'Failed to get signature info for gene edge', response);
               $log.error(message);
               htmlText += '<br>' + message + '. Please try again later.';
               edgeTip.html(htmlText);
@@ -441,7 +441,7 @@ angular.module('adage.gene.network', [
                   drawNetwork();
                 },
                 function error(response) {
-                  var message = errGen('Failed to get gene expression value: ',
+                  var message = errGen('Failed to get gene expression value',
                                        response);
                   $log.error(message);
                   self.statusMessage = message + '. Please try again later.';
@@ -449,14 +449,14 @@ angular.module('adage.gene.network', [
               );
             },
             function error(response) {
-              var message = errGen('Failed to get genes: ', response);
+              var message = errGen('Failed to get genes', response);
               $log.error(message);
               self.statusMessage = message + '. Please try again later.';
             }
           );
         },
         function error(response) {
-          var message = errGen('Failed to get edges: ', response);
+          var message = errGen('Failed to get edges', response);
           $log.error(message);
           self.statusMessage = message + '. Please try again later.';
         }
