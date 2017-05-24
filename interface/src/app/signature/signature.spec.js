@@ -109,8 +109,8 @@ describe('<high-range-exp> directive', function() {
       ' top-exp="{{topExp}}"></high-range-exp>';
 
     element = $compile(testHTML)(parentScope);
-    activityUri = '/api/v0/activity/?limit=0&node=' + parentScope.signatureID;
-    experimentUri = '/api/v0/experiment/?limit=0&node=' +
+    activityUri = '/api/v0/activity?limit=0&node=' + parentScope.signatureID;
+    experimentUri = '/api/v0/experiment?limit=0&node=' +
       parentScope.signatureID;
 
     mockExperiment = [{
@@ -153,27 +153,27 @@ describe('<high-range-exp> directive', function() {
   it('should get the appropriate activity values', function() {
     // Mocked activity response data:
     var mockActivity = [
-      {id: 1, signature: 123, sample: 1001, value: 0.0854334209211516},
-      {id: 2, signature: 123, sample: 1002, value: 0.0689115612702348},
-      {id: 3, signature: 123, sample: 1003, value: 0.0702073433150119},
-      {id: 4, signature: 123, sample: 1004, value: 0.0677049302827924},
-      {id: 5, signature: 123, sample: 1005, value: 0.0712094377832054},
-      {id: 6, signature: 123, sample: 1006, value: 0.0721038265557411},
-      {id: 7, signature: 123, sample: 1007, value: 0.0715914344928831},
-      {id: 8, signature: 123, sample: 1008, value: 0.0825894283807123},
-      {id: 9, signature: 123, sample: 1009, value: 0.0836206569872482},
-      {id: 10, signature: 123, sample: 1010, value: 0.0647705496729518},
-      {id: 11, signature: 123, sample: 1011, value: 0.0658942367538415},
-      {id: 12, signature: 123, sample: 1012, value: 0.0727115753936357},
-      {id: 13, signature: 123, sample: 1013, value: 0.0790896289324697},
-      {id: 14, signature: 123, sample: 1014, value: 0.0692046195604449},
-      {id: 15, signature: 123, sample: 1015, value: 0.078560557941843},
-      {id: 16, signature: 123, sample: 1016, value: 0.0743736434104904},
-      {id: 17, signature: 123, sample: 1017, value: 0.07871175918013},
-      {id: 18, signature: 123, sample: 1018, value: 0.0614160606502279},
-      {id: 19, signature: 123, sample: 1019, value: 0.0661371872868119},
-      {id: 20, signature: 123, sample: 1020, value: 0.0783672660119669},
-      {id: 21, signature: 123, sample: 1021, value: 0.0769023791604038}
+      {id: 1, node: 123, sample: 1001, value: 0.0854334209211516},
+      {id: 2, node: 123, sample: 1002, value: 0.0689115612702348},
+      {id: 3, node: 123, sample: 1003, value: 0.0702073433150119},
+      {id: 4, node: 123, sample: 1004, value: 0.0677049302827924},
+      {id: 5, node: 123, sample: 1005, value: 0.0712094377832054},
+      {id: 6, node: 123, sample: 1006, value: 0.0721038265557411},
+      {id: 7, node: 123, sample: 1007, value: 0.0715914344928831},
+      {id: 8, node: 123, sample: 1008, value: 0.0825894283807123},
+      {id: 9, node: 123, sample: 1009, value: 0.0836206569872482},
+      {id: 10, node: 123, sample: 1010, value: 0.0647705496729518},
+      {id: 11, node: 123, sample: 1011, value: 0.0658942367538415},
+      {id: 12, node: 123, sample: 1012, value: 0.0727115753936357},
+      {id: 13, node: 123, sample: 1013, value: 0.0790896289324697},
+      {id: 14, node: 123, sample: 1014, value: 0.0692046195604449},
+      {id: 15, node: 123, sample: 1015, value: 0.078560557941843},
+      {id: 16, node: 123, sample: 1016, value: 0.0743736434104904},
+      {id: 17, node: 123, sample: 1017, value: 0.07871175918013},
+      {id: 18, node: 123, sample: 1018, value: 0.0614160606502279},
+      {id: 19, node: 123, sample: 1019, value: 0.0661371872868119},
+      {id: 20, node: 123, sample: 1020, value: 0.0783672660119669},
+      {id: 21, node: 123, sample: 1021, value: 0.0769023791604038}
     ];
 
     $httpBackend.expectGET(activityUri).respond({objects: mockActivity});
