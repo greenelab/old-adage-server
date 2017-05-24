@@ -8,10 +8,7 @@
           ng-show="topMode">Show All</button>
 
   <br>
-  (Click
-  <i class="fa fa-plus-square fa-lg" aria-hidden="true"></i> or
-  <i class="fa fa-minus-square fa-lg" aria-hidden="true"></i>
-  to show or hide the samples related to both the signature and experiment.)
+  (Click the activity graph to see annotations of samples in this experiement.)
   <table class="table table-striped">
     <tbody>
       <!-- It may seem more intuitive to use:
@@ -21,52 +18,14 @@
          -->
       <tr ng-repeat="exp in experiments" ng-show="$index < numExpShown">
         <td>
-          <i class="fa fa-plus-square fa-lg" aria-hidden="true"
-             ng-show="!exp.isExpanded" ng-click="toggleExpansion(exp)"></i>
-          <i class="fa fa-minus-square fa-lg" aria-hidden="true"
-             ng-show="exp.isExpanded" ng-click="toggleExpansion(exp)"></i>
           <b>{{$index + 1}}. {{exp.accession}}: </b>{{exp.name}}
-
-          <!-- Location of vega-lite widget -->
-          <div id="{{ 'exp-' + $index }}"></div>
-
-          <div ng-if="exp.isExpanded">
-            <div ng-if="!exp.sampleStatus">
-              <table class="table table-bordered table-condensed table-hover">
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Activity</th>
-                    <th>Sample Name</th>
-                    <th>Data Source</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr ng-repeat="sample in exp.samples | orderBy: '-activity'"
-                      ng-class="{success: sample.selected}">
-                    <td>
-                      <label>
-                        <input type="checkbox" ng-model="sample.selected"
-                               ng-change="toggleSelection(exp, sample.selected)">
-                        {{$index + 1}}
-                      </label>
-                    </td>
-                    <td>{{sample.activity | number: activityDigits}}</td>
-                    <td>{{sample.name}}</td>
-                    <td>{{sample.ml_data_source}}</td>
-                  </tr>
-                </tbody>
-              </table>
-              <div style="text-align: center">
-                <button class="btn btn-md btn-success"
-                        ng-disabled="exp.numSelections === 0"
-                        ng-click="showAnnotations(exp)">
-                  Show Annotations of Selected Samples
-                </button>
-              </div>
-            </div>
-            <div ng-bind="exp.sampleStatus"></div>
-          </div>
+          <!-- vega-lite widget. If it is clicked, go to sample annotations
+               page. -->
+          <a ui-sref="sampleAnnotation(
+                      {signature: signatureId, samples: exp.sample_set.join()}
+                      )">
+            <div id="{{ 'exp-' + $index }}"></div>
+          </a>
         </td>
       </tr>
     </tbody>
