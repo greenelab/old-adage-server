@@ -13,9 +13,9 @@ from django.db.models import Q
 from django.test import TestCase
 from organisms.models import Organism
 from genes.models import Gene
-from analyze.models import Experiment, Sample, AnnotationType, SampleAnnotation
 from analyze.models import (
-    MLModel, Node, Activity, Edge, Participation, ParticipationType)
+    Experiment, Sample, AnnotationType, SampleAnnotation, MLModel, Node,
+    Activity, Edge, Participation, ParticipationType, ExpressionValue)
 from analyze.management.commands.import_data import (
     bootstrap_database, JSON_CACHE_FILE_NAME)
 from datetime import datetime
@@ -348,8 +348,12 @@ class BootstrapDBTestCase(TestCase):
 
 class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
     # API tests:
-    # For all of our interfaces, we should be able to GET, but every other
-    # REST API should fail: POST, PUT, PATCH, DELETE
+    # For most of our interfaces, we should be able to GET, but every other
+    # REST API should fail: POST, PUT, PATCH, DELETE. There are a few
+    # exceptions for which we allow POST but the behavior is the same as GET.
+    # This is done to work around the length limitations of URIs imposed on
+    # using GET by passing parameters to the API via the request body.
+    # Exceptions: ExpressionValueResource
 
     baseURI = '/api/v0/'
 
@@ -429,6 +433,9 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         self.num_gene1 = 100
         self.num_gene2 = 100
 
+        # Define the URI for testing ExpressionValue APIs
+        self.expressionvalueURI = self.baseURI + 'expressionvalue/'
+
     @staticmethod
     def create_activities(node_counter):
         """
@@ -459,14 +466,17 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         resp = self.api_client.get(uri)
         self.assertValidJSONResponse(resp)
 
-    def call_non_get_API(self, uri, data={}):
+    def call_post_API(self, uri):
         '''
-        Helper method: assert that the methods of POST, PUT, PATCH and DELETE
-        are NOT allowed via input URI.
+        Helper method: asserts that POST method is allowed via input URI.
         '''
-        # POST
-        resp = self.api_client.post(uri, data=data)
-        self.assertHttpMethodNotAllowed(resp)
+        resp = self.api_client.post(uri)
+        self.assertValidJSONResponse(resp)
+
+    def call_non_get_post_API(self, uri, data={}):
+        '''
+        Helper method: assert that PUT, PATCH and DELETE methods are NOT allowed
+        '''
         # PUT
         resp = self.api_client.put(uri, data=data)
         self.assertHttpMethodNotAllowed(resp)
@@ -476,6 +486,17 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         # DELETE
         resp = self.api_client.delete(uri, data=data)
         self.assertHttpMethodNotAllowed(resp)
+
+    def call_non_get_API(self, uri, data={}):
+        '''
+        Helper method: assert that the methods of POST, PUT, PATCH and DELETE
+        are NOT allowed via input URI.
+        '''
+        # POST
+        resp = self.api_client.post(uri, data=data)
+        self.assertHttpMethodNotAllowed(resp)
+        # other non-GET methods
+        self.call_non_get_post_API(uri, data=data)
 
     def test_experiment_get(self):
         """
@@ -907,3 +928,100 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
 
         # Test non-get methods too.
         self.call_non_get_API(filter_uri, data=data)
+
+    def create_expressionvalue_data(self, num_genes):
+        """
+        Generate test data for ExpressionValueResource
+        """
+        if Organism.objects.exists():
+            organism = Organism.objects.first()
+        else:
+            organism = factory.create(Organism)
+
+        if MLModel.objects.exists():
+            ml_model = MLModel.objects.first()
+        else:
+            ml_model = factory.create(MLModel)
+
+        # Create genes:
+        for i in range(num_genes):
+            Gene.objects.create(entrezid=(i + 1),
+                                systematic_name="sys_name #" + str(i + 1),
+                                standard_name="sys_name #" + str(i + 1),
+                                organism=organism)
+
+        # Note: no need to create samples. See setUp() above.
+
+        # Now, for each sample, randomly select Genes and create
+        # ExpressionValue objects for them
+        self.expressionvalue_total = 0
+        for s in Sample.objects.all():
+            num_ev_genes = random.randint(1, num_genes)
+            for g in random.sample(Gene.objects.all(), num_ev_genes):
+                factory.create(ExpressionValue, {
+                    'gene': g,
+                    'sample': s,
+                })
+                self.expressionvalue_total += 1
+
+    def test_expressionvalue_get(self):
+        """
+        Test that we can GET ExpressionValue data successfully
+        """
+        self.call_get_API(self.expressionvalueURI)
+
+    def test_expressionvalue_post(self):
+        """
+        Test that we can POST ExpressionValue data successfully
+        """
+        self.call_post_API(self.expressionvalueURI)
+
+    def test_expressionvalue_non_get_post(self):
+        """
+        Test to ensure we can not invoke PUT, PATCH or DELETE
+        """
+        self.call_non_get_post_API(self.expressionvalueURI)
+
+    def test_expressionvalue_creation(self):
+        """
+        Test that we can create ExpressionValue data correctly
+        """
+        self.create_expressionvalue_data(100)
+        self.assertEqual(
+            ExpressionValue.objects.count(),
+            self.expressionvalue_total
+        )
+
+    def test_expressionvalue_retrieval(self):
+        """
+        Test that we can retrieve ExpressionValue records from the API
+        """
+        self.create_expressionvalue_data(1000)
+        rs = APIResourceTestCase.random_object(Sample)
+        resp = self.api_client.get(self.expressionvalueURI, data={
+            'sample__in': rs.id
+        })
+        self.assertValidJSONResponse(resp)
+        ev_resp = self.deserialize(resp)
+        self.assertEqual(
+            ExpressionValue.objects.filter(sample=rs.id).count(),
+            len(ev_resp['objects'])
+        )
+
+    def test_expressionvalue_big_post(self):
+        """
+        Test that we can use POST to retrieve more ExpressionValue records
+        that would fit in the ~4k-char limit for a GET
+        """
+        # we select 1100 genes because representing those gene IDs will require
+        # >= (9*1 + 90*2 + 900*3 + 101*4)chars + (1100-1)delimiters = 4392 char
+        self.create_expressionvalue_data(1100)
+        gene_ids = ",".join([str(g.id) for g in Gene.objects.all()])
+        resp = self.api_client.post(self.expressionvalueURI, data={
+            'gene__in': gene_ids
+        })
+        self.assertValidJSONResponse(resp)
+        self.assertEqual(
+            self.deserialize(resp)['meta']['total_count'],
+            self.expressionvalue_total
+        )
