@@ -166,7 +166,7 @@ class ModelsTestCase(TestCase):
         for i in range(gene_counter):
             Gene.objects.create(entrezid=(i + 1),
                                 systematic_name="sys_name #" + str(i + 1),
-                                standard_name="sys_name #" + str(i + 1),
+                                standard_name="std_name #" + str(i + 1),
                                 organism=organism)
 
         # Select the first "num_gene1" genes as gene1.
@@ -947,14 +947,14 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         for i in range(num_genes):
             Gene.objects.create(entrezid=(i + 1),
                                 systematic_name="sys_name #" + str(i + 1),
-                                standard_name="sys_name #" + str(i + 1),
+                                standard_name="std_name #" + str(i + 1),
                                 organism=organism)
 
         # Note: no need to create samples. See setUp() above.
 
         # Now, for each sample, randomly select Genes and create
         # ExpressionValue objects for them
-        self.expressionvalue_total = 0
+        self.expressionvalue_count = 0
         for s in Sample.objects.all():
             num_ev_genes = random.randint(1, num_genes)
             for g in random.sample(Gene.objects.all(), num_ev_genes):
@@ -962,7 +962,7 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
                     'gene': g,
                     'sample': s,
                 })
-                self.expressionvalue_total += 1
+                self.expressionvalue_count += 1
 
     def test_expressionvalue_get(self):
         """
@@ -989,7 +989,7 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         self.create_expressionvalue_data(100)
         self.assertEqual(
             ExpressionValue.objects.count(),
-            self.expressionvalue_total
+            self.expressionvalue_count
         )
 
     def test_expressionvalue_retrieval(self):
@@ -1023,5 +1023,5 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         self.assertValidJSONResponse(resp)
         self.assertEqual(
             self.deserialize(resp)['meta']['total_count'],
-            self.expressionvalue_total
+            self.expressionvalue_count
         )
