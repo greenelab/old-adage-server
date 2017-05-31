@@ -24,6 +24,13 @@
           <a ui-sref="sampleAnnotation(
                       {signature: signatureId, samples: exp.sample_set.join()}
                       )">
+            <!-- The UI would look nicer if the tooltip showed up on the right
+                 side of the activity distribution map (instead of left side).
+                 But because the vega-lite widget takes the full width of the
+                 area, if we had set tooltip-placement to "right" or
+                 "right-top", the tooltip would have shown up way beyond the
+                 right border. So tooltip-placement is set to "left-top" here.
+              -->
             <div id="{{ 'exp-' + $index }}"
                  uib-tooltip-html="'<b>Click to see sample annotations</b>'"
                  tooltip-placement="left-top">
