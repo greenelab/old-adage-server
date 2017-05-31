@@ -8,7 +8,7 @@
           ng-show="topMode">Show All</button>
 
   <br>
-  (Click the activity graph to see annotations of samples in this experiement.)
+  (Click the activity distribution widget to see sample annotations in this experiement.)
   <table class="table table-striped">
     <tbody>
       <!-- It may seem more intuitive to use:
@@ -24,7 +24,10 @@
           <a ui-sref="sampleAnnotation(
                       {signature: signatureId, samples: exp.sample_set.join()}
                       )">
-            <div id="{{ 'exp-' + $index }}"></div>
+            <div id="{{ 'exp-' + $index }}"
+                 uib-tooltip-html="'<b>Click to see sample annotations</b>'"
+                 tooltip-placement="left-top">
+            </div>
           </a>
         </td>
       </tr>
