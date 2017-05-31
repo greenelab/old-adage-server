@@ -7,6 +7,7 @@
   <thead>
     <th ng-if="ctrl.hasSignature">Activity</th>
     <th>Sample Name</th>
+    <th>Data Source</th>
     <th ng-repeat="typeName in ctrl.uniqueAnnotationTypes">
       {{typeName}}
     </th>
@@ -19,6 +20,7 @@
         <strong>{{sample.activity | number: ctrl.activityDigits}}</strong>
       </td>
       <td>{{sample.name}}</td>
+      <td>{{sample.dataSource}}</td>
       <td ng-repeat="typeName in ctrl.uniqueAnnotationTypes">
         {{sample.annotations[typeName] ? sample.annotations[typeName] : ""}}
       </td>

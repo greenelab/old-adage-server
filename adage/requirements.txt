@@ -10,7 +10,7 @@ python-dateutil==2.5.0
 python-mimeparse==1.5.1
 six==1.10.0
 unicodecsv==0.14.1
-urllib3==1.14
+urllib3==1.21.1
 wsgiref==0.1.2
 django-genes>=0.11
 tribe-client>=1.1.8

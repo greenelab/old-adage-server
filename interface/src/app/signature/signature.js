@@ -92,8 +92,71 @@ angular.module('adage.signature', [
   }]
 )
 
-.directive('highRangeExp', ['$http', '$log', '$state', 'ActivityDigits',
-  function($http, $log, $state, ActivityDigits) {
+// A service that defines the specifications of embedded vega-lite widget.
+// It is used by "highRangeExp" directive.
+.service('EmbedSpecService', [function() {
+  // sample2index: a dictionary that maps a sample's ID to the index
+  // of this sample's activity value in "EmbedSpecService.spec.data.values".
+  // It will make the toggling of "highlight" flag faster.
+  sample2index = {};
+
+  this.mode = 'vega-lite';
+  this.actions = false;
+  // Method that sets vega-lite specification:
+  this.setSpec = function(activities) {
+    var activityArr = [];
+    var samples = Object.keys(activities);
+    samples.forEach(function(sampleID, index) {
+      activityArr.push({
+        'val': activities[sampleID],
+        'highlight': false
+      });
+      sample2index[sampleID] = index;
+    });
+
+    var vlSpec = {
+      'data': {values: activityArr},
+      'mark': 'tick',
+      'encoding': {
+        'x': {
+          'field': 'val',
+          'type': 'quantitative',
+          'axis': {
+            'grid': false,
+            'title': '',
+            'format': 'r'
+          }
+        },
+        'color': {
+          'field': 'highlight',
+          'type': 'nominal',
+          'scale': {'range': ['black', 'red']},
+          'legend': false
+        },
+        'size': {
+          'field': 'highlight',
+          'type': 'nominal',
+          'scale': {'range': [10, 30]},
+          'legend': false
+        }
+      }
+    };
+    this.spec = vlSpec;
+  };
+
+  // Method that toggles "highlight" flags based on input sample IDs:
+  this.toggleLines = function(samples) {
+    for (var i = 0; i < samples.length; ++i) {
+      var arrIndex = sample2index[samples[i]];
+      var val = this.spec.data.values[arrIndex].highlight;
+      this.spec.data.values[arrIndex].highlight = !val;
+    }
+  };
+}])
+
+.directive('highRangeExp', ['Activity', 'Experiment', 'EmbedSpecService',
+  'errGen', '$log',
+  function(Activity, Experiment, EmbedSpecService, errGen, $log) {
     return {
       templateUrl: 'signature/high_range_exp.tpl.html',
       restrict: 'E',
@@ -104,7 +167,6 @@ angular.module('adage.signature', [
       link: function($scope) {
         $scope.queryStatus = 'Connecting to the server ...';
         $scope.activities = {};
-        $scope.activityDigits = ActivityDigits;
         $scope.experiments = [];
         $scope.topMode = true;
         // If "top-exp" tag is not found, or its value is not a finite positive
@@ -127,210 +189,100 @@ angular.module('adage.signature', [
         $scope.numExpShown = $scope.topNum;
 
         // Get activities that are related to the current signature:
-        var httpConfig = {params: {node: $scope.signatureId, limit: 0}};
-        $http.get('/api/v0/activity/', httpConfig)
-          .then(function success(response) {
-            var sampleID;
-            for (var i = 0; i < response.data.objects.length; ++i) {
-              sampleID = response.data.objects[i].sample;
-              $scope.activities[sampleID] = response.data.objects[i].value;
-            }
-            return $http.get('/api/v0/experiment/', httpConfig);
-          }, function error(err) {
-            $log.error('Failed to get activities: ' + err.statusText);
-            $scope.queryStatus = 'Failed to get related activities from server';
-          })
-          // Get experiments that are related to the current signature:
-          .then(function success(response) {
-            // enhanceExpData: a function that enhances the given experiment.
-            // The enhancements include:
-            // (1) Add a new key "isExpanded", whose default is false;
-            // (2) Convert entries in sample_set from sample URI to sample ID,
-            //     and delete samples that are not related to current signature;
-            // (3) Add a new "range" key, which is the range of activity values.
-            //     (This key will be used to order experiments on web UI.)
-            var enhanceExpData = function(exp) {
-              exp.isExpanded = false;  // Enhancement (1)
-              var signatureRelatedSamples = [];
-              exp.sample_set.forEach(function(element) { // Enhancement (2)
-                var parts = element.split('/');
-                // The format of exp.sample_set[i] is "/api/v0/sample/1234/",
-                // so after the split, "parts" will always include 6 entries:
-                // ["", "api", "v0", "sample", "1234", ""]
-                var sampleID = parts[parts.length - 2];
-                if (sampleID in $scope.activities) {
-                  signatureRelatedSamples.push(sampleID);
-                }
-              });
-              exp['sample_set'] = signatureRelatedSamples;
-              // Enhancement (3): Add activity range
-              var minActivity = null;
-              var maxActivity = null;
-              var sampleID, currValue;
-              for (var i = 0, n = exp.sample_set.length; i < n; ++i) {
-                sampleID = exp.sample_set[i];
-                currValue = $scope.activities[sampleID];
-                if (!minActivity || minActivity > currValue) {
-                  minActivity = currValue;
-                }
-                if (!maxActivity || maxActivity < currValue) {
-                  maxActivity = currValue;
-                }
-              }
-              exp.range = maxActivity - minActivity;
-            }; // end of enhanceExpData() definition.
+        var activityPromise = Activity.get(
+          {node: $scope.signatureId, limit: 0}
+        ).$promise;
 
-            // setEmbedSpec: a function that sets the specification for
-            // vega-lite. The second parameter "sample2index" maps a sample's ID
-            // to the index of this sample in activityArr to make the toggling
-            // of "highlight" flag faster.
-            var setEmbedSpec = function(embedSpec, sample2index) {
-              var activityArr = [];
-              var samples = Object.keys($scope.activities);
-              for (var i = 0; i < samples.length; ++i) {
-                activityArr.push({
-                  'val': $scope.activities[samples[i]],
-                  'highlight': false
-                });
-                sample2index[samples[i]] = i;
+        // Function that will be called to handle experiment data
+        var handleExperimentResponse = function(response) {
+          // enhanceExpData: a function that enhances the given experiment.
+          // The enhancements include:
+          // (1) Convert entries in sample_set from sample URI to sample ID,
+          //     and delete samples that are not related to current signature;
+          // (2) Add a new "range" property, which is the range of activity
+          //     values, which will be used to order experiments on web UI.
+          var enhanceExpData = function(exp) {
+            var signatureRelatedSamples = [];
+            exp.sample_set.forEach(function(element) { // Enhancement (1)
+              var tokens = element.split('/');
+              // The format of exp.sample_set[i] is "/api/v<n>/sample/1234/",
+              // so after the split, "tokens" will always include 6 entries:
+              // ["", "api", "v<n>", "sample", "1234", ""]
+              var sampleID = tokens[tokens.length - 2];
+              if (sampleID in $scope.activities) {
+                signatureRelatedSamples.push(sampleID);
               }
-              var vlSpec = {
-                'data': {values: activityArr},
-                'mark': 'tick',
-                'encoding': {
-                  'x': {
-                    'field': 'val',
-                    'type': 'quantitative',
-                    'axis': {
-                      'grid': false,
-                      'title': '',
-                      'format': 'r'
-                    }
-                  },
-                  'color': {
-                    'field': 'highlight',
-                    'type': 'nominal',
-                    'scale': {'range': ['black', 'red']},
-                    'legend': false
-                  },
-                  'size': {
-                    'field': 'highlight',
-                    'type': 'nominal',
-                    'scale': {'range': [10, 30]},
-                    'legend': false
-                  }
-                }
-              };
-              embedSpec.spec = vlSpec;
-            }; // end of setEmbedSpec() definition.
-
-            // Enhance experiment objects and put them into $scope.experiments.
-            response.data.objects.forEach(function(element) {
-              enhanceExpData(element);
-              $scope.experiments.push(element);
             });
-            // Sort experiments by range in descending order:
-            $scope.experiments.sort(function(e1, e2) {
-              return e2.range - e1.range;
-            });
-
-            // Add vega-lite widget for each experiment:
-            var embedSpec = {'mode': 'vega-lite', 'actions': false};
-            var sample2index = {};
-
-            // toggleSampleHighlights(): a function that toggles "highlight"
-            // flag of samples in an experiment:
-            var toggleSampleHighlights = function(expIndex) {
-              var currExp = $scope.experiments[expIndex];
-              var j, sid, arrIndex, val;
-              for (j = 0; j < currExp.sample_set.length; ++j) {
-                sid = $scope.experiments[i].sample_set[j];
-                arrIndex = sample2index[sid];
-                val = embedSpec.spec.data.values[arrIndex].highlight;
-                embedSpec.spec.data.values[arrIndex].highlight = !val;
+            exp['sample_set'] = signatureRelatedSamples;
+            // Enhancement (2): Add activity range
+            var minActivity = null;
+            var maxActivity = null;
+            var sampleID, currValue;
+            for (var i = 0, n = exp.sample_set.length; i < n; ++i) {
+              sampleID = exp.sample_set[i];
+              currValue = $scope.activities[sampleID];
+              if (minActivity === null || minActivity > currValue) {
+                minActivity = currValue;
               }
-            };
-            setEmbedSpec(embedSpec, sample2index); // Initialize embedSpec.
-            // For each experiment, toggle the highlight flags (to true) for
-            // all of its samples, embed the vega-lite widget, and toggle these
-            // highlight flags again (to false). This procedure ensures that
-            // only activitity values in current experiment will be highlighted
-            // in the widget.
-            for (var i = 0, n = $scope.experiments.length; i < n; ++i) {
-              toggleSampleHighlights(i);
-              vg.embed('#exp-' + i, embedSpec, function(error, result) { });
-              toggleSampleHighlights(i);
+              if (maxActivity === null || maxActivity < currValue) {
+                maxActivity = currValue;
+              }
             }
-            // Clear $scope.queryStatus to indicate that the view is ready!
-            $scope.queryStatus = '';
-          }, function error(err) {
-            $log.error('Failed to get activities: ' + err.statusText);
-            $scope.queryStatus =
-              'Failed to get related experiments from server';
-          }); // end of $http.get().then().then() chaining.
+            exp.range = maxActivity - minActivity;
+          };
 
-        // Event handler when user clicks "+" or "-" icon in front of
-        // an experiment.
-        $scope.toggleExpansion = function(exp) {
-          exp.isExpanded = !exp.isExpanded;
-          // Get samples data if they are not available yet.
-          if (exp.isExpanded && !exp.samples) {
-            exp.sampleStatus = 'Connecting to the server ...';
-            var sampleURI = '/api/v0/sample/';
-            $http.get(sampleURI, {params: {experiment: exp.accession}})
-              .then(function success(response) {
-                exp.samples = [];
-                exp.numSelections = 0;
-                // Add "activity" property to each sample that is related to the
-                // current signature (to order samples on web UI later).
-                response.data.objects.forEach(function(element) {
-                  if (element.id in $scope.activities) {
-                    element.activity = $scope.activities[element.id];
-                    element.selected = false; // default: sample not selected.
-                    exp.samples.push(element);
-                  }
-                });
-                exp.sampleStatus = '';
-              }, function error(err) {
-                $log.error('Failed to get sample data: ' + err.statusText);
-                exp.sampleStatus = 'Failed to get sample data from ' +
-                  sampleURI;
-              }
-            );
-          }
+          // Enhance experiment objects and put them into $scope.experiments.
+          response.objects.forEach(function(element) {
+            enhanceExpData(element);
+            $scope.experiments.push(element);
+          });
+          // Sort experiments by range in descending order:
+          $scope.experiments.sort(function(e1, e2) {
+            return e2.range - e1.range;
+          });
+          // Add vega-lite widget for each experiment:
+          EmbedSpecService.setSpec($scope.activities);
+          $scope.experiments.forEach(function(exp, index) {
+            EmbedSpecService.toggleLines(exp.sample_set);
+            vg.embed('#exp-' + index, EmbedSpecService);
+            EmbedSpecService.toggleLines(exp.sample_set);
+          });
+          // Indicate that the view is ready!
+          $scope.queryStatus = '';
         };
+
+        // Handle activities that are releted to the current signature.
+        activityPromise.then(
+          function success(response) {
+            var sampleID;
+            for (var i = 0; i < response.objects.length; ++i) {
+              sampleID = response.objects[i].sample;
+              $scope.activities[sampleID] = response.objects[i].value;
+            }
+            return Experiment.get({node: $scope.signatureId, limit: 0})
+              .$promise;
+          },
+          function error(response) {
+            var errMessage = errGen('Failed to get activities', response);
+            $log.error(errMessage);
+            $scope.queryStatus = errMessage + '. Please try again later.';
+          }
+        )
+        // Handle experiments that are related to the current signature.
+        .then(
+          handleExperimentResponse,
+          function error(response) {
+            var errMessage = errGen('Failed to get experiments', response);
+            $log.error(errMessage);
+            $scope.queryStatus = errMessage + '. Please try again later.';
+          }
+        );
 
         // Event handler when user clicks "Show All" or "Show Top N" button.
         $scope.setMode = function() {
           $scope.topMode = !$scope.topMode;
           $scope.numExpShown =
             $scope.topMode ? $scope.topNum : $scope.experiments.length;
-        };
-
-        // Event handler when user clicks the checkbox in front of each sample.
-        // It keeps track of the number of selected samples in each experiment
-        // to indicate whether the "show annotations" button should be enabled.
-        $scope.toggleSelection = function(exp, selected) {
-          if (selected) {
-            ++exp.numSelections;
-          } else {
-            --exp.numSelections;
-          }
-        };
-
-        // Event handler when user clicks the "show annotations" button:
-        $scope.showAnnotations = function(exp) {
-          var selectedSampleIDs = [];
-          exp.samples.forEach(function(sample) {
-            if (sample.selected) {
-              selectedSampleIDs.push(sample.id);
-            }
-          });
-          var stateParams = {
-            signature: $scope.signatureId,
-            samples: selectedSampleIDs.join()
-          };
-          $state.go('sampleAnnotation', stateParams);
         };
       } // end of link function
     };
@@ -364,7 +316,7 @@ angular.module('adage.signature', [
 
         // This is the main function that calculates the geneset enrichments.
         // It calculates the enrichment for each geneset that has genes
-        // also present in the signature high weight genes, and pushes that
+        // also present in the signature's high weight genes, and pushes that
         // geneset into the releventGenesetArray.
         var calculateEnrichments = function(geneGenesets, allGenesetInfo,
                                             totalGeneNum, cutoff) {
