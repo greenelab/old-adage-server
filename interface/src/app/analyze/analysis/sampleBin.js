@@ -19,9 +19,7 @@ angular.module('adage.analyze.sampleBin', [
       {},
       {post: {
         method: 'POST',
-        // Setting Content-Type is required. Django will not process the
-        // POST data the way Angular's defaults send it.
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+        headers: {'Content-Type': 'text/plain'}
       }}
     );
   }
