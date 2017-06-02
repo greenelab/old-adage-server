@@ -14,7 +14,16 @@ angular.module('adage.analyze.sampleBin', [
 
 .factory('SignatureSet', ['$resource', 'ApiBasePath',
   function($resource, ApiBasePath) {
-    return $resource(ApiBasePath + 'node/set/:ids/');
+    return $resource(
+      ApiBasePath + 'node/post_multiple/',
+      {},
+      {post: {
+        method: 'POST',
+        // Setting Content-Type is required. Django will not process the
+        // POST data the way Angular's defaults send it.
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+      }}
+    );
   }
 ])
 
@@ -230,8 +239,9 @@ MathFuncts, errGen) {
         defer.resolve(cachedSignatureSet);
         return defer.promise;
       }
-      SignatureSet.get(
-        {ids: uncachedPkArr.join(';')},
+      SignatureSet.post(
+        {},
+        uncachedPkArr.join(';'),
         function success(responseObject) {
           var i;
           var signatureArr = responseObject.objects;
