@@ -452,6 +452,8 @@ angular.module('adage.signature', [
                 $scope.queryStatus = 'Failed to get genesets from server';
               }
             );
+          } else {
+            $scope.enrichedGenesets = [];
           }
         });
       }
