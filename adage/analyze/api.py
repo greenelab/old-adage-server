@@ -437,6 +437,7 @@ class ParticipationResource(ModelResource):
         filtering = {
             'node': ('exact', 'in', ),
             'gene': ('exact', 'in', ),
+            'participation_type': ('exact', ),
         }
 
 
