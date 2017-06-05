@@ -5,8 +5,8 @@
 angular.module('adage.sampleAnnotation', [
   'ui.router',
   'ui.bootstrap',
-  'ngResource',
   'adage.utils',
+  'adage.signature.resources',
   'adage.sample.services'
 ])
 
@@ -22,12 +22,6 @@ angular.module('adage.sampleAnnotation', [
     data: {pageTitle: 'Sample Annotations'}
   });
 }])
-
-.factory('Activity', ['$resource', 'ApiBasePath',
-  function($resource, ApiBasePath) {
-    return $resource(ApiBasePath + 'activity');
-  }
-])
 
 .controller('SampleAnnotationCtrl', [
   '$stateParams', '$q', '$log', 'errGen', 'Activity', 'Sample',
@@ -101,6 +95,7 @@ angular.module('adage.sampleAnnotation', [
               sampleDict[element.id] = {};
             }
             sampleDict[element.id].name = element.name;
+            sampleDict[element.id].dataSource = element.ml_data_source;
             sampleDict[element.id].annotations = element.annotations;
             var currentTypes = Object.keys(element.annotations);
             currentTypes.forEach(function(annotationType) {

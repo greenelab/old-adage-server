@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from organisms.api import OrganismResource
 from genes.api import GeneResource
 from tastypie import fields, http
-from tastypie.resources import Resource, ModelResource
+from tastypie.resources import Resource, ModelResource, convert_post_to_VERB
 from tastypie.utils import trailing_slash
 from tastypie.bundle import Bundle
 from tastypie.exceptions import BadRequest
@@ -448,7 +448,8 @@ class ExpressionValueResource(ModelResource):
     class Meta:
         queryset = ExpressionValue.objects.all()
         include_resource_uri = False
-        allowed_methods = ['get']
+        list_allowed_methods = ['get', 'post']
+        detail_allowed_methods = ['get']
         limit = 0
         max_limit = 0
         filtering = {
@@ -457,3 +458,14 @@ class ExpressionValueResource(ModelResource):
         }
         # Allow ordering by gene ID.
         ordering = ['gene']
+
+    def post_list(self, request, **kwargs):
+        """
+        handle an incoming POST as a GET to work around URI length limitations
+        """
+        # The convert_post_to_VERB() technique is borrowed from
+        # resources.py in tastypie source. This helps us to convert the POST
+        # to a GET in the proper way internally.
+        request.method = 'GET'  # override the incoming POST
+        dispatch_request = convert_post_to_VERB(request, 'GET')
+        return self.dispatch('list', dispatch_request, **kwargs)

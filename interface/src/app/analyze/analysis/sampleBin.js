@@ -12,12 +12,6 @@ angular.module('adage.analyze.sampleBin', [
   'adage.signature.resources'
 ])
 
-.factory('Activity', ['$resource', 'ApiBasePath',
-  function($resource, ApiBasePath) {
-    return $resource(ApiBasePath + 'activity/');
-  }
-])
-
 .factory('SignatureSet', ['$resource', 'ApiBasePath',
   function($resource, ApiBasePath) {
     return $resource(ApiBasePath + 'node/set/:ids/');

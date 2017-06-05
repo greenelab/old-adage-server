@@ -56,15 +56,26 @@ angular.module('adage.gene.network', [
 
 .factory('ExpressionValue', ['$resource', 'ApiBasePath',
   function($resource, ApiBasePath) {
-    return $resource(ApiBasePath + 'expressionvalue');
+    return $resource(
+      ApiBasePath + 'expressionvalue/',
+      {},
+      {post: {
+        method: 'POST',
+        // Setting Content-Type is required. Django will not process the
+        // POST data the way Angular's defaults send it.
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+      }}
+    );
   }
 ])
 
 .controller('GeneNetworkCtrl',
   ['$stateParams', 'Edge', 'Signature', 'Gene', 'ExpressionValue', '$log',
-    'errGen',
-    function GeneNetworkController($stateParams, Edge, Signature, Gene,
-                                 ExpressionValue, $log, errGen) {
+    'errGen', '$httpParamSerializerJQLike',
+    function GeneNetworkController(
+      $stateParams, Edge, Signature, Gene, ExpressionValue, $log, errGen,
+      $httpParamSerializerJQLike
+    ) {
       var self = this;
       // Do nothing if no genes are specified in URL.
       if (!$stateParams.genes || !$stateParams.genes.split(',').length) {
@@ -304,7 +315,7 @@ angular.module('adage.gene.network', [
             },
             function error(response) {
               var message = errGen(
-                'Failed to get signature info for gene edge: ', response);
+                'Failed to get signature info for gene edge', response);
               $log.error(message);
               htmlText += '<br>' + message + '. Please try again later.';
               edgeTip.html(htmlText);
@@ -390,9 +401,16 @@ angular.module('adage.gene.network', [
                 return g.id;
               });
 
-              ExpressionValue.get(
-                {'gene__in': geneID.join(), 'sample__in': sampleID.join(),
-                  'order_by': 'gene'},
+              ExpressionValue.post(
+                {},
+                // Angular does not serialize POST data the way we would expect
+                // so we have to do it manually here. For more details, see
+                // https://github.com/angular/angular.js/issues/6039#issuecomment-113502695
+                $httpParamSerializerJQLike({
+                  'sample__in': sampleID.join(),
+                  'order_by': 'gene',
+                  'gene__in': geneID.join()
+                }),
                 function success(responseObject) {
                   // Function that calculates input gene's expression value
                   // based on the input array of base and comparison sums.
@@ -441,7 +459,7 @@ angular.module('adage.gene.network', [
                   drawNetwork();
                 },
                 function error(response) {
-                  var message = errGen('Failed to get gene expression value: ',
+                  var message = errGen('Failed to get gene expression value',
                                        response);
                   $log.error(message);
                   self.statusMessage = message + '. Please try again later.';
@@ -449,14 +467,14 @@ angular.module('adage.gene.network', [
               );
             },
             function error(response) {
-              var message = errGen('Failed to get genes: ', response);
+              var message = errGen('Failed to get genes', response);
               $log.error(message);
               self.statusMessage = message + '. Please try again later.';
             }
           );
         },
         function error(response) {
-          var message = errGen('Failed to get edges: ', response);
+          var message = errGen('Failed to get edges', response);
           $log.error(message);
           self.statusMessage = message + '. Please try again later.';
         }
