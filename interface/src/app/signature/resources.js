@@ -15,4 +15,12 @@ angular.module('adage.signature.resources', [
   function($resource, ApiBasePath) {
     return $resource(ApiBasePath + 'participation/');
   }
-]);
+])
+
+.factory('ParticipationType', ['$resource', 'ApiBasePath',
+  function($resource, ApiBasePath) {
+    return $resource(ApiBasePath + 'participationtype/');
+  }
+])
+
+;
