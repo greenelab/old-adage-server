@@ -3,14 +3,14 @@
  *
  **/
 
-// Test <high-weight-genes> directive.
-describe('<high-weight-genes> directive', function() {
+// Test <participatory-genes> directive.
+describe('<participatory-genes> directive', function() {
   beforeEach(module('adage.signature'));
 
   // Thanks to "grunt-html2js" module (called by Grunt), the template file
   // "signature/high_weight_genes.tpl.html" has been converted into an Angular
   // module of the same name and put in $templateCache before karma runs.
-  beforeEach(module('signature/high_weight_genes.tpl.html'));
+  beforeEach(module('signature/participatory_genes.tpl.html'));
 
   var $compile, $httpBackend, $rootScope;
   beforeEach(inject(function(_$compile_, _$httpBackend_, _$rootScope_) {
@@ -21,11 +21,15 @@ describe('<high-weight-genes> directive', function() {
 
   it('should render HTML correctly', function() {
     var parentScope = $rootScope.$new();
-    parentScope.signatureID = 123;
-    var testHTML = '<high-weight-genes signature-id="{{signatureID}}" ' +
-        'genes="ctrl.genes"></high-weight-genes>';
-    var uri = '/api/v0/participation?limit=0&node=' + parentScope.signatureID;
+    parentScope.signatureId = 123;
+    parentScope.selectedParticipationType = null;
+
+    var testHTML = '<participatory-genes signature-id="{{signatureId}}" ' +
+        'genes="genes" selected-participation-type=' +
+        '"selectedParticipationType"></participatory-genes>';
+
     var element = $compile(testHTML)(parentScope);
+    parentScope.$digest(); // Start Angular's digest cycle manually.
 
     // Mocked response data of genes:
     var mockGenes = [
@@ -46,11 +50,28 @@ describe('<high-weight-genes> directive', function() {
       }}
     ];
 
+    // Get isolate scope of <participatory-genes> directive:
+    var elementScope = element.isolateScope();
+
+    expect(elementScope).toBeDefined();
+
+    parentScope.selectedParticipationType = {
+      'description': 'Genes in this node are high-weight',
+      'id': 1, 'name': 'High weight genes',
+      'resource_uri': '/api/v0/participationtype/1/'
+    };
+
+    var uri = '/api/v0/participation?limit=0&node=' + parentScope.signatureId +
+        '&participation_type=' + parentScope.selectedParticipationType.id;
+
     $httpBackend.expectGET(uri).respond({objects: mockGenes});
+
     parentScope.$digest(); // Start Angular's digest cycle manually.
 
-    // Get isolate scope of <high-weight-genes> directive:
-    var elementScope = element.isolateScope();
+    // Check to make sure that the properties from the parentScope have
+    // been inherited to the child scope (elementScope in this case).
+    expect(elementScope.signatureId).toBe('123');
+    expect(elementScope.selectedParticipationType.id).toBe(1);
 
     // Before $httpBackend.flush() is called, no backend data is available;
     // so queryStatus in the directive's scope keeps its initial value, and
