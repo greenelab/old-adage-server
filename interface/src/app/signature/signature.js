@@ -23,8 +23,39 @@ angular.module('adage.signature', [
   });
 }])
 
-.controller('SignatureCtrl', ['Signature', '$stateParams', '$log',
-  function SignatureController(Signature, $stateParams, $log) {
+.component('participationTypeSelector', {
+  templateUrl: 'signature/participation-type-selector.tpl.html',
+  bindings: {
+    selectedParticipationType: '=',
+    onChange: '&'
+  },
+  controller: ['ParticipationType', '$log', function(ParticipationType, $log) {
+    var self = this;
+
+    // apiReturnLimit is what the 'limit' parameter will be set to in the
+    // ParticipationType resource's GET request. By setting it to 0, we
+    // are actually telling the Tastypie API that we want it to return ALL
+    // objects from this endpoint (i.e. that we do not want a maximum
+    // limit to how many objects it returns).
+    var apiReturnLimit = 0;
+
+    ParticipationType.get({limit: apiReturnLimit},
+      function success(response) {
+        self.availableParticipationTypes = response.objects;
+        self.selectedParticipationType = response.objects[0];
+      },
+      function error(response) {
+        var errMessage = errGen('Failed to get ParticipationTypes: ',
+                                response);
+        $log.error(errMessage);
+        self.errorMessage = errMessage + '. Please try again later.';
+      }
+    );
+  }]
+})
+
+.controller('SignatureCtrl', ['Signature', '$stateParams', '$log', 'errGen',
+  function SignatureController(Signature, $stateParams, $log, errGen) {
     var self = this;
     if (!$stateParams.id) {
       self.statusMessage = 'Please specify signature ID in the URL.';
@@ -37,56 +68,66 @@ angular.module('adage.signature', [
       function success(response) {
         self.name = response.name;
         self.mlmodel = response.mlmodel.title;
+        self.organism = response.mlmodel.organism.scientific_name;
         self.statusMessage = '';
       },
-      function error(err) {
-        $log.error('Failed to get signature information: ' + err.statusText);
-        self.statusMessage = 'Failed to get signature information from server';
+      function error(response) {
+        var errMessage = errGen('Failed to get signature information: ',
+                                response);
+        $log.error(errMessage);
+        self.statusMessage = errMessage + '. Please try again later.';
       }
     );
-    self.organism = 'Pseudomonas aeruginosa';
     self.genes = [];
   }
 ])
 
-.directive('highWeightGenes', ['Participation', '$log',
+.directive('participatoryGenes', ['Participation', '$log',
   function(Participation, $log) {
     return {
-      templateUrl: 'signature/high_weight_genes.tpl.html',
+      templateUrl: 'signature/participatory_genes.tpl.html',
       restrict: 'E',
       scope: {
         signatureId: '@',
+        selectedParticipationType: '=',
         genes: '='
       },
       link: function($scope) {
         $scope.queryStatus = 'Connecting to the server ...';
-        Participation.get(
-          {node: $scope.signatureId, limit: 0},
-          function success(response) {
-            $scope.genes = [];
-            var i = 0, n = response.objects.length;
-            var sysName, stdName, desc;
-            var numHypo = 0;
-            for (; i < n; ++i) {
-              sysName = response.objects[i].gene.systematic_name;
-              stdName = response.objects[i].gene.standard_name;
-              desc = response.objects[i].gene.description;
-              entrezID = response.objects[i].gene.entrezid;
-              if (desc.toLowerCase() === 'hypothetical protein') {
-                ++numHypo;
+        $scope.$watch('selectedParticipationType', function() {
+          if ($scope.selectedParticipationType) {
+            Participation.get(
+              {node: $scope.signatureId, limit: 0,
+               participation_type: $scope.selectedParticipationType.id},
+              function success(response) {
+                $scope.genes = [];
+                var i = 0, n = response.objects.length;
+                var sysName, stdName, desc;
+                var numHypo = 0;
+                for (; i < n; ++i) {
+                  sysName = response.objects[i].gene.systematic_name;
+                  stdName = response.objects[i].gene.standard_name;
+                  desc = response.objects[i].gene.description;
+                  entrezID = response.objects[i].gene.entrezid;
+                  if (desc.toLowerCase() === 'hypothetical protein') {
+                    ++numHypo;
+                  }
+                  $scope.genes.push(
+                    {sysName: sysName, stdName: stdName, desc: desc,
+                      entrezID: entrezID});
+                }
+                $scope.hypoPercentage = Math.round(numHypo / n * 100);
+                $scope.queryStatus = '';
+              },
+              function error(response) {
+                var errMessage = errGen('Failed to get participatory genes: ',
+                                        response);
+                $log.error(errMessage);
+                self.statusMessage = errMessage + '. Please try again later.';
               }
-              $scope.genes.push(
-                {sysName: sysName, stdName: stdName, desc: desc,
-                  entrezID: entrezID});
-            }
-            $scope.hypoPercentage = Math.round(numHypo / n * 100);
-            $scope.queryStatus = '';
-          },
-          function error(err) {
-            $log.error('Failed to get high weight genes: ' + err.statusText);
-            $scope.queryStatus = 'Failed to get high weight genes from server';
+            );
           }
-        );
+        });
       }
     };
   }]
@@ -344,6 +385,7 @@ angular.module('adage.signature', [
       restrict: 'E',
       scope: {
         organism: '@',
+        selectedParticipationType: '=',
         genes: '=' // an array of high-weight genes in the Signature page.
       },
       link: function($scope) {
