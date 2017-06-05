@@ -1,0 +1,7 @@
+<div class="alert alert-danger" role="alert" ng-if="$ctrl.errorMessage">
+  {{$ctrl.errorMessage}}
+</div>
+<select name="selectedParticipationType"
+  ng-options="opt.name for opt in $ctrl.availableParticipationTypes track by opt.id"
+  ng-model="$ctrl.selectedParticipationType">
+</select>
