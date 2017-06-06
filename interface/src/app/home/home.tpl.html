@@ -1,6 +1,32 @@
-<div>
+<div class="page-header">
   <h1>ADAGE: Home</h1>
-  <p class="lead">
-    This shell is the framework into which the ADAGE server will grow.
-  </p>
+</div>
+
+<h3>Step 1: Choose a machine leanring model</h3>
+<ml-model-selector selected-ml-model="ctrl.modelInfo"
+                   on-change="ctrl.changeModel(value)">
+</ml-model-selector>
+
+<hr>
+<div ng-show="ctrl.modelInfo.title">
+  <h3>Step 2: Now that the model is set, you have three options:</h3>
+    <ul>
+      <li>
+        <h4><a ui-sref="analyze({mlmodel: modelInfo.id})">
+            Explore assays and experiments
+        </a></h4>
+      </li>
+
+      <li>
+        <h4><a ui-sref="gene_search({mlmodel: modelInfo.id})">
+            Explore genes' model similarities
+        </a></h4>
+      </li>
+
+      <li>
+        <h4><a ui-sref="signature_search({mlmodel: modelInfo.id})">
+            Explore model signatures
+        </a></h4>
+      </li>
+    </ul>
 </div>

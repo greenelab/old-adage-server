@@ -7,6 +7,7 @@
 </div>
 
 <div ng-if="ctrl.isValidModel">
+  <h3 class="text-warning" ng-bind="ctrl.statusMessage"></h3>
   <div ng-hide="ctrl.statusMessage">
     <form>
       <strong>Correlation Range:</strong>
@@ -37,5 +38,4 @@
        See details in GitHub Issue #25.
     -->
   <div id="chart"></div>
-  <h3 class="text-warning" ng-bind="ctrl.statusMessage"></h3>
 </div>

@@ -29,6 +29,13 @@ angular.module('adage.volcano-plot.view', [
   //      to make a plot from those lists)
   function VolcanoPlotViewCtrl(SampleBin, $stateParams) {
     var ctrl = this;
+    ctrl.isValidModel = false;
+    // Do nothing if mlmodel in URL is falsey. The error will be taken
+    // care of by "<ml-model-validator>" component.
+    if (!$stateParams.mlmodel) {
+      return;
+    }
+
     this.mlModel = $stateParams.mlmodel;
     SampleBin.getVolcanoPlotData();
     this.sampleGroups = SampleBin.getSamplesByGroup();

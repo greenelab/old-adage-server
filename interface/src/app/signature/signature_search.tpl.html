@@ -1,28 +1,32 @@
-<h1>ADAGE: Search a Signature by Name</h1>
-
-<div class="well well-sm">
-  <h4>Machine Learning Model:</h4>
-  <ml-model-selector selected-ml-model="mlModel"></ml-model-selector>
+<div class="page-header">
+  <h1>ADAGE: Search Signature by Name</h1>
+  <ml-model-view></ml-model-view>
+  <ml-model-validator model-id="ctrl.modelInUrl"
+                      is-valid-model="ctrl.isValidModel">
+  </ml-model-validator>
 </div>
 
-<h4 class="text-warning"  ng-bind="statusMessage"></h4>
+<div ng-if="ctrl.isValidModel">
+  <h4 class="text-warning" ng-bind="ctrl.statusMessage"></h4>
 
-<!-- We are using "ng-hide" (instead of "ng-if") here because we want to
-     keep the filter string when user selects another ML model. -->
-<div class="container" ng-hide="statusMessage">
-  <div class="row">
-    <div class="col-sm-3">
-      <h4><strong>Signatures in Selected Model:</strong></h4>
+  <!-- We are using "ng-hide" (instead of "ng-if") here because we want to
+       keep the filter string when user selects another ML model. -->
+  <div class="container" ng-hide="ctrl.statusMessage">
+    <div class="row">
+      <div class="col-sm-3">
+        <h4><strong>Signatures in Selected Model:</strong></h4>
+      </div>
+
+      <div class="col-sm-3">
+        <input class="form-control" placeholder="Filter"
+               ng-model="ctrl.nameFilter">
+      </div>
     </div>
 
-    <div class="col-sm-3">
-      <input class="form-control" placeholder="Filter"
-             ng-model="nameFilter">
+    <div class="col-sm-3"
+         ng-repeat="signature in ctrl.signatures
+                    | filter: {name: ctrl.nameFilter}">
+      <h4><a ui-sref="signature({id: signature.id})">{{signature.name}}</a></h4>
     </div>
-  </div>
-
-  <div class="col-sm-3"
-       ng-repeat="signature in signatures | filter: {name: nameFilter}">
-    <h4><a ui-sref="signature({id: signature.id})">{{signature.name}}</a></h4>
   </div>
 </div>

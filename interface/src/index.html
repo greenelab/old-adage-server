@@ -8,12 +8,14 @@
     <meta property="og:title" content="adage" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="http://adage.greenelab.com" />
-    <meta property="og:description" content="ADAGE: TODO: A description of the adage server and its purpose belongs here.">
+    <meta property="og:description"
+          content="ADAGE: A webserver for exploratory analyses guided by machine learning.">
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <!-- font awesome from BootstrapCDN -->
-    <link href="http://netdna.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.css" rel="stylesheet">
+    <link href="http://netdna.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.css"
+          rel="stylesheet">
 
     <!-- compiled CSS --><% styles.forEach( function ( file ) { %>
     <link rel="stylesheet" type="text/css" href="/static/<%= file %>" /><% }); %>
@@ -68,22 +70,25 @@
               </a>
             </li>
             <li ui-sref-active="active">
-              <a ui-sref="analyze">
-                Analyze
-              </a>
-            </li>
-            <li ui-sref-active="active">
               <a ui-sref="download">
                 Download
               </a>
             </li>
+            <li ui-sref-active="active">
+              <a ui-sref="analyze({mlmodel: modelInfo.id})"
+                 ng-show="modelInfo.title">
+                Analyze
+              </a>
+            </li>
             <li ng-class="{active: inGeneStates()}">
-              <a ui-sref="gene_search">
+              <a  ui-sref="gene_search({mlmodel: modelInfo.id})"
+                  ng-show="modelInfo.title">
                 GeneNetwork
               </a>
             </li>
             <li ng-class="{active: inSignatureStates()}">
-              <a ui-sref="signature_search">
+              <a ui-sref="signature_search({mlmodel: modelInfo.id})"
+                 ng-show="modelInfo.title">
                 Signature
               </a>
             </li>
@@ -98,6 +103,19 @@
             <profile-button ng-if="userObj"></profile-button>
           </ul>
         </div>
+
+        <!-- Current machine learning model
+        <div class="row">
+          <div class="col-sm-1"></div>
+          <div class="col-sm-11">
+            <span>Current Model: </span>
+            <span class="text-danger" ng-bind="modelInfo.title || 'Not Set'">
+            </span>
+            <span>(Click <a href="#/home">Home</a> to change)</span>
+          </div>
+        </div>
+        End of machine learning model info part
+        -->
       </div>
     </div>
 

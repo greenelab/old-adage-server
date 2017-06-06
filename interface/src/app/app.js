@@ -1,4 +1,6 @@
 angular.module('adage', [
+  'ui.router',
+  'ngResource',
   'templates-app',
   'templates-common',
   'adage.home',
@@ -16,8 +18,7 @@ angular.module('adage', [
   'adage.help',
   'adage.sampleAnnotation',
   'adage.volcano-plot.view',
-  'ui.router',
-  'ngResource'
+  'adage.utils'
 ])
 
 .config(function myAppConfig($stateProvider, $urlRouterProvider) {
@@ -30,8 +31,11 @@ angular.module('adage', [
   $resourceProvider.defaults.stripTrailingSlashes = false;
 }])
 
-.controller('AppCtrl', ['$scope', '$state', 'UserFactory',
-  function AppCtrl($scope, $state, UserFactory) {
+.controller('AppCtrl', ['$scope', '$state', 'UserFactory', 'GlobalModelInfo',
+  function AppCtrl($scope, $state, UserFactory, GlobalModelInfo) {
+    // Machine learning model
+    $scope.modelInfo = GlobalModelInfo;
+
     // Function that indicates whether the current state is 'gene_search'
     // or 'gene_network'. (Used by index.html to highlight the 'GeneNetwork'
     // tab on web UI in either state.)
@@ -53,7 +57,8 @@ angular.module('adage', [
         if (angular.isDefined(toState.data.pageTitle)) {
           $scope.pageTitle = toState.data.pageTitle + ' | adage';
         }
-      });
+      }
+    );
 
     UserFactory.getPromise().then(function() {
       $scope.userObj = UserFactory.getUser();

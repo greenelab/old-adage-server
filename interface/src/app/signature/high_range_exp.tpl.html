@@ -21,9 +21,11 @@
           <b>{{$index + 1}}. {{exp.accession}}: </b>{{exp.name}}
           <!-- vega-lite widget. If it is clicked, go to sample annotations
                page. -->
-          <a ui-sref="sampleAnnotation(
-                      {signature: signatureId, samples: exp.sample_set.join()}
-                      )">
+          <a ui-sref="sampleAnnotation({
+                      mlmodel: modelId,
+                      signature: signatureId,
+                      samples: exp.sample_set.join()
+                     })">
             <!-- The UI would look nicer if the tooltip showed up on the right
                  side of the activity distribution map (instead of left side).
                  But because the vega-lite widget takes the full width of the

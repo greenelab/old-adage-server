@@ -23,8 +23,10 @@ angular.module('adage.signature', [
   });
 }])
 
-.controller('SignatureCtrl', ['Signature', '$stateParams', '$log',
-  function SignatureController(Signature, $stateParams, $log) {
+.controller('SignatureCtrl', ['Signature', '$stateParams', 'GlobalModelInfo',
+  '$log', 'errGen',
+  function SignatureController(Signature, $stateParams, GlobalModelInfo, $log,
+                               errGen) {
     var self = this;
     if (!$stateParams.id) {
       self.statusMessage = 'Please specify signature ID in the URL.';
@@ -36,12 +38,17 @@ angular.module('adage.signature', [
       {id: self.id},
       function success(response) {
         self.name = response.name;
-        self.mlmodel = response.mlmodel.title;
+        GlobalModelInfo.set(response.mlmodel);
+        self.modelID = GlobalModelInfo.id;
+        console.log('self.modelID: ' + self.modelID);
         self.statusMessage = '';
       },
-      function error(err) {
-        $log.error('Failed to get signature information: ' + err.statusText);
-        self.statusMessage = 'Failed to get signature information from server';
+      function error(errObj) {
+        GlobalModelInfo.init();
+        var errMessage = errGen('Failed to get signature from server', errObj);
+        $log.error(errMessage);
+        self.statusMessage = errMessage +
+          '. Please check the signature ID and/or try again later.';
       }
     );
     self.organism = 'Pseudomonas aeruginosa';
@@ -161,6 +168,7 @@ angular.module('adage.signature', [
       templateUrl: 'signature/high_range_exp.tpl.html',
       restrict: 'E',
       scope: {
+        modelId: '@',
         signatureId: '@',
         inputTopNum: '@topExp'
       },

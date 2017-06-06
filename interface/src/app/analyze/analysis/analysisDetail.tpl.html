@@ -1,11 +1,20 @@
 <!--
   TODO each sample should be built using a reusable Angular directive
 -->
-<h1>Samples
-  <small>(drag <i class="fa fa-bars" aria-hidden="true"></i> to reorder,
-    click <i class="fa fa-times" aria-hidden="true"></i> to delete,
-    choose <input type="radio" disabled> to set group)</small>
-</h1>
+
+<div class="page-header">
+  <h1>Samples
+    <small>(drag <i class="fa fa-bars" aria-hidden="true"></i> to reorder,
+      click <i class="fa fa-times" aria-hidden="true"></i> to delete,
+      choose <input type="radio" disabled> to set group)</small>
+  </h1>
+  <ml-model-view></ml-model-view>
+  <ml-model-validator model-id="modelInUrl" is-valid-model="isValidModel">
+  </ml-model-validator>
+</div>
+
+<div ng-if="isValidModel">
+
 <status-bar msg-text="analysis.status"></status-bar>
 <!-- TODO need a tool to select and order annotation columns -->
 <table class="table table-hover">
@@ -59,13 +68,7 @@
     </tr>
   </tbody>
 </table>
-<p>To proceed with further analysis, please select a machine learning model.</p>
-<label>Machine learning model:</label>
-<ml-model-selector
-  selected-ml-model="sb.selectedMlModel"
-  on-change="analysis.updateMlModel(value)">
-</ml-model-selector>
-<div ng-show="sb.selectedMlModel.id">
+
   <p>Note: scroll to the right to see all signatures in the heatmap. Zooming
      feature to come in a future update.</p>
   <div vega spec="heatmapSpec" vega-data="sb.heatmapData"></div>
@@ -86,4 +89,5 @@
       Volcano Plot
     </button>
   </nav>
+
 </div>

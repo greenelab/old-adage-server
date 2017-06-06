@@ -15,7 +15,7 @@ angular.module('adage.analyze.analysis', [
 
 .config(['$stateProvider', function($stateProvider) {
   $stateProvider.state('analysis-detail', {
-    url: '/analysis-detail',
+    url: '/analysis-detail?mlmodel',
     views: {
       main: {
         controller: 'AnalysisCtrl',
@@ -26,8 +26,18 @@ angular.module('adage.analyze.analysis', [
   });
 }])
 
-.controller('AnalysisCtrl', ['$scope', '$log', '$q', '$state', 'SampleBin',
-function AnalysisCtrl($scope, $log, $q, $state, SampleBin) {
+.controller('AnalysisCtrl', ['$scope', '$log', '$q', '$state', '$stateParams',
+  'SampleBin',
+function AnalysisCtrl($scope, $log, $q, $state, $stateParams, SampleBin) {
+  $scope.isValidModel = false;
+  // Do nothing if mlmodel in URL is falsey. The error will be taken
+  // care of by "<ml-model-validator>" component.
+  if (!$stateParams.mlmodel) {
+    return;
+  }
+
+  $scope.modelInUrl = $stateParams.mlmodel;
+  SampleBin.getActivityForSampleList($scope.modelInUrl);
   $scope.analysis = {
     status: '',
     // TODO these exampleCols are temporarily hard-coded until a column chooser
@@ -38,12 +48,7 @@ function AnalysisCtrl($scope, $log, $q, $state, SampleBin) {
       {'typename': 'medium'},
       {'typename': 'temperature'},
       {'typename': 'treatment'}
-    ],
-    updateMlModel: function(value) {
-      if (value !== null && value.id !== null) {
-        SampleBin.getActivityForSampleList(value.id);
-      }
-    }
+    ]
   };
 
   // give our templates a way to access the SampleBin service
@@ -58,11 +63,7 @@ function AnalysisCtrl($scope, $log, $q, $state, SampleBin) {
   };
 
   $scope.showVolcanoPlot = function() {
-    if (SampleBin.selectedMlModel.id === null) {
-      $scope.analysis.status = 'Please select a machine learning model.';
-      return;
-    }
-    $state.go('volcano', {'mlmodel': SampleBin.selectedMlModel.id});
+    $state.go('volcano', {'mlmodel': $scope.modelInUrl});
   };
 
   // these options are important for making ngSortable work with tables

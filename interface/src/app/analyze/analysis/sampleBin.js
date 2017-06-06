@@ -498,11 +498,13 @@ MathFuncts, errGen) {
   return SampleBin;
 }])
 
-.controller('SampleBinCtrl', ['$scope', 'SampleBin',
-function SampleBinCtrl($scope, SampleBin) {
-  // give our templates a way to access the SampleBin service
-  $scope.sb = SampleBin;
-}])
+.controller('SampleBinCtrl', ['$scope', 'SampleBin', 'GlobalModelInfo',
+  function SampleBinCtrl($scope, SampleBin, GlobalModelInfo) {
+    // give our templates a way to access the SampleBin service
+    $scope.sb = SampleBin;
+    $scope.modelInfo = GlobalModelInfo;
+  }
+])
 
 .directive('sampleBin', function() {
   return {

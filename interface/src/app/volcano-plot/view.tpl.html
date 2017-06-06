@@ -1,15 +1,23 @@
-<h1>Volcano Plot</h1>
-
-<div class="col-sm-8">
-  <volcano-plot
-    plot-data="ctrl.data"
-    on-click="ctrl.updateSelection(selectedSignatures)">
-  </volcano-plot>
+<div class="page-header">
+  <h1>Volcano Plot</h1>
+  <ml-model-view></ml-model-view>
+  <ml-model-validator model-id="ctrl.mlModel"
+                      is-valid-model="ctrl.isValidModel">
+  </ml-model-validator>
 </div>
-<div class="col-sm-4">
-  <volcano-plot-selection
-    ml-model="ctrl.mlModel"
-    selected-signatures="ctrl.selection"
-    sample-groups="ctrl.sampleGroups">
-  </volcano-plot-selection>
+
+<div ng-if="ctrl.isValidModel">
+  <div class="col-sm-8">
+    <volcano-plot
+       plot-data="ctrl.data"
+       on-click="ctrl.updateSelection(selectedSignatures)">
+    </volcano-plot>
+  </div>
+  <div class="col-sm-4">
+    <volcano-plot-selection
+       ml-model="ctrl.mlModel"
+       selected-signatures="ctrl.selection"
+       sample-groups="ctrl.sampleGroups">
+    </volcano-plot-selection>
+  </div>
 </div>

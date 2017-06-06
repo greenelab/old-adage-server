@@ -12,7 +12,7 @@ angular.module('adage.sampleAnnotation', [
 
 .config(['$stateProvider', function($stateProvider) {
   $stateProvider.state('sampleAnnotation', {
-    url: '/sample_annotation?signature&samples',
+    url: '/sample_annotation?mlmodel&signature&samples',
     views: {
       main: {
         templateUrl: 'sample_annotation/annotation.tpl.html',
@@ -28,14 +28,21 @@ angular.module('adage.sampleAnnotation', [
   'ActivityDigits',
   function($stateParams, $q, $log, errGen, Activity, Sample, ActivityDigits) {
     var self = this;
-    self.queryStatus = 'Connecting to the server ...';
+    self.isValidModel = false;
+    // Do nothing if mlmodel in URL is falsey. The error will be taken
+    // care of by "<ml-model-validator>" component.
+    if (!$stateParams.mlmodel) {
+      return;
+    }
+
+    self.modelInUrl = $stateParams.mlmodel;
 
     // Ensure that the URL includes sample ID(s).
     if (!$stateParams.samples) {
       self.queryStatus = 'Please specify sample ID(s) in the URL.';
       return;
     }
-
+    self.queryStatus = 'Connecting to the server ...';
     var samplesInUrl = $stateParams.samples;
     self.uniqueAnnotationTypes = [];
     // Note: Ideally self.uniqueAnnotationTypes should be a hashtable (such as

@@ -1,19 +1,31 @@
 angular.module('adage.gene.searchMany', [
+  'ui.router',
   'adage.gene.resource',
   'adage.gene.utils',
   'adage.gene.selected',
+  'adage.utils',
   'adage.mlmodel.components'
 ])
 
 .config(function($stateProvider) {
   $stateProvider
     .state('gene_search', {
-      url: '/gene_search',
+      url: '/gene_search?mlmodel',
       views: {
         'main': {
           templateUrl: 'gene/gene-network.tpl.html',
-          controller: ['UserFactory', function(UserFactory) {
+          controller: ['$stateParams', 'GlobalModelInfo', 'UserFactory',
+          function($stateParams, GlobalModelInfo, UserFactory) {
             var self = this;
+            self.isValidModel = false;
+            // Do nothing if mlmodel in URL is falsey. The error will be taken
+            // care of by "<ml-model-validator>" component.
+            if (!$stateParams.mlmodel) {
+              return;
+            }
+
+            self.modelInUrl = $stateParams.mlmodel;
+            self.selectedMlModel = GlobalModelInfo;
             self.userObj = null;
             UserFactory.getPromise().then(function() {
               self.userObj = UserFactory.getUser();
