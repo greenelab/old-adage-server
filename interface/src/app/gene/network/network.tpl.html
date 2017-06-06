@@ -1,34 +1,41 @@
-<h1>ADAGE: Gene-Gene Network</h1>
-
-<div ng-hide="ctrl.statusMessage">
-  <form>
-    <strong>Correlation Range:</strong>
-    <label>
-      <input type="checkbox" ng-model="ctrl.includeNegative"
-             ng-disabled="!ctrl.includePositive"
-             ng-change="ctrl.renderNetwork()">
-      Include negative correlation
-    </label>
-    &nbsp;
-    <label>
-      <input type="checkbox" ng-model="ctrl.includePositive"
-             ng-disabled="!ctrl.includeNegative"
-             ng-change="ctrl.renderNetwork()">
-      Include positive correlation
-    </label>
-  </form>
-  <rzslider
-     rz-slider-model="ctrl.slider.min"
-     rz-slider-high="ctrl.slider.max"
-     rz-slider-options="ctrl.slider.options">
-  </rzslider>
+<div class="page-header">
+  <h1>ADAGE: Gene-Gene Network</h1>
+  <ml-model-view></ml-model-view>
+  <ml-model-validator model-id="ctrl.modelInUrl"
+                      is-valid-model="ctrl.isValidModel">
+  </ml-model-validator>
 </div>
 
-<!-- DO NOT put the following "chart" div into a div that is controlled by
-     "ng-hide" of "ng-if", otherwise the legend bar in d3.network won't be
-     rendered correctly (some of the legend marks may be absent).
-     See details in GitHub Issue #25.
-  -->
-<div id="chart"></div>
+<div ng-if="ctrl.isValidModel">
+  <div ng-hide="ctrl.statusMessage">
+    <form>
+      <strong>Correlation Range:</strong>
+      <label>
+        <input type="checkbox" ng-model="ctrl.includeNegative"
+               ng-disabled="!ctrl.includePositive"
+               ng-change="ctrl.renderNetwork()">
+        Include negative correlation
+      </label>
+      &nbsp;
+      <label>
+        <input type="checkbox" ng-model="ctrl.includePositive"
+               ng-disabled="!ctrl.includeNegative"
+               ng-change="ctrl.renderNetwork()">
+        Include positive correlation
+      </label>
+    </form>
+    <rzslider
+       rz-slider-model="ctrl.slider.min"
+       rz-slider-high="ctrl.slider.max"
+       rz-slider-options="ctrl.slider.options">
+    </rzslider>
+  </div>
 
-<h3 class="text-warning" ng-bind="ctrl.statusMessage"></h3>
+  <!-- DO NOT put the following "chart" div into a div that is controlled by
+       "ng-hide" of "ng-if", otherwise the legend bar in d3.network won't be
+       rendered correctly (some of the legend marks may be absent).
+       See details in GitHub Issue #25.
+    -->
+  <div id="chart"></div>
+  <h3 class="text-warning" ng-bind="ctrl.statusMessage"></h3>
+</div>
