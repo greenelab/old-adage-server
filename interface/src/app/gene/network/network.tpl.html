@@ -6,8 +6,13 @@
   </ml-model-validator>
 </div>
 
-<div ng-if="ctrl.isValidModel">
+<!-- Unlike the other HTML template files, this one is using "ng-show" here
+     instead of "ng-if". The reason is that when "ng-if" is used to enclose
+     the <div> section, the "rzslider" inside won't be rendered correctly.
+  -->
+<div ng-show="ctrl.isValidModel">
   <h3 class="text-warning" ng-bind="ctrl.statusMessage"></h3>
+
   <div ng-hide="ctrl.statusMessage">
     <form>
       <strong>Correlation Range:</strong>
@@ -25,17 +30,16 @@
         Include positive correlation
       </label>
     </form>
-    <rzslider
-       rz-slider-model="ctrl.slider.min"
-       rz-slider-high="ctrl.slider.max"
-       rz-slider-options="ctrl.slider.options">
+    <rzslider rz-slider-model="ctrl.slider.min"
+              rz-slider-high="ctrl.slider.max"
+              rz-slider-options="ctrl.slider.options">
     </rzslider>
   </div>
-
-  <!-- DO NOT put the following "chart" div into a div that is controlled by
-       "ng-hide" of "ng-if", otherwise the legend bar in d3.network won't be
-       rendered correctly (some of the legend marks may be absent).
-       See details in GitHub Issue #25.
-    -->
-  <div id="chart"></div>
 </div>
+
+<!-- DO NOT put the following "chart" div into a div that is controlled by
+     "ng-hide" of "ng-if", otherwise the legend bar in d3.network won't be
+     rendered correctly (some of the legend marks may be absent).
+     See details in GitHub Issue #25.
+  -->
+<div id="chart"></div>
