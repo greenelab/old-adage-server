@@ -29,13 +29,11 @@ angular.module('adage.home', [
 /**
  * And of course we define a controller for our route.
  */
-.controller('HomeCtrl', ['GlobalModelInfo',
-  function HomeController(GlobalModelInfo) {
-    var self = this;
-    self.modelInfo = GlobalModelInfo;
-    self.changeModel = function(newModel) {
-      GlobalModelInfo.set(newModel);
-    };
-  }
-])
+.controller('HomeCtrl', ['GlobalModelInfo', function(GlobalModelInfo) {
+  var self = this;
+  self.modelInfo = GlobalModelInfo;
+  self.changeModel = function(newModel) {
+    GlobalModelInfo.set(newModel);
+  };
+}])
 ;
