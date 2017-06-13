@@ -5,7 +5,10 @@
   </ml-model-validator>
 </div>
 
-<div ng-if="isValidModel">
+<!-- Use "ng-show" below to make sure that the DOM will be rendered but hidden;
+     "ng-if" will not render the DOM at all when "isValidModel" is falsey, and
+     it will leave "$scope.detail" undefined and cause errors. -->
+<div ng-show="isValidModel">
   <div>
     <div id="search" ng-class="detail.showing ? 'with-detail':''">
       <p>
