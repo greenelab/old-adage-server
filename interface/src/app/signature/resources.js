@@ -23,7 +23,7 @@ angular.module('adage.signature.resources', [
   }
 ])
 
-.factory('Experiment', ['$resource', 'ApiBasePath',
+.factory('SignatureExperiment', ['$resource', 'ApiBasePath',
   function($resource, ApiBasePath) {
     return $resource(ApiBasePath + 'experiment');
   }

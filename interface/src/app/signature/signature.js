@@ -161,9 +161,9 @@ angular.module('adage.signature', [
   };
 }])
 
-.directive('highRangeExp', ['Activity', 'Experiment', 'EmbedSpecService',
-  'errGen', '$log',
-  function(Activity, Experiment, EmbedSpecService, errGen, $log) {
+.directive('highRangeExp', ['Activity', 'SignatureExperiment',
+  'EmbedSpecService', 'errGen', '$log',
+  function(Activity, SignatureExperiment, EmbedSpecService, errGen, $log) {
     return {
       templateUrl: 'signature/high_range_exp.tpl.html',
       restrict: 'E',
@@ -267,7 +267,7 @@ angular.module('adage.signature', [
               sampleID = response.objects[i].sample;
               $scope.activities[sampleID] = response.objects[i].value;
             }
-            return Experiment.get({node: $scope.signatureId, limit: 0})
+            return SignatureExperiment.get({node: $scope.signatureId, limit: 0})
               .$promise;
           },
           function error(response) {
