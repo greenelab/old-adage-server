@@ -56,9 +56,11 @@ angular.module('adage.gene.network', [
 
 .controller('GeneNetworkCtrl',
   ['$stateParams', 'Edge', 'Signature', 'Gene', 'ExpressionValue', '$log',
-    'errGen',
-    function GeneNetworkController($stateParams, Edge, Signature, Gene,
-                                   ExpressionValue, $log, errGen) {
+    'errGen', '$httpParamSerializerJQLike',
+    function GeneNetworkController(
+      $stateParams, Edge, Signature, Gene, ExpressionValue, $log, errGen,
+      $httpParamSerializerJQLike
+    ) {
       var self = this;
       self.isValidModel = false;
       // Do nothing if mlmodel in URL is falsey. The error will be taken
