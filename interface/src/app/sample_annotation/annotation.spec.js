@@ -21,15 +21,15 @@ describe('sample_annotation', function() {
   });
 
   describe('SampleAnnotationCtrl', function() {
-    var SampleAnnotationCtrl, mockStateParams, mockGlobalModelInfo;
+    var SampleAnnotationCtrl, mockStateParams, mockMlModelTracker;
 
     beforeEach(inject(function($controller) {
       var modelID = 23;
       mockStateParams = {samples: '1', mlmodel: modelID};
-      mockGlobalModelInfo = {id: modelID, title: 'test model', organism: null};
+      mockMlModelTracker = {id: modelID, title: 'test model', organism: null};
       SampleAnnotationCtrl = $controller('SampleAnnotationCtrl', {
         $stateParams: mockStateParams,
-        GlobalModelInfo: mockGlobalModelInfo
+        MlModelTracker: mockMlModelTracker
       });
     }));
 

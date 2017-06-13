@@ -31,10 +31,10 @@ angular.module('adage', [
   $resourceProvider.defaults.stripTrailingSlashes = false;
 }])
 
-.controller('AppCtrl', ['$scope', '$state', 'UserFactory', 'GlobalModelInfo',
-  function AppCtrl($scope, $state, UserFactory, GlobalModelInfo) {
+.controller('AppCtrl', ['$scope', '$state', 'UserFactory', 'MlModelTracker',
+  function AppCtrl($scope, $state, UserFactory, MlModelTracker) {
     // Machine learning model
-    $scope.modelInfo = GlobalModelInfo;
+    $scope.modelInfo = MlModelTracker;
 
     // Function that indicates whether the current state is 'gene_search'
     // or 'gene_network'. (Used by index.html to highlight the 'GeneNetwork'

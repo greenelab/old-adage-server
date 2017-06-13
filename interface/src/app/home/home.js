@@ -29,11 +29,11 @@ angular.module('adage.home', [
 /**
  * And of course we define a controller for our route.
  */
-.controller('HomeCtrl', ['GlobalModelInfo', function(GlobalModelInfo) {
+.controller('HomeCtrl', ['MlModelTracker', function(MlModelTracker) {
   var self = this;
-  self.modelInfo = GlobalModelInfo;
+  self.modelInfo = MlModelTracker;
   self.changeModel = function(newModel) {
-    GlobalModelInfo.set(newModel);
+    MlModelTracker.set(newModel);
   };
 }])
 ;

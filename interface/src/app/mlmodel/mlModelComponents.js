@@ -33,8 +33,8 @@ angular.module('adage.mlmodel.components', [
 
 .component('mlModelView', {
   templateUrl: 'mlmodel/view.tpl.html',
-  controller: ['GlobalModelInfo', function(GlobalModelInfo) {
-    this.modelInfo = GlobalModelInfo;
+  controller: ['MlModelTracker', function(MlModelTracker) {
+    this.modelInfo = MlModelTracker;
   }]
 })
 
@@ -44,16 +44,16 @@ angular.module('adage.mlmodel.components', [
     modelId: '=',
     isValidModel: '='
   },
-  controller: ['MlModel', 'GlobalModelInfo', '$log', 'errGen',
-    function(MlModel, GlobalModelInfo, $log, errGen) {
+  controller: ['MlModel', 'MlModelTracker', '$log', 'errGen',
+    function(MlModel, MlModelTracker, $log, errGen) {
       var self = this;
       // Ensure that input modelId is truthy.
       if (!self.modelId) {
         self.errMessage = 'Machine learning model not set yet.';
         return;
       }
-      // Do nothing if GlobalModelInfo has same ID as the input model ID.
-      if (self.modelId === GlobalModelInfo.id) {
+      // Do nothing if MlModelTracker has same ID as the input model ID.
+      if (self.modelId === MlModelTracker.id) {
         self.isValidModel = true;
         return;
       }
@@ -61,11 +61,11 @@ angular.module('adage.mlmodel.components', [
       MlModel.get(
         {id: self.modelId},
         function success(response) {
-          GlobalModelInfo.set(response);
+          MlModelTracker.set(response);
           self.isValidModel = true;
         },
         function error(err) {
-          GlobalModelInfo.reset();
+          MlModelTracker.reset();
           self.errMessage = errGen('Failed to get machine learning model', err);
           $log.error(self.errorMessage);
         }

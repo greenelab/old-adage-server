@@ -498,11 +498,11 @@ MathFuncts, errGen) {
   return SampleBin;
 }])
 
-.controller('SampleBinCtrl', ['$scope', 'SampleBin', 'GlobalModelInfo',
-  function SampleBinCtrl($scope, SampleBin, GlobalModelInfo) {
+.controller('SampleBinCtrl', ['$scope', 'SampleBin', 'MlModelTracker',
+  function SampleBinCtrl($scope, SampleBin, MlModelTracker) {
     // give our templates a way to access the SampleBin service
     $scope.sb = SampleBin;
-    $scope.modelInfo = GlobalModelInfo;
+    $scope.modelInfo = MlModelTracker;
   }
 ])
 

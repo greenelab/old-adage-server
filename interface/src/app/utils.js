@@ -20,7 +20,7 @@ angular.module('adage.utils', [])
 
 // Service of global machine learning model, which is shared by multiple
 // modules.
-.service('GlobalModelInfo', [function() {
+.service('MlModelTracker', [function() {
   this.init = function() {
     this.id = null;
     this.title = null;

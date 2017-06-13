@@ -14,8 +14,8 @@ angular.module('adage.gene.searchMany', [
       views: {
         'main': {
           templateUrl: 'gene/gene-network.tpl.html',
-          controller: ['$stateParams', 'GlobalModelInfo', 'UserFactory',
-          function($stateParams, GlobalModelInfo, UserFactory) {
+          controller: ['$stateParams', 'MlModelTracker', 'UserFactory',
+          function($stateParams, MlModelTracker, UserFactory) {
             var self = this;
             self.isValidModel = false;
             // Do nothing if mlmodel in URL is falsey. The error will be taken
@@ -25,7 +25,7 @@ angular.module('adage.gene.searchMany', [
             }
 
             self.modelInUrl = $stateParams.mlmodel;
-            self.selectedMlModel = GlobalModelInfo;
+            self.selectedMlModel = MlModelTracker;
             self.userObj = null;
             UserFactory.getPromise().then(function() {
               self.userObj = UserFactory.getUser();
