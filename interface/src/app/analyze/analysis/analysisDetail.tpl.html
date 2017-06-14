@@ -15,59 +15,60 @@
 
 <div ng-if="isValidModel">
 
-<status-bar msg-text="analysis.status"></status-bar>
-<!-- TODO need a tool to select and order annotation columns -->
-<table class="table table-hover">
-  <thead>
-    <tr>
-      <th> </th>
-      <th>
-        <span class="row-control">
-          <i class="fa fa-bars" aria-hidden="true"></i>
-        </span>
-        ML Data Source
-      </th>
-      <th>id</th>
-      <th>Sample Name</th>
-      <th ng-repeat="at in analysis.exampleCols">{{
-        at.typename
-      }}</th>
-    </tr>
-  </thead>
-  <tbody ng-model="sb.heatmapData.samples" as-sortable="sortableOptions">
-    <tr ng-repeat="id in sb.heatmapData.samples"
-        ng-mouseover="showControls = true" ng-mouseleave="showControls = false"
-        ng-class="'sample-' + sb.sampleToGroup[id]" as-sortable-item>
-      <td class="row-control">
-        <input type="radio" ng-model="sb.sampleToGroup[id]"
-            name="{{id}}-group" value="base-group"
-            class="sample-base-group" aria-label="group a">
-        <input type="radio" ng-model="sb.sampleToGroup[id]"
-            name="{{id}}-group" value="comp-group"
-            class="sample-comp-group" aria-label="group b">
-        <input type="radio" ng-model="sb.sampleToGroup[id]"
-            name="{{id}}-group" value="other"
-            class="sample-other" aria-label="other">
-        &nbsp;
-        <button type="button" class="btn row-control"
-            ng-click="sb.removeSample(id)" aria-label="Delete">
-          <i class="fa fa-times" aria-hidden="true"></i>
-        </button>
-      </td>
-      <td as-sortable-item-handle>
-        <span class="row-control">
-          <i class="fa fa-bars" aria-hidden="true"></i>
-        </span>
-        {{sb.sampleData[id].ml_data_source}}
-      </td>
-      <td>{{id}}</td>
-      <td>{{sb.sampleData[id].name}}</td>
-      <td ng-repeat="at in analysis.exampleCols">{{
-        sb.sampleData[id].annotations[at.typename]
-      }}</td>
-    </tr>
-  </tbody>
-</table>
+  <status-bar msg-text="analysis.status"></status-bar>
+  <!-- TODO need a tool to select and order annotation columns -->
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th> </th>
+        <th>
+          <span class="row-control">
+            <i class="fa fa-bars" aria-hidden="true"></i>
+          </span>
+          ML Data Source
+        </th>
+        <th>id</th>
+        <th>Sample Name</th>
+        <th ng-repeat="at in analysis.exampleCols">{{
+          at.typename
+          }}</th>
+      </tr>
+    </thead>
+    <tbody ng-model="sb.heatmapData.samples" as-sortable="sortableOptions">
+      <tr ng-repeat="id in sb.heatmapData.samples"
+          ng-mouseover="showControls = true"
+          ng-mouseleave="showControls = false"
+          ng-class="'sample-' + sb.sampleToGroup[id]" as-sortable-item>
+        <td class="row-control">
+          <input type="radio" ng-model="sb.sampleToGroup[id]"
+                 name="{{id}}-group" value="base-group"
+                 class="sample-base-group" aria-label="group a">
+          <input type="radio" ng-model="sb.sampleToGroup[id]"
+                 name="{{id}}-group" value="comp-group"
+                 class="sample-comp-group" aria-label="group b">
+          <input type="radio" ng-model="sb.sampleToGroup[id]"
+                 name="{{id}}-group" value="other"
+                 class="sample-other" aria-label="other">
+          &nbsp;
+          <button type="button" class="btn row-control"
+                  ng-click="sb.removeSample(id)" aria-label="Delete">
+            <i class="fa fa-times" aria-hidden="true"></i>
+          </button>
+        </td>
+        <td as-sortable-item-handle>
+          <span class="row-control">
+            <i class="fa fa-bars" aria-hidden="true"></i>
+          </span>
+          {{sb.sampleData[id].ml_data_source}}
+        </td>
+        <td>{{id}}</td>
+        <td>{{sb.sampleData[id].name}}</td>
+        <td ng-repeat="at in analysis.exampleCols">{{
+          sb.sampleData[id].annotations[at.typename]
+          }}</td>
+      </tr>
+    </tbody>
+  </table>
 
   <p>Note: scroll to the right to see all signatures in the heatmap. Zooming
      feature to come in a future update.</p>
