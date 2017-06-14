@@ -23,8 +23,10 @@ angular.module('adage.signature', [
   });
 }])
 
-.controller('SignatureCtrl', ['Signature', '$stateParams', '$log',
-  function SignatureController(Signature, $stateParams, $log) {
+.controller('SignatureCtrl', ['Signature', '$stateParams', 'MlModelTracker',
+  '$log', 'errGen',
+  function SignatureController(Signature, $stateParams, MlModelTracker, $log,
+                               errGen) {
     var self = this;
     if (!$stateParams.id) {
       self.statusMessage = 'Please specify signature ID in the URL.';
@@ -36,12 +38,17 @@ angular.module('adage.signature', [
       {id: self.id},
       function success(response) {
         self.name = response.name;
-        self.mlmodel = response.mlmodel.title;
+        MlModelTracker.set(response.mlmodel);
+        self.modelID = MlModelTracker.id;
+        console.log('self.modelID: ' + self.modelID);
         self.statusMessage = '';
       },
-      function error(err) {
-        $log.error('Failed to get signature information: ' + err.statusText);
-        self.statusMessage = 'Failed to get signature information from server';
+      function error(errObj) {
+        MlModelTracker.init();
+        var errMessage = errGen('Failed to get signature from server', errObj);
+        $log.error(errMessage);
+        self.statusMessage = errMessage +
+          '. Please check the signature ID and/or try again later.';
       }
     );
     self.organism = 'Pseudomonas aeruginosa';
@@ -154,13 +161,14 @@ angular.module('adage.signature', [
   };
 }])
 
-.directive('highRangeExp', ['Activity', 'Experiment', 'EmbedSpecService',
-  'errGen', '$log',
-  function(Activity, Experiment, EmbedSpecService, errGen, $log) {
+.directive('highRangeExp', ['Activity', 'SignatureExperiment',
+  'EmbedSpecService', 'errGen', '$log',
+  function(Activity, SignatureExperiment, EmbedSpecService, errGen, $log) {
     return {
       templateUrl: 'signature/high_range_exp.tpl.html',
       restrict: 'E',
       scope: {
+        modelId: '@',
         signatureId: '@',
         inputTopNum: '@topExp'
       },
@@ -259,7 +267,7 @@ angular.module('adage.signature', [
               sampleID = response.objects[i].sample;
               $scope.activities[sampleID] = response.objects[i].value;
             }
-            return Experiment.get({node: $scope.signatureId, limit: 0})
+            return SignatureExperiment.get({node: $scope.signatureId, limit: 0})
               .$promise;
           },
           function error(response) {

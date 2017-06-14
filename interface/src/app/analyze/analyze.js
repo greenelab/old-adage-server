@@ -16,7 +16,7 @@ angular.module('adage.analyze', [
 
 .config(function config($stateProvider) {
   $stateProvider.state('analyze', {
-    url: '/analyze',
+    url: '/analyze?mlmodel',
     views: {
       'main': {
         controller: 'AnalyzeCtrl',
@@ -31,9 +31,19 @@ angular.module('adage.analyze', [
   $anchorScroll.yOffset = 80;
 }])
 
-.controller('AnalyzeCtrl', ['$scope', '$log', '$location',
+.controller('AnalyzeCtrl', ['$scope', '$stateParams', '$log', '$location',
   '$anchorScroll', 'Sample',
-  function AnalyzeCtrl($scope, $log, $location, $anchorScroll, Sample) {
+  function AnalyzeCtrl($scope, $stateParams, $log, $location, $anchorScroll,
+                       Sample) {
+    $scope.isValidModel = false;
+    // Do nothing if mlmodel in URL is falsey. The error will be taken
+    // care of by "<ml-model-validator>" component.
+    if (!$stateParams.mlmodel) {
+      return;
+    }
+
+    $scope.modelInUrl = $stateParams.mlmodel;
+
     $scope.analyze = {
       item_style: function(search_item) {
         // Determine which CSS classes should apply to this search_item.
@@ -53,5 +63,6 @@ angular.module('adage.analyze', [
         $anchorScroll();
       }
     };
-  }])
+  }
+])
 ;

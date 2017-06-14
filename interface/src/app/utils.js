@@ -17,4 +17,24 @@ angular.module('adage.utils', [])
 
 // Number of digits in activity value shown on frontend:
 .constant('ActivityDigits', 5)
+
+// Service of global machine learning model, which is shared by multiple
+// modules.
+.service('MlModelTracker', [function() {
+  this.init = function() {
+    this.id = null;
+    this.title = null;
+    this.organism = null;
+  };
+
+  this.set = function(inputModel) {
+    if (this.id !== inputModel.id) {
+      this.id = inputModel.id || null;
+      this.title = inputModel.title || null;
+      this.organism = inputModel.organism || null;
+    }
+  };
+
+  this.init();
+}])
 ;

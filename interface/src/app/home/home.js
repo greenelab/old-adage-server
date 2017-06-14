@@ -1,20 +1,11 @@
 /**
- * Each section of the site has its own module. It probably also has
- * submodules, though this boilerplate is too simple to demonstrate it. Within
- * `src/app/home`, however, could exist several additional folders representing
- * additional modules that would then be listed as dependencies of this one.
- * For example, a `note` section could have the submodules `note.create`,
- * `note.delete`, `note.edit`, etc.
- *
- * Regardless, so long as dependencies are managed correctly, the build process
- * will automatically take care of the rest.
- *
- * The dependencies block here is also where component dependencies should be
- * specified, as shown below.
+ * adage.home module.
  */
 angular.module('adage.home', [
   'ui.router',
-  'plusOne'
+  'ui.bootstrap',
+  'adage.mlmodel.components',
+  'adage.utils'
 ])
 
 /**
@@ -27,7 +18,7 @@ angular.module('adage.home', [
     url: '/home',
     views: {
       'main': {
-        controller: 'HomeCtrl',
+        controller: 'HomeCtrl as ctrl',
         templateUrl: 'home/home.tpl.html'
       }
     },
@@ -38,7 +29,11 @@ angular.module('adage.home', [
 /**
  * And of course we define a controller for our route.
  */
-.controller('HomeCtrl', function HomeController($scope) {
-})
-
+.controller('HomeCtrl', ['MlModelTracker', function(MlModelTracker) {
+  var self = this;
+  self.modelInfo = MlModelTracker;
+  self.changeModel = function(newModel) {
+    MlModelTracker.set(newModel);
+  };
+}])
 ;

@@ -44,12 +44,6 @@ angular.module('adage.gene.network', [
 
 .factory('Edge', ['$resource', 'ApiBasePath',
   function($resource, ApiBasePath) {
-  // Possible parameters for this endpoint when making a query are:
-  // {
-  //   genes: Database IDs of genes associated with the edge,
-  //   mlmodel: Database ID of MLModel associated with the edge,
-  //   limit: Maximum number of results to return
-  //  }
     return $resource(ApiBasePath + 'edge');
   }
 ])
@@ -77,6 +71,15 @@ angular.module('adage.gene.network', [
       $httpParamSerializerJQLike
     ) {
       var self = this;
+      self.isValidModel = false;
+      // Do nothing if mlmodel in URL is falsey. The error will be taken
+      // care of by "<ml-model-validator>" component.
+      if (!$stateParams.mlmodel) {
+        return;
+      }
+
+      self.modelInUrl = $stateParams.mlmodel;
+
       // Do nothing if no genes are specified in URL.
       if (!$stateParams.genes || !$stateParams.genes.split(',').length) {
         self.statusMessage = 'No genes are specified.';
@@ -296,7 +299,7 @@ angular.module('adage.gene.network', [
           htmlText += data.weight.toFixed(weightPrecision);
           var heavyGenes = [data.gene1.id, data.gene2.id].join(',');
           var target = d3.event.target;
-          Signaure.get(
+          Signature.get(
             {'heavy_genes': heavyGenes, 'limit': 0},
             function success(response) {
               var i = 0, n = response.objects.length;
