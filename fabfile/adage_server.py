@@ -191,8 +191,11 @@ def import_data_and_index():
         CONFIG['data']['gene_history_file'])
     run('python manage.py import_gene_network  %s "Ensemble ADAGE 300"' %
         CONFIG['data']['gene_network_file'])
-    run('python manage.py import_node_gene_network %s "Ensemble ADAGE 300"' %
-        CONFIG['data']['node_gene_network_file'])
+    run('python manage.py create_or_update_participation_type'
+        ' "High weight genes" "Genes that most strongly influence the'
+        ' activation of a signature."')
+    run('python manage.py import_node_gene_network %s "Ensemble ADAGE 300"'
+        ' "High weight genes"' % CONFIG['data']['node_gene_network_file'])
     run('python manage.py import_gene_sample_expr %s 208964' %
         CONFIG['data']['gene_sample_expr_file'])
     run('python manage.py tribe_client_pickle_public_genesets')
