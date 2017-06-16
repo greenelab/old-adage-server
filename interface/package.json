@@ -1,12 +1,12 @@
 {
-  "author": "Matt Huyck",
+  "author": "GreeneLab",
   "name": "adage",
-  "version": "0.7.0b",
-  "description": "Adage Web Server",
+  "version": "0.8.0b",
+  "description": "ADAGE web server",
   "homepage": "http://adage.greenelab.com",
   "license": "(MIT AND BSD-3-Clause)",
   "license_url": "https://raw.github.com/ngbp/ngbp/master/LICENSE",
-  "bugs": "mailto:mhuyck@fgtech.com",
+  "bugs": "mailto:team@greenelab.com",
   "repository": {
     "type": "hg",
     "url": "https://bitbucket.org/greenelab/adage-server"
