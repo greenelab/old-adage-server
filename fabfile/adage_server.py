@@ -192,8 +192,10 @@ def import_data_and_index():
     run('python manage.py import_gene_network  %s "Ensemble ADAGE 300"' %
         CONFIG['data']['gene_network_file'])
     run('python manage.py create_or_update_participation_type'
-        ' "High weight genes" "Genes that most strongly influence the'
-        ' activation of a signature."')
+        ' "High weight genes" "High-weight genes are those that most strongly '
+        'influence the signature\'s activity, and we have found that they '
+        'often reveal the underlying process or processes captured by the '
+        'signature."')
     run('python manage.py import_node_gene_network %s "Ensemble ADAGE 300"'
         ' "High weight genes"' % CONFIG['data']['node_gene_network_file'])
     run('python manage.py import_gene_sample_expr %s 208964' %
