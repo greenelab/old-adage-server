@@ -372,7 +372,12 @@ angular.module('adage.gene.network', [
           // Collect a list of distinct genes for query.
           var geneList = getQueriedGenes(edgeList);
           // Now retrieve the Gene objects using the geneList.
-          Gene.get({'pk__in': geneList.join(), 'limit': 0},
+          Gene.post(
+            {},
+            $httpParamSerializerJQLike({
+              'pk__in': geneList.join(),
+              'limit': 0
+            }),
             function success(responseObject) {
               setGenes(responseObject);
               if (genes.length === 0) {
