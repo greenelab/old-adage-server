@@ -26,7 +26,7 @@ angular.module('adage.participation', [
           self.selectedParticipationType = response.objects[0];
         },
         function error(response) {
-          var errMessage = errGen('Failed to get ParticipationTypes: ',
+          var errMessage = errGen('Failed to get ParticipationTypes',
                                   response);
           $log.error(errMessage);
           self.errorMessage = errMessage + '. Please try again later.';

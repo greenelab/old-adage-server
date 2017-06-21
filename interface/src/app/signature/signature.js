@@ -59,8 +59,8 @@ angular.module('adage.signature', [
   }
 ])
 
-.directive('participatoryGenes', ['Participation', '$log',
-  function(Participation, $log) {
+.directive('participatoryGenes', ['Participation', '$log', 'errGen',
+  function(Participation, $log, errGen) {
     return {
       templateUrl: 'signature/participatory_genes.tpl.html',
       restrict: 'E',
@@ -97,7 +97,7 @@ angular.module('adage.signature', [
                 $scope.queryStatus = '';
               },
               function error(response) {
-                var errMessage = errGen('Failed to get participatory genes: ',
+                var errMessage = errGen('Failed to get participatory genes',
                                         response);
                 $log.error(errMessage);
                 self.statusMessage = errMessage + '. Please try again later.';

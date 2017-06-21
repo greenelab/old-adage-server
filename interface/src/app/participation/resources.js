@@ -5,7 +5,7 @@ angular.module('adage.participation.resources', [
 
 .factory('ParticipationType', ['$resource', 'ApiBasePath',
   function($resource, ApiBasePath) {
-    return $resource(ApiBasePath + 'participationtype/');
+    return $resource(ApiBasePath + 'participationtype');
   }
 ])
 
