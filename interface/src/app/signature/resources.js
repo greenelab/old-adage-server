@@ -11,25 +11,13 @@ angular.module('adage.signature.resources', [
   }
 ])
 
-.factory('ParticipationType', ['$resource', 'ApiBasePath',
-  function($resource, ApiBasePath) {
-    return $resource(ApiBasePath + 'participationtype/');
-  }
-])
-
-.factory('Participation', ['$resource', 'ApiBasePath',
-  function($resource, ApiBasePath) {
-    return $resource(ApiBasePath + 'participation');
-  }
-])
-
 .factory('Activity', ['$resource', 'ApiBasePath',
   function($resource, ApiBasePath) {
     return $resource(ApiBasePath + 'activity');
   }
 ])
 
-.factory('Experiment', ['$resource', 'ApiBasePath',
+.factory('SignatureExperiment', ['$resource', 'ApiBasePath',
   function($resource, ApiBasePath) {
     return $resource(ApiBasePath + 'experiment');
   }

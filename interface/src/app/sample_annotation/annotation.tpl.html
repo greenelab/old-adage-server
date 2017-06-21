@@ -1,29 +1,36 @@
-<h1>ADAGE: Sample Annotations</h1>
+<div class="page-header">
+  <h3>ADAGE: Sample Annotations</h3>
+  <ml-model-view></ml-model-view>
+  <ml-model-validator model-id="ctrl.modelInUrl"
+                      is-valid-model="ctrl.isValidModel">
+  </ml-model-validator>
+</div>
 
-<h3 class="text-warning" ng-bind="ctrl.queryStatus"></h3>
+<div ng-if="ctrl.isValidModel">
+  <h3 class="text-warning" ng-bind="ctrl.queryStatus"></h3>
 
-<table ng-hide="ctrl.queryStatus"
-       class="table table-bordered table-striped table-hover table-condensed">
-  <thead>
-    <th ng-if="ctrl.hasSignature">Activity</th>
-    <th>Sample Name</th>
-    <th>Data Source</th>
-    <th ng-repeat="typeName in ctrl.uniqueAnnotationTypes">
-      {{typeName}}
-    </th>
-  </thead>
-
-  <tbody>
-    <tr ng-repeat=
-        "sample in ctrl.samples | orderBy: ctrl.hasSignature ? '-activity' : 'name'">
-      <td ng-if="ctrl.hasSignature">
-        <strong>{{sample.activity | number: ctrl.activityDigits}}</strong>
-      </td>
-      <td>{{sample.name}}</td>
-      <td>{{sample.dataSource}}</td>
-      <td ng-repeat="typeName in ctrl.uniqueAnnotationTypes">
-        {{sample.annotations[typeName] ? sample.annotations[typeName] : ""}}
-      </td>
-    </tr>
-  </tbody>
-</table>
+  <table ng-hide="ctrl.queryStatus"
+         class="table table-bordered table-striped table-hover table-condensed">
+    <thead>
+      <th ng-if="ctrl.hasSignature">Activity</th>
+      <th>Sample Name</th>
+      <th>Data Source</th>
+      <th ng-repeat="typeName in ctrl.uniqueAnnotationTypes">
+        {{typeName}}
+      </th>
+    </thead>
+    <tbody>
+      <tr ng-repeat=
+          "sample in ctrl.samples | orderBy: ctrl.hasSignature ? '-activity' : 'name'">
+        <td ng-if="ctrl.hasSignature">
+          <strong>{{sample.activity | number: ctrl.activityDigits}}</strong>
+        </td>
+        <td>{{sample.name}}</td>
+        <td>{{sample.dataSource}}</td>
+        <td ng-repeat="typeName in ctrl.uniqueAnnotationTypes">
+          {{sample.annotations[typeName] ? sample.annotations[typeName] : ""}}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

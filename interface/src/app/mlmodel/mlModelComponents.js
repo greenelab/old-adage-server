@@ -1,4 +1,5 @@
 angular.module('adage.mlmodel.components', [
+  'adage.utils',
   'adage.mlmodel.resource'
 ])
 
@@ -30,4 +31,45 @@ angular.module('adage.mlmodel.components', [
   }]
 })
 
+.component('mlModelView', {
+  templateUrl: 'mlmodel/view.tpl.html',
+  controller: ['MlModelTracker', function(MlModelTracker) {
+    this.modelInfo = MlModelTracker;
+  }]
+})
+
+.component('mlModelValidator', {
+  templateUrl: 'mlmodel/validator.tpl.html',
+  bindings: {
+    modelId: '=',
+    isValidModel: '='
+  },
+  controller: ['MlModel', 'MlModelTracker', '$log', 'errGen',
+    function(MlModel, MlModelTracker, $log, errGen) {
+      var self = this;
+      // Ensure that input modelId is truthy.
+      if (!self.modelId) {
+        self.errMessage = 'Machine learning model not set yet.';
+        return;
+      }
+      // Do nothing if MlModelTracker has same ID as the input model ID.
+      if (self.modelId === MlModelTracker.id) {
+        self.isValidModel = true;
+        return;
+      }
+
+      MlModel.get(
+        {id: self.modelId},
+        function success(response) {
+          MlModelTracker.set(response);
+          self.isValidModel = true;
+        },
+        function error(err) {
+          MlModelTracker.reset();
+          self.errMessage = errGen('Failed to get machine learning model', err);
+          $log.error(self.errorMessage);
+        }
+      );
+    }]
+})
 ;

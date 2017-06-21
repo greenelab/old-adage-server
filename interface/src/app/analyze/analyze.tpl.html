@@ -1,44 +1,55 @@
-<div>
-  <div id="search" ng-class="detail.showing ? 'with-detail':''">
-    <h1 class="page-header">
-      Analyze
-    </h1>
-    <p>
-      In this area, users will be able to search for an experiment or set of
-      samples to analyze, define analysis groups and generate a DA heatmap to
-      review ADAGE signature intensities for each sample.
-    </p>
-    <div id="search-results" class="col-sm-11">
-      <search placeholder="query text" results="analyze.query_results"></search>
-      <ul class="list-group">
-        <li ng-repeat="search_item in analyze.query_results"
-        ng-class="analyze.item_style(search_item)" class="list-group-item">
-          <a id="{{search_item.pk}}" ng-click="detail.show(search_item)">
-            <div class="media-left">
-              <span ng-if="search_item.item_type === 'experiment'"
-              class="badge">
-                {{ search_item.related_items.length }}
-              </span>
-            </div>
-            <div class="media-body">
-              <button type="button" class="btn"
-              ng-class="sb.hasItem(search_item)?'disabled':''"
-              ng-click="sb.addItem(search_item)">
-                <i class="fa fa-plus" aria-hidden="true"></i>
-              </button>
-              <h4 class="list-group-item-heading">
-                {{search_item.description}}
-              </h4>
-              <p class="list-group-item-text">{{ search_item.pk }}:
-                ...<span ng-bind-html="search_item.snippet"></span>...
-              </p>
-            </div>
-          </a>
-        </li>
-      </ul>
+<div class="page-header">
+  <h3>Analyze</h3>
+  <ml-model-view></ml-model-view>
+  <ml-model-validator model-id="modelInUrl" is-valid-model="isValidModel">
+  </ml-model-validator>
+</div>
+
+<!-- Use "ng-show" below to make sure that the DOM will be rendered but hidden;
+     "ng-if" will not render the DOM at all when "isValidModel" is falsey, and
+     it will leave "$scope.detail" undefined and cause errors. -->
+<div ng-show="isValidModel">
+  <div>
+    <div id="search" ng-class="detail.showing ? 'with-detail':''">
+      <p>
+        In this area, users will be able to search for an experiment or set of
+        samples to analyze, define analysis groups and generate a DA heatmap to
+        review ADAGE signature intensities for each sample.
+      </p>
+      <div id="search-results" class="col-sm-11">
+        <search placeholder="query text" results="analyze.query_results">
+        </search>
+        <ul class="list-group">
+          <li ng-repeat="search_item in analyze.query_results"
+              ng-class="analyze.item_style(search_item)"
+              class="list-group-item">
+            <a id="{{search_item.pk}}" ng-click="detail.show(search_item)">
+              <div class="media-left">
+                <span ng-if="search_item.item_type === 'experiment'"
+                      class="badge">
+                  {{ search_item.related_items.length }}
+                </span>
+              </div>
+              <div class="media-body">
+                <button type="button" class="btn"
+                        ng-class="sb.hasItem(search_item)?'disabled':''"
+                        ng-click="sb.addItem(search_item)">
+                  <i class="fa fa-plus" aria-hidden="true"></i>
+                </button>
+                <h4 class="list-group-item-heading">
+                  {{search_item.description}}
+                </h4>
+                <p class="list-group-item-text">{{ search_item.pk }}:
+                  ...<span ng-bind-html="search_item.snippet"></span>...
+                </p>
+              </div>
+            </a>
+          </li>
+        </ul>
+      </div>
     </div>
-  </div>
-  <div id="search-detail" ng-show="detail.showing" class="col-sm-6">
-    <search-detail></search-detail>
+    <div id="search-detail" ng-show="detail.showing" class="col-sm-6">
+      <search-detail></search-detail>
+    </div>
   </div>
 </div>

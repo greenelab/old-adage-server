@@ -275,11 +275,36 @@ class NodeResource(ModelResource):
         queryset = Node.objects.all()
         resource_name = 'node'
         allowed_methods = ['get']
+        multiple_allowed_methods = ['post']
         filtering = {
             'name': ('exact', 'in', ),
             'heavy_genes': ('exact', ),  # New filter, see apply_filters().
             'mlmodel': ('exact', ),
         }
+
+    def prepend_urls(self):
+        return [
+            url((r'^(?P<resource_name>%s)/'
+                 r'post_multiple%s$') %
+                (self._meta.resource_name, trailing_slash()),
+                self.wrap_view('dispatch_multiple'),
+                name='api_post_multiple'),
+        ]
+
+    def dispatch_multiple(self, request, **kwargs):
+        return self.dispatch('multiple', request, **kwargs)
+
+    def post_multiple(self, request, **kwargs):
+        """
+        use POSTs for retrieving long lists of Nodes
+        """
+        # we use the built-in Tastypie get_multiple implementation
+        # but to do so, we need to convert the request to a GET
+        request.method = 'GET'  # override the incoming POST
+        converted_request = convert_post_to_VERB(request, 'GET')
+        kwarg_name = '%s_list' % self._meta.detail_uri_name
+        kwargs[kwarg_name] = converted_request.body
+        return self.get_multiple(converted_request, **kwargs)
 
     def apply_filters(self, request, applicable_filters):
         object_list = super(NodeResource, self).apply_filters(

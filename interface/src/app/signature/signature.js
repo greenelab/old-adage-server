@@ -5,6 +5,7 @@
 angular.module('adage.signature', [
   'ui.router',
   'ui.bootstrap',
+  'adage.participation',
   'adage.signature.resources',
   'adage.utils',
   'greenelab.stats'
@@ -23,39 +24,11 @@ angular.module('adage.signature', [
   });
 }])
 
-.component('participationTypeSelector', {
-  templateUrl: 'signature/participation-type-selector.tpl.html',
-  bindings: {
-    selectedParticipationType: '=',
-    onChange: '&'
-  },
-  controller: ['ParticipationType', '$log', function(ParticipationType, $log) {
-    var self = this;
 
-    // apiReturnLimit is what the 'limit' parameter will be set to in the
-    // ParticipationType resource's GET request. By setting it to 0, we
-    // are actually telling the Tastypie API that we want it to return ALL
-    // objects from this endpoint (i.e. that we do not want a maximum
-    // limit to how many objects it returns).
-    var apiReturnLimit = 0;
-
-    ParticipationType.get({limit: apiReturnLimit},
-      function success(response) {
-        self.availableParticipationTypes = response.objects;
-        self.selectedParticipationType = response.objects[0];
-      },
-      function error(response) {
-        var errMessage = errGen('Failed to get ParticipationTypes: ',
-                                response);
-        $log.error(errMessage);
-        self.errorMessage = errMessage + '. Please try again later.';
-      }
-    );
-  }]
-})
-
-.controller('SignatureCtrl', ['Signature', '$stateParams', '$log', 'errGen',
-  function SignatureController(Signature, $stateParams, $log, errGen) {
+.controller('SignatureCtrl', ['Signature', '$stateParams', 'MlModelTracker',
+  '$log', 'errGen',
+  function SignatureController(Signature, $stateParams, MlModelTracker, $log,
+                               errGen) {
     var self = this;
     if (!$stateParams.id) {
       self.statusMessage = 'Please specify signature ID in the URL.';
@@ -67,15 +40,19 @@ angular.module('adage.signature', [
       {id: self.id},
       function success(response) {
         self.name = response.name;
-        self.mlmodel = response.mlmodel.title;
-        self.organism = response.mlmodel.organism.scientific_name;
+        MlModelTracker.set(response.mlmodel);
+        self.modelID = MlModelTracker.id;
+        console.log('self.modelID: ' + self.modelID);
+        self.mlmodel = MlModelTracker.title;
+        self.organism = MlModelTracker.organism.scientific_name;
         self.statusMessage = '';
       },
-      function error(response) {
-        var errMessage = errGen('Failed to get signature information: ',
-                                response);
+      function error(errObj) {
+        MlModelTracker.init();
+        var errMessage = errGen('Failed to get signature from server', errObj);
         $log.error(errMessage);
-        self.statusMessage = errMessage + '. Please try again later.';
+        self.statusMessage = errMessage +
+          '. Please check the signature ID and/or try again later.';
       }
     );
     self.genes = [];
@@ -195,13 +172,14 @@ angular.module('adage.signature', [
   };
 }])
 
-.directive('highRangeExp', ['Activity', 'Experiment', 'EmbedSpecService',
-  'errGen', '$log',
-  function(Activity, Experiment, EmbedSpecService, errGen, $log) {
+.directive('highRangeExp', ['Activity', 'SignatureExperiment',
+  'EmbedSpecService', 'errGen', '$log',
+  function(Activity, SignatureExperiment, EmbedSpecService, errGen, $log) {
     return {
       templateUrl: 'signature/high_range_exp.tpl.html',
       restrict: 'E',
       scope: {
+        modelId: '@',
         signatureId: '@',
         inputTopNum: '@topExp'
       },
@@ -300,7 +278,7 @@ angular.module('adage.signature', [
               sampleID = response.objects[i].sample;
               $scope.activities[sampleID] = response.objects[i].value;
             }
-            return Experiment.get({node: $scope.signatureId, limit: 0})
+            return SignatureExperiment.get({node: $scope.signatureId, limit: 0})
               .$promise;
           },
           function error(response) {

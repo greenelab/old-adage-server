@@ -1,14 +1,12 @@
-<div>
-  <h1 class="page-header">
-    Gene Network
-  </h1>
+<div class="page-header">
+  <h3>Gene Network</h3>
+  <ml-model-view></ml-model-view>
+  <ml-model-validator model-id="searchCtrl.modelInUrl"
+                      is-valid-model="searchCtrl.isValidModel">
+  </ml-model-validator>
+</div>
 
-  <div class="well">
-    <h3>Machine Learning Model</h3>
-    <ml-model-selector selected-ml-model="searchCtrl.selectedMlModel">
-    </ml-model-selector>
-  </div>
-
+<div ng-if="searchCtrl.isValidModel">
   <autocomplete-search-panel
     ng-if="searchCtrl.autocomplete"
     autocomplete="searchCtrl.autocomplete"

@@ -1,17 +1,23 @@
-<h1>ADAGE: Signature Information</h1>
+<div class="page-header">
+  <h3>Signature: {{ctrl.name}}</h3>
+  <ml-model-view></ml-model-view>
+</div>
+
+<h3 class="text-warning" ng-bind="ctrl.statusMessage"></h3>
+
+<h4>
+  <participation-type-selector
+      selected-participation-type="ctrl.selectedParticipationType">
+  </participation-type-selector>
+  <br>
+  <br>
+  {{ctrl.selectedParticipationType.description}}
+</h4>
+
+<hr>
 
 <div ng-if="!ctrl.statusMessage">
-  <h3>{{ctrl.name}}</h3>
-  <h4>(Model: {{ctrl.mlmodel}})</h4>
-  <h4>
-    <participation-type-selector
-        selected-participation-type="ctrl.selectedParticipationType">
-    </participation-type-selector>
-    <br>
-    <br>
-    {{ctrl.selectedParticipationType.description}}
-  </h4>
-  <hr>
+
   <div class="container">
     <div class="row">
       <div class="col-xs-6">
@@ -21,7 +27,8 @@
       </div>
 
       <div class="col-xs-6">
-        <high-range-exp signature-id="{{ctrl.id}}" top-exp="20">
+        <high-range-exp signature-id="{{ctrl.id}}" model-id="{{ctrl.modelID}}"
+                        top-exp="20">
         </high-range-exp>
       </div>
     </div>
@@ -37,5 +44,3 @@
     </div>
   </div>
 </div>
-
-<h3 class="text-warning" ng-bind="ctrl.statusMessage"></h3>

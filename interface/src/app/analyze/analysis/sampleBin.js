@@ -14,7 +14,14 @@ angular.module('adage.analyze.sampleBin', [
 
 .factory('SignatureSet', ['$resource', 'ApiBasePath',
   function($resource, ApiBasePath) {
-    return $resource(ApiBasePath + 'node/set/:ids/');
+    return $resource(
+      ApiBasePath + 'node/post_multiple/',
+      {},
+      {post: {
+        method: 'POST',
+        headers: {'Content-Type': 'text/plain'}
+      }}
+    );
   }
 ])
 
@@ -230,8 +237,9 @@ MathFuncts, errGen) {
         defer.resolve(cachedSignatureSet);
         return defer.promise;
       }
-      SignatureSet.get(
-        {ids: uncachedPkArr.join(';')},
+      SignatureSet.post(
+        {},
+        uncachedPkArr.join(';'),
         function success(responseObject) {
           var i;
           var signatureArr = responseObject.objects;
@@ -498,11 +506,13 @@ MathFuncts, errGen) {
   return SampleBin;
 }])
 
-.controller('SampleBinCtrl', ['$scope', 'SampleBin',
-function SampleBinCtrl($scope, SampleBin) {
-  // give our templates a way to access the SampleBin service
-  $scope.sb = SampleBin;
-}])
+.controller('SampleBinCtrl', ['$scope', 'SampleBin', 'MlModelTracker',
+  function SampleBinCtrl($scope, SampleBin, MlModelTracker) {
+    // give our templates a way to access the SampleBin service
+    $scope.sb = SampleBin;
+    $scope.modelInfo = MlModelTracker;
+  }
+])
 
 .directive('sampleBin', function() {
   return {
