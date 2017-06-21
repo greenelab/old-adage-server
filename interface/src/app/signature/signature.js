@@ -74,8 +74,8 @@ angular.module('adage.signature', [
         $scope.$watch('selectedParticipationType', function() {
           if ($scope.selectedParticipationType) {
             Participation.get(
-              {node: $scope.signatureId, limit: 0,
-               participation_type: $scope.selectedParticipationType.id},
+              {'node': $scope.signatureId, 'limit': 0,
+                'participation_type': $scope.selectedParticipationType.id},
               function success(response) {
                 $scope.genes = [];
                 var i = 0, n = response.objects.length;
