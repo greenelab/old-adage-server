@@ -5,14 +5,18 @@
 
 <h3 class="text-warning" ng-bind="ctrl.statusMessage"></h3>
 
-<h4>
+<p>
+  <b>Gene Participation Type:</b>
+  <br>
   <participation-type-selector
-      selected-participation-type="ctrl.selectedParticipationType">
+    selected-participation-type="ctrl.selectedParticipationType">
   </participation-type-selector>
   <br>
   <br>
+  <b>Description:</b>
+  <br>
   {{ctrl.selectedParticipationType.description}}
-</h4>
+</p>
 
 <hr>
 
