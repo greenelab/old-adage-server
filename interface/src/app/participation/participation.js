@@ -4,10 +4,9 @@ angular.module('adage.participation', [
 ])
 
 .component('participationTypeSelector', {
-  templateUrl: 'signature/participation-type-selector.tpl.html',
+  templateUrl: 'participation/participation-type-selector.tpl.html',
   bindings: {
-    selectedParticipationType: '=',
-    onChange: '&'
+    selectedParticipationType: '='
   },
   controller: ['ParticipationType', 'errGen', '$log',
     function(ParticipationType, errGen, $log) {
