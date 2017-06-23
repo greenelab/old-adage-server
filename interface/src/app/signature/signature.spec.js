@@ -24,9 +24,11 @@ describe('<participatory-genes> directive', function() {
     parentScope.signatureId = 123;
     parentScope.selectedParticipationType = null;
 
-    var testHTML = '<participatory-genes signature-id="{{signatureId}}" ' +
-        'genes="genes" selected-participation-type=' +
-        '"selectedParticipationType"></participatory-genes>';
+    var testHTML = '<participatory-genes ' +
+      'signature-id="{{signatureId}}" ' +
+      'genes="genes" ' +
+      'selected-participation-type="selectedParticipationType">' +
+    '</participatory-genes>';
 
     var element = $compile(testHTML)(parentScope);
     parentScope.$digest(); // Start Angular's digest cycle manually.
