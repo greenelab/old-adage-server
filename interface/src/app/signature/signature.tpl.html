@@ -5,12 +5,31 @@
 
 <h3 class="text-warning" ng-bind="ctrl.statusMessage"></h3>
 
+<p>
+  <b>Gene Participation Type:</b>
+  <br>
+  <participation-type-selector
+    selected-participation-type="ctrl.selectedParticipationType">
+  </participation-type-selector>
+  <br>
+  <br>
+  <b>Description:</b>
+  <br>
+  {{ctrl.selectedParticipationType.description}}
+</p>
+
+<hr>
+
 <div ng-if="!ctrl.statusMessage">
+
   <div class="container">
     <div class="row">
       <div class="col-xs-6">
-        <high-weight-genes signature-id="{{ctrl.id}}" genes="ctrl.genes">
-        </high-weight-genes>
+        <participatory-genes
+          signature-id="{{ctrl.id}}"
+          genes="ctrl.genes"
+          selected-participation-type="ctrl.selectedParticipationType">
+        </participatory-genes>
       </div>
 
       <div class="col-xs-6">
@@ -21,7 +40,10 @@
     </div>
     <div class="row">
       <div class="col-xs-6">
-        <enriched-genesets organism="{{ctrl.organism}}" genes="ctrl.genes">
+        <enriched-genesets
+          organism="{{ctrl.organism}}"
+          genes="ctrl.genes"
+          selected-participation-type="ctrl.selectedParticipationType">
         </enriched-genesets>
       </div>
 
