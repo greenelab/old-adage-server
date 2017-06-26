@@ -5,6 +5,7 @@
 angular.module('adage.signature', [
   'ui.router',
   'ui.bootstrap',
+  'adage.participation',
   'adage.signature.resources',
   'adage.utils',
   'greenelab.stats'
@@ -22,6 +23,7 @@ angular.module('adage.signature', [
     data: {pageTitle: 'Signature Information'}
   });
 }])
+
 
 .controller('SignatureCtrl', ['Signature', '$stateParams', 'MlModelTracker',
   '$log', 'errGen',
@@ -41,6 +43,8 @@ angular.module('adage.signature', [
         MlModelTracker.set(response.mlmodel);
         self.modelID = MlModelTracker.id;
         console.log('self.modelID: ' + self.modelID);
+        self.mlmodel = MlModelTracker.title;
+        self.organism = MlModelTracker.organism.scientific_name;
         self.statusMessage = '';
       },
       function error(errObj) {
@@ -51,49 +55,56 @@ angular.module('adage.signature', [
           '. Please check the signature ID and/or try again later.';
       }
     );
-    self.organism = 'Pseudomonas aeruginosa';
     self.genes = [];
   }
 ])
 
-.directive('highWeightGenes', ['Participation', '$log',
-  function(Participation, $log) {
+.directive('participatoryGenes', ['Participation', '$log', 'errGen',
+  function(Participation, $log, errGen) {
     return {
-      templateUrl: 'signature/high_weight_genes.tpl.html',
+      templateUrl: 'signature/participatory_genes.tpl.html',
       restrict: 'E',
       scope: {
         signatureId: '@',
+        selectedParticipationType: '=',
         genes: '='
       },
       link: function($scope) {
         $scope.queryStatus = 'Connecting to the server ...';
-        Participation.get(
-          {node: $scope.signatureId, limit: 0},
-          function success(response) {
-            $scope.genes = [];
-            var i = 0, n = response.objects.length;
-            var sysName, stdName, desc;
-            var numHypo = 0;
-            for (; i < n; ++i) {
-              sysName = response.objects[i].gene.systematic_name;
-              stdName = response.objects[i].gene.standard_name;
-              desc = response.objects[i].gene.description;
-              entrezID = response.objects[i].gene.entrezid;
-              if (desc.toLowerCase() === 'hypothetical protein') {
-                ++numHypo;
+        $scope.$watch('selectedParticipationType', function() {
+          if ($scope.selectedParticipationType) {
+            Participation.get(
+              {'node': $scope.signatureId, 'limit': 0,
+                'participation_type': $scope.selectedParticipationType.id},
+              function success(response) {
+                $scope.genes = [];
+                var i = 0, n = response.objects.length;
+                var sysName, stdName, desc;
+                var numHypo = 0;
+                for (; i < n; ++i) {
+                  sysName = response.objects[i].gene.systematic_name;
+                  stdName = response.objects[i].gene.standard_name;
+                  desc = response.objects[i].gene.description;
+                  entrezID = response.objects[i].gene.entrezid;
+                  if (desc.toLowerCase() === 'hypothetical protein') {
+                    ++numHypo;
+                  }
+                  $scope.genes.push(
+                    {sysName: sysName, stdName: stdName, desc: desc,
+                      entrezID: entrezID});
+                }
+                $scope.hypoPercentage = Math.round(numHypo / n * 100);
+                $scope.queryStatus = '';
+              },
+              function error(response) {
+                var errMessage = errGen('Failed to get participatory genes',
+                                        response);
+                $log.error(errMessage);
+                self.statusMessage = errMessage + '. Please try again later.';
               }
-              $scope.genes.push(
-                {sysName: sysName, stdName: stdName, desc: desc,
-                  entrezID: entrezID});
-            }
-            $scope.hypoPercentage = Math.round(numHypo / n * 100);
-            $scope.queryStatus = '';
-          },
-          function error(err) {
-            $log.error('Failed to get high weight genes: ' + err.statusText);
-            $scope.queryStatus = 'Failed to get high weight genes from server';
+            );
           }
-        );
+        });
       }
     };
   }]
@@ -304,6 +315,7 @@ angular.module('adage.signature', [
       restrict: 'E',
       scope: {
         organism: '@',
+        selectedParticipationType: '=',
         genes: '=' // an array of high-weight genes in the Signature page.
       },
       link: function($scope) {
@@ -418,6 +430,8 @@ angular.module('adage.signature', [
                 $scope.queryStatus = 'Failed to get genesets from server';
               }
             );
+          } else {
+            $scope.enrichedGenesets = [];
           }
         });
       }
