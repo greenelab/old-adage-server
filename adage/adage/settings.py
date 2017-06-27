@@ -82,12 +82,18 @@ ELASTICSEARCH_INDEX_SETTINGS = {
                     "tokenizer": "standard",
                     "filter": [
                         "standard",
-                        "word_delimiter",
+                        "adage_word_delimiter",
                         "lowercase",
                         "stop",
                         "snowball"
                     ]
                 },
+            },
+            'filter': {
+                'adage_word_delimiter': {
+                    'type': 'word_delimiter',
+                    'split_on_case_change': False
+                }
             }
         }
     }
