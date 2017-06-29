@@ -1,4 +1,4 @@
-<div class="page-header">
+<div class="page-header" id="top-of-page">
   <h3>Signature: {{ctrl.name}}</h3>
   <ml-model-view></ml-model-view>
 </div>
@@ -21,26 +21,23 @@
 <hr>
 
 <div ng-if="!ctrl.statusMessage">
-  <div class="container">
-    <b>Sections:</b>
-    <ul class="nav nav-pills">
-      <li role="presentation">
-        <a ng-click="ctrl.goToAnchor('participatory-genes')">
-          {{ctrl.selectedParticipationType.name}}
-        </a>
-      </li>
-      <li role="presentation">
-        <a ng-click="ctrl.goToAnchor('high-range-exp')">
-          High range experiments
-        </a>
-      </li>
-      <li role="presentation">
-        <a ng-click="ctrl.goToAnchor('enriched-genesets')">
-          Enriched gene sets
-        </a>
-      </li>
-    </ul>
-  </div>
+  <h4><b>Sections:</b></h4>
+  <li role="presentation">
+    <a ng-click="ctrl.goToAnchor({anchor: 'participatory-genes'})">
+      {{ctrl.selectedParticipationType.name}}
+    </a>
+  </li>
+  <li role="presentation">
+    <a ng-click="ctrl.goToAnchor({anchor: 'high-range-exp'})">
+      High range experiments
+    </a>
+  </li>
+  <li role="presentation">
+    <a ng-click="ctrl.goToAnchor({anchor: 'enriched-genesets'})">
+      Enriched gene sets
+    </a>
+  </li>
+  <br>
 
   <div class="container">
     <participatory-genes
@@ -55,7 +52,8 @@
       signature-id="{{ctrl.id}}"
       model-id="{{ctrl.modelID}}"
       top-exp="20"
-      id="high-range-exp">
+      id="high-range-exp"
+      go-to-anchor="ctrl.goToAnchor({anchor: anchor})">
     </high-range-exp>
     <hr>
 
@@ -63,7 +61,8 @@
       organism="{{ctrl.organism}}"
       genes="ctrl.genes"
       selected-participation-type="ctrl.selectedParticipationType"
-      id="enriched-genesets">
+      id="enriched-genesets"
+      go-to-anchor="ctrl.goToAnchor({anchor: anchor})">
     </enriched-genesets>
 
   </div>

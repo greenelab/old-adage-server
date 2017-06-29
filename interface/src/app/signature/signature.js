@@ -37,8 +37,8 @@ angular.module('adage.signature', [
     self.id = $stateParams.id;
     self.statusMessage = 'Connecting to the server ...';
 
-    self.goToAnchor = function(anchorName) {
-      $location.hash(anchorName);
+    self.goToAnchor = function(anchorObj) {
+      $location.hash(anchorObj.anchor);
       $anchorScroll();
     };
 
@@ -187,7 +187,8 @@ angular.module('adage.signature', [
       scope: {
         modelId: '@',
         signatureId: '@',
-        inputTopNum: '@topExp'
+        inputTopNum: '@topExp',
+        goToAnchor: '&'
       },
       link: function($scope) {
         $scope.queryStatus = 'Connecting to the server ...';
@@ -322,7 +323,8 @@ angular.module('adage.signature', [
       scope: {
         organism: '@',
         selectedParticipationType: '=',
-        genes: '=' // an array of high-weight genes in the Signature page.
+        genes: '=', // an array of high-weight genes in the Signature page.
+        goToAnchor: '&'
       },
       link: function($scope) {
         $scope.queryStatus = 'Connecting to the server ...';

@@ -1,6 +1,10 @@
 <div ng-if="!queryStatus">
   <h4>
-    <b>Experiments with the Highest Range: </b>
+    <b>Experiments with the Highest Range: </b>&nbsp;
+    <button type="button" class="btn btn-default"
+      ng-click="goToAnchor({anchor: 'top-of-page'})">
+      Back to Top
+    </button>
   </h4>
   <button class="btn btn-primary" ng-click="setMode()"
           ng-hide="topMode">Show Top {{topNum}}</button>
