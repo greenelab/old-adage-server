@@ -8,9 +8,13 @@ import re
 import sys
 import codecs
 import unittest
+from copy import deepcopy
 
 from django.db.models import Q
 from django.test import TestCase
+from django.test.utils import override_settings
+from django.core.management import call_command
+from django.conf import settings
 from organisms.models import Organism
 from genes.models import Gene
 from analyze.models import (
@@ -21,6 +25,7 @@ from analyze.management.commands.import_data import (
 from datetime import datetime
 from tastypie.test import ResourceTestCaseMixin
 from fixtureless import Factory
+import haystack
 
 sys.path.append(os.path.abspath('../../'))
 import get_pseudo_sdrf as gp
@@ -31,6 +36,10 @@ factory = Factory()
 
 from adage.settings import CONFIG
 from analyze.api import SampleResource
+
+
+TEST_INDEX = deepcopy(settings.HAYSTACK_CONNECTIONS)
+TEST_INDEX['default']['INDEX_NAME'] = 'test_index'
 
 
 class ModelsTestCase(TestCase):
@@ -1025,3 +1034,107 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
             self.deserialize(resp)['meta']['total_count'],
             self.expressionvalue_count
         )
+
+
+@override_settings(HAYSTACK_CONNECTIONS=TEST_INDEX)
+class SearchIndexTestCase(ResourceTestCaseMixin, TestCase):
+    searchURI = '/api/v0/search/'
+    experiments = [
+        {
+            'accession':    'E-GEOD-31227',
+            'name':         'Expression data of Pseudomonas aeruginosa isolates'
+                            ' from Cystic Fibrosis patients in Denmark',
+            'description':  'CF patients suffer from chronic and recurrent '
+                'respiratory tract infections which eventually lead to lung '
+                'failure followed by death. Pseudomonas aeruginosa is one '
+                'of the major pathogens for CF patients and is the principal '
+                'cause of mortality and morbidity in CF patients. Once it '
+                'gets adapted, P. aeruginosa can persist for several decades '
+                'in the respiratory tracts of CF patients, overcoming host '
+                'defense mechanisms as well as intensive antibiotic '
+                'therapies. P. aeruginosa CF strains isolated from different '
+                'infection stage were selected for RNA extraction and '
+                'hybridization on Affymetrix microarrays. Two batch of P. '
+                'aeruginosa CF isolates are chosen : 1) isolates from a '
+                'group of patients since 1973-2008 as described in ref '
+                '(PMID: 21518885); 2) isolates from a group of newly '
+                'infected children as described in ref (PMID: 20406284).'
+        }, {
+            'accession':    'E-GEOD-24262',
+            'name':         'PA14_mexR vs. wildtype planktonic cells in minimal'
+                            ' medium with C-30',
+            'description':  'Mutations that made the cells insensitive to the '
+                'QS inhibition by C-30 were identified in mexR, a multi-drug '
+                'resistance operon repressor. Gene expression of mexR mutant '
+                'relative to wild-type at the presence of C-30 was examined. '
+                'Strains: PA14_mexR and wildtype. Medium: OS minimal medium + '
+                '0.1% Adenosine as carbon source. Compounds: 50 µM C-30 added '
+                'at OD600=0.25. Time: 2 hr. Temp: 37 ºC. Cell type: Planktonic '
+                'Cells.'
+        }, {
+            'accession':    'E-GEOD-17296',
+            'name':         'Transcription profiling of Pseudomonas aeruginosa '
+                            'roxSR and anr mutant strains under aerobic '
+                            'conditions',
+            'description':  'To assess the role of two redox-sensitive '
+                'transcriptional regulators, RoxSR and ANR, in Pseudomonas '
+                'aeruginosa under aerobic conditions, microarray analysis was '
+                'performed. Transcriptome profiles of roxSR mutant and anr '
+                'mutant aerobically grown in LB medium were determined by '
+                'Affymetrix GeneChip at both the exponential phase and early '
+                'stationary phase and compared to that of the wild type '
+                'strain. Experiment Overall Design: Pseudomonas aeruginosa '
+                'wild type (PAO1ut), roxSR mutant (ROX1), and anr mutant '
+                '(PAO6261) strains were cultivated aerobically in LB in '
+                'Erlenmeyer flasks, and total RNAs were extracted at both the '
+                'exponential phase (OD600 = 0.3) and early stationary phase '
+                '(OD600 = 1.4). The experiment was performed in duplicate '
+                'independent cultures.'
+        }
+    ]
+
+    def setUp(self):
+        haystack.connections.reload('default')
+        super(SearchIndexTestCase, self).setUp()
+        for e in self.experiments:
+            ModelsTestCase.create_test_experiment(experiment_data=e)
+        call_command('update_index', interactive=False, verbosity=0)
+
+    def testCaseInsensitive(self):
+        """
+        We should find the same results whether we're searching with a
+        mixed-case search term or all lower case.
+        This is a check that we're handing issue #123 properly.
+        """
+        respMixed = self.api_client.get(self.searchURI, data={'q': 'mexR'})
+        self.assertValidJSONResponse(respMixed)
+        respLower = self.api_client.get(self.searchURI, data={'q': 'mexr'})
+        self.assertValidJSONResponse(respLower)
+        jsonMixed = self.deserialize(respMixed)
+        jsonLower = self.deserialize(respLower)
+        self.assertEqual(
+            jsonMixed['meta']['total_count'],
+            jsonLower['meta']['total_count']
+        )
+        self.assertEqual(
+            jsonMixed['objects'],
+            jsonLower['objects']
+        )
+
+    def testSearchPA14(self):
+        """
+        A search for 'PA14' should yield experiment E-GEOD-24262
+        This is a check that we're handling Bitbucket issue #1 properly:
+        https://bitbucket.org/greenelab/adage-server/issues/1/
+        Note: this simple test assumes no other PA14 experiments are added
+        to the test data.
+        """
+        respPA14 = self.api_client.get(self.searchURI, data={'q': 'PA14'})
+        self.assertValidJSONResponse(respPA14)
+        self.assertEqual(
+            self.deserialize(respPA14)['objects'][0]['pk'],
+            'E-GEOD-24262'
+        )
+
+    def tearDown(self):
+        call_command('clear_index', interactive=False, verbosity=0)
