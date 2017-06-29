@@ -21,34 +21,50 @@
 <hr>
 
 <div ng-if="!ctrl.statusMessage">
+  <div class="container">
+    <b>Sections:</b>
+    <ul class="nav nav-pills">
+      <li role="presentation">
+        <a ng-click="ctrl.goToAnchor('participatory-genes')">
+          {{ctrl.selectedParticipationType.name}}
+        </a>
+      </li>
+      <li role="presentation">
+        <a ng-click="ctrl.goToAnchor('high-range-exp')">
+          High range experiments
+        </a>
+      </li>
+      <li role="presentation">
+        <a ng-click="ctrl.goToAnchor('enriched-genesets')">
+          Enriched genesets
+        </a>
+      </li>
+    </ul>
+  </div>
 
   <div class="container">
-    <div class="row">
-      <div class="col-xs-6">
-        <participatory-genes
-          signature-id="{{ctrl.id}}"
-          genes="ctrl.genes"
-          selected-participation-type="ctrl.selectedParticipationType">
-        </participatory-genes>
-      </div>
+    <participatory-genes
+      signature-id="{{ctrl.id}}"
+      genes="ctrl.genes"
+      selected-participation-type="ctrl.selectedParticipationType"
+      id="participatory-genes">
+    </participatory-genes>
+    <hr>
 
-      <div class="col-xs-6">
-        <high-range-exp signature-id="{{ctrl.id}}" model-id="{{ctrl.modelID}}"
-                        top-exp="20">
-        </high-range-exp>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-xs-6">
-        <enriched-genesets
-          organism="{{ctrl.organism}}"
-          genes="ctrl.genes"
-          selected-participation-type="ctrl.selectedParticipationType">
-        </enriched-genesets>
-      </div>
+    <high-range-exp
+      signature-id="{{ctrl.id}}"
+      model-id="{{ctrl.modelID}}"
+      top-exp="20"
+      id="high-range-exp">
+    </high-range-exp>
+    <hr>
 
-      <div class="col-xs-6">
-      </div>
-    </div>
+    <enriched-genesets
+      organism="{{ctrl.organism}}"
+      genes="ctrl.genes"
+      selected-participation-type="ctrl.selectedParticipationType"
+      id="enriched-genesets">
+    </enriched-genesets>
+
   </div>
 </div>

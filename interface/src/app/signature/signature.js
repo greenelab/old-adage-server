@@ -26,9 +26,9 @@ angular.module('adage.signature', [
 
 
 .controller('SignatureCtrl', ['Signature', '$stateParams', 'MlModelTracker',
-  '$log', 'errGen',
+  '$log', 'errGen', '$location', '$anchorScroll',
   function SignatureController(Signature, $stateParams, MlModelTracker, $log,
-                               errGen) {
+                               errGen, $location, $anchorScroll) {
     var self = this;
     if (!$stateParams.id) {
       self.statusMessage = 'Please specify signature ID in the URL.';
@@ -36,6 +36,12 @@ angular.module('adage.signature', [
     }
     self.id = $stateParams.id;
     self.statusMessage = 'Connecting to the server ...';
+
+    self.goToAnchor = function(anchorName) {
+      $location.hash(anchorName);
+      $anchorScroll();
+    };
+
     Signature.get(
       {id: self.id},
       function success(response) {
