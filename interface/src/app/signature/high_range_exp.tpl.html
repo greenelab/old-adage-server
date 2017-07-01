@@ -1,23 +1,17 @@
 <div ng-if="!queryStatus">
   <h4>
-    <b>Experiments with the Highest Range: </b>&nbsp;
-    <button type="button" class="btn btn-default"
-      ng-click="goToAnchor({anchor: 'top-of-page'})">
-      Back to Top
-    </button>
+    <b>Experiments with the Highest Range: </b>
   </h4>
-  <button class="btn btn-primary" ng-click="setMode()"
-          ng-hide="topMode">Show Top {{topNum}}</button>
-  <button class="btn btn-primary" ng-click="setMode()"
-          ng-show="topMode">Show All</button>
-
-  <br>
+  <p>
+    Explore gene expression experiments with the highest range of this
+    signature's activity.
+  </p>
   (Click the activity distribution widget to see sample annotations in this experiement.)
   <table class="table table-striped">
     <tbody>
       <!-- It may seem more intuitive to use:
              <tr ng-repeat="exp in experiments | limitTo: numExpShown">
-           but this approach would require re-rendering the vega-lite widget;
+           but this approach would require re-r.endering the vega-lite widget;
            instead we use "$index >= numExpShown" to hide rows of lower range.
          -->
       <tr ng-repeat="exp in experiments" ng-show="$index < numExpShown">
@@ -42,6 +36,16 @@
                  tooltip-placement="left-top">
             </div>
           </a>
+        </td>
+      </tr>
+      <tr ng-click="setMode()" ng-show="topMode">
+        <td>
+          <button type="button" class="btn btn-default">Show all ...</button>
+        </td>
+      </tr>
+      <tr ng-click="setMode()" ng-hide="topMode">
+        <td>
+          <button type="button" class="btn btn-default">Only show top {{topNum}}</button>
         </td>
       </tr>
     </tbody>
