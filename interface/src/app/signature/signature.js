@@ -36,7 +36,6 @@ angular.module('adage.signature', [
     }
     self.id = $stateParams.id;
     self.statusMessage = 'Connecting to the server ...';
-
     Signature.get(
       {id: self.id},
       function success(response) {
