@@ -6,64 +6,37 @@
 <h3 class="text-warning" ng-bind="ctrl.statusMessage"></h3>
 
 <p>
-  <b>Gene Participation Type:</b>
+  <b>Participation Type of Genes in this Signature:</b>
   <br>
   <participation-type-selector
     selected-participation-type="ctrl.selectedParticipationType">
   </participation-type-selector>
   <br>
-  <br>
-  <b>Description:</b>
-  <br>
   {{ctrl.selectedParticipationType.description}}
 </p>
-
-<hr>
+<br>
 
 <div ng-if="!ctrl.statusMessage">
-  <h4><b>Sections:</b></h4>
-  <li role="presentation">
-    <a ng-click="ctrl.goToAnchor({anchor: 'participatory-genes'})">
-      {{ctrl.selectedParticipationType.name}}
-    </a>
-  </li>
-  <li role="presentation">
-    <a ng-click="ctrl.goToAnchor({anchor: 'high-range-exp'})">
-      High range experiments
-    </a>
-  </li>
-  <li role="presentation">
-    <a ng-click="ctrl.goToAnchor({anchor: 'enriched-genesets'})">
-      Enriched gene sets
-    </a>
-  </li>
-  <br>
-
   <div class="container">
     <participatory-genes
       signature-id="{{ctrl.id}}"
       genes="ctrl.genes"
-      selected-participation-type="ctrl.selectedParticipationType"
-      id="participatory-genes">
+      selected-participation-type="ctrl.selectedParticipationType">
     </participatory-genes>
-    <hr>
-
-    <high-range-exp
-      signature-id="{{ctrl.id}}"
-      model-id="{{ctrl.modelID}}"
-      top-exp="20"
-      id="high-range-exp"
-      go-to-anchor="ctrl.goToAnchor({anchor: anchor})">
-    </high-range-exp>
     <hr>
 
     <enriched-genesets
       organism="{{ctrl.organism}}"
       genes="ctrl.genes"
-      selected-participation-type="ctrl.selectedParticipationType"
-      id="enriched-genesets"
-      go-to-anchor="ctrl.goToAnchor({anchor: anchor})">
+      selected-participation-type="ctrl.selectedParticipationType">
     </enriched-genesets>
+    <hr>
+
+    <high-range-exp
+      signature-id="{{ctrl.id}}"
+      model-id="{{ctrl.modelID}}"
+      top-exp="3">
+    </high-range-exp>
 
   </div>
 </div>
