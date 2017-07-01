@@ -11,7 +11,7 @@
     <tbody>
       <!-- It may seem more intuitive to use:
              <tr ng-repeat="exp in experiments | limitTo: numExpShown">
-           but this approach would require re-r.endering the vega-lite widget;
+           but this approach would require re-rendering the vega-lite widget;
            instead we use "$index >= numExpShown" to hide rows of lower range.
          -->
       <tr ng-repeat="exp in experiments" ng-show="$index < numExpShown">
