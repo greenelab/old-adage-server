@@ -1,12 +1,13 @@
 <h4>
-  <b>Enriched gene sets: </b>&nbsp;
-  <button type="button" class="btn btn-default"
-    ng-click="goToAnchor({anchor: 'top-of-page'})">
-    Back to Top
-  </button>
+  <b>Enriched gene sets: </b>
 </h4>
+<p>
+  Explore canonical (or curated) gene sets that significantly overlap
+  with this signature's associated genes; can help with interpretation of
+  the underlying process or processes.
+</p>
 
-<table id="enrichment-table" class="table table-striped table-bordered table-condensed">
+<table id="enrichment-table" class="table table-striped">
   <thead>
     <tr>
       <th>Pathways/Processes/Diseases</th>
@@ -16,11 +17,28 @@
     </tr>
   </thead>
 
-  <tr ng-repeat="geneset in enrichedGenesets">
+  <tr ng-repeat="geneset in enrichedGenesets | limitTo: numGenesetsShown">
     <td><a href="{{geneset.url}}">{{geneset.name}}</a></td>
     <td>{{geneset.dbase}}</td>
     <td>{{geneset.pValue}}</td>
     <td>{{geneset.genes}}</td>
+  </tr>
+
+  <tr ng-click="setMode()" ng-show="topMode">
+    <td>
+      <button type="button" class="btn btn-default">Show all ...</button>
+    </td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+  <tr ng-click="setMode()" ng-hide="topMode">
+    <td>
+      <button type="button" class="btn btn-default">Only show top {{topNum}}</button>
+    </td>
+    <td></td>
+    <td></td>
+    <td></td>
   </tr>
 
 </table>
