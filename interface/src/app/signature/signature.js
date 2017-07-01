@@ -77,6 +77,17 @@ angular.module('adage.signature', [
       },
       link: function($scope) {
         $scope.queryStatus = 'Connecting to the server ...';
+
+        $scope.topMode = true;
+        $scope.topNum = 3;
+        $scope.numGenesShown = $scope.topNum;
+
+        $scope.setMode = function() {
+          $scope.topMode = !$scope.topMode;
+          $scope.numGenesShown =
+            $scope.topMode ? $scope.topNum : $scope.genes.length;
+        };
+
         $scope.$watch('selectedParticipationType', function() {
           if ($scope.selectedParticipationType) {
             Participation.get(
@@ -187,8 +198,7 @@ angular.module('adage.signature', [
       scope: {
         modelId: '@',
         signatureId: '@',
-        inputTopNum: '@topExp',
-        goToAnchor: '&'
+        inputTopNum: '@topExp'
       },
       link: function($scope) {
         $scope.queryStatus = 'Connecting to the server ...';
@@ -323,11 +333,20 @@ angular.module('adage.signature', [
       scope: {
         organism: '@',
         selectedParticipationType: '=',
-        genes: '=', // an array of high-weight genes in the Signature page.
-        goToAnchor: '&'
+        genes: '=' // an array of high-weight genes in the Signature page.
       },
       link: function($scope) {
         $scope.queryStatus = 'Connecting to the server ...';
+
+        $scope.topMode = true;
+        $scope.topNum = 3;
+        $scope.numGenesetsShown = $scope.topNum;
+
+        $scope.setMode = function() {
+          $scope.topMode = !$scope.topMode;
+          $scope.numGenesetsShown =
+            $scope.topMode ? $scope.topNum : $scope.enrichedGenesets.length;
+        };
 
         $scope.pValueCutoff = 0.05;
         var pValueSigDigits = 3;
