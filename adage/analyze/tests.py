@@ -1069,8 +1069,8 @@ class SearchIndexTestCase(ResourceTestCaseMixin, TestCase):
                 'relative to wild-type at the presence of C-30 was examined. '
                 'Strains: PA14_mexR and wildtype. Medium: OS minimal medium + '
                 '0.1% Adenosine as carbon source. Compounds: 50 µM C-30 added '
-                'at OD600=0.25. Time: 2 hr. Temp: 37 ºC. Cell type: Planktonic '
-                'Cells.'
+                'at OD600=0.25. Time: 2 hr. Temp: 37 ºC. Cell type: '
+                'Planktonic Cells.'
         }, {
             'accession': 'E-GEOD-17296',
             'name': 'Transcription profiling of Pseudomonas aeruginosa roxSR '
