@@ -206,7 +206,7 @@ angular.module('adage.gene.network', [
         });
       };
 
-      // Function that sets edges in the netowrk.
+      // Function that sets edges in the network.
       var setEdges = function(edgeList) {
         // Build a hash with gene objects indexed by pk.
         var geneObjectHash = {};
