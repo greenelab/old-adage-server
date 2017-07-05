@@ -72,20 +72,20 @@ HAYSTACK_SEARCH_RESULTS_PER_PAGE = 10
 # define and activate an Elasticsearch Custom Analyzer that mimics Snowball
 # but adds a word_delimiter token filter where we want it (fixes bitbucket
 # issue #1: "search on PA14 does not find E-GEOD-24262")
-ELASTICSEARCH_DEFAULT_ANALYZER = "adage_snowball"
+ELASTICSEARCH_DEFAULT_ANALYZER = 'adage_snowball'
 ELASTICSEARCH_INDEX_SETTINGS = {
     'settings': {
-        "analysis": {
-            "analyzer": {
-                "adage_snowball": {
-                    "type": "custom",
-                    "tokenizer": "standard",
-                    "filter": [
-                        "standard",
-                        "adage_word_delimiter",
-                        "lowercase",
-                        "stop",
-                        "snowball"
+        'analysis': {
+            'analyzer': {
+                'adage_snowball': {
+                    'type': 'custom',
+                    'tokenizer': 'standard',
+                    'filter': [
+                        'standard',
+                        'adage_word_delimiter',
+                        'lowercase',
+                        'stop',
+                        'snowball'
                     ]
                 },
             },
