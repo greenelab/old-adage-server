@@ -484,7 +484,8 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
 
     def call_non_get_post_API(self, uri, data={}):
         '''
-        Helper method: assert that PUT, PATCH and DELETE methods are NOT allowed
+        Helper method: assert that PUT, PATCH and DELETE methods are NOT
+        allowed.
         '''
         # PUT
         resp = self.api_client.put(uri, data=data)
@@ -707,6 +708,19 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         self.call_get_API(uri)
         self.call_non_get_API(uri)
 
+    @staticmethod
+    def get_edge_union(gene_ids):
+        """Return all edges that are related to input gene_ids."""
+        qset = Q(gene1__in=gene_ids) | Q(gene2__in=gene_ids)
+        direct_edges = Edge.objects.filter(qset).distinct()
+        related_genes = set()
+        for e in direct_edges:
+            related_genes.add(e.gene1)
+            related_genes.add(e.gene2)
+        return Edge.objects.filter(
+            gene1__in=related_genes, gene2__in=related_genes
+        ).distinct()
+
     def test_edge_union(self):
         """
         Test edge unions via 'api/v0/edge/?genes=<id1,id2,...>' API.
@@ -718,18 +732,16 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         id2 = Gene.objects.last().id   # The last gene
 
         # The number of edges in the union of the first and last genes
-        # should be: num_gene1 + num_gene2 - 1, "-1" is due to double
-        # counting of the edge between the first and last genes.
+        # should be equal to num_gene1 * num_gene2.
         uri = self.baseURI + "edge/"
         data = {'genes': "%s,%s" % (id1, id2)}
         resp = self.api_client.get(uri, data=data)
         resp = self.deserialize(resp)
         api_result = len(resp['objects'])
-        self.assertEqual(api_result, self.num_gene1 + self.num_gene2 - 1)
+        self.assertEqual(api_result, self.num_gene1 * self.num_gene2)
 
         # Also confirm that api_result matches the Django query result.
-        qset = Q(gene1__in=[id1, id2]) | Q(gene2__in=[id1, id2])
-        query_result = Edge.objects.filter(qset).distinct().count()
+        query_result = self.get_edge_union([id1, id2]).count()
         self.assertEqual(api_result, query_result)
 
         # Confirm the union of edges that involve 100 randomly selected
@@ -741,9 +753,7 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         resp = self.api_client.get(uri, data=data)
         resp = self.deserialize(resp)
         api_result = len(resp['objects'])
-
-        qset = Q(gene1__in=random_genes) | Q(gene2__in=random_genes)
-        query_result = Edge.objects.filter(qset).distinct().count()
+        query_result = self.get_edge_union(random_genes).count()
         self.assertEqual(api_result, query_result)
 
     def test_edge_intersection(self):
@@ -946,11 +956,6 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
             organism = Organism.objects.first()
         else:
             organism = factory.create(Organism)
-
-        if MLModel.objects.exists():
-            ml_model = MLModel.objects.first()
-        else:
-            ml_model = factory.create(MLModel)
 
         # Create genes:
         for i in range(num_genes):
