@@ -15,37 +15,38 @@ angular.module('adage.gene.searchMany', [
         'main': {
           templateUrl: 'gene/gene-network.tpl.html',
           controller: ['$stateParams', 'MlModelTracker', 'UserFactory',
-          function($stateParams, MlModelTracker, UserFactory) {
-            var self = this;
-            self.isValidModel = false;
-            // Do nothing if mlmodel in URL is falsey. The error will be taken
-            // care of by "<ml-model-validator>" component.
-            if (!$stateParams.mlmodel) {
-              return;
+            function($stateParams, MlModelTracker, UserFactory) {
+              var self = this;
+              self.isValidModel = false;
+              // Do nothing if mlmodel in URL is falsey. The error will be taken
+              // care of by "<ml-model-validator>" component.
+              if (!$stateParams.mlmodel) {
+                return;
+              }
+
+              self.modelInUrl = $stateParams.mlmodel;
+              self.selectedMlModel = MlModelTracker;
+              self.userObj = null;
+              UserFactory.getPromise().then(function() {
+                self.userObj = UserFactory.getUser();
+              });
+
+              // 'self.autocomplete' holds a boolean value, of whether or
+              // not the user wants to use autocomplete search to look up a
+              // few genes. If not, then the autocomplete search panel will
+              // disappear, and the panel to search many genes will appear.
+              //
+              // *Note: This boolean value wasn't getting properly changed
+              // in the child directives when it was passed as a primitive.
+              // It needed to be either set as a property inside a new object
+              // (which was then placed in the $scope object), or made part of
+              // the controller instance object when using 'controllerAs'
+              // syntax. We chose to follow this last approach as it is
+              // considered a best practice. For more information on this, see:
+              // https://github.com/angular/angular.js/wiki/Understanding-Scopes
+              self.autocomplete = true;
             }
-
-            self.modelInUrl = $stateParams.mlmodel;
-            self.selectedMlModel = MlModelTracker;
-            self.userObj = null;
-            UserFactory.getPromise().then(function() {
-              self.userObj = UserFactory.getUser();
-            });
-
-            // 'self.autocomplete' holds a boolean value, of whether or
-            // not the user wants to use autocomplete search to look up a
-            // few genes. If not, then the autocomplete search panel will
-            // disappear, and the panel to search many genes will appear.
-            //
-            // *Note: This boolean value wasn't getting properly changed
-            // in the child directives when it was passed as a primitive.
-            // It needed to be either set as a property inside a new object
-            // (which was then placed in the $scope object), or made part of
-            // the controller instance object when using 'controllerAs' syntax.
-            // We chose to follow this last approach as it is considered
-            // a best practice. For more information on this, see:
-            // https://github.com/angular/angular.js/wiki/Understanding-Scopes
-            self.autocomplete = true;
-          }],
+          ],
           controllerAs: 'searchCtrl'
         }
       },
