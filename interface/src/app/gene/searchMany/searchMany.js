@@ -73,7 +73,8 @@ angular.module('adage.gene.searchMany', [
     restrict: 'E',
     scope: {
       organism: '@',
-      autocomplete: '='
+      autocomplete: '=',
+      mlModel: '@'
     },
     templateUrl: 'gene/searchMany/gene-search-panel.tpl.html'
   };
@@ -129,7 +130,8 @@ angular.module('adage.gene.searchMany', [
     scope: {
       searchResults: '=',
       queries: '=',
-      organism: '@'
+      organism: '@',
+      switchToFew: '&'
     },
     restrict: 'E',
     templateUrl: 'gene/searchMany/gene-search-form.tpl.html'

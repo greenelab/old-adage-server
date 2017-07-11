@@ -77,7 +77,8 @@ angular.module('adage.gene.searchFew', [
     ],
     scope: {
       organism: '@',
-      mlModel: '@'
+      mlModel: '@',
+      switchToMany: '&'
     },
     restrict: 'E',
     templateUrl: 'gene/searchFew/autocomplete-search-form.tpl.html'

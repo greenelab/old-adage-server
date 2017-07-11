@@ -7,6 +7,8 @@
 </div>
 
 <div ng-if="searchCtrl.isValidModel">
+  <h3>Search for Genes to view as Network</h3>
+  <br>
   <autocomplete-search-panel
     ng-if="searchCtrl.autocomplete"
     autocomplete="searchCtrl.autocomplete"
@@ -14,15 +16,14 @@
     ml-model="{{searchCtrl.selectedMlModel.id}}">
   </autocomplete-search-panel>
 
-  <div class="well" ng-if="!searchCtrl.autocomplete">
+  <div ng-if="!searchCtrl.autocomplete">
     <gene-search-panel
       autocomplete="searchCtrl.autocomplete"
-      organism="{{searchCtrl.selectedMlModel.organism.resource_uri}}">
+      organism="{{searchCtrl.selectedMlModel.organism.resource_uri}}"
+      ml-model="{{searchCtrl.selectedMlModel.id}}">
     </gene-search-panel>
-
-    <selected-genes-panel ml-model="{{searchCtrl.selectedMlModel.id}}">
-    </selected-genes-panel>
   </div>
+
   <geneset-search-form ng-if="searchCtrl.userObj"
     organism="{{searchCtrl.selectedMlModel.organism.scientific_name}}"
     ml-model="{{searchCtrl.selectedMlModel.id}}">

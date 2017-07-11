@@ -1,30 +1,37 @@
 <form>
 
   <div class="control-group">
-    <div class="well">
-      <span ng-repeat="gene in selectedGenes">
-        <selected-gene-button gene="gene"></selected-gene-button>
-      </span>
+    <span ng-repeat="gene in selectedGenes">
+      <selected-gene-button gene="gene"></selected-gene-button>
+    </span>
 
-      <input type="text" ng-model="autocompleteQuery"
-        placeholder="Enter gene name"
-        uib-typeahead="result.standard_name for result in searchGenes($viewValue)"
-        typeahead-min-length="2"
-        typeahead-on-select="onSelect($item,$model,$label)"
-        typeahead-loading="loadingGenes">
+    <input type="text" ng-model="autocompleteQuery"
+      placeholder="Search gene name..."
+      uib-typeahead="result.standard_name for result in searchGenes($viewValue)"
+      typeahead-min-length="2"
+      typeahead-on-select="onSelect($item,$model,$label)"
+      typeahead-loading="loadingGenes">
 
-      <i ng-show="loadingGenes" class="fa fa-spinner"></i>
-      <div ng-show="noResults">
-        <i class="fa fa-remove"></i> No genes found for query
-      </div>
+    <i ng-show="loadingGenes" class="fa fa-spinner"></i>
+
+    <div ng-show="noResults">
+      <i class="fa fa-remove"></i> No genes found for query
     </div>
   </div>
 
   <p class="bg-danger">{{ errors }}</p>
 
+  <div class="control-group">
+    <button type="button" class="btn btn-sm" ng-click="switchToMany()">
+      I would like to copy and paste a list of genes instead.
+    </button>
+  </div>
+
+  <br>
   <div class="form-group">
-    <button class="btn btn-success" ng-click="sendToNetwork()">
+    <button class="btn btn-success btn-lg" ng-click="sendToNetwork()">
       View Genes as Network <i class="fa fa-check"></i>
     </button>
   </div>
+
 </form>
