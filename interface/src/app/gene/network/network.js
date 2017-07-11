@@ -134,7 +134,7 @@ angular.module('adage.gene.network', [
       };
 
       self.slider = {  // range slider configuration
-        min: maxCorrelation / 2.0, // initial position of slider on the left
+        min: 0,                    // initial position of slider on the left
         max: maxCorrelation,       // initial position of slider on the right
         options: {
           floor: 0,                // minimum of the slider bar
@@ -206,7 +206,7 @@ angular.module('adage.gene.network', [
         });
       };
 
-      // Function that sets edges in the netowrk.
+      // Function that sets edges in the network.
       var setEdges = function(edgeList) {
         // Build a hash with gene objects indexed by pk.
         var geneObjectHash = {};
@@ -240,6 +240,7 @@ angular.module('adage.gene.network', [
         var minSvgSize = 600;  // Minimum size of svg.
         var maxSvgSize = 1280; // Maximum size of svg.
         var svgSize = genes.length * 10;
+
         if (svgSize < minSvgSize) {
           svgSize = minSvgSize;
         } else if (svgSize > maxSvgSize) {
