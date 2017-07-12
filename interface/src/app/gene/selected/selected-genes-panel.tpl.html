@@ -1,14 +1,12 @@
 <h3>Selected Genes</h3>
-
 <br>
 
-<table class="table table-striped">
-  <tr ng-repeat="gene in selectedGenes">
-    <td>
-      <selected-gene-button gene="gene"></selected-gene-button>
-    </td>
-  </tr>
-</table>
+<div>
+  <span ng-repeat="gene in selectedGenes">
+    <selected-gene-button gene="gene"></selected-gene-button>
+  </span>
+</div>
+<br>
 
 <span class="pull-right">
   <button class="btn btn-success btn-lg" ng-click="sendToNetwork()">
