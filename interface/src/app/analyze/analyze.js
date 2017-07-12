@@ -27,10 +27,6 @@ angular.module('adage.analyze', [
   });
 })
 
-.run(['$anchorScroll', function($anchorScroll) {
-  $anchorScroll.yOffset = 80;
-}])
-
 .controller('AnalyzeCtrl', ['$scope', '$stateParams', '$log', '$location',
   '$anchorScroll', 'Sample',
   function AnalyzeCtrl($scope, $stateParams, $log, $location, $anchorScroll,
@@ -58,9 +54,7 @@ angular.module('adage.analyze', [
       },
 
       scroll_to_id: function(id) {
-        $log.info('scroll_to_id called with: ' + id);
         $location.hash(id);
-        $anchorScroll();
       }
     };
   }
