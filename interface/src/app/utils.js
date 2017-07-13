@@ -25,6 +25,7 @@ angular.module('adage.utils', [])
     this.id = null;
     this.title = null;
     this.organism = null;
+    this.g2gEdgeCutoff = null;
   };
 
   this.set = function(inputModel) {
@@ -32,6 +33,7 @@ angular.module('adage.utils', [])
       this.id = inputModel.id || null;
       this.title = inputModel.title || null;
       this.organism = inputModel.organism || null;
+      this.g2gEdgeCutoff = inputModel.g2g_edge_cutoff;
     }
   };
 
