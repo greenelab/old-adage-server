@@ -51,17 +51,21 @@ angular.module('adage.gene.searchFew', [
               } else {
                 $scope.noResults = false;
               }
-
-              return data.results;
             },
 
             // Error function
             function(responseObject, responseHeaders) {
               $scope.errors = 'Gene search is temporarily down';
             }
-          ).$promise.then(function(response) {
-            return response.results;
-          });
+          ).$promise.then(
+            function(response) {
+              var selectedIDs = Object.keys($scope.selectedGenes);
+              var geneResultsList = response.results.filter(function(result) {
+                return selectedIDs.indexOf(result.id.toString()) === -1;
+              });
+              return geneResultsList;
+            }
+          );
         };
 
         $scope.onSelect = function($item, $model, $label) {
