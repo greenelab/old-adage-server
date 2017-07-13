@@ -214,7 +214,13 @@ angular.module('adage.gene.searchMany', [
       function($scope, SelectedGenesFactory, CommonGeneFuncts) {
         $scope.buttonPage = 1;
         $scope.queryResults = $scope.searchResults[$scope.query];
-        $scope.found = $scope.queryResults.found;
+
+        var selectedGenes = SelectedGenesFactory.returnGenes();
+        var selectedIDs = Object.keys(selectedGenes);
+
+        $scope.found = $scope.queryResults.found.filter(function(result) {
+          return selectedIDs.indexOf(result.id.toString()) === -1;
+        });
 
         var begin;
         var end;
