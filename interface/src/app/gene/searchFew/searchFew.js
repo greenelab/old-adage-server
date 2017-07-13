@@ -36,7 +36,6 @@ angular.module('adage.gene.searchFew', [
           $scope.loadingGenes = true;
           var qparams = {
             'query': val,
-            'limit': numResultsToReturn,
             'organism': $scope.organism
           };
 
@@ -63,7 +62,7 @@ angular.module('adage.gene.searchFew', [
               var geneResultsList = response.results.filter(function(result) {
                 return selectedIDs.indexOf(result.id.toString()) === -1;
               });
-              return geneResultsList;
+              return geneResultsList.slice(0, numResultsToReturn);
             }
           );
         };
