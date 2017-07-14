@@ -31,10 +31,10 @@
                 </span>
               </div>
               <div class="media-body">
-                <button type="button" class="btn btn-default btn-xs"
+                <button type="button" class="btn btn-default btn-sm"
                         ng-class="sb.hasItem(search_item)?'disabled':''"
                         ng-click="sb.addItem(search_item)">
-                  add
+                  <i class="fa fa-plus" aria-hidden="true"></i> add
                 </button>
                 <h4 class="list-group-item-heading">
                   {{search_item.description}}
