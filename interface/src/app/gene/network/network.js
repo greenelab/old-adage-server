@@ -152,7 +152,7 @@ angular.module('adage.gene.network', [
 
       // After machine learning model in the URL has been validated,
       // reconfigure the slider and force render it. See the discussion at:
-      // https://github.com/angular-slider/angularjs-slider/issues/79#issuecomment-219213647
+      // https://github.com/angular-slider/angularjs-slider/issues/79#issuecomment-225438841
       // (Also tried $scope.$$postDigest, not work.)
       var refreshSlider = function() {
         $timeout(function() {
