@@ -30,7 +30,7 @@ angular.module('adage.analyze.sampleBin', [
 function($log, $cacheFactory, $q, Sample, Activity, Signature, SignatureSet,
 MathFuncts, errGen) {
   var SampleBin = {
-    selectedMlModel: {
+    mlModelInfo: {
       id: null
     },
     heatmapData: {
@@ -65,7 +65,7 @@ MathFuncts, errGen) {
       delete this.sampleToGroup[+id];
       this.heatmapData.signatureOrder = [];  // reset to default order
       this.rebuildHeatmapActivity(
-        this.selectedMlModel.id, this.heatmapData.samples
+        this.mlModelInfo.id, this.heatmapData.samples
       );
     },
 
@@ -391,13 +391,13 @@ MathFuncts, errGen) {
 
     getActivityForSampleList: function(mlModelId) {
       // retrieve activity data for heatmap to display
-      if (!mlModelId && !this.selectedMlModel.id) {
+      if (!mlModelId && !this.mlModelInfo.id) {
         $log.warn('getActivityForSampleList called before setting mlmodel');
         return;
       }
       if (!mlModelId) {
-        // default to the current selectedMlModel
-        mlModelId = this.selectedMlModel.id;
+        // default to the current mlModelInfo
+        mlModelId = this.mlModelInfo.id;
       }
       // FIXME restore query progress messages (see rebuildHeatmapActivity)
       //  note: progress can be reported by returning a $promise to the caller
@@ -510,7 +510,7 @@ MathFuncts, errGen) {
   function SampleBinCtrl($scope, SampleBin, MlModelTracker) {
     // give our templates a way to access the SampleBin service
     $scope.sb = SampleBin;
-    $scope.mlModelInfo = MlModelTracker;
+    SampleBin.mlModelInfo = MlModelTracker;
   }
 ])
 
