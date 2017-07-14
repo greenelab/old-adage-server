@@ -6,7 +6,7 @@ name is ml_model_name into the database's ml_model table.  It should be
 invoked like this:
 
   python manage.py add_ml_model <ml_model_name> <organism_tax_id> \
- [--directed_edge] --g2g_edge_cutoff <cutoff_value>
+ [--directed_edge] [--g2g_edge_cutoff <cutoff_value>]
 
 The two required arguments are:
   (1) ml_model_name: machine learning model name;
