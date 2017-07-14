@@ -1,16 +1,12 @@
 <div class="panel panel-default">
   <div class="panel-heading">
-    <h3>
-      Search for Genes
-    </h3>
+    <b>Type in gene name to search using autocomplete</b>
   </div>
   <div class="panel-body">
-    <autocomplete-search-form organism="{{organism}}" ml-model="{{mlModel}}">
+    <autocomplete-search-form
+      organism="{{organism}}"
+      ml-model="{{mlModel}}"
+      switch-to-many="switchToMany()">
     </autocomplete-search-form>
-  </div>
-  <div class="panel-footer">
-    <button type="button" class="btn btn-link" ng-click="switchToMany()">
-      I would like to copy and paste a list of genes instead.
-    </button>
   </div>
 </div>

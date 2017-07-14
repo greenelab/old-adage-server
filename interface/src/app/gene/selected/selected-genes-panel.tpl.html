@@ -1,26 +1,15 @@
-<div class="row">
-  <div class="col-sm-12">
-    <div class="panel panel-default">
-      <div class="panel-heading">
-        <h3>
-          Selected Genes
-          <span class="pull-right">
-            <button class="btn btn-success"
-              ng-click="sendToNetwork()">
-              View Genes as Network
-            </button>
-          </span>
-        </h3>
-      </div>    
-      <div class="panel-body">
-        <table class="table table-striped"> 
-          <tr ng-repeat="gene in selectedGenes">
-            <td>
-              <selected-gene-button gene="gene"></selected-gene-button>
-            </td>
-          </tr>     
-        </table>
-      </div>
-    </div>
-  </div>
+<h3>Selected Genes</h3>
+<br>
+
+<div>
+  <span ng-repeat="gene in selectedGenes">
+    <selected-gene-button gene="gene"></selected-gene-button>
+  </span>
 </div>
+<br>
+
+<span class="pull-right">
+  <button class="btn btn-success btn-lg" ng-click="sendToNetwork()">
+    View Genes as Network <i class="fa fa-check"></i>
+  </button>
+</span>
