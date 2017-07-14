@@ -510,7 +510,7 @@ MathFuncts, errGen) {
   function SampleBinCtrl($scope, SampleBin, MlModelTracker) {
     // give our templates a way to access the SampleBin service
     $scope.sb = SampleBin;
-    $scope.modelInfo = MlModelTracker;
+    $scope.mlModelInfo = MlModelTracker;
   }
 ])
 
