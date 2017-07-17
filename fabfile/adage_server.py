@@ -169,7 +169,8 @@ def import_data_and_index():
     run('python manage.py organisms_create_or_update --taxonomy_id=208964 '
         '--scientific_name="Pseudomonas aeruginosa" '
         '--common_name="Pseudomonas aeruginosa"')
-    run('python manage.py add_ml_model "Ensemble ADAGE 300" 208964')
+    run('python manage.py add_ml_model "Ensemble ADAGE 300" 208964 '
+        '--g2g_edge_cutoff 0.4')
     # import activity data
     run('python manage.py import_activity "%s" "Ensemble ADAGE 300"' %
         CONFIG['data']['activity_file'])

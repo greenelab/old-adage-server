@@ -65,13 +65,15 @@ angular.module('adage.gene.network', [
 
 .controller('GeneNetworkCtrl',
   ['$stateParams', 'Edge', 'Signature', 'Gene', 'ExpressionValue', '$log',
-    'errGen', '$httpParamSerializerJQLike',
+    'errGen', '$httpParamSerializerJQLike', '$scope', 'MlModelTracker',
+    '$timeout',
     function GeneNetworkController(
       $stateParams, Edge, Signature, Gene, ExpressionValue, $log, errGen,
-      $httpParamSerializerJQLike
+      $httpParamSerializerJQLike, $scope, MlModelTracker, $timeout
     ) {
       var self = this;
       self.isValidModel = false;
+
       // Do nothing if mlmodel in URL is falsey. The error will be taken
       // care of by "<ml-model-validator>" component.
       if (!$stateParams.mlmodel) {
@@ -134,21 +136,45 @@ angular.module('adage.gene.network', [
       };
 
       self.slider = {  // range slider configuration
-        min: 0,                    // initial position of slider on the left
-        max: maxCorrelation,       // initial position of slider on the right
+        min: 0,                  // initial position of slider on the left
+        max: maxCorrelation,     // initial position of slider on the right
         options: {
-          floor: 0,                // minimum of the slider bar
-          ceil: maxCorrelation,    // maximum of the slider bar
+          floor: 0,              // minimum of the slider bar
+          ceil: maxCorrelation,  // maximum of the slider bar
           step: 0.01,
           precision: 2,
-          showTicks: 0.5,
-          showTicksValues: true,
           noSwitching: true,
           onEnd: function(id, low, high) {
             self.renderNetwork();
           }
         }
       };
+
+      // After machine learning model in the URL has been validated,
+      // reconfigure the slider and force render it. See the discussion at:
+      // https://github.com/angular-slider/angularjs-slider/issues/79#issuecomment-225438841
+      // (Also tried $scope.$$postDigest, not work.)
+      var refreshSlider = function() {
+        $timeout(function() {
+          $scope.$broadcast('rzSliderForceRender');
+        }, 250);
+        // Note by dhu: 250ms is an arbitrary timeout value. The minimum timeout
+        // value that worked on my desktop is 150ms.
+      };
+      // Monitor "self.isValidModel". Once it is true, reconfigure a few slider
+      // parameters and call refreshSlider().
+      $scope.$watch(
+        function() {
+          return self.isValidModel;
+        },
+        function() {
+          if (self.isValidModel) {
+            self.slider.min = MlModelTracker.g2gEdgeCutoff;
+            self.slider.options.floor = MlModelTracker.g2gEdgeCutoff;
+            refreshSlider();
+          }
+        }
+      );
 
       // Function that returns unique numerical gene IDs included in the URL.
       var getGenesInURL = function(genesParam) {

@@ -6,7 +6,7 @@ name is ml_model_name into the database's ml_model table.  It should be
 invoked like this:
 
   python manage.py add_ml_model <ml_model_name> <organism_tax_id> \
- [--directed_edge]
+ [--directed_edge] [--g2g_edge_cutoff <cutoff_value>]
 
 The two required arguments are:
   (1) ml_model_name: machine learning model name;
@@ -15,6 +15,10 @@ The two required arguments are:
 "--directed_edge" is an optional argument.  If it is specified, the
 edges in the gene-gene relationship table will be directed; otherwise
 the edges in the gene-gene relationship table will be undirected.
+
+"--g2g_edge_cutoff" is another optional argument.  If it is specified,
+the numeric value that follows will be the cutoff value of the edges in
+gene-gene network; otherwise the edge cutoff value will be set to 0.
 
 IMPORTANT:
 Before running this command, please make sure that organism_tax_id
@@ -42,12 +46,18 @@ class Command(BaseCommand):
                             default=False,
                             help='Create directed gene-gene relationship '
                             'edges')
+        parser.add_argument('--g2g_edge_cutoff',
+                            type=float,
+                            dest='g2g_edge_cutoff',
+                            default=0.0,
+                            help='Gene-gene network edge cutoff value')
 
     def handle(self, **options):
         try:
             add_ml_model(options['ml_model_name'],
                          options['organism_tax_id'],
-                         options['directed'])
+                         options['directed'],
+                         options['g2g_edge_cutoff'])
             self.stdout.write(self.style.NOTICE(
                 "Added a new machine learning model successfully"))
         except Exception as e:
@@ -56,7 +66,7 @@ class Command(BaseCommand):
                 "raised an exception:\n%s" % e)
 
 
-def add_ml_model(ml_model_name, organism_tax_id, directed_edge):
+def add_ml_model(ml_model_name, organism_tax_id, directed_edge, edge_cutoff):
     # Raise an exception if ml_model_name on the command line is "" or
     # "  ".
     if not ml_model_name or ml_model_name.isspace():
@@ -74,4 +84,5 @@ def add_ml_model(ml_model_name, organism_tax_id, directed_edge):
 
     MLModel.objects.create(title=ml_model_name,
                            organism=organism,
-                           directed_g2g_edge=directed_edge)
+                           directed_g2g_edge=directed_edge,
+                           g2g_edge_cutoff=edge_cutoff)
