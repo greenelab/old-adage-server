@@ -32,7 +32,7 @@ AWS_DEPLOY = {
         'MinCount': 1, 'MaxCount': 1,
         'KeyName': '<configure>',
         'SecurityGroups':  ['<configure>'],
-        'InstanceType': 't2.micro',
+        'InstanceType': 't2.small',
     },
     'host_conn': {
         # this user needs sudo privilege
