@@ -86,9 +86,7 @@ module.exports = {
       // greenelab.stats.ttest.js from ES6 to ES5 to fit with the rest of
       // our tools.
       'node_modules/ttest/greenelab.stats.ttest.js',
-      'node_modules/multtest/greenelab.stats.multtest.js',
-
-      'vendor/placeholders/angular-placeholders-0.0.1-SNAPSHOT.min.js'
+      'node_modules/multtest/greenelab.stats.multtest.js'
     ],
     css: [
       'vendor/angularjs-slider/dist/rzslider.min.css'
