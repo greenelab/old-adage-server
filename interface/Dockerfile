@@ -11,13 +11,13 @@ RUN apt-get update && apt-get install -y \
   git \
   libfontconfig
 
-# Install node packages.
+# Install global node packages.
 RUN npm -g install grunt-cli karma-cli bower
 
 # Clean up APT when done.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Code to server directory
+# Copy code to server directory
 COPY . .
 
 USER user
