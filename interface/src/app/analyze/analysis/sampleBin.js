@@ -508,9 +508,10 @@ MathFuncts, errGen) {
 
 .controller('SampleBinCtrl', ['$scope', 'SampleBin', 'MlModelTracker',
   function SampleBinCtrl($scope, SampleBin, MlModelTracker) {
+    // initialize mlModelInfo property on SampleBin
+    SampleBin.mlModelInfo = MlModelTracker;
     // give our templates a way to access the SampleBin service
     $scope.sb = SampleBin;
-    SampleBin.mlModelInfo = MlModelTracker;
   }
 ])
 
