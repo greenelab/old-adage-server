@@ -1,0 +1,31 @@
+FROM phusion/baseimage:0.9.22
+
+RUN groupadd user && useradd --create-home --home-dir /home/user -g user user
+WORKDIR /home/user
+
+# libfontconfig is needed for phantomjs, which is apparently installed in
+# our ubuntu machines, but required with this phusion/baseimage:0.9.22.
+# Also install global node packages, and clean up APT when done.
+RUN apt-get update && apt-get install -y \
+        nodejs-legacy \
+        npm \
+        git \
+        libfontconfig && \
+    npm -g install grunt-cli karma-cli bower && \
+    apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Copy requirements files to container directory
+COPY package.json .
+COPY bower.json .
+
+# *Note: Copying this file is important! This way, bower will know
+# where to put all the packages it installs (e.g. 'vendor/'), which
+# will later be called on by the build.config.js file.
+COPY .bowerrc .
+
+USER user
+
+RUN npm install
+RUN bower install
+
+RUN ls
