@@ -25,7 +25,4 @@ COPY .bowerrc .
 
 USER user
 
-RUN npm install
-RUN bower install
-
-RUN ls
+RUN npm install && bower install
