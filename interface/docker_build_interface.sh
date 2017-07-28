@@ -17,5 +17,6 @@ docker run \
       adage-server/docker-interface-build
 
 mv $compile_folder/bin ./
+mv $compile_folder/build ./
 
 rmdir $compile_folder
