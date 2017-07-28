@@ -5,4 +5,4 @@ COPY . .
 
 RUN grunt
 
-CMD ["mv", "bin", "compile_folder"]
+CMD mv bin compile_folder && mv build compile_folder
