@@ -16,7 +16,7 @@ docker run \
       --volume $compile_folder:/home/user/compile_folder \
       adage-server/docker-interface-build
 
-mv $compile_folder/bin ./
-mv $compile_folder/build ./
+mv $compile_folder/bin .
+mv $compile_folder/build .
 
 rmdir $compile_folder
