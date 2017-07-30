@@ -1,15 +1,15 @@
 {
   "author": "GreeneLab",
   "name": "adage",
-  "version": "0.8.0b",
+  "version": "0.8.1b",
   "description": "ADAGE web server",
   "homepage": "http://adage.greenelab.com",
   "license": "(MIT AND BSD-3-Clause)",
   "license_url": "https://raw.github.com/ngbp/ngbp/master/LICENSE",
   "bugs": "mailto:team@greenelab.com",
   "repository": {
-    "type": "hg",
-    "url": "https://bitbucket.org/greenelab/adage-server"
+    "type": "git",
+    "url": "https://github.com/greenelab/adage-server"
   },
   "engines": {
     "node": ">=4.0"
