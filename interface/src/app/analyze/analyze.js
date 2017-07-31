@@ -7,7 +7,6 @@ angular.module('adage.analyze', [
   'adage.analyze.detail',
   'adage.analyze.analysis', // includes sample-bin
   'ui.router',
-  'placeholders',
   'ui.bootstrap',
   'as.sortable',
   'ngAnimate',

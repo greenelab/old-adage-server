@@ -216,7 +216,11 @@ python manage.py tribe_client_pickle_public_genesets
 
 ### Build adage-server web interface
 
+You can build the interface manually using the following steps:
+
 ```shell
+# Building the interface manually
+
 cd interface/
 
 # Download newest version of Node.js. Also, the command
@@ -232,6 +236,18 @@ bower install
 
 # Run Grunt to build the interface
 grunt
+```
+
+Or, you can use our Docker build, if you have Docker set up on you machine,
+by running the following script:
+
+```shell
+# Building the interface using Docker
+
+cd interface/
+
+./docker_build_interface.sh
+
 ```
 
 ## Deployment Steps
