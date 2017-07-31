@@ -1,7 +1,7 @@
 FROM adage-server/docker-interface-base
 
 # Copy code to server directory
-COPY . .
+COPY . /home/user/
 
 RUN grunt
 
