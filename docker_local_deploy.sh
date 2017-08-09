@@ -20,3 +20,11 @@
 # https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-gsg.html
 docker pull library/elasticsearch:2.3
 docker run -d -p 9200:9200 elasticsearch:2.3
+
+HOST_IP=$(ip route get 8.8.8.8 | awk '{print $NF; exit}')
+
+docker build -t adage-server/docker-backend .
+
+docker run \
+    --add-host=localhost:$HOST_IP \
+    adage-server/docker-backend
