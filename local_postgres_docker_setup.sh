@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Copied from https://github.com/data-refinery/data_refinery/blob/master/data_models/install.sh
+# Based on
+# https://github.com/data-refinery/data_refinery/blob/master/data_models/install.sh
 
 # Run this script with 'sudo ./local_postgres_docker_setup.sh'
 
