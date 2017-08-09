@@ -23,7 +23,8 @@ RUN apt-get update && apt-get install -y \
 # be out of date with an older version of pip
 RUN pip install --upgrade pip
 
-# Copy requirements.txt file here and install requirements to save time
+# Copy requirements.txt file and install requirements here to save time
+# when building this docker image again if no requirements have changed
 COPY $ADAGE_SRC/requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 

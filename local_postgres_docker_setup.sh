@@ -22,7 +22,7 @@ iptables -A INPUT -s 172.17.0.0/16 -j ACCEPT
 # See http://stackoverflow.com/questions/31249112/allow-docker-container-to-connect-to-a-local-host-postgres-database
 # and https://blog.jsinh.in/how-to-enable-remote-access-to-postgresql-database-server/#.WNFiBCErLmG
 # for more information on these two settings.
-# 172.17.0.0/16 is the range of addresses that docker gives its containers
+# 172.17.0.0/16 is the range of addresses that Docker gives its containers
 echo 'host    all             all             172.17.0.0/16           md5' >> \
     /etc/postgresql/$POSTGRES_VERSION/main/pg_hba.conf
 
