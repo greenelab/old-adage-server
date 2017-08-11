@@ -4,17 +4,12 @@ FROM phusion/baseimage:0.9.22
 # To make it public, use -p flag
 EXPOSE 8000
 
-# Directory containing ADAGE server source code
-ENV ADAGE_SRC=adage
-
-# Directory used in container
-ENV ADAGE_SRV=/srv
-
 # Create required directories
-WORKDIR $ADAGE_SRV
+WORKDIR /srv
 RUN mkdir static logs
 
 RUN apt-get update && apt-get install -y \
+  wget \
   python \
   python-pip \
   python-psycopg2 # Install here so that postgres lib dependency is met.
@@ -25,15 +20,22 @@ RUN pip install --upgrade pip
 
 # Copy requirements.txt file and install requirements here to save time
 # when building this docker image again if no requirements have changed
-COPY $ADAGE_SRC/requirements.txt requirements.txt
+COPY adage/requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 
 # Clean up APT when done.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-# Code to server directory
-COPY $ADAGE_SRC .
+# Copy necessary data files to bootstrap database
+COPY data data
+
+# Copy code for Django project
+COPY adage adage
+WORKDIR adage
+
+RUN wget https://bitbucket.org/greenelab/get_pseudomonas/raw/tip/get_pseudo_sdrf.py && \
+    wget https://bitbucket.org/greenelab/get_pseudomonas/raw/tip/gen_spreadsheets.py
 
 # Copy entrypoint script into the container
-COPY ./docker-entrypoint.sh /
-ENTRYPOINT ["/docker-entrypoint.sh"]
+COPY docker-entrypoint.sh .
+ENTRYPOINT ["./docker-entrypoint.sh"]
