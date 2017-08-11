@@ -1,3 +1,10 @@
-data
 interface
 adage/adage/config.py
+
+**/*~
+**/*.pyc
+
+data/gene_history
+data/*.gene_info
+data/bootstrap_cache_*
+data/*_pickled_genesets
