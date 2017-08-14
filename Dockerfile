@@ -33,6 +33,9 @@ COPY data data
 COPY adage adage
 WORKDIR adage
 
+# The next couple of files are part of the 'get_pseudomonas' repository
+# in bitbucket. That code does not really belong in this repository, but
+# is needed for deployment of this server.
 RUN wget https://bitbucket.org/greenelab/get_pseudomonas/raw/tip/get_pseudo_sdrf.py && \
     wget https://bitbucket.org/greenelab/get_pseudomonas/raw/tip/gen_spreadsheets.py
 
