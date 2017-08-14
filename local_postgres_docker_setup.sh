@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# We recommend RDS/etc as a database service in production,
+# but we include this script, which helps connect the local postgres
+# server to the Docker containers, for a development instance.
+
 # Based on
 # https://github.com/data-refinery/data_refinery/blob/master/data_models/install.sh
 
