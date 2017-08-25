@@ -1,9 +1,5 @@
 FROM phusion/baseimage:0.9.22
 
-# Make available on port 8000 - however, it is not public yet
-# To make it public, use -p flag
-EXPOSE 8000
-
 # Create required directories
 WORKDIR /srv
 RUN mkdir static logs
