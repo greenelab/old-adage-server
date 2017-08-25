@@ -28,6 +28,10 @@ elif os.environ.get('CIRCLECI') == 'true':
     with open(os.path.join(BASE_DIR, 'adage', 'config.py.template')) as f:
         exec f
     CONFIG = CIRCLECI_CONFIG
+elif os.environ.get('DOCKER_DEV') == 'true':
+    with open(os.path.join(BASE_DIR, 'adage', 'config.py.template')) as f:
+        exec f
+    CONFIG = DOCKER_DEV
 else:
     from config import CONFIG
 
