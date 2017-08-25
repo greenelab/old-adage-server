@@ -217,5 +217,18 @@ CIRCLECI_CONFIG.update({
     },
 })
 
+DOCKER_DEV = CIRCLECI_CONFIG.copy()
+DOCKER_DEV.update({
+    'haystack': {
+        'default': {
+            'ENGINE':
+                'adage.search_backend.CustomElasticsearchEngine',
+            'URL': 'localhost',
+            'INDEX_NAME': 'haystack',
+        }
+    },
+
+})
+
 # now that each config is defined, specify which one to use
 CONFIG = AWS_CONFIG
