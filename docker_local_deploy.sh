@@ -21,10 +21,31 @@
 docker pull library/elasticsearch:2.3
 docker run -d -p 9200:9200 elasticsearch:2.3
 
+# Get the IP for the current host machine
 HOST_IP=$(ip route get 8.8.8.8 | awk '{print $NF; exit}')
 
+# Build docker image and run it
 docker build -t adage-server/docker-backend .
 
 docker run \
+    --name adage-django \
     --add-host=localhost:$HOST_IP \
+    -e DOCKER_DEV="true" \
+    -p 8000:8000 \
     adage-server/docker-backend
+
+# Build the interface
+interface/docker_build_interface.sh
+
+# Get location for nginx.conf file
+current_directory=`dirname "${BASH_SOURCE[0]}"  | xargs realpath`
+nginx_file="$current_directory/nginx/dev/adage-nginx.conf"
+built_interface_folder="$current_directory/interface/bin"
+
+docker run \
+    --name docker-nginx \
+    -p 80:80 \
+    --link adage-django:adage-django \
+    -v $nginx_file:/etc/nginx/conf.d/default.conf:ro \
+    -v $built_interface_folder:/home/static \
+    -d nginx
