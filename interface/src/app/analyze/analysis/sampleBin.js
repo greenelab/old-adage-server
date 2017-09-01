@@ -69,6 +69,14 @@ MathFuncts, errGen) {
       );
     },
 
+    clearSamples: function() {
+      this.heatmapData.samples = [];
+      this.heatmapData.signatureOrder = [];  // reset to default order
+      this.rebuildHeatmapActivity(
+        this.mlModelInfo.id, this.heatmapData.samples
+      );
+    },
+
     addExperiment: function(sampleIdList) {
       for (var i = 0; i < sampleIdList.length; i++) {
         this.addSample(sampleIdList[i]);
@@ -101,6 +109,11 @@ MathFuncts, errGen) {
         }
         return true;
       }
+    },
+
+    length: function() {
+      // make it easy to ask how many samples are in the sampleBin
+      return this.heatmapData.samples.length;
     },
 
     getSamplesByGroup: function() {
