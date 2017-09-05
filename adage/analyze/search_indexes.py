@@ -25,7 +25,7 @@ class SampleIndex(indexes.SearchIndex, indexes.Indexable):
     """
     text = indexes.CharField(document=True, use_template=True)
     name = indexes.CharField(model_attr='name')
-    experiments = indexes.CharField(model_attr='experiments__all')
+    experiments = indexes.MultiValueField()
     ml_data_source = indexes.CharField(model_attr='ml_data_source', null=True)
 
     def get_model(self):
@@ -33,3 +33,6 @@ class SampleIndex(indexes.SearchIndex, indexes.Indexable):
 
     def index_queryset(self, using=None):
         return self.get_model().objects
+
+    def prepare_experiments(self, obj):
+        return [e.accession for e in obj.experiments.all()]
