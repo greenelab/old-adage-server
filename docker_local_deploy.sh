@@ -36,7 +36,7 @@ docker run \
     --add-host=localhost:$HOST_IP \
     -e DOCKER_DEV="true" \
     -p 8000:8000 \
-    adage-server/docker-backend
+    -d adage-server/docker-backend
 
 # Build the interface
 interface/docker_build_interface.sh
