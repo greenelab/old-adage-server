@@ -21,6 +21,10 @@
 docker pull library/elasticsearch:2.3
 docker run -d -p 9200:9200 elasticsearch:2.3
 
+# Start up postgres container
+docker run -e POSTGRES_USER=docker_adage -e POSTGRES_PASSWORD=password123 \
+    --name docker-postgres -p 5431:5432 -d postgres
+
 # Get the IP for the current host machine
 HOST_IP=$(ip route get 8.8.8.8 | awk '{print $NF; exit}')
 
