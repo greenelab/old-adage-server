@@ -219,6 +219,17 @@ CIRCLECI_CONFIG.update({
 
 DOCKER_DEV = CIRCLECI_CONFIG.copy()
 DOCKER_DEV.update({
+    'databases': {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql_psycopg2',
+            # database name and user cannot have upper case letters
+            'NAME': 'docker_adage',
+            'USER': 'docker_adage',
+            'PASSWORD': 'password123',
+            'HOST': 'localhost',
+            'PORT': '5431'
+        }
+    },
     'haystack': {
         'default': {
             'ENGINE':
