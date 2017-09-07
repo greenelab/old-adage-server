@@ -1096,12 +1096,27 @@ class SearchIndexTestCase(ResourceTestCaseMixin, TestCase):
                 'independent cultures.'
         }
     ]
+    samples = [
+        # These examples are pulled from E-GEOD-24262
+        {
+            'name': 'GSM596626 1',
+            'ml_data_source': 'GSM596626.CEL',
+        }, {
+            'name': 'GSM596819 1',
+            'ml_data_source': 'GSM596819.CEL',
+        }
+    ]
 
     def setUp(self):
         haystack.connections.reload('default')
         super(SearchIndexTestCase, self).setUp()
+        # create each of our test experiments
         for e in self.experiments:
             ModelsTestCase.create_test_experiment(experiment_data=e)
+        # retrieve an experiment and link some samples to test the sample index
+        exp_obj = Experiment.objects.get(pk='E-GEOD-24262')
+        for s in self.samples:
+            exp_obj.sample_set.create(**s)
         call_command('update_index', interactive=False, verbosity=0)
 
     def testCaseInsensitive(self):
@@ -1138,6 +1153,27 @@ class SearchIndexTestCase(ResourceTestCaseMixin, TestCase):
         self.assertEqual(
             self.deserialize(respPA14)['objects'][0]['pk'],
             'E-GEOD-24262'
+        )
+
+    def testSampleIndex(self):
+        """
+        Make sure that analyze.search_indexes.SampleIndex.prepare_experiments
+        produced the expected result. We should be able to find each sample we
+        indexed in setUp() by searching on the corresponding Experiment's
+        accession number.
+        """
+        respEGEOD24262 = self.api_client.get(
+            self.searchURI,
+            data={'q': 'E-GEOD-24262'}
+        )
+        self.assertValidJSONResponse(respEGEOD24262)
+        self.assertEqual(
+            frozenset([
+                item['description']
+                for item in self.deserialize(respEGEOD24262)['objects']
+                if item['item_type'] == 'sample'    # only testing samples
+            ]),
+            frozenset([u'GSM596626 1', u'GSM596819 1'])
         )
 
     def tearDown(self):
