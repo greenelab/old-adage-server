@@ -18,7 +18,6 @@
 # 2.x major version (as of 8/7/17). The logic here is that we want the local
 # deployment to mirror our deployment on AWS. See:
 # https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/es-gsg.html
-docker pull library/elasticsearch:2.3
 docker run -d -p 9200:9200 elasticsearch:2.3
 
 # Start up postgres container
@@ -42,7 +41,7 @@ docker run \
 interface/docker_build_interface.sh
 
 # Get location for nginx.conf file
-current_directory=`dirname "${BASH_SOURCE[0]}"  | xargs realpath`
+current_directory=`dirname "${BASH_SOURCE[0]}" | xargs realpath`
 nginx_file="$current_directory/nginx/dev/adage-nginx.conf"
 built_interface_folder="$current_directory/interface/bin"
 
