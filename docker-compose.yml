@@ -1,0 +1,37 @@
+# As of 9-11-17, Amazon ECS CLI supports Docker compose file syntax versions
+# 1 and 2
+# (see: http://docs.aws.amazon.com/AmazonECS/latest/developerguide/cmd-ecs-cli-compose.html)
+version: '2'
+
+services:
+
+  elasticsearch:
+    image: elasticsearch:2.3
+
+  db:
+    image: postgres:latest
+    environment:
+      - POSTGRES_USER=docker_adage
+      - POSTGRES_PASSWORD=password123
+
+  core:
+    image: adage-server/docker-backend
+    build: .
+    container_name: adage-django
+    environment:
+      - DOCKER_DEV=true
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - elasticsearch
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8080:80"
+    depends_on:
+      - core
+    volumes:
+      - ./nginx/dev/adage-nginx.conf:/etc/nginx/conf.d/default.conf
+      - ./interface/bin:/home/static

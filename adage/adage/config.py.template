@@ -226,15 +226,15 @@ DOCKER_DEV.update({
             'NAME': 'docker_adage',
             'USER': 'docker_adage',
             'PASSWORD': 'password123',
-            'HOST': 'localhost',
-            'PORT': '5431'
+            'HOST': 'db',
+            'PORT': '5432'
         }
     },
     'haystack': {
         'default': {
             'ENGINE':
                 'adage.search_backend.CustomElasticsearchEngine',
-            'URL': 'localhost',
+            'URL': 'elasticsearch',
             'INDEX_NAME': 'haystack',
         }
     },
