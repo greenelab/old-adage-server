@@ -1,4 +1,4 @@
-script_directory=`dirname "${BASH_SOURCE[0]}"  | xargs realpath`
+script_directory=`dirname "${BASH_SOURCE[0]}" | xargs realpath`
 
 cd $script_directory
 
