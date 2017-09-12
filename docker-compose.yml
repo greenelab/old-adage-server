@@ -1,4 +1,4 @@
-# As of 9-11-17, Amazon ECS CLI supports Docker compose file syntax versions
+# As of 9-12-17, Amazon ECS CLI supports Docker compose file syntax versions
 # 1 and 2
 # (see: http://docs.aws.amazon.com/AmazonECS/latest/developerguide/cmd-ecs-cli-compose.html)
 version: '2'

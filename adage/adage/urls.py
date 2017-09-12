@@ -42,6 +42,5 @@ v0_api.register(ExpressionValueResource())
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api/', include(v0_api.urls)),
-    url(r'^search/', include('haystack.urls')),
     url(r'^tribe_client/', include('tribe_client.urls')),
 ]
