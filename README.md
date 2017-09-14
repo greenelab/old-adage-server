@@ -9,7 +9,49 @@ considered pre-release status. The following instructions detail the steps
 required for getting a development instance up and running manually. For a guide
 to automated deployment, see [Deployment Steps](#deployment-steps) below.
 
-## Get a working instance of the adage-server running
+## Get a working instance of the adage-server running with Docker
+
+We recommend using [Docker](https://www.docker.com/) to get a local working
+instance of the server.
+
+### Steps
+1. Install [Docker](https://docs.docker.com/get-started/) on your computer.
+
+   Also, if your computer is not running Mac or Windows OS, you will need to
+   [install Docker Compose](https://docs.docker.com/compose/install/).
+
+2. Fork and clone the adage-server repository
+
+   Fork [the adage-server repository on Github](https://github.com/greenelab/adage-server)
+   (see [Github's documentation](https://help.github.com/articles/fork-a-repo/)
+   for forking repositories) and then clone that fork you made in the directory
+   of your choice.
+
+   ```shell
+   cd /<your chosen directory>/
+   git clone git@github.com:<your github account>/adage-server.git
+   ```
+
+
+3. In a terminal, change directories into the `adage-server` directory
+   (the main directory of the repository you just cloned), and run the
+   command to deploy a local instance of the server:
+
+   ```shell
+   cd adage-server/
+   ./docker_local_deploy.sh
+   ```
+   Give it a few moments to start up.
+
+4. If you want to load the default Pseudomonas data into the server database,
+   enter the following command:
+
+   ```shell
+   docker-compose exec core ./load_default_pseudomonas_data.sh
+   ```
+You are done!
+
+## Get a working instance of the adage-server running without Docker
 
 Note: The following steps assume you have already installed PostgreSQL (>=9.4),
 NGINX (>=1.10), supervisord (>=3.2), Python (2.7) and Elasticsearch (1.7) on
