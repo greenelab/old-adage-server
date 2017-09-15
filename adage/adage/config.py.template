@@ -239,6 +239,10 @@ DOCKER_DEV.update({
         }
     },
 
+    # Tribe-client settings - the folder where pickled genesets will
+    # be stored.
+    'public_geneset_folder': '../data/'
+
 })
 
 # now that each config is defined, specify which one to use
