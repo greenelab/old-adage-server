@@ -1,9 +1,5 @@
 FROM phusion/baseimage:0.9.22
 
-# Make available on port 8000 - however, it is not public yet
-# To make it public, use -p flag
-EXPOSE 8000
-
 # Create required directories
 WORKDIR /srv
 RUN mkdir static logs
@@ -32,6 +28,8 @@ COPY data data
 # Copy code for Django project
 COPY adage adage
 WORKDIR adage
+
+COPY load_default_pseudomonas_data.sh .
 
 # The next couple of files are part of the 'get_pseudomonas' repository
 # in bitbucket. That code does not really belong in this repository, but

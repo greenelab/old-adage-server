@@ -1,5 +1,6 @@
 interface
 adage/adage/config.py
+adage/static/
 
 **/*~
 **/*.pyc

@@ -1,15 +1,35 @@
+script_directory=`dirname "${BASH_SOURCE[0]}" | xargs realpath`
+
+cd $script_directory
+
 docker build -t adage-server/docker-interface-base -f Dockerfile.base .
 
 docker build -t adage-server/docker-interface-build -f Dockerfile .
 
+compile_folder="$script_directory/compile_folder"
+bin_folder="$script_directory/bin"
+build_folder="$script_directory/build"
+
 # Set up mounting volume directory that will house bin and build folders
 # if it doesn't already exist.
-script_directory=`dirname "${BASH_SOURCE[0]}"  | xargs realpath`
-compile_folder="$script_directory/compile_folder"
-
-if [ ! -d "$compile_folder" ]; then
+if [ -d "$compile_folder" ]
+then
+    rm -r $compile_folder
+else
     mkdir $compile_folder
     chmod 775 $compile_folder
+fi
+
+# Remove previous bin and build folders if they already exist in the
+# interface folder
+if [ -d "$bin_folder" ]
+then
+    rm -r $bin_folder
+fi
+
+if [ -d "$build_folder" ]
+then
+    rm -r $build_folder
 fi
 
 # The reason we mount the parent "compile_folder" and then move the
