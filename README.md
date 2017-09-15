@@ -12,7 +12,7 @@ to automated deployment, see [Deployment Steps](#deployment-steps) below.
 ## Get a working instance of the adage-server running with Docker
 
 We recommend using [Docker](https://www.docker.com/) to get a local working
-instance of the server.
+instance of the adage-server.
 
 ### Steps
 1. Install [Docker](https://docs.docker.com/get-started/) on your computer.
@@ -24,14 +24,13 @@ instance of the server.
 
    Fork [the adage-server repository on Github](https://github.com/greenelab/adage-server)
    (see [Github's documentation](https://help.github.com/articles/fork-a-repo/)
-   for forking repositories) and then clone that fork you made in the directory
+   for forking repositories), and then clone that fork you made in the directory
    of your choice.
 
    ```shell
    cd /<your chosen directory>/
    git clone git@github.com:<your github account>/adage-server.git
    ```
-
 
 3. In a terminal, change directories into the `adage-server` directory
    (the main directory of the repository you just cloned), and run the
@@ -61,7 +60,7 @@ Ubuntu (16.04).
 
 Fork [the adage-server repository on Github](https://github.com/greenelab/adage-server)
 (see [Github's documentation](https://help.github.com/articles/fork-a-repo/)
-for forking repositories) and then clone that fork you made in the directory
+for forking repositories), and then clone that fork you made in the directory
 of your choice.
 
 ```shell
