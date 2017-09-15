@@ -2,6 +2,13 @@
 
 # Script to load default Pseudomonas data (in the files included in this
 # repository) into the adage-server database via management commands.
+#
+# *Note: This script uses relative paths to the locations of certain files,
+# which means that this script must be run from the current directory.
+
+script_directory=`dirname "${BASH_SOURCE[0]}" | xargs realpath`
+
+cd $script_directory
 
 # Import Pseudomonas annotation data
 python manage.py import_data ../data/PseudomonasAnnotation.tsv
@@ -20,11 +27,7 @@ python manage.py import_activity \
     ../data/all-pseudomonas-gene-normalized_HWActivity_perGene_with_net300_100models_k=300_seed=123_ClusterByweighted_avgweight_network_ADAGE.txt \
     "Ensemble ADAGE 300"
 
-# Save Ensembl and PseudoCAP Cross-reference Databases
-python manage.py genes_add_xrdb \
-    --name=Ensembl \
-    --URL=http://www.ensembl.org/Gene/Summary?g=_REPL_
-
+# Save PseudoCAP Cross-reference Database
 python manage.py genes_add_xrdb \
     --name=PseudoCAP \
     --URL=http://www.pseudomonas.com/getAnnotation.do?locusID=_REPL_
