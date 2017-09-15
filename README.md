@@ -48,7 +48,8 @@ instance of the adage-server.
    ```shell
    docker-compose exec core ./load_default_pseudomonas_data.sh
    ```
-You are done!
+You are done! You can visit the interface of your new local adage-server
+at `http://localhost`.
 
 ## Get a working instance of the adage-server running without Docker
 
@@ -279,17 +280,6 @@ bower install
 grunt
 ```
 
-Or, you can use our Docker build, if you have Docker set up on you machine,
-by running the following script:
-
-```shell
-# Building the interface using Docker
-
-cd interface/
-
-./docker_build_interface.sh
-
-```
 
 ## Deployment Steps
 
