@@ -38,6 +38,7 @@ logger = logging.getLogger(__name__)
 logger.addHandler(logging.NullHandler())
 
 NUM_COLUMNS = 4
+BULK_SIZE = 2000
 
 
 class Command(BaseCommand):
@@ -86,7 +87,13 @@ def check_and_import(file_handle, ml_model):
     Read valid data lines into the database.  An exception will be raised
     if any errors are detected in file_handle.
     """
+    # If the database already includes record(s) of the same ml_model,
+    # check the "unique_together" constraint; Otherwise do not check.
+    check_unique = Edge.objects.filter(mlmodel=ml_model).exists()
+
     gene_pairs_in_file = set()
+    cached_genes = dict()
+    records = []
     for line_index, line in enumerate(file_handle):
         # Skip the first line, which includes column names only.
         if line_index == 0:
@@ -121,6 +128,10 @@ def check_and_import(file_handle, ml_model):
                             "value in [-1.0, 1.0]" %
                             (line_index + 1, tokens[3] + tokens[2]))
 
+        # Skip the line if the weight is less than cutoff.
+        if abs(weight) < ml_model.g2g_edge_cutoff:
+            continue
+
         # Check whether the pair of (column #1, column #2) is duplicate
         # in the file.
         pair01 = tokens[0] + '\t' + tokens[1]
@@ -144,7 +155,7 @@ def check_and_import(file_handle, ml_model):
         # If tokens[0] does not match one and only one gene's
         # systematic_name in the database, skip the line.
         try:
-            gene1 = find_gene(tokens[0])
+            gene1 = find_gene(tokens[0], cached_genes)
         except Exception as e:
             logger.warning("Input file line #%d will be skipped: %s",
                            line_index + 1, e)
@@ -153,31 +164,42 @@ def check_and_import(file_handle, ml_model):
         # If tokens[1] does not match one and only one gene's
         # systematic_name in the database, skip the line.
         try:
-            gene2 = find_gene(tokens[1])
+            gene2 = find_gene(tokens[1], cached_genes)
         except Exception as e:
             logger.warning("Input file line #%d will be skipped: %s",
                            line_index + 1, e)
             continue
 
         # Check whether the triplet (ml_model, gene1, gene2) is unique.
-        if not unique_together(ml_model, gene1, gene2):
+        if check_unique and not unique_together(ml_model, gene1, gene2):
             raise Exception("Input file line #%d: (%s, %s, %s) is not unique "
                             "in the database" % (line_index + 1,
                                                  tokens[0],
                                                  tokens[1],
                                                  ml_model.title))
 
-        # Import the valid data line into the database.
-        Edge.objects.create(mlmodel=ml_model, gene1=gene1, gene2=gene2,
-                            weight=weight)
+        # Save the valid data into batch.
+        records.append(
+            Edge(mlmodel=ml_model, gene1=gene1, gene2=gene2, weight=weight)
+        )
+        if len(records) == BULK_SIZE:  # dump bulk records into database
+            Edge.objects.bulk_create(records)
+            records = []
+    # Don't forget the last bulk:
+    if len(records) > 0:
+        Edge.objects.bulk_create(records)
+        records = []
 
 
-def find_gene(systematic_name):
+def find_gene(systematic_name, cached_genes):
     """
     Return the gene in database whose systematic_name matches input
     "systematic_name".  An exception will be raised if no gene is found
     or multiple genes exist in the database.
     """
+    if systematic_name in cached_genes:
+        return cached_genes[systematic_name]
+
     try:
         gene = Gene.objects.get(systematic_name=systematic_name)
     except Gene.DoesNotExist:
@@ -186,6 +208,8 @@ def find_gene(systematic_name):
     except Gene.MultipleObjectsReturned:
         raise Exception("gene name %s matches multiple genes in the database"
                         % systematic_name)
+
+    cached_genes[systematic_name] = gene
     return gene
 
 
