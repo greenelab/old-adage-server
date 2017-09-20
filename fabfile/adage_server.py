@@ -196,7 +196,7 @@ def import_data_and_index():
         "cutoff": 0.2
     }
     # Unzip gene-gene network file.
-    run('gunzip "%s.gz"' % CONFIG['data']['gene_network_file']);
+    run('gunzip "%s.gz"' % CONFIG['data']['gene_network_file'])
     # Create two ML models and related records separately:
     for mlmodel in [mlmodel_basic, mlmodel_complex]:
         # Create ML model
@@ -210,7 +210,8 @@ def import_data_and_index():
         # migrations/0009_auto_20170503_1700.py
         run('python manage.py import_signature_gene_network "%s" "%s" '
             '"High-weight genes"'
-            % (CONFIG['data']['signature_gene_network_file'], mlmodel["title"]))
+            % (CONFIG['data']['signature_gene_network_file'], mlmodel["title"])
+        )
         # Import gene-gene network data
         run('python manage.py import_gene_network  "%s" "%s"' %
             (CONFIG['data']['gene_network_file'], mlmodel["title"]))
