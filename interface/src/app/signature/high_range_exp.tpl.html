@@ -2,13 +2,11 @@
   <h4>
     <b>Experiments with the Highest Range: </b>
   </h4>
-  <button class="btn btn-primary" ng-click="setMode()"
-          ng-hide="topMode">Show Top {{topNum}}</button>
-  <button class="btn btn-primary" ng-click="setMode()"
-          ng-show="topMode">Show All</button>
-
-  <br>
-  (Click the activity distribution widget to see sample annotations in this experiement.)
+  <p>
+    Explore gene expression experiments with the highest range of this
+    signature's activity. Click the activity distribution widget to see sample
+    annotations in this experiment.
+  </p>
   <table class="table table-striped">
     <tbody>
       <!-- It may seem more intuitive to use:
@@ -38,6 +36,16 @@
                  tooltip-placement="left-top">
             </div>
           </a>
+        </td>
+      </tr>
+      <tr ng-click="setMode()" ng-show="topMode">
+        <td>
+          <button type="button" class="btn btn-default">Show all ...</button>
+        </td>
+      </tr>
+      <tr ng-click="setMode()" ng-hide="topMode">
+        <td>
+          <button type="button" class="btn btn-default">Only show top {{topNum}}</button>
         </td>
       </tr>
     </tbody>

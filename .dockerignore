@@ -1,0 +1,11 @@
+interface
+adage/adage/config.py
+adage/static/
+
+**/*~
+**/*.pyc
+
+data/gene_history
+data/*.gene_info
+data/bootstrap_cache_*
+data/*_pickled_genesets

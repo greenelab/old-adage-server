@@ -1,4 +1,6 @@
 {{ object.name }}
 {{ object.ml_data_source }}
+Experiments: {% for e in object.experiments.all %}{{ e.accession }}{% endfor %}
+Annotations:
 {% for k, v in object.get_annotation_items %}<em>{{ k }}:</em> {{ v }}
 {% endfor %}

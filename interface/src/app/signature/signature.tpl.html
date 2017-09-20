@@ -6,49 +6,39 @@
 <h3 class="text-warning" ng-bind="ctrl.statusMessage"></h3>
 
 <p>
-  <b>Gene Participation Type:</b>
+  Each signature is comprised of genes with varying importance. Different
+  methods can be used to find the most relevant set of genes.
+  <b>Filter genes in this signature using:</b>
   <br>
   <participation-type-selector
     selected-participation-type="ctrl.selectedParticipationType">
   </participation-type-selector>
   <br>
-  <br>
-  <b>Description:</b>
-  <br>
   {{ctrl.selectedParticipationType.description}}
 </p>
-
-<hr>
+<br>
 
 <div ng-if="!ctrl.statusMessage">
-
   <div class="container">
-    <div class="row">
-      <div class="col-xs-6">
-        <participatory-genes
-          signature-id="{{ctrl.id}}"
-          genes="ctrl.genes"
-          selected-participation-type="ctrl.selectedParticipationType">
-        </participatory-genes>
-      </div>
+    <participatory-genes
+      signature-id="{{ctrl.id}}"
+      genes="ctrl.genes"
+      selected-participation-type="ctrl.selectedParticipationType">
+    </participatory-genes>
+    <hr>
 
-      <div class="col-xs-6">
-        <high-range-exp signature-id="{{ctrl.id}}" model-id="{{ctrl.modelID}}"
-                        top-exp="20">
-        </high-range-exp>
-      </div>
-    </div>
-    <div class="row">
-      <div class="col-xs-6">
-        <enriched-genesets
-          organism="{{ctrl.organism}}"
-          genes="ctrl.genes"
-          selected-participation-type="ctrl.selectedParticipationType">
-        </enriched-genesets>
-      </div>
+    <enriched-genesets
+      organism="{{ctrl.organism}}"
+      genes="ctrl.genes"
+      selected-participation-type="ctrl.selectedParticipationType">
+    </enriched-genesets>
+    <hr>
 
-      <div class="col-xs-6">
-      </div>
-    </div>
+    <high-range-exp
+      signature-id="{{ctrl.id}}"
+      model-id="{{ctrl.modelID}}"
+      top-exp="3">
+    </high-range-exp>
+
   </div>
 </div>

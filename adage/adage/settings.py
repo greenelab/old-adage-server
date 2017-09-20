@@ -28,6 +28,10 @@ elif os.environ.get('CIRCLECI') == 'true':
     with open(os.path.join(BASE_DIR, 'adage', 'config.py.template')) as f:
         exec f
     CONFIG = CIRCLECI_CONFIG
+elif os.environ.get('DOCKER_DEV') == 'true':
+    with open(os.path.join(BASE_DIR, 'adage', 'config.py.template')) as f:
+        exec f
+    CONFIG = DOCKER_DEV
 else:
     from config import CONFIG
 
@@ -72,22 +76,28 @@ HAYSTACK_SEARCH_RESULTS_PER_PAGE = 10
 # define and activate an Elasticsearch Custom Analyzer that mimics Snowball
 # but adds a word_delimiter token filter where we want it (fixes bitbucket
 # issue #1: "search on PA14 does not find E-GEOD-24262")
-ELASTICSEARCH_DEFAULT_ANALYZER = "adage_snowball"
+ELASTICSEARCH_DEFAULT_ANALYZER = 'adage_snowball'
 ELASTICSEARCH_INDEX_SETTINGS = {
     'settings': {
-        "analysis": {
-            "analyzer": {
-                "adage_snowball": {
-                    "type": "custom",
-                    "tokenizer": "standard",
-                    "filter": [
-                        "standard",
-                        "word_delimiter",
-                        "lowercase",
-                        "stop",
-                        "snowball"
+        'analysis': {
+            'analyzer': {
+                'adage_snowball': {
+                    'type': 'custom',
+                    'tokenizer': 'standard',
+                    'filter': [
+                        'standard',
+                        'adage_word_delimiter',
+                        'lowercase',
+                        'stop',
+                        'snowball'
                     ]
                 },
+            },
+            'filter': {
+                'adage_word_delimiter': {
+                    'type': 'word_delimiter',
+                    'split_on_case_change': False
+                }
             }
         }
     }

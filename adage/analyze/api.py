@@ -427,7 +427,14 @@ class EdgeResource(ModelResource):
                 raise BadRequest("Invalid gene IDs: %s" % genes)
             # "in" operator in Django supports both list and set.
             qset = Q(gene1__in=ids) | Q(gene2__in=ids)
-            object_list = object_list.filter(qset).distinct()
+            direct_edges = object_list.filter(qset).distinct()
+            related_genes = set()
+            for e in direct_edges:
+                related_genes.add(e.gene1)
+                related_genes.add(e.gene2)
+            object_list = object_list.filter(
+                gene1__in=related_genes, gene2__in=related_genes
+            ).distinct()
         return object_list
 
 

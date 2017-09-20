@@ -7,7 +7,6 @@ angular.module('adage.analyze', [
   'adage.analyze.detail',
   'adage.analyze.analysis', // includes sample-bin
   'ui.router',
-  'placeholders',
   'ui.bootstrap',
   'as.sortable',
   'ngAnimate',
@@ -27,14 +26,10 @@ angular.module('adage.analyze', [
   });
 })
 
-.run(['$anchorScroll', function($anchorScroll) {
-  $anchorScroll.yOffset = 80;
-}])
-
 .controller('AnalyzeCtrl', ['$scope', '$stateParams', '$log', '$location',
-  '$anchorScroll', 'Sample',
-  function AnalyzeCtrl($scope, $stateParams, $log, $location, $anchorScroll,
-                       Sample) {
+  'Sample', 'SampleBin',
+  function AnalyzeCtrl($scope, $stateParams, $log, $location, Sample,
+                       SampleBin) {
     $scope.isValidModel = false;
     // Do nothing if mlmodel in URL is falsey. The error will be taken
     // care of by "<ml-model-validator>" component.
@@ -57,10 +52,23 @@ angular.module('adage.analyze', [
         return classList;
       },
 
+      item_tooltip: function(search_item) {
+        // Determine what text to show as a tooltip for this search_item.
+        if (SampleBin.hasItem(search_item)) {
+          return 'Already added to analysis';
+        }
+        if (search_item.item_type === 'sample') {
+          return 'Add this sample to analysis';
+        }
+        if (search_item.item_type === 'experiment') {
+          return 'Add these samples to analysis';
+        }
+        $log.warn('item_tooltip: unknown search item_type', search_item);
+        return 'Unknown search item type';
+      },
+
       scroll_to_id: function(id) {
-        $log.info('scroll_to_id called with: ' + id);
         $location.hash(id);
-        $anchorScroll();
       }
     };
   }

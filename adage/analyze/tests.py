@@ -8,9 +8,13 @@ import re
 import sys
 import codecs
 import unittest
+from copy import deepcopy
 
 from django.db.models import Q
 from django.test import TestCase
+from django.test.utils import override_settings
+from django.core.management import call_command
+from django.conf import settings
 from organisms.models import Organism
 from genes.models import Gene
 from analyze.models import (
@@ -21,6 +25,7 @@ from analyze.management.commands.import_data import (
 from datetime import datetime
 from tastypie.test import ResourceTestCaseMixin
 from fixtureless import Factory
+import haystack
 
 sys.path.append(os.path.abspath('../../'))
 import get_pseudo_sdrf as gp
@@ -33,29 +38,33 @@ from adage.settings import CONFIG
 from analyze.api import SampleResource
 
 
+TEST_INDEX = deepcopy(settings.HAYSTACK_CONNECTIONS)
+TEST_INDEX['default']['INDEX_NAME'] = 'test_index'
+
+
 class ModelsTestCase(TestCase):
     """
     Test all aspects of defining and manipulating models here
     """
     experiment_data = {
-        'accession':    'E-GEOD-31227',
-        'name':         'Expression data of Pseudomonas aeruginosa isolates '
-                        'from Cystic Fibrosis patients in Denmark',
-        'description':  'CF patients suffer from chronic and recurrent '
-                'respiratory tract infections which eventually lead to lung '
-                'failure followed by death. Pseudomonas aeruginosa is one '
-                'of the major pathogens for CF patients and is the principal '
-                'cause of mortality and morbidity in CF patients. Once it '
-                'gets adapted, P. aeruginosa can persist for several decades '
-                'in the respiratory tracts of CF patients, overcoming host '
-                'defense mechanisms as well as intensive antibiotic '
-                'therapies. P. aeruginosa CF strains isolated from different '
-                'infection stage were selected for RNA extraction and '
-                'hybridization on Affymetrix microarrays. Two batch of P. '
-                'aeruginosa CF isolates are chosen : 1) isolates from a '
-                'group of patients since 1973-2008 as described in ref '
-                '(PMID: 21518885); 2) isolates from a group of newly '
-                'infected children as described in ref (PMID: 20406284).'
+        'accession': 'E-GEOD-31227',
+        'name': 'Expression data of Pseudomonas aeruginosa isolates from '
+            'Cystic Fibrosis patients in Denmark',
+        'description': 'CF patients suffer from chronic and recurrent '
+            'respiratory tract infections which eventually lead to lung '
+            'failure followed by death. Pseudomonas aeruginosa is one '
+            'of the major pathogens for CF patients and is the principal '
+            'cause of mortality and morbidity in CF patients. Once it '
+            'gets adapted, P. aeruginosa can persist for several decades '
+            'in the respiratory tracts of CF patients, overcoming host '
+            'defense mechanisms as well as intensive antibiotic '
+            'therapies. P. aeruginosa CF strains isolated from different '
+            'infection stage were selected for RNA extraction and '
+            'hybridization on Affymetrix microarrays. Two batch of P. '
+            'aeruginosa CF isolates are chosen : 1) isolates from a '
+            'group of patients since 1973-2008 as described in ref '
+            '(PMID: 21518885); 2) isolates from a group of newly '
+            'infected children as described in ref (PMID: 20406284).'
     }
 
     sample_list = [
@@ -475,7 +484,8 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
 
     def call_non_get_post_API(self, uri, data={}):
         '''
-        Helper method: assert that PUT, PATCH and DELETE methods are NOT allowed
+        Helper method: assert that PUT, PATCH and DELETE methods are NOT
+        allowed.
         '''
         # PUT
         resp = self.api_client.put(uri, data=data)
@@ -698,6 +708,19 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         self.call_get_API(uri)
         self.call_non_get_API(uri)
 
+    @staticmethod
+    def get_edge_union(gene_ids):
+        """Return all edges that are related to input gene_ids."""
+        qset = Q(gene1__in=gene_ids) | Q(gene2__in=gene_ids)
+        direct_edges = Edge.objects.filter(qset).distinct()
+        related_genes = set()
+        for e in direct_edges:
+            related_genes.add(e.gene1)
+            related_genes.add(e.gene2)
+        return Edge.objects.filter(
+            gene1__in=related_genes, gene2__in=related_genes
+        ).distinct()
+
     def test_edge_union(self):
         """
         Test edge unions via 'api/v0/edge/?genes=<id1,id2,...>' API.
@@ -709,18 +732,16 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         id2 = Gene.objects.last().id   # The last gene
 
         # The number of edges in the union of the first and last genes
-        # should be: num_gene1 + num_gene2 - 1, "-1" is due to double
-        # counting of the edge between the first and last genes.
+        # should be equal to num_gene1 * num_gene2.
         uri = self.baseURI + "edge/"
         data = {'genes': "%s,%s" % (id1, id2)}
         resp = self.api_client.get(uri, data=data)
         resp = self.deserialize(resp)
         api_result = len(resp['objects'])
-        self.assertEqual(api_result, self.num_gene1 + self.num_gene2 - 1)
+        self.assertEqual(api_result, self.num_gene1 * self.num_gene2)
 
         # Also confirm that api_result matches the Django query result.
-        qset = Q(gene1__in=[id1, id2]) | Q(gene2__in=[id1, id2])
-        query_result = Edge.objects.filter(qset).distinct().count()
+        query_result = self.get_edge_union([id1, id2]).count()
         self.assertEqual(api_result, query_result)
 
         # Confirm the union of edges that involve 100 randomly selected
@@ -732,9 +753,7 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         resp = self.api_client.get(uri, data=data)
         resp = self.deserialize(resp)
         api_result = len(resp['objects'])
-
-        qset = Q(gene1__in=random_genes) | Q(gene2__in=random_genes)
-        query_result = Edge.objects.filter(qset).distinct().count()
+        query_result = self.get_edge_union(random_genes).count()
         self.assertEqual(api_result, query_result)
 
     def test_edge_intersection(self):
@@ -938,11 +957,6 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         else:
             organism = factory.create(Organism)
 
-        if MLModel.objects.exists():
-            ml_model = MLModel.objects.first()
-        else:
-            ml_model = factory.create(MLModel)
-
         # Create genes:
         for i in range(num_genes):
             Gene.objects.create(entrezid=(i + 1),
@@ -1025,3 +1039,142 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
             self.deserialize(resp)['meta']['total_count'],
             self.expressionvalue_count
         )
+
+
+@override_settings(HAYSTACK_CONNECTIONS=TEST_INDEX)
+class SearchIndexTestCase(ResourceTestCaseMixin, TestCase):
+    searchURI = '/api/v0/search/'
+    experiments = [
+        {
+            'accession': 'E-GEOD-31227',
+            'name': 'Expression data of Pseudomonas aeruginosa isolates from '
+                'Cystic Fibrosis patients in Denmark',
+            'description': 'CF patients suffer from chronic and recurrent '
+                'respiratory tract infections which eventually lead to lung '
+                'failure followed by death. Pseudomonas aeruginosa is one '
+                'of the major pathogens for CF patients and is the principal '
+                'cause of mortality and morbidity in CF patients. Once it '
+                'gets adapted, P. aeruginosa can persist for several decades '
+                'in the respiratory tracts of CF patients, overcoming host '
+                'defense mechanisms as well as intensive antibiotic '
+                'therapies. P. aeruginosa CF strains isolated from different '
+                'infection stage were selected for RNA extraction and '
+                'hybridization on Affymetrix microarrays. Two batch of P. '
+                'aeruginosa CF isolates are chosen : 1) isolates from a '
+                'group of patients since 1973-2008 as described in ref '
+                '(PMID: 21518885); 2) isolates from a group of newly '
+                'infected children as described in ref (PMID: 20406284).'
+        }, {
+            'accession': 'E-GEOD-24262',
+            'name': 'PA14_mexR vs. wildtype planktonic cells in minimal '
+                'medium with C-30',
+            'description': 'Mutations that made the cells insensitive to the '
+                'QS inhibition by C-30 were identified in mexR, a multi-drug '
+                'resistance operon repressor. Gene expression of mexR mutant '
+                'relative to wild-type at the presence of C-30 was examined. '
+                'Strains: PA14_mexR and wildtype. Medium: OS minimal medium + '
+                '0.1% Adenosine as carbon source. Compounds: 50 µM C-30 added '
+                'at OD600=0.25. Time: 2 hr. Temp: 37 ºC. Cell type: '
+                'Planktonic Cells.'
+        }, {
+            'accession': 'E-GEOD-17296',
+            'name': 'Transcription profiling of Pseudomonas aeruginosa roxSR '
+                'and anr mutant strains under aerobic conditions',
+            'description': 'To assess the role of two redox-sensitive '
+                'transcriptional regulators, RoxSR and ANR, in Pseudomonas '
+                'aeruginosa under aerobic conditions, microarray analysis was '
+                'performed. Transcriptome profiles of roxSR mutant and anr '
+                'mutant aerobically grown in LB medium were determined by '
+                'Affymetrix GeneChip at both the exponential phase and early '
+                'stationary phase and compared to that of the wild type '
+                'strain. Experiment Overall Design: Pseudomonas aeruginosa '
+                'wild type (PAO1ut), roxSR mutant (ROX1), and anr mutant '
+                '(PAO6261) strains were cultivated aerobically in LB in '
+                'Erlenmeyer flasks, and total RNAs were extracted at both the '
+                'exponential phase (OD600 = 0.3) and early stationary phase '
+                '(OD600 = 1.4). The experiment was performed in duplicate '
+                'independent cultures.'
+        }
+    ]
+    samples = [
+        # These examples are pulled from E-GEOD-24262
+        {
+            'name': 'GSM596626 1',
+            'ml_data_source': 'GSM596626.CEL',
+        }, {
+            'name': 'GSM596819 1',
+            'ml_data_source': 'GSM596819.CEL',
+        }
+    ]
+
+    def setUp(self):
+        haystack.connections.reload('default')
+        super(SearchIndexTestCase, self).setUp()
+        # create each of our test experiments
+        for e in self.experiments:
+            ModelsTestCase.create_test_experiment(experiment_data=e)
+        # retrieve an experiment and link some samples to test the sample index
+        exp_obj = Experiment.objects.get(pk='E-GEOD-24262')
+        for s in self.samples:
+            exp_obj.sample_set.create(**s)
+        call_command('update_index', interactive=False, verbosity=0)
+
+    def testCaseInsensitive(self):
+        """
+        We should find the same results whether we're searching with a
+        mixed-case search term or all lower case.
+        This is a check that we're handing issue #123 properly.
+        """
+        respMixed = self.api_client.get(self.searchURI, data={'q': 'mexR'})
+        self.assertValidJSONResponse(respMixed)
+        respLower = self.api_client.get(self.searchURI, data={'q': 'mexr'})
+        self.assertValidJSONResponse(respLower)
+        jsonMixed = self.deserialize(respMixed)
+        jsonLower = self.deserialize(respLower)
+        self.assertEqual(
+            jsonMixed['meta']['total_count'],
+            jsonLower['meta']['total_count']
+        )
+        self.assertEqual(
+            jsonMixed['objects'],
+            jsonLower['objects']
+        )
+
+    def testSearchPA14(self):
+        """
+        A search for 'PA14' should yield experiment E-GEOD-24262
+        This is a check that we're handling Bitbucket issue #1 properly:
+        https://bitbucket.org/greenelab/adage-server/issues/1/
+        Note: this simple test assumes no other PA14 experiments are added
+        to the test data.
+        """
+        respPA14 = self.api_client.get(self.searchURI, data={'q': 'PA14'})
+        self.assertValidJSONResponse(respPA14)
+        self.assertEqual(
+            self.deserialize(respPA14)['objects'][0]['pk'],
+            'E-GEOD-24262'
+        )
+
+    def testSampleIndex(self):
+        """
+        Make sure that analyze.search_indexes.SampleIndex.prepare_experiments
+        produced the expected result. We should be able to find each sample we
+        indexed in setUp() by searching on the corresponding Experiment's
+        accession number.
+        """
+        respEGEOD24262 = self.api_client.get(
+            self.searchURI,
+            data={'q': 'E-GEOD-24262'}
+        )
+        self.assertValidJSONResponse(respEGEOD24262)
+        self.assertEqual(
+            frozenset([
+                item['description']
+                for item in self.deserialize(respEGEOD24262)['objects']
+                if item['item_type'] == 'sample'    # only testing samples
+            ]),
+            frozenset([u'GSM596626 1', u'GSM596819 1'])
+        )
+
+    def tearDown(self):
+        call_command('clear_index', interactive=False, verbosity=0)

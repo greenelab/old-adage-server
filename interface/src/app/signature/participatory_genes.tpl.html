@@ -15,10 +15,25 @@
       </tr>
     </thead>
     <tbody>
-      <tr ng-repeat="gene in genes | orderBy: 'sysName'">
+      <tr ng-repeat="gene in genes | orderBy: 'sysName' | limitTo: numGenesShown">
         <td><b>{{gene.sysName}}</b></td>
         <td>{{gene.stdName}}</td>
         <td>{{gene.desc}}</td>
+      </tr>
+
+      <tr ng-click="setMode()" ng-show="topMode">
+        <td>
+          <button type="button" class="btn btn-default">Show all ...</button>
+        </td>
+        <td></td>
+        <td></td>
+      </tr>
+      <tr ng-click="setMode()" ng-hide="topMode">
+        <td>
+          <button type="button" class="btn btn-default">Only show {{topNum}}</button>
+        </td>
+        <td></td>
+        <td></td>
       </tr>
     </tbody>
   </table>

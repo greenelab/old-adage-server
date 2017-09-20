@@ -18,17 +18,33 @@
       background-color: inherit;
     }
     .btn:hover {
-      background-color: #f8f8f8;
+      background-color: @navbar-default-bg;
     }
     .btn.disabled {
+      opacity: .25;
+    }
+  }
+  li.active {
+    .btn {
+      background-color: @highlight-general;
+    }
+    .btn.disabled {
+      background-color: inherit;
       opacity: .25;
     }
   }
   a:hover {
     text-decoration: none;
   }
+  a[id]:before {
+    display: block;
+    content: " ";
+    margin-top: -80px;
+    height: 80px;
+    visibility: hidden;
+  }
   .experiment {
-    background-color: #f6f6ff;
+    background-color: @experiment-bg;
   }
   .experiment .media-left {
     background: url('/static/assets/testtube-expt2.svg');
@@ -39,11 +55,11 @@
     .li-media-left;
   }
   .list-group-item:hover {
-    background-color: #f5f5f5;
+    background-color: @list-group-hover-bg;
   }
   .list-group-item.active {
-    background-color: #e7e7e7;
-    border-color: #ddd;
+    background-color: @navbar-default-border;
+    border-color: @list-group-border;
   }
   .list-group-item-text {
     color: #333;
