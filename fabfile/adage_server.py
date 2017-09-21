@@ -209,9 +209,10 @@ def import_data_and_index():
         # "High-weight genes" has been created in:
         # migrations/0009_auto_20170503_1700.py
         run('python manage.py import_signature_gene_network "%s" "%s" '
-            '"High-weight genes"'
-            % (CONFIG['data']['signature_gene_network_file'], mlmodel["title"])
-        )
+            '"High-weight genes"' % (
+                CONFIG['data']['signature_gene_network_file'],
+                mlmodel["title"]
+            ))
         # Import gene-gene network data
         run('python manage.py import_gene_network  "%s" "%s"' %
             (CONFIG['data']['gene_network_file'], mlmodel["title"]))
