@@ -2,27 +2,60 @@
 
 ## Overview
 
-This directory contains files used for pre-loading our production server with
-*Pseudomonas aeruginosa*-related samples and annotations. All of these files
-are loaded into the system using the `import_data_and_index()` function in
+This directory contains files used for pre-loading our production server
+database with *Pseudomonas aeruginosa*-related samples and annotations. All of
+these files are loaded into the system using the management commands listed in
+[the load_default_pseudomonas_data.sh script](https://github.com/greenelab/adage-server/blob/master/load_default_pseudomonas_data.sh).
+These commands take the location and filename of the desired data files as
+an argument.
+
+If using [fabric](http://www.fabfile.org/), these can also be loaded using the
+`import_data_and_index()` function in
 [fabfile/adage_server.py](https://github.com/greenelab/adage-server/blob/master/fabfile/adage_server.py).
 The
 [adage/adage/configy.py.template file](https://github.com/greenelab/adage-server/blob/master/adage/adage/config.py.template)
-specifies which files are loaded by the `import_data_and_index()` function.
+specifies which files are loaded by this `import_data_and_index()` function.
 
-## File Listing
+All of the files below are tab-delimited text files. If you wish to load your
+own files into your adage-server instance, they should be in the same format as
+the files below.
 
-* **PseudomonasAnnotation.tsv** lists samples retrieved from ArrayExpress along
-  with manually-curated annotations for those samples.
-* **all-pseudomonas-gene-normalized.pcl** contains normalized expression levels for
-  every gene in each sample in the compendium.
-* **all-pseudomonas-gene-normalized_HWActivity_perGene_with_net300_100models_1_100_k=300_seed=123_ClusterByweighted_avgweight_network_ADAGE.txt**
-  contains signature (node) activity levels (as absolute values) for each
+## File Listing and Description
+
+### **PseudomonasAnnotation.tsv**
+  Lists samples retrieved from ArrayExpress along with manually-curated
+  annotations for those samples. Each row is a sample, and the columns
+  contain information about that sample.
+
+### **all-pseudomonas-gene-normalized.pcl**
+  Contains normalized expression levels for every gene in each sample in
+  the compendium. In this file, genes are rows, and samples are columns.
+  This is the input expression data for building an ADAGE model.
+
+### **all-pseudomonas-gene-normalized_HWActivity_perGene_with_net300_100models_1_100_k=300_seed=123_ClusterByweighted_avgweight_network_ADAGE.txt**
+  Contains signature (node) activity levels (as absolute values) for each
   sample in the compendium derived from the eADAGE machine learning model.
-* **all-pseudomonas-gene-normalized_HWActivity_perGene_with_net300_100models_k=300_seed=123_ClusterByweighted_avgweight_network_ADAGE.txt**
-  contains signature (node) activity levels for each sample in the compendium
-  derived from the eADAGE machine learning model.
-* **eADAGE_net300_allNodes_ADAGEnet_PAID_corCutoff0.4.txt** contains gene-gene
-  network information derived from the eADAGE machine learning model.
-* **node_gene_network.txt** lists high-weight genes participating in each
-  signature (node) in the eADAGE machine learning model.
+  In this file, samples are rows, and nodes are columns.
+
+### **all-pseudomonas-gene-normalized_HWActivity_perGene_with_net300_100models_k=300_seed=123_ClusterByweighted_avgweight_network_ADAGE.txt**
+  Contains signature (node) activity levels for each sample in the compendium
+  derived from the eADAGE machine learning model. In this file, samples are
+  rows, and nodes are columns.
+
+### **eADAGE_net300_allNodes_ADAGEnet_PAID_corCutoff0.4.txt**
+  Contains gene-gene network information derived from the eADAGE machine
+  learning model, where each row contains the edge weight between two genes
+  in this model and whether this is a positive or negative weight.
+
+  The first two columns are the genes for the given edge weight. The order of
+  these first two columns ("from"/"to") does not matter, as the weight of the
+  edge between the two genes is the same. The third column is the edge's
+  weight, and the fourth column is whether it is a positive or negative weight.
+
+### **node_gene_network.txt**
+  Lists high-weight genes participating in each signature (node) in the eADAGE
+  machine learning model. Each row is a signature (node), and the tab-delimited
+  values following each node name are the high-weight gene names that
+  participate in it. This is similar to a
+  [GMT file format](http://software.broadinstitute.org/cancer/software/genepattern/file-formats-guide#GMT),
+  where each row represents a gene set.
