@@ -195,8 +195,14 @@ def import_data_and_index():
         "title": "Ensemble ADAGE 300 with more complex gene-gene network",
         "cutoff": 0.2
     }
-    # Unzip gene-gene network file.
-    run('gunzip "%s.gz"' % CONFIG['data']['gene_network_file'])
+
+    # If the gene-gene network file has ".gz" extension, unzip it.
+    gene_gene_network_file = CONFIG['data']['gene_network_file']
+    basename, extension = os.path.splitext(gene_gene_network_file)
+    if extension == '.gz':
+        run('gunzip "%s"' % gene_gene_network_file)
+        gene_gene_network_file = basename
+
     # Create two ML models and related records separately:
     for mlmodel in [mlmodel_basic, mlmodel_complex]:
         # Create ML model
@@ -214,8 +220,8 @@ def import_data_and_index():
                 mlmodel["title"]
             ))
         # Import gene-gene network data
-        run('python manage.py import_gene_network  "%s" "%s"' %
-            (CONFIG['data']['gene_network_file'], mlmodel["title"]))
+        run('python manage.py import_gene_network "%s" "%s"' %
+            (gene_gene_network_file, mlmodel["title"]))
 
     run('python manage.py import_gene_sample_expr "%s" 208964' %
         CONFIG['data']['gene_sample_expr_file'])
