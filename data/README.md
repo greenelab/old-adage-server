@@ -36,8 +36,8 @@ instance, they should be in the same format as the files below.
 ### **sample_signature_activity.txt**
   Contains signature (node) activity levels (as absolute values) for each
   sample in the compendium derived from the eADAGE machine learning model.
-  In this file, samples are rows, and nodes are columns. This file is based
-  on the
+  In this file, samples are rows, and signatures are columns. This file is
+  based on the
   `all-pseudomonas-gene-normalized_HWActivity_perGene_with_net300_100models_1_100_k=300_seed=123_ClusterByweighted_avgweight_network_ADAGE.txt`
   file, which is now in the `data/old/` folder.
 
