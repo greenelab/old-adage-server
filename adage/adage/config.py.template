@@ -76,7 +76,7 @@ DATA_CONFIG.update({
     'gene_history_url': 'ftp://ftp.ncbi.nih.gov/gene/DATA/gene_history.gz',
     'gene_history_file': os.path.join(DATA_CONFIG['data_dir'], 'gene_history'),
     'gene_network_file': os.path.join(
-        DATA_CONFIG['data_dir'], 'gene_gene_network_cutoff_0.2.txt.gz'),
+        DATA_CONFIG['data_dir'], 'gene_gene_network_cutoff_0.2.txt'),
     'signature_gene_network_file': os.path.join(
         DATA_CONFIG['data_dir'], 'signature_gene_network.txt'),
     'gene_sample_expr_file': os.path.join(
