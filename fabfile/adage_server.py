@@ -169,11 +169,7 @@ def import_data_and_index():
     run('python manage.py organisms_create_or_update --taxonomy_id=208964 '
         '--scientific_name="Pseudomonas aeruginosa" '
         '--common_name="Pseudomonas aeruginosa"')
-    run('python manage.py add_ml_model "Ensemble ADAGE 300" 208964 '
-        '--g2g_edge_cutoff 0.4')
-    # import activity data
-    run('python manage.py import_activity "%s" "Ensemble ADAGE 300"' %
-        CONFIG['data']['activity_file'])
+
     # define a CrossRefDB for PseudoCap
     run('python manage.py genes_add_xrdb --name=PseudoCap '
         '--URL=http://www.pseudomonas.com/getAnnotation.do?locusID=_REPL_')
@@ -190,13 +186,44 @@ def import_data_and_index():
     run(('python manage.py genes_load_gene_history %s 208964 '
         '--tax_id_col=1 --discontinued_id_col=3 --discontinued_symbol_col=4') %
         CONFIG['data']['gene_history_file'])
-    run('python manage.py import_gene_network  %s "Ensemble ADAGE 300"' %
-        CONFIG['data']['gene_network_file'])
-    # Note that the ParticipationType "High-weight genes" has been
-    # created in: migrations/0009_auto_20170503_1700.py
-    run('python manage.py import_node_gene_network %s "Ensemble ADAGE 300"'
-        ' "High-weight genes"' % CONFIG['data']['node_gene_network_file'])
-    run('python manage.py import_gene_sample_expr %s 208964' %
+
+    mlmodel_basic = {
+        "title": "Ensemble ADAGE 300",
+        "cutoff": 0.4
+    }
+    mlmodel_complex = {
+        "title": "Ensemble ADAGE 300 with more complex gene-gene network",
+        "cutoff": 0.2
+    }
+
+    # If the gene-gene network file has ".gz" extension, unzip it.
+    gene_gene_network_file = CONFIG['data']['gene_network_file']
+    basename, extension = os.path.splitext(gene_gene_network_file)
+    if extension == '.gz':
+        run('gunzip "%s"' % gene_gene_network_file)
+        gene_gene_network_file = basename
+
+    # Create two ML models and related records separately:
+    for mlmodel in [mlmodel_basic, mlmodel_complex]:
+        # Create ML model
+        run('python manage.py add_ml_model "%s" 208964 --g2g_edge_cutoff %s'
+            % (mlmodel["title"], mlmodel["cutoff"]))
+        # Import activity data
+        run('python manage.py import_activity "%s" "%s"' %
+            (CONFIG['data']['activity_file'], mlmodel["title"]))
+        # Import participation data.  Note that the ParticipationType
+        # "High-weight genes" has been created in:
+        # migrations/0009_auto_20170503_1700.py
+        run('python manage.py import_signature_gene_network "%s" "%s" '
+            '"High-weight genes"' % (
+                CONFIG['data']['signature_gene_network_file'],
+                mlmodel["title"]
+            ))
+        # Import gene-gene network data
+        run('python manage.py import_gene_network "%s" "%s"' %
+            (gene_gene_network_file, mlmodel["title"]))
+
+    run('python manage.py import_gene_sample_expr "%s" 208964' %
         CONFIG['data']['gene_sample_expr_file'])
     run('python manage.py tribe_client_pickle_public_genesets')
     rebuild_search_index()

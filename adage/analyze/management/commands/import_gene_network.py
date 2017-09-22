@@ -83,8 +83,7 @@ def import_network(file_handle, ml_model_name):
 
 
 def check_and_import(file_handle, ml_model):
-    """
-    Read valid data lines into the database.  An exception will be raised
+    """Read valid data lines into the database.  An exception will be raised
     if any errors are detected in file_handle.
     """
     # If the database already includes record(s) of the same ml_model,
