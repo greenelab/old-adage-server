@@ -204,8 +204,7 @@ python manage.py migrate
 
 Download the `get_pseudo_sdrf.py` and `gen_spreadsheets.py` files from
 [this repository](https://bitbucket.org/greenelab/get_pseudomonas/src),
-and put them in whichever parent directory the adage-server repository has been
-cloned into.
+and put them in the `adage-server/adage/` folder.
 
 ### Populate the database
 
