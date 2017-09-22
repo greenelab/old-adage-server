@@ -17,19 +17,28 @@ instance of the adage-server.
 ### Steps
 1. Install [Docker](https://docs.docker.com/get-started/) on your computer.
 
-   Also, if your computer is not running Mac or Windows OS, you will need to
+   Also, **if your computer is not running Mac or Windows OS**, you will need to
    [install Docker Compose](https://docs.docker.com/compose/install/).
 
-2. Fork and clone the adage-server repository
+2. Fork and/or clone the adage-server repository
 
-   Fork [the adage-server repository on Github](https://github.com/greenelab/adage-server)
+   If you will be doing development on your instance of the adage-server,
+   first fork
+   [the adage-server repository on Github](https://github.com/greenelab/adage-server)
    (see [Github's documentation](https://help.github.com/articles/fork-a-repo/)
    for forking repositories), and then clone that fork you made in the directory
-   of your choice.
+   of your choice:
 
    ```shell
    cd /<your chosen directory>/
    git clone git@github.com:<your github account>/adage-server.git
+   ```
+
+   Otherwise, you can just clone the main repository:
+
+   ```shell
+   cd /<your chosen directory>/
+   git clone git@github.com:greenelab/adage-server.git
    ```
 
 3. In a terminal, change directories into the `adage-server` directory
@@ -42,14 +51,26 @@ instance of the adage-server.
    ```
    Give it a few moments to start up.
 
-4. If you want to load the default Pseudomonas data into the server database,
+4. (Optional) Loading Adage models into your new instance.
+
+   If you want to load the default Pseudomonas data into the server database,
    enter the following command:
 
    ```shell
    docker-compose exec core ./load_default_pseudomonas_data.sh
    ```
+
+   This will load the files in the
+   [data/ folder](https://github.com/greenelab/adage-server/tree/master/data)
+   using the
+   [the load_default_pseudomonas_data.sh script](https://github.com/greenelab/adage-server/blob/master/load_default_pseudomonas_data.sh)
+   into your adage-server instance's database. For more information about
+   these files, see
+   [the README in the data folder](https://github.com/greenelab/adage-server/blob/master/data/README.md).
+
+
 You are done! You can visit the interface of your new local adage-server
-at `http://localhost`.
+at `http://localhost:80`, or simply `http://localhost`.
 
 ## Get a working instance of the adage-server running without Docker
 
