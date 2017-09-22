@@ -56,7 +56,7 @@ instance of the adage-server.
    If you want to load the default Pseudomonas data into the server database,
    enter the following command:
 
-   ```shell
+   ```
    docker-compose exec core ./load_default_pseudomonas_data.sh
    ```
 
