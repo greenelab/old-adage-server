@@ -62,3 +62,7 @@ instance, they should be in the same format as the files below.
   participate in it. This is similar to a
   [GMT file format](http://software.broadinstitute.org/cancer/software/genepattern/file-formats-guide#GMT),
   where each row represents a gene set.
+
+### **The `old/` subdirectory**
+    The `old/` folder contains previous versions of the files above. These are
+    now obsolete and for backup purpose only.
