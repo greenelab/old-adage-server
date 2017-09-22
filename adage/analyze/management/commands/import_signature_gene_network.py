@@ -99,8 +99,9 @@ def import_network(file_handle, ml_model_name, participation_type_name):
 
 
 def check_and_import(file_handle, ml_model, participation_type):
-    """Read valid data lines into the database.  An exception will be raised
-    if any errors are detected in file_handle."""
+    """Read valid data lines into the database.  An exception will be
+    raised if any errors are detected in file_handle.
+    """
     nodes_in_file = set()
     for line_index, line in enumerate(file_handle):
         tokens = line.rstrip("\t\r\n").split("\t")
