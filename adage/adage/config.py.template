@@ -68,10 +68,7 @@ DATA_CONFIG.update({
     'annotation_file': os.path.join(
         DATA_CONFIG['data_dir'], 'PseudomonasAnnotation.tsv'),
     'activity_file': os.path.join(
-        DATA_CONFIG['data_dir'],
-        'all-pseudomonas-gene-normalized_HWActivity_perGene_with_net300_'
-        '100models_1_100_k=300_seed=123_ClusterByweighted_avgweight_'
-        'network_ADAGE.txt'),
+        DATA_CONFIG['data_dir'], 'sample_signature_activity.txt'),
     'pao1_genes_url':
         'ftp://ftp.ncbi.nih.gov/gene/DATA/GENE_INFO/Archaea_Bacteria/Pseudomonas_aeruginosa_PAO1.gene_info.gz',
     'pao1_genes_file': os.path.join(
@@ -79,10 +76,9 @@ DATA_CONFIG.update({
     'gene_history_url': 'ftp://ftp.ncbi.nih.gov/gene/DATA/gene_history.gz',
     'gene_history_file': os.path.join(DATA_CONFIG['data_dir'], 'gene_history'),
     'gene_network_file': os.path.join(
-        DATA_CONFIG['data_dir'],
-        'eADAGE_net300_allNodes_ADAGEnet_PAID_corCutoff0.4.txt'),
-    'node_gene_network_file': os.path.join(
-        DATA_CONFIG['data_dir'], 'node_gene_network.txt'),
+        DATA_CONFIG['data_dir'], 'gene_gene_network_cutoff_0.2.txt.gz'),
+    'signature_gene_network_file': os.path.join(
+        DATA_CONFIG['data_dir'], 'signature_gene_network.txt'),
     'gene_sample_expr_file': os.path.join(
         DATA_CONFIG['data_dir'], 'all-pseudomonas-gene-normalized.pcl')
 })
