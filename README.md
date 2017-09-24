@@ -78,7 +78,7 @@ instance of the adage-server.
    Docker container using the following command:
 
    ```
-   docker cp <your desired data file> adage-django:/data/
+   docker cp <your desired data file> adage-django:/srv/data/
    ```
 
    Then, run the appropriate management command to load the desired data file
