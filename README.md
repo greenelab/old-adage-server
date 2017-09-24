@@ -51,7 +51,7 @@ instance of the adage-server.
    ```
    Give it a few moments to start up.
 
-4. (Optional) Loading Adage models into your new instance.
+4. (Optional) Loading ADAGE models into your new instance.
 
    If you want to load the default Pseudomonas data into the server database,
    enter the following command:
