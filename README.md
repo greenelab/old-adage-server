@@ -68,6 +68,43 @@ instance of the adage-server.
    these files, see
    [the README in the data folder](https://github.com/greenelab/adage-server/blob/master/data/README.md).
 
+   **To load your own ADAGE model files:**
+
+   If you would like to load different data files from your own ADAGE model,
+   you can do so, provided that they are in the same format as the
+   corresponding files in the `data/` folder.
+
+   To do this, first copy each of the desired files into the `adage-django`
+   Docker container using the following command:
+
+   ```
+   docker cp <your desired data file> adage-django:/data/
+   ```
+
+   Then, run the appropriate management command to load the desired data file
+   into your local instance:
+
+   ```
+   docker-compose exec core python manage.py <management command> <arguments>
+   ```
+   These are the management commands currently available to load data files:
+   `add_ml_model`,
+   `create_or_update_participation_type`,
+   `delete_participation_type`,
+   `import_activity`,
+   `import_data`,
+   `import_gene_network.py`,
+   `import_gene_sample_expr`,
+   `import_signature_gene_network`
+
+   To see an example of how these management commands are used, see
+   [the load_default_pseudomonas_data.sh script](https://github.com/greenelab/adage-server/blob/master/load_default_pseudomonas_data.sh).
+
+   To see more documentation about how each of the management commands work,
+   see
+   [the corresponding files in the management command folder](https://github.com/greenelab/adage-server/blob/master/adage/analyze/management/commands/).
+   The beginning of each of these files contains more detailed documentation
+   about how to use each of the commands.
 
 You are done! You can visit the interface of your new local adage-server
 at `http://localhost:80`, or simply `http://localhost`.
