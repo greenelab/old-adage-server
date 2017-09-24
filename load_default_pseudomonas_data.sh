@@ -24,7 +24,7 @@ python manage.py add_ml_model "Ensemble ADAGE 300" 208964 --g2g_edge_cutoff 0.4
 
 # Import activity data into the database:
 python manage.py import_activity \
-    ../data/all-pseudomonas-gene-normalized_HWActivity_perGene_with_net300_100models_k=300_seed=123_ClusterByweighted_avgweight_network_ADAGE.txt \
+    ../data/sample_signature_activity.txt \
     "Ensemble ADAGE 300"
 
 # Save PseudoCAP Cross-reference Database
@@ -47,20 +47,23 @@ python manage.py genes_load_geneinfo \
 wget -qO - "ftp://ftp.ncbi.nih.gov/gene/DATA/gene_history.gz" \
     | zcat > ../data/gene_history
 
-python manage.py genes_load_gene_history ../data/gene_history 208964 \
+python manage.py genes_load_gene_history \
+    ../data/gene_history 208964 \
     --tax_id_col=1 \
     --discontinued_id_col=3 \
     --discontinued_symbol_col=4
 
-# Import gene-gene network data into the database:
+# Decompress and import gene-gene network data into the database:
+gunzip ../data/gene_gene_network_cutoff_0.2.txt.gz
 python manage.py import_gene_network \
-    ../data/eADAGE_net300_allNodes_ADAGEnet_PAID_corCutoff0.4.txt \
+    ../data/gene_gene_network_cutoff_0.2.txt \
     "Ensemble ADAGE 300"
 
 # Note that the ParticipationType "High-weight genes" has been
 # created in: migrations/0009_auto_20170503_1700.py
-# Import node-gene participation data into the database:
-python manage.py import_node_gene_network ../data/node_gene_network.txt \
+# Import signature-gene participation data into the database:
+python manage.py import_signature_gene_network \
+    ../data/signature_gene_network.txt \
     "Ensemble ADAGE 300" \
     "High-weight genes"
 
