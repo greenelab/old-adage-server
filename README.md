@@ -17,19 +17,28 @@ instance of the adage-server.
 ### Steps
 1. Install [Docker](https://docs.docker.com/get-started/) on your computer.
 
-   Also, if your computer is not running Mac or Windows OS, you will need to
+   Also, **if your computer is not running Mac or Windows OS**, you will need to
    [install Docker Compose](https://docs.docker.com/compose/install/).
 
-2. Fork and clone the adage-server repository
+2. Fork and/or clone the adage-server repository
 
-   Fork [the adage-server repository on Github](https://github.com/greenelab/adage-server)
+   If you will be doing development on your instance of the adage-server,
+   first fork
+   [the adage-server repository on Github](https://github.com/greenelab/adage-server)
    (see [Github's documentation](https://help.github.com/articles/fork-a-repo/)
    for forking repositories), and then clone that fork you made in the directory
-   of your choice.
+   of your choice:
 
    ```shell
    cd /<your chosen directory>/
    git clone git@github.com:<your github account>/adage-server.git
+   ```
+
+   Otherwise, you can just clone the main repository:
+
+   ```shell
+   cd /<your chosen directory>/
+   git clone git@github.com:greenelab/adage-server.git
    ```
 
 3. In a terminal, change directories into the `adage-server` directory
@@ -42,14 +51,63 @@ instance of the adage-server.
    ```
    Give it a few moments to start up.
 
-4. If you want to load the default Pseudomonas data into the server database,
+4. (Optional) Loading ADAGE models into your new instance.
+
+   If you want to load the default Pseudomonas data into the server database,
    enter the following command:
 
-   ```shell
+   ```
    docker-compose exec core ./load_default_pseudomonas_data.sh
    ```
+
+   This will load the files in the
+   [data/ folder](https://github.com/greenelab/adage-server/tree/master/data)
+   using the
+   [the load_default_pseudomonas_data.sh script](https://github.com/greenelab/adage-server/blob/master/load_default_pseudomonas_data.sh)
+   into your adage-server instance's database. For more information about
+   these files, see
+   [the README in the data folder](https://github.com/greenelab/adage-server/blob/master/data/README.md).
+
+   **To load your own ADAGE model files:**
+
+   If you would like to load different data files from your own ADAGE model,
+   you can do so, provided that they are in the same format as the
+   corresponding files in the `data/` folder.
+
+   To do this, first copy each of the desired files into the `adage-django`
+   Docker container using the following command:
+
+   ```
+   docker cp <your desired data file> adage-django:/srv/data/
+   ```
+
+   Then, run the appropriate management command to load the desired data file
+   into your local instance:
+
+   ```
+   docker-compose exec core python manage.py <management command> <arguments>
+   ```
+   These are the management commands currently available to load data files:
+   `add_ml_model`,
+   `create_or_update_participation_type`,
+   `delete_participation_type`,
+   `import_activity`,
+   `import_data`,
+   `import_gene_network.py`,
+   `import_gene_sample_expr`,
+   `import_signature_gene_network`
+
+   To see an example of how these management commands are used, see
+   [the load_default_pseudomonas_data.sh script](https://github.com/greenelab/adage-server/blob/master/load_default_pseudomonas_data.sh).
+
+   To see more documentation about how each of the management commands works,
+   see
+   [the corresponding files in the management command folder](https://github.com/greenelab/adage-server/blob/master/adage/analyze/management/commands/).
+   The beginning of each of these files contains more detailed documentation
+   about how to use each of the commands.
+
 You are done! You can visit the interface of your new local adage-server
-at `http://localhost`.
+at `http://localhost:80`, or simply `http://localhost`.
 
 ## Get a working instance of the adage-server running without Docker
 
@@ -183,8 +241,7 @@ python manage.py migrate
 
 Download the `get_pseudo_sdrf.py` and `gen_spreadsheets.py` files from
 [this repository](https://bitbucket.org/greenelab/get_pseudomonas/src),
-and put them in whichever parent directory the adage-server repository has been
-cloned into.
+and put them in the `adage-server/adage/` folder.
 
 ### Populate the database
 
