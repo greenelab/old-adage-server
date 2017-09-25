@@ -100,7 +100,7 @@ instance of the adage-server.
    To see an example of how these management commands are used, see
    [the load_default_pseudomonas_data.sh script](https://github.com/greenelab/adage-server/blob/master/load_default_pseudomonas_data.sh).
 
-   To see more documentation about how each of the management commands work,
+   To see more documentation about how each of the management commands works,
    see
    [the corresponding files in the management command folder](https://github.com/greenelab/adage-server/blob/master/adage/analyze/management/commands/).
    The beginning of each of these files contains more detailed documentation
