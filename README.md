@@ -106,14 +106,14 @@ instance of the adage-server.
    ```
 
    These are the management commands currently available to load data files:
-   * `add_ml_model`,
-   * `create_or_update_participation_type`,
-   * `delete_participation_type`,
-   * `import_activity`,
-   * `import_data`,
-   * `import_gene_network`,
-   * `import_gene_sample_expr`, and
-   * `import_signature_gene_network`.
+   * `add_ml_model`
+   * `create_or_update_participation_type`
+   * `delete_participation_type`
+   * `import_activity`
+   * `import_data`
+   * `import_gene_network`
+   * `import_gene_sample_expr`
+   * `import_signature_gene_network`
 
    To see an example of how these management commands are used, see
    [the load_default_pseudomonas_data.sh script](https://github.com/greenelab/adage-server/blob/master/load_default_pseudomonas_data.sh).
