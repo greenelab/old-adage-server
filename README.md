@@ -53,8 +53,8 @@ instance of the adage-server.
 
 4. (Optional) Loading ADAGE models into your new instance.
 
-   If you want to load the default Pseudomonas data into the server database,
-   enter the following command:
+   If you want to load the default _Pseudomonas_ data into the server
+   database, enter the following command:
 
    ```
    docker-compose exec core ./load_default_pseudomonas_data.sh
@@ -111,7 +111,7 @@ instance of the adage-server.
    * `delete_participation_type`,
    * `import_activity`,
    * `import_data`,
-   * `import_gene_network.py`,
+   * `import_gene_network`,
    * `import_gene_sample_expr`, and
    * `import_signature_gene_network`.
 
@@ -259,7 +259,7 @@ and put them in the `adage-server/adage/` folder.
 
 * **Note:** This step is not necessary if you are running the `fabric`
 commands in the first part of the *Populate the database* section below,
-as these commands will automatically run it for you.
+because the `fabric` commands will automatically run it for you.
 
 ```shell
 python manage.py migrate
