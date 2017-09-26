@@ -53,8 +53,8 @@ instance of the adage-server.
 
 4. (Optional) Loading ADAGE models into your new instance.
 
-   If you want to load the default Pseudomonas data into the server database,
-   enter the following command:
+   If you want to load the default _Pseudomonas_ data into the server
+   database, enter the following command:
 
    ```
    docker-compose exec core ./load_default_pseudomonas_data.sh
@@ -72,7 +72,7 @@ instance of the adage-server.
 
    If you would like to load different data files from your own ADAGE model,
    you can do so, provided that they are in the same format as the
-   corresponding files in the `data/` folder.
+   corresponding files in the `data/` folder described above.
 
    To do this, first copy each of the desired files into the `adage-django`
    Docker container using the following command:
@@ -87,15 +87,33 @@ instance of the adage-server.
    ```
    docker-compose exec core python manage.py <management command> <arguments>
    ```
+
+   Note that the files that you will pass as some of these `<arguments>`
+   will be located in the `/srv/data/` folder, as specified by the `docker cp`
+   command above.
+
+   For example, if you wanted to copy a file on your computer called
+   'SomeOrganismAnnotation.tsv', and then load it into the instance's
+   database using the `import_data` management command, you would enter:
+
+   ```
+   docker cp \
+       <local path to file>/SomeOrganismAnnotation.tsv \
+       adage-django:/srv/data/
+
+   docker-compose exec core python manage.py import_data \
+       /srv/data/SomeOrganismAnnotation.tsv
+   ```
+
    These are the management commands currently available to load data files:
-   `add_ml_model`,
-   `create_or_update_participation_type`,
-   `delete_participation_type`,
-   `import_activity`,
-   `import_data`,
-   `import_gene_network.py`,
-   `import_gene_sample_expr`,
-   `import_signature_gene_network`
+   * `add_ml_model`
+   * `create_or_update_participation_type`
+   * `delete_participation_type`
+   * `import_activity`
+   * `import_data`
+   * `import_gene_network`
+   * `import_gene_sample_expr`
+   * `import_signature_gene_network`
 
    To see an example of how these management commands are used, see
    [the load_default_pseudomonas_data.sh script](https://github.com/greenelab/adage-server/blob/master/load_default_pseudomonas_data.sh).
@@ -231,24 +249,29 @@ cd adage/
 pip install -r requirements.txt
 ```
 
-### Run Django migration of database tables
-
-```shell
-python manage.py migrate
-```
-
 ### Download other necessary files
 
 Download the `get_pseudo_sdrf.py` and `gen_spreadsheets.py` files from
 [this repository](https://bitbucket.org/greenelab/get_pseudomonas/src),
 and put them in the `adage-server/adage/` folder.
 
-### Populate the database
+### Run Django migration of database tables
+
+* **Note:** This step is not necessary if you are running the `fabric`
+commands in the first part of the *Populate the database* section below,
+because the `fabric` commands will automatically run it for you.
+
+```shell
+python manage.py migrate
+```
 
 Django will use the database you configured earlier to build tables to support
-its models (during the `migrate` step, above), but the tables will remain empty
-until you run the management commands to import data into the models. This
-repository contains several data files from our work with _Pseudomonas
+its models with this command, but the tables will remain empty
+until you run the management commands to import data into the models.
+
+### Populate the database
+
+This repository contains several data files from our work with _Pseudomonas
 aeruginosa_ that we use for "bootstrapping" our database. The commands to load
 the data are scripted in our `fabric` deployment scripts. If you choose, you
 may run those commands at this point using the following steps:
