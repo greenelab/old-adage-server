@@ -1,7 +1,7 @@
 angular.module('adage.analyze.sample', [
   'statusBar',
-  'adage.sample.services',
-  'adage.analyze.experiment'
+  'adage.sample.services',  // TODO: use adage.sample.service when refactored
+  'adage.experiment.service'
 ])
 
 .controller('SampleCtrl', ['$scope', '$log', '$location', 'Sample',

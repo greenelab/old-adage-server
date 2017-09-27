@@ -1,0 +1,16 @@
+<div class="page-header">
+  <h1>Experiment
+    <small><a href="{{$ctrl.makeHref.arrExpExperiment($ctrl.id)}}"
+      target="_blank">{{$ctrl.id}}</a>
+    </small>
+  </h1>
+  <status-bar msg-text="$ctrl.experiment.status"></status-bar>
+  <h2>{{$ctrl.experiment.results.name}}</h2>
+</div>
+<p>{{$ctrl.experiment.results.description}}</p>
+<h3>Samples</h3>
+<ul class="list-group">
+  <li ng-repeat="sample in $ctrl.experiment.relatedSamples" class="list-group-item">
+    {{sample.name}} ({{sample.ml_data_source}})
+  </li>
+</ul>

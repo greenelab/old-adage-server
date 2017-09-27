@@ -1,12 +1,10 @@
 angular.module('adage.analyze.detail', [
-  'adage.analyze.sample',
-  'adage.analyze.experiment'
+  'adage.analyze.sample', // TODO: use adage.sample when refactored
+  'adage.experiment'
 ])
 
-.controller('SearchDetailCtrl', ['$scope', '$log', '$location',
-  '$timeout', 'Sample', 'Experiment',
-  function SearchDetailCtrl($scope, $log, $location,
-    $timeout, Sample, Experiment) {
+.controller('SearchDetailCtrl', ['$scope', '$location', '$timeout',
+  function SearchDetailCtrl($scope, $location, $timeout) {
     $scope.detail = {
       // The detail object contains all of the information needed for
       // displaying the detail page for search_item and includes convenience
