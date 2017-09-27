@@ -40,7 +40,7 @@ describe('Experiment', function() {
     'name': 'GSE9989GSM252508'
   }];
 
-  beforeEach(module('adage.analyze.sample'));
+  beforeEach(module('adage.experiment'));
   beforeEach(inject(function(_$httpBackend_, _$log_, Experiment) {
     $httpBackend = _$httpBackend_;
     $log = _$log_;
@@ -75,25 +75,23 @@ describe('Experiment', function() {
     });
   });
 
-  // FIXME restore tests (convert from $controller to $componentController)
-  xdescribe('ExperimentCtrl', function() {
-    var ExperimentCtrl, $location, $scope;
+  describe('ExperimentDetailController', function() {
+    var $componentController;
+    var bindings = {id: 'E-GEOD-9989'};
 
-    beforeEach(inject(function($controller, _$location_, $rootScope) {
-      $location = _$location_;
-      $scope = $rootScope.$new();
-      ExperimentCtrl = $controller(
-        'ExperimentCtrl',
-        {$location: $location, $scope: $scope}
-      );
+    beforeEach(inject(function(_$componentController_) {
+      $componentController = _$componentController_;
     }));
 
     it('should pass a dummy test', inject(function() {
-      expect(ExperimentCtrl).toBeTruthy();
+      var ctrl = $componentController('experimentDetail', null, bindings);
+      expect(ctrl).toBeTruthy();
     }));
 
     it('should render the experimentDetail for an experiment', inject(
       function() {
+        var ctrl = $componentController('experimentDetail', null, bindings);
+
         $httpBackend.expectGET(
           '/api/v0/experiment/E-GEOD-9989?limit=0'
         ).respond(mockExperimentResponse);
@@ -115,17 +113,17 @@ describe('Experiment', function() {
         $httpBackend.expectGET('/api/v0/sample/6/').respond(
           mockSampleResponses[5]
         );
-        $scope.show('E-GEOD-9989');
-        expect($scope.experiment.status).toEqual('retrieving...');
+        ctrl.show('E-GEOD-9989');
+        expect(ctrl.experiment.status).toEqual('retrieving...');
         $httpBackend.flush();
 
-        expect($scope.experiment.status).toEqual('');
-        expect($scope.experiment.results.name).toEqual(
+        expect(ctrl.experiment.status).toEqual('');
+        expect(ctrl.experiment.results.name).toEqual(
           'Transcription profiling of P. aeruginosa biofilms treated blah…'
         );
-        expect($scope.experiment.relatedSamples.length).toEqual(6);
+        expect(ctrl.experiment.relatedSamples.length).toEqual(6);
         expect(
-          $scope.experiment.relatedSamples[0].name
+          ctrl.experiment.relatedSamples[0].name
         ).toEqual('GSE9989GSM252496');
       }
     ));
