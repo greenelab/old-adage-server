@@ -1,6 +1,6 @@
 angular.module('adage.analyze.detail', [
   'adage.analyze.sample', // TODO: use adage.sample when refactored
-  'adage.experiment'
+  'adage.experimentDetail'
 ])
 
 .controller('SearchDetailCtrl', ['$scope', '$location', '$timeout',

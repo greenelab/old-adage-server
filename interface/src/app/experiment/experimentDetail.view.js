@@ -3,7 +3,7 @@
  */
 angular.module('adage.experimentDetail.view', [
   'ui.router',
-  'adage.experiment',
+  'adage.experimentDetail',
   'adage.sampleBin.addItem',
   'adage.utils'
 ])

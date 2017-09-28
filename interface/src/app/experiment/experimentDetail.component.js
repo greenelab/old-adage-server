@@ -1,11 +1,11 @@
-angular.module('adage.experiment', [
+angular.module('adage.experimentDetail', [
   'adage.experiment.service',
   'adage.analyze.sample',   // TODO fix after Sample is also refactored
   'statusBar'
 ])
 
 .component('experimentDetail', {
-  templateUrl: 'experiment/experiment.component.tpl.html',
+  templateUrl: 'experiment/experimentDetail.component.tpl.html',
   bindings: {
     id: '<',
     onLoad: '&'
@@ -25,13 +25,15 @@ angular.module('adage.experiment', [
       };
 
       var queryError = function(responseObject) {
-        $log.warn('adage.experiment: Query errored with: ' + responseObject);
+        $log.warn(
+          'adage.experimentDetail: query errored with: ' + responseObject
+        );
         ctrl.experiment.status = 'Query failed.';
       };
 
       ctrl.show = function(id) {
         if (!id) {
-          $log.warn('adage.experiment: show() called with id', id);
+          $log.warn('adage.experimentDetail: show() called with id', id);
           return;
         }
         ctrl.experiment = {

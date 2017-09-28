@@ -40,7 +40,7 @@ describe('Experiment', function() {
     'name': 'GSE9989GSM252508'
   }];
 
-  beforeEach(module('adage.experiment'));
+  beforeEach(module('adage.experimentDetail'));
   beforeEach(inject(function(_$httpBackend_, _$log_, Experiment) {
     $httpBackend = _$httpBackend_;
     $log = _$log_;
