@@ -6,6 +6,7 @@ angular.module('adage.analyze', [
   'adage.analyze.search',
   'adage.analyze.detail',
   'adage.analyze.analysis', // includes sample-bin
+  'adage.sampleBin.addItem',
   'ui.router',
   'ui.bootstrap',
   'as.sortable',
@@ -50,21 +51,6 @@ angular.module('adage.analyze', [
           classList += ' active';
         }
         return classList;
-      },
-
-      item_tooltip: function(search_item) {
-        // Determine what text to show as a tooltip for this search_item.
-        if (SampleBin.hasItem(search_item)) {
-          return 'Already added to analysis';
-        }
-        if (search_item.item_type === 'sample') {
-          return 'Add this sample to analysis';
-        }
-        if (search_item.item_type === 'experiment') {
-          return 'Add these samples to analysis';
-        }
-        $log.warn('item_tooltip: unknown search item_type', search_item);
-        return 'Unknown search item type';
       },
 
       scroll_to_id: function(id) {

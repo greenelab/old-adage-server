@@ -1,0 +1,7 @@
+<button type="button" class="btn btn-default btn-sm"
+        ng-class="$ctrl.sb.hasItem($ctrl.item)?'disabled':''"
+        ng-click="$ctrl.sb.addItem($ctrl.item)"
+        uib-tooltip="{{$ctrl.itemTooltip()}}"
+        tooltip-placement="left-top">
+  <i class="fa fa-plus" aria-hidden="true"></i> Add
+</button>
