@@ -77,7 +77,7 @@ describe('Experiment', function() {
 
   describe('ExperimentDetailController', function() {
     var $componentController;
-    var bindings = {id: 'E-GEOD-9989'};
+    var bindings = {id: 'E-GEOD-9989'};   // TODO test on-load callback here
 
     beforeEach(inject(function(_$componentController_) {
       $componentController = _$componentController_;

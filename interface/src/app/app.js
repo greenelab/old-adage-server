@@ -8,6 +8,7 @@ angular.module('adage', [
   'adage.analyze',
   'adage.analyze.analysis',
   'adage.analyze.sampleBin',
+  'adage.experimentDetail.view',
   'adage.download',
   'adage.tribe_client',
   'adage.gene.searchFew',

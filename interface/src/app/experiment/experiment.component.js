@@ -7,7 +7,8 @@ angular.module('adage.experiment', [
 .component('experimentDetail', {
   templateUrl: 'experiment/experiment.component.tpl.html',
   bindings: {
-    id: '<'
+    id: '<',
+    onLoad: '&'
   },
   controller: [
     'Experiment', 'Sample', '$log',
@@ -23,14 +24,14 @@ angular.module('adage.experiment', [
         relatedSamples: []
       };
 
-      var queryError = function(responseObject, responseHeaders) {
-        $log.warn('Query errored with: ' + responseObject);
+      var queryError = function(responseObject) {
+        $log.warn('adage.experiment: Query errored with: ' + responseObject);
         ctrl.experiment.status = 'Query failed.';
       };
 
       ctrl.show = function(id) {
         if (!id) {
-          $log.warn('experiment.show called with id', id);
+          $log.warn('adage.experiment: show() called with id', id);
           return;
         }
         ctrl.experiment = {
@@ -50,12 +51,15 @@ angular.module('adage.experiment', [
         };
         Experiment.get(
           {accession: id},
-          function(responseObject, responseHeaders) {
+          function(responseObject) {
             if (responseObject) {
               ctrl.experiment.results = responseObject;
               ctrl.experiment.status = 'Retrieving sample details...';
-              for (var i = 0; i < responseObject.sample_set.length; i++) {
-                getSampleDetails(responseObject.sample_set[i]);
+              responseObject.sample_set.forEach(function(sample) {
+                getSampleDetails(sample);
+              });
+              if (ctrl.onLoad !== undefined) {
+                ctrl.onLoad({experiment: responseObject});
               }
             }
           },
