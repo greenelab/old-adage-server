@@ -74,19 +74,22 @@
                 Download
               </a>
             </li>
-            <li ui-sref-active="active">
+            <li
+            ng-class="{active: inStateArr(['analyze', 'experiment'])}">
               <a ui-sref="analyze({mlmodel: modelInfo.id})"
                  ng-show="modelInfo.title">
                 Analyze
               </a>
             </li>
-            <li ng-class="{active: inGeneStates()}">
+            <li
+            ng-class="{active: inStateArr(['gene_search', 'gene_network'])}">
               <a  ui-sref="gene_search({mlmodel: modelInfo.id})"
                   ng-show="modelInfo.title">
                 GeneNetwork
               </a>
             </li>
-            <li ng-class="{active: inSignatureStates()}">
+            <li
+            ng-class="{active: inStateArr(['signature', 'signature_search'])}">
               <a ui-sref="signature_search({mlmodel: modelInfo.id})"
                  ng-show="modelInfo.title">
                 Signature

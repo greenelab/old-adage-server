@@ -36,20 +36,15 @@ angular.module('adage', [
     // Machine learning model
     $scope.modelInfo = MlModelTracker;
 
-    // Function that indicates whether the current state is 'gene_search'
-    // or 'gene_network'. (Used by index.html to highlight the 'GeneNetwork'
-    // tab on web UI in either state.)
-    $scope.inGeneStates = function() {
+    // inStateArr indicates whether the current state is in the stateArr
+    // array. (Used by index.html to highlight tabs for ui-router states)
+    $scope.inStateArr = function(stateArr) {
       var currState = $state.current.name;
-      return currState === 'gene_search' || currState === 'gene_network';
-    };
-
-    // Function that indicates whether the current state is 'signature' or
-    // 'signature_search'. (Used by index.html to highlight the 'signature' tab
-    // on web UI in either state.)
-    $scope.inSignatureStates = function() {
-      var currState = $state.current.name;
-      return currState === 'signature' || currState === 'signature_search';
+      if (stateArr.indexOf(currState) === -1) {
+        return false;
+      } else {
+        return true;
+      }
     };
 
     $scope.$on('$stateChangeSuccess',

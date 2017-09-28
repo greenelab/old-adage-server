@@ -1,4 +1,7 @@
-<li ui-sref-active="active" class="sample-bin" ng-if="sb.mlModelInfo.title">
+<li
+ ng-class="{active: inStateArr(['analysis-detail', 'volcano'])}"
+ class="sample-bin"
+ ng-if="sb.mlModelInfo.title">
   <a ui-sref="analysis-detail({mlmodel: sb.mlModelInfo.id})">
     <img src="/static/assets/testtube-expt2.svg" alt="Samples"
      width="28" height="28">
