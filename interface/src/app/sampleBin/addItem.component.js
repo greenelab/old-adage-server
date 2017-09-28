@@ -7,8 +7,8 @@ angular.module('adage.sampleBin.addItem', [
   bindings: {
     item: '<'
   },
-  controller: ['SampleBin',
-    function(SampleBin) {
+  controller: ['SampleBin', '$log',
+    function(SampleBin, $log) {
       var ctrl = this;
       ctrl.sb = SampleBin;
 
