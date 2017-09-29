@@ -20,7 +20,7 @@ angular.module('adage.sampleBin.addItemAnalyze', [
 
       ctrl.itemTooltip = function() {
         if (!ctrl.item) {
-          return 'ititializing...';
+          return 'initializing...';
         }
 
         // Determine what text to show as a tooltip for this item.

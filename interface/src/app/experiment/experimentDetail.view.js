@@ -24,20 +24,21 @@ angular.module('adage.experimentDetail.view', [
 
 .controller('ExperimentDetailViewCtrl', ['$stateParams', 'ApiBasePath',
   function ExperimentDetailViewCtrl($stateParams, ApiBasePath) {
-    this.id = $stateParams.id;
-    this.experimentItem = {
-      pk: this.id,
+    var ctrl = this;
+    ctrl.id = $stateParams.id;
+    ctrl.experimentItem = {
+      pk: ctrl.id,
       item_type: 'experiment',
       description: '',
       related_items: []
     };
-    this.loaded = function(experiment) {
-      this.experimentItem.description = experiment.description;
+    ctrl.loaded = function(experiment) {
+      ctrl.experimentItem.description = experiment.description;
 
       // we want an array of sample ids for related_items, but the sample_set
       // property we get from experiment has URIs, so we need to convert them
       var rxSampleUri = new RegExp(ApiBasePath + 'sample/(\\d+)/');
-      this.experimentItem.related_items = experiment.sample_set.map(
+      ctrl.experimentItem.related_items = experiment.sample_set.map(
         function(val) {
           return val.match(rxSampleUri)[1]; // want first match in rxSampleUri
         }

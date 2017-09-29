@@ -75,21 +75,21 @@
               </a>
             </li>
             <li
-            ng-class="{active: inStateArr(['analyze', 'experiment'])}">
+             ng-class="{active: inStateArr(['analyze', 'experiment'])}">
               <a ui-sref="analyze({mlmodel: modelInfo.id})"
                  ng-show="modelInfo.title">
                 Analyze
               </a>
             </li>
             <li
-            ng-class="{active: inStateArr(['gene_search', 'gene_network'])}">
+             ng-class="{active: inStateArr(['gene_search', 'gene_network'])}">
               <a  ui-sref="gene_search({mlmodel: modelInfo.id})"
                   ng-show="modelInfo.title">
                 GeneNetwork
               </a>
             </li>
             <li
-            ng-class="{active: inStateArr(['signature', 'signature_search'])}">
+             ng-class="{active: inStateArr(['signature', 'signature_search'])}">
               <a ui-sref="signature_search({mlmodel: modelInfo.id})"
                  ng-show="modelInfo.title">
                 Signature
