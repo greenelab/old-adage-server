@@ -12,9 +12,11 @@
   <div>
     <div id="search" ng-class="detail.showing ? 'with-detail':''">
       <p>
-        In this area, users will be able to search for an experiment or set of
-        samples to analyze, define analysis groups and generate a DA heatmap to
-        review ADAGE signature intensities for each sample.
+        Search for an experiment or set of samples. Click on a search result
+        to view more details, add them to an analysis with the
+        "<i class="fa fa-plus" aria-hidden="true"></i> Add" button,
+        or use the "Analyze" button to go directly into an analysis with
+        that experiment or sample added.
       </p>
       <div id="search-results" class="col-sm-11">
         <search placeholder="query text" results="analyze.query_results">
@@ -31,6 +33,8 @@
                 </span>
               </div>
               <div class="media-body">
+                <add-item-analyze-button item="search_item">
+                </add-item-analyze-button>
                 <add-item-button item="search_item"></add-item-button>
                 <h4 class="list-group-item-heading">
                   {{search_item.description}}

@@ -3,8 +3,8 @@ angular.module('adage.analyze.detail', [
   'adage.experimentDetail'
 ])
 
-.controller('SearchDetailCtrl', ['$scope', '$location', '$timeout',
-  function SearchDetailCtrl($scope, $location, $timeout) {
+.controller('SearchDetailCtrl', ['$scope', '$location', '$timeout', '$state',
+  function SearchDetailCtrl($scope, $location, $timeout, $state) {
     $scope.detail = {
       // The detail object contains all of the information needed for
       // displaying the detail page for search_item and includes convenience
@@ -16,14 +16,19 @@ angular.module('adage.analyze.detail', [
 
       show: function(search_item) {
         $scope.detail.search_item = search_item;
-        $scope.detail.showing = true;
-        $timeout(function() {
-          // if we inititate the scroll too early, the search results list
-          // hasn't finished compressing width and it doesn't work right,
-          // so this timeout waits until the transition has finished
-          // before scrolling
-          $scope.analyze.scroll_to_id(search_item.pk);
-        }, 500);
+        if (search_item.item_type === 'experiment') {
+          $scope.detail.showing = false;
+          $state.go('experiment', {'id': search_item.pk});
+        } else {
+          $scope.detail.showing = true;
+          $timeout(function() {
+            // if we inititate the scroll too early, the search results list
+            // hasn't finished compressing width and it doesn't work right,
+            // so this timeout waits until the transition has finished
+            // before scrolling
+            $scope.analyze.scroll_to_id(search_item.pk);
+          }, 500);
+        }
       },
 
       clear: function() {
