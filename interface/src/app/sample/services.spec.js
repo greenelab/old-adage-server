@@ -1,7 +1,7 @@
-describe('adage.sample.services', function() {
+describe('adage.sample.service', function() {
   var $httpBackend, $log, Sample, mockSampleData;
 
-  beforeEach(module('adage.sample.services', 'adage.mocks.sample'));
+  beforeEach(module('adage.sample.service', 'adage.mocks.sample'));
   beforeEach(inject(function(_$httpBackend_, _$log_, _Sample_, SampleMocks) {
     $httpBackend = _$httpBackend_;
     $log = _$log_;

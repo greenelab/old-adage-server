@@ -1,7 +1,7 @@
-describe('adage.analyze.sample', function() {
+describe('Sample', function() {
   var $httpBackend, $log, mockSampleData;
 
-  beforeEach(module('adage.analyze.sample'));
+  beforeEach(module('adage.sampleDetail'));
   beforeEach(module('adage.mocks.sample'));
   beforeEach(inject(function(_$httpBackend_, _$log_, SampleMocks) {
     $httpBackend = _$httpBackend_;
@@ -20,38 +20,37 @@ describe('adage.analyze.sample', function() {
     }
   });
 
-  describe('SampleCtrl', function() {
-    var SampleCtrl, $location, $scope;
+  describe('SampleDetailCtrl', function() {
+    var $componentController;
+    var bindings = {id: 1};   // TODO test on-load callback here
 
-    beforeEach(inject(function($controller, _$location_, $rootScope) {
-      $location = _$location_;
-      $scope = $rootScope.$new();
-      SampleCtrl = $controller(
-        'SampleCtrl',
-        {$location: $location, $scope: $scope}
-      );
+    beforeEach(inject(function(_$componentController_) {
+      $componentController = _$componentController_;
     }));
 
     it('should pass a dummy test', inject(function() {
-      expect(SampleCtrl).toBeTruthy();
+      var ctrl = $componentController('sampleDetail', null, bindings);
+      expect(ctrl).toBeTruthy();
     }));
 
     it('should render the sampleDetail for a sample', inject(function() {
+      var ctrl = $componentController('sampleDetail', null, bindings);
+
       $httpBackend.expectGET(
         '/api/v0/sample/1?limit=0'
       ).respond(mockSampleData.sample1);
       $httpBackend.expectGET(
         '/api/v0/sample/1/get_experiments?limit=0'
       ).respond(mockSampleData.sample1GetExperiments);
-      $scope.show(1);
-      expect($scope.sample.status).toEqual('retrieving...');
+      ctrl.show(1);
+      expect(ctrl.sample.status).toEqual('retrieving...');
       $httpBackend.flush();
 
-      expect($scope.sample.status).toEqual('');
-      expect($scope.sample.results.name).toEqual(mockSampleData.sample1.name);
-      expect($scope.sample.relatedExperiments.length).toEqual(2);
+      expect(ctrl.sample.status).toEqual('');
+      expect(ctrl.sample.results.name).toEqual(mockSampleData.sample1.name);
+      expect(ctrl.sample.relatedExperiments.length).toEqual(2);
       expect(
-        $scope.sample.relatedExperiments[0].accession
+        ctrl.sample.relatedExperiments[0].accession
       ).toEqual(mockSampleData.sample1GetExperiments[0].accession);
     }));
   });

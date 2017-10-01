@@ -1,5 +1,5 @@
 angular.module('adage.analyze.detail', [
-  'adage.analyze.sample', // TODO: use adage.sample when refactored
+  'adage.sampleDetail',
   'adage.experimentDetail'
 ])
 

@@ -7,7 +7,7 @@ angular.module('adage.sampleAnnotation', [
   'ui.bootstrap',
   'adage.utils',
   'adage.signature.resources',
-  'adage.sample.services'
+  'adage.sample.service'
 ])
 
 .config(['$stateProvider', function($stateProvider) {

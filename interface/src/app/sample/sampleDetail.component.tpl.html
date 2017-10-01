@@ -1,0 +1,24 @@
+<status-bar msg-text="$ctrl.sample.status"></status-bar>
+
+<h2>{{$ctrl.sample.results.name}}</h2>
+<h3>Data Source
+  <!-- TODO okay to make a direct link to ArrayExpress here? -->
+  <small><a href="{{$ctrl.makeHref.mlDataSource(
+    $ctrl.sample.relatedExperiments[0].accession,
+    $ctrl.sample.results.ml_data_source
+  ) }}">{{$ctrl.sample.results.ml_data_source}}</a></small>
+</h3>
+<table class="table">
+  <tr ng-repeat="(type, text) in $ctrl.sample.results.annotations">
+    <th>{{type}}</th><td>{{text}}</td>
+  </tr>
+</table>
+<h3>Related Experiments</h3>
+<ul class="list-group">
+  <li ng-repeat="expt in $ctrl.sample.relatedExperiments"
+    class="list-group-item">
+    <!-- FIXME: this analyze.scroll_to_id() below will not work -->
+    <a ng-click="analyze.scroll_to_id(expt.accession)">{{expt.accession}}</a>:
+    {{expt.name}}
+  </li>
+</ul>

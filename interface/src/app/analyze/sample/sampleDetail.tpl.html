@@ -1,10 +1,9 @@
+<!-- MOVED to app/sample/sampleDetail.view.tpl.html
 <div class="page-header">
-  <h1>Sample
-    <small>{{sample.results.name}}</small></h1>
-</div>
-<!--
-  TODO okay to make a direct link to ArrayExpress here?
--->
+  <h1>Sample</h1>
+</div> -->
+<!-- MOVED to app/sample/sampleDetail.component.tpl.html
+<h2>{{sample.results.name}}</h2>
 <h3>Data Source
   <small><a href="{{makeHref.mlDataSource(
     sample.relatedExperiments[0].accession, sample.results.ml_data_source)
@@ -23,4 +22,4 @@
     <a ng-click="analyze.scroll_to_id(expt.accession)">{{expt.accession}}</a>:
     {{expt.name}}
   </li>
-</ul>
+</ul> -->
