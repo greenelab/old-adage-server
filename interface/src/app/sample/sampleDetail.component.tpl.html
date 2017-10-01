@@ -17,8 +17,7 @@
 <ul class="list-group">
   <li ng-repeat="expt in $ctrl.sample.relatedExperiments"
     class="list-group-item">
-    <!-- FIXME: this analyze.scroll_to_id() below will not work -->
-    <a ng-click="analyze.scroll_to_id(expt.accession)">{{expt.accession}}</a>:
+    <a ui-sref="experiment({id: expt.accession})">{{expt.accession}}</a>:
     {{expt.name}}
   </li>
 </ul>
