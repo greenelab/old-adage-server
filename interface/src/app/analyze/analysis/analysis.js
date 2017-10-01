@@ -9,7 +9,6 @@ angular.module('adage.analyze.analysis', [
   'ngResource',
   'statusBar',
   'adage.analyze.sampleBin',
-  'adage.analyze.sample',
   'adage.mlmodel.components'
 ])
 

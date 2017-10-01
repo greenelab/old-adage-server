@@ -1,6 +1,6 @@
 angular.module('adage.experimentDetail', [
   'adage.experiment.service',
-  'adage.analyze.sample',   // TODO fix after Sample is also refactored
+  'adage.sample.service',
   'statusBar'
 ])
 

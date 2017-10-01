@@ -20,14 +20,9 @@ angular.module('adage.analyze.detail', [
           $scope.detail.showing = false;
           $state.go('experiment', {'id': search_item.pk});
         } else {
-          $scope.detail.showing = true;
-          $timeout(function() {
-            // if we inititate the scroll too early, the search results list
-            // hasn't finished compressing width and it doesn't work right,
-            // so this timeout waits until the transition has finished
-            // before scrolling
-            $scope.analyze.scroll_to_id(search_item.pk);
-          }, 500);
+          // only other valid item_type is sample
+          $scope.detail.showing = false;
+          $state.go('sample', {'id': search_item.pk});
         }
       },
 

@@ -8,7 +8,6 @@ angular.module('adage.analyze.sampleBin', [
   'ngResource',
   'greenelab.stats',
   'adage.utils',
-  'adage.analyze.sample',
   'adage.signature.resources'
 ])
 
