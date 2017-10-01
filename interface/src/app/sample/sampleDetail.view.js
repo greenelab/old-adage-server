@@ -4,8 +4,8 @@
 angular.module('adage.sampleDetail.view', [
   'ui.router',
   'adage.sampleDetail',
-  // 'adage.sampleBin.addItem',   // TODO: make these buttons work for Samples
-  // 'adage.sampleBin.addItemAnalyze',
+  'adage.sampleBin.addItem',
+  'adage.sampleBin.addItemAnalyze',
   'adage.utils'
 ])
 
