@@ -9,6 +9,7 @@
 <h3>Samples</h3>
 <ul class="list-group">
   <li ng-repeat="sample in $ctrl.experiment.relatedSamples" class="list-group-item">
-    {{sample.name}} ({{sample.ml_data_source}})
+    <a ui-sref="sample({id: sample.id})">{{sample.name}}</a>
+    ({{sample.ml_data_source}})
   </li>
 </ul>
