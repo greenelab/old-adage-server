@@ -16,13 +16,15 @@ angular.module('adage.sampleDetail', [
       var ctrl = this;
       ctrl.makeHref = Experiment.makeHref;
 
+      ctrl.$onInit = function() {
+        ctrl.sample = {
+          status: '',
+          results: {},
+          relatedExperiments: []
+        };
+      };
       ctrl.$onChanges = function(changesObj) {
         ctrl.show(changesObj.id.currentValue);
-      };
-      ctrl.sample = {
-        status: '',
-        results: {},
-        relatedExperiments: []
       };
 
       var queryError = function(responseObject) {
@@ -37,11 +39,8 @@ angular.module('adage.sampleDetail', [
           $log.warn('adage.sampleDetail: show() called with id', id);
           return;
         }
-        ctrl.sample = {
-          status: 'retrieving...',
-          results: {},
-          relatedExperiments: []
-        };
+        ctrl.$onInit();   // re-initialize properties
+        ctrl.sample.status = 'retrieving...';
         Sample.get({id: id},
           function(responseObject) {
             if (responseObject) {

@@ -15,14 +15,16 @@ angular.module('adage.experimentDetail', [
     function(Experiment, Sample, $log) {
       var ctrl = this;
 
+      ctrl.$onInit = function() {
+        ctrl.experiment = {
+          status: '',
+          relatedSamples: []
+        };
+      };
       ctrl.$onChanges = function(changesObj) {
         ctrl.show(changesObj.id.currentValue);
       };
       ctrl.makeHref = Experiment.makeHref;
-      ctrl.experiment = {
-        status: '',
-        relatedSamples: []
-      };
 
       var queryError = function(responseObject) {
         $log.warn(
@@ -36,10 +38,8 @@ angular.module('adage.experimentDetail', [
           $log.warn('adage.experimentDetail: show() called with id', id);
           return;
         }
-        ctrl.experiment = {
-          status: 'retrieving...',
-          relatedSamples: []
-        };
+        ctrl.$onInit();   // re-initialize properties
+        ctrl.experiment.status = 'retrieving...';
         var getSampleDetails = function(uri) {
           Sample.getUri(uri).then(
             function(responseObject) {
