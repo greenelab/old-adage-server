@@ -1,6 +1,6 @@
 angular.module('adage.analyze.detail', [
-  'adage.sampleDetail',
-  'adage.experimentDetail'
+  'adage.sampleDetail.component',
+  'adage.experimentDetail.component'
 ])
 
 .controller('SearchDetailCtrl', ['$scope', '$location', '$timeout', '$state',

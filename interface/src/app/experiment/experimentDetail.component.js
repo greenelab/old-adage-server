@@ -1,4 +1,4 @@
-angular.module('adage.experimentDetail', [
+angular.module('adage.experimentDetail.component', [
   'adage.experiment.service',
   'adage.sample.service',
   'statusBar'
@@ -28,14 +28,18 @@ angular.module('adage.experimentDetail', [
 
       var queryError = function(responseObject) {
         $log.warn(
-          'adage.experimentDetail: query errored with: ' + responseObject
+          'adage.experimentDetail.component: query errored with:',
+          responseObject
         );
         ctrl.experiment.status = 'Query failed.';
       };
 
       ctrl.show = function(id) {
         if (!id) {
-          $log.warn('adage.experimentDetail: show() called with id', id);
+          $log.warn(
+            'adage.experimentDetail.component: show() called with id',
+            id
+          );
           return;
         }
         ctrl.$onInit();   // re-initialize properties
