@@ -76,7 +76,7 @@ instance, they should be in the same format as the files below.
   where each row represents a gene set, except this file does not include a
   description column, which is the second column in the GMT file format.
 
-  As we mentioned in the description of **sample_signature_activity.txt**,
+  As we mentioned in the description of *sample_signature_activity.txt*,
   depending on your preference of the signatures order shown online, you may
   need to pad some signatures' names.
 
