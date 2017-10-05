@@ -157,9 +157,9 @@ angular.module('adage.gene.network', [
       var refreshSlider = function() {
         $timeout(function() {
           $scope.$broadcast('rzSliderForceRender');
-        }, 250);
-        // Note by dhu: 250ms is an arbitrary timeout value. The minimum timeout
-        // value that worked on my desktop is 150ms.
+        }, 1000);
+        // Note by dhu: 1000ms is an arbitrary timeout value. The minimum
+        // timeout value that worked on my desktop is 150ms.
       };
       // Monitor "self.isValidModel". Once it is true, reconfigure a few slider
       // parameters and call refreshSlider().
@@ -327,7 +327,10 @@ angular.module('adage.gene.network', [
           var heavyGenes = [data.gene1.id, data.gene2.id].join(',');
           var target = d3.event.target;
           Signature.get(
-            {'heavy_genes': heavyGenes, 'limit': 0},
+            {'heavy_genes': heavyGenes,
+              'mlmodel': MlModelTracker.id,
+              'limit': 0
+            },
             function success(response) {
               var i = 0, n = response.objects.length;
               var anchorTag;
