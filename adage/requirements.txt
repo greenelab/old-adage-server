@@ -5,7 +5,7 @@ django-haystack==2.6.0
 django-tastypie==0.13.3
 elasticsearch==1.9.0
 gunicorn==19.4.5
-psycopg2==2.6.1
+psycopg2==2.7.3.1
 python-dateutil==2.5.0
 python-mimeparse==1.5.1
 six==1.10.0
