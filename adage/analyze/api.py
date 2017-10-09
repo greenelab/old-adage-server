@@ -281,6 +281,7 @@ class NodeResource(ModelResource):
             'heavy_genes': ('exact', ),  # New filter, see apply_filters().
             'mlmodel': ('exact', ),
         }
+        ordering = ['name']
 
     def prepend_urls(self):
         return [
