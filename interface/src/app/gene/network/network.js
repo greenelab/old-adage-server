@@ -130,21 +130,20 @@ angular.module('adage.gene.network', [
         } else {
           correlationSign = 1;
         }
-        network.filterEdgeWeight(self.slider.min, self.slider.max,
+        network.filterEdgeWeight(self.slider.min, maxCorrelation,
                                  correlationSign);
         network.draw();
       };
 
       self.slider = {  // range slider configuration
         min: 0,                  // initial position of slider on the left
-        max: maxCorrelation,     // initial position of slider on the right
         options: {
           floor: 0,              // minimum of the slider bar
           ceil: maxCorrelation,  // maximum of the slider bar
           step: 0.01,
           precision: 2,
-          noSwitching: true,
-          onEnd: function(id, low, high) {
+          showSelectionBarEnd: true,
+          onEnd: function() {
             self.renderNetwork();
           }
         }
@@ -329,6 +328,7 @@ angular.module('adage.gene.network', [
           Signature.get(
             {'heavy_genes': heavyGenes,
               'mlmodel': MlModelTracker.id,
+              'order_by': 'name',
               'limit': 0
             },
             function success(response) {
