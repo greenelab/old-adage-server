@@ -32,8 +32,10 @@ MathFuncts, errGen) {
     mlModelInfo: {
       id: null
     },
+    samples: [],  // When refactored, all SampleBin samples will be listed here.
+                  // For now, this only holds samples without activity data.
     heatmapData: {
-      samples: [],
+      samples: [],  // only samples with activity data can be in the heatmap
       signatureOrder: []
     },
     volcanoData: {
@@ -60,6 +62,12 @@ MathFuncts, errGen) {
 
     removeSample: function(id) {
       var pos = this.heatmapData.samples.indexOf(+id);
+      if (pos === -1) {
+        // this sample must be in the "missing activity" list
+        pos = this.samples.indexOf(+id);
+        this.samples.splice(pos, 1);
+        return;
+      }
       this.heatmapData.samples.splice(pos, 1);
       delete this.sampleToGroup[+id];
       this.heatmapData.signatureOrder = [];  // reset to default order
@@ -74,6 +82,10 @@ MathFuncts, errGen) {
       this.rebuildHeatmapActivity(
         this.mlModelInfo.id, this.heatmapData.samples
       );
+    },
+
+    clearSamplesMissingActivity: function() {
+      this.samples = [];
     },
 
     addExperiment: function(sampleIdList) {
@@ -352,32 +364,50 @@ MathFuncts, errGen) {
       }
       var cbSampleBin = this; // closure link to SampleBin for callbacks
       var loadCache = function(responseObject) {
-        if (responseObject) {
+        if (responseObject && responseObject.objects.length > 0) {
           var sampleID = responseObject.objects[0].sample;
           cbSampleBin.activityCache.put(sampleID, responseObject.objects);
           $log.info('populating cache with ' + sampleID);
-          // TODO need to find & report samples that return no results
-        } else {
-          // FIXME what happens if responseObject is empty? (possible?)
-          $log.error('responseObject is empty: what now?');
         }
+        // Note: no else clause here on purpose.
+        // If responseObject is empty there's no activity data for this sample.
+        // We detect this error and handle it in updateHeatmapActivity.
       };
       var updateHeatmapActivity = function(activityPromisesFulfilled) {
         // when all promises are fulfilled, we can update heatmapData
         var newActivity = [];
+        var excludeSamples = [];
 
         for (var i = 0; i < samples.length; i++) {
           var sampleActivity = cbSampleBin.activityCache.get(samples[i]);
-          newActivity = newActivity.concat(sampleActivity);
-          // re-initialize signatureOrder, if needed
-          if (i === 0 && cbSampleBin.heatmapData.signatureOrder.length === 0) {
-            cbSampleBin.heatmapData.signatureOrder = sampleActivity.map(
-              function(val) {
-                return val.node;
-              }
+          if (sampleActivity === undefined) {
+            // this sample has no activity data, so move it out of the heatmap
+            $log.error(
+              'updateHeatmapActivity: no activity for sample id', samples[i]
             );
+            excludeSamples.push(samples[i]);
+          } else {
+            newActivity = newActivity.concat(sampleActivity);
+            // re-initialize signatureOrder, if needed
+            if (cbSampleBin.heatmapData.signatureOrder.length === 0) {
+              cbSampleBin.heatmapData.signatureOrder = sampleActivity.map(
+                function(val) {
+                  return val.node;
+                }
+              );
+            }
           }
         }
+        excludeSamples.forEach(function(id) {
+          // remove from the heatmap
+          pos = cbSampleBin.heatmapData.samples.indexOf(id);
+          cbSampleBin.heatmapData.samples.splice(pos, 1);
+          delete cbSampleBin.sampleToGroup[id];
+          // add to the non-heatmap list if not already present
+          if (cbSampleBin.samples.indexOf(id) === -1) {
+            cbSampleBin.samples.push(id);
+          }
+        });
         cbSampleBin.heatmapData.activity = newActivity;
       };
 
