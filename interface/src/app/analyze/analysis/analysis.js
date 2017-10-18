@@ -8,6 +8,7 @@ angular.module('adage.analyze.analysis', [
   'ngVega',
   'ngResource',
   'statusBar',
+  'adage.formatMissing.filter',
   'adage.analyze.sampleBin',
   'adage.mlmodel.components'
 ])

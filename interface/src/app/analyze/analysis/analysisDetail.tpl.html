@@ -67,12 +67,13 @@
           <span class="row-control">
             <i class="fa fa-bars" aria-hidden="true"></i>
           </span>
-          {{sb.sampleData[id].ml_data_source}}
+          {{sb.sampleData[id].ml_data_source | formatMissing}}
         </td>
         <td>{{id}}</td>
-        <td>{{sb.sampleData[id].name}}</td>
+        <td>{{sb.sampleData[id].name | formatMissing}}</td>
         <td ng-repeat="at in analysis.exampleCols">{{
-          sb.sampleData[id].annotations[at.typename]
+          (sb.sampleData[id].annotations[at.typename]) | formatMissing
+          <!-- TODO: make this work always. sb.sampleData[id].getAnnotation(at.typename) | formatMissing -->
         }}</td>
       </tr>
     </tbody>
@@ -95,9 +96,6 @@
         <tr>
           <th>&nbsp;</th>
           <th>
-            <span class="row-control">
-              <i class="fa fa-bars" aria-hidden="true"></i>
-            </span>
             ML Data Source
           </th>
           <th>id</th>
@@ -118,12 +116,12 @@
             </button>
           </td>
           <td>
-            {{sb.sampleData[id].ml_data_source}}
+            {{sb.sampleData[id].ml_data_source | formatMissing}}
           </td>
           <td>{{id}}</td>
-          <td>{{sb.sampleData[id].name}}</td>
+          <td>{{sb.sampleData[id].name | formatMissing}}</td>
           <td ng-repeat="at in analysis.exampleCols">{{
-            sb.sampleData[id].annotations[at.typename]
+            (sb.sampleData[id].annotations[at.typename]) | formatMissing
           }}</td>
         </tr>
       </tbody>
