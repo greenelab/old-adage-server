@@ -11,6 +11,35 @@ angular.module('adage.sample.service', [
       // then, can change "limit" below to something sensible
       {limit: 0},
       {
+        'get': {
+          method: 'GET',
+          transformResponse: function(data, headersGetter, status) {
+            var getAnnotation = function(typename) {
+              // We are going to attach getAnnotation to an object, so use of
+              // 'this' below is intentional: we are making a "safe" accessor
+              // method that will return a blank string instead of undefined
+              if (this.annotations !== undefined &&
+                  this.annotations.hasOwnProperty(typename)) {
+                return this.annotations[typename];
+              } else {
+                return '';
+              }
+            };
+            if (status === 200) {
+              data = angular.fromJson(data);
+              if (data.hasOwnProperty('objects')) {
+                // data has a pagination wrapper, so must iterate over list
+                data.objects.forEach(function(obj) {
+                  obj.getAnnotation = getAnnotation;
+                });
+              } else {
+                // this is a single object, so just add our method
+                data.getAnnotation = getAnnotation;
+              }
+            }
+            return data;
+          }
+        },
         'getExperiments': {
           url: ApiBasePath + 'sample/:id/get_experiments/',
           method: 'GET',

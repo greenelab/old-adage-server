@@ -8,7 +8,8 @@ angular.module('adage.analyze.sampleBin', [
   'ngResource',
   'greenelab.stats',
   'adage.utils',
-  'adage.signature.resources'
+  'adage.sample.service',     // provides Sample
+  'adage.signature.resources' // provides Activity, Signature
 ])
 
 .factory('SignatureSet', ['$resource', 'ApiBasePath',

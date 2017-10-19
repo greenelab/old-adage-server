@@ -72,8 +72,7 @@
         <td>{{id}}</td>
         <td>{{sb.sampleData[id].name | formatMissing}}</td>
         <td ng-repeat="at in analysis.exampleCols">{{
-          (sb.sampleData[id].annotations[at.typename]) | formatMissing
-          <!-- TODO: make this work always. sb.sampleData[id].getAnnotation(at.typename) | formatMissing -->
+          sb.sampleData[id].getAnnotation(at.typename) | formatMissing
         }}</td>
       </tr>
     </tbody>
@@ -121,7 +120,7 @@
           <td>{{id}}</td>
           <td>{{sb.sampleData[id].name | formatMissing}}</td>
           <td ng-repeat="at in analysis.exampleCols">{{
-            (sb.sampleData[id].annotations[at.typename]) | formatMissing
+            sb.sampleData[id].getAnnotation(at.typename) | formatMissing
           }}</td>
         </tr>
       </tbody>
