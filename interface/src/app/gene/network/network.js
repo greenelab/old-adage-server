@@ -252,9 +252,7 @@ angular.module('adage.gene.network', [
         // Reset default position and ceiling of maxGeneNumSlider.
         self.maxGeneNumSlider.value = Math.min(genes.length, 50);
         self.maxGeneNumSlider.options.ceil = genes.length;
-
-        // After machine learning model in the URL has been validated,
-        // reconfigure the slider and force render it. See the discussion at:
+        // Reconfigure the slider and force render it. See the discussion at:
         // https://github.com/angular-slider/angularjs-slider/issues/79#issuecomment-225438841
         // (Also tried $scope.$$postDigest, not work.)
         $timeout(function() {
