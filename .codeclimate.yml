@@ -18,6 +18,7 @@ engines:
     exclude_paths:
     - "interface/Gruntfile.js"
     - "interface/eslint.google.js"
+    - "interface/d3.network.js"
   fixme:
     enabled: false
   radon:
@@ -35,7 +36,6 @@ engines:
     - "interface/CHANGELOG.md"
     - "interface/CONTRIBUTING.md"
     - "interface/README.md"
-    - "interface/d3.network.js"
     - "interface/tools.md"
     - "interface/src/README.md"
     - "interface/src/app/README.md"
