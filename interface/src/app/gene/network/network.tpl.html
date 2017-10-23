@@ -14,25 +14,35 @@
   <h3 class="text-warning" ng-bind="ctrl.statusMessage"></h3>
 
   <div ng-hide="ctrl.statusMessage">
+    <div class="well well-sm">
     <form>
-      <strong>Correlation Range:</strong>
+      <strong>Min edge weight:</strong>
       <label>
         <input type="checkbox" ng-model="ctrl.includeNegative"
                ng-disabled="!ctrl.includePositive"
                ng-change="ctrl.renderNetwork()">
-        Include negative correlation
+        Include negative weight
       </label>
       &nbsp;
       <label>
         <input type="checkbox" ng-model="ctrl.includePositive"
                ng-disabled="!ctrl.includeNegative"
                ng-change="ctrl.renderNetwork()">
-        Include positive correlation
+        Include positive weight
       </label>
     </form>
-    <rzslider rz-slider-model="ctrl.slider.min"
-              rz-slider-options="ctrl.slider.options">
+    <rzslider rz-slider-model="ctrl.minEdgeWeightSlider.value"
+              rz-slider-options="ctrl.minEdgeWeightSlider.options">
     </rzslider>
+    </div>
+
+    <div class="well well-sm">
+      <strong>Max # of genes:</strong>
+      <br>
+      <rzslider rz-slider-model="ctrl.maxGeneNumSlider.value"
+                rz-slider-options="ctrl.maxGeneNumSlider.options">
+      </rzslider>
+    </div>
   </div>
 </div>
 
