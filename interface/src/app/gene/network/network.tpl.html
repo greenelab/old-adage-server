@@ -31,7 +31,8 @@
         Include positive weight
       </label>
     </form>
-    <rzslider rz-slider-model="ctrl.minEdgeWeightSlider.value"
+    <rzslider id="edge-slider"
+              rz-slider-model="ctrl.minEdgeWeightSlider.value"
               rz-slider-options="ctrl.minEdgeWeightSlider.options">
     </rzslider>
     </div>
@@ -39,7 +40,8 @@
     <div class="well well-sm">
       <strong>Max # of genes:</strong>
       <br>
-      <rzslider rz-slider-model="ctrl.maxGeneNumSlider.value"
+      <rzslider id="gene-slider"
+                rz-slider-model="ctrl.maxGeneNumSlider.value"
                 rz-slider-options="ctrl.maxGeneNumSlider.options">
       </rzslider>
     </div>
