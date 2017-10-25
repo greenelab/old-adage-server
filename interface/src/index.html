@@ -23,14 +23,6 @@
     <!-- compiled JavaScript --><% scripts.forEach( function ( file ) { %>
     <script type="text/javascript" src="/static/<%= file %>"></script><% }); %>
 
-    <!-- d3.network library, written by Aaron Wang (aaronkw)
-      FIXME: Ideally d3.network.js should be installed in vendor/ subdirectory,
-      but since it is under active development, it is requested online for now.
-
-    <script src="https://rawgit.com/dongbohu/d3-network/master/d3.network.js"
-            charset="utf-8"></script>
-    -->
-
     <!-- it's stupid to have to load it here, but this is for the +1 button -->
     <script type="text/javascript" src="https://apis.google.com/js/plusone.js">
       { "parsetags": "explicit" }

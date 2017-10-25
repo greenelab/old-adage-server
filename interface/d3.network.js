@@ -297,7 +297,7 @@ d3.network = function() {
                 cmpVal = -d.weight;
             } else if (weightSign > 0) {
                 cmpVal = d.weight;
-            } else {  // in case cmpVal is not even a valid number
+            } else {  // in case weightSign is not even a valid number
                 cmpVal = Math.abs(d.weight);
             }
 
@@ -491,7 +491,6 @@ d3.network = function() {
 
     // dhu: new function to set the option of background correction.
     my.bgCorrection = function(x) {
-
         if (!arguments.length) {
           return bgCorrection;
         }

@@ -244,7 +244,6 @@ angular.module('adage.gene.network', [
         // any more.
       };
 
-      // Function that renders the sliders:
       var renderSliders = function() {
         // Reset default position and floor of minEdgeWeightSlider.
         self.minEdgeWeightSlider.value = MlModelTracker.g2gEdgeCutoff;
