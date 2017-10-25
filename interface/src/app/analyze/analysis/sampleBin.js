@@ -96,26 +96,26 @@ MathFuncts, errGen) {
     },
 
     addItem: function(searchItem) {
-      if (searchItem.item_type === 'sample') {
+      if (searchItem.itemType === 'sample') {
         this.addSample(searchItem.pk);
-      } else if (searchItem.item_type === 'experiment') {
-        this.addExperiment(searchItem.related_items);
+      } else if (searchItem.itemType === 'experiment') {
+        this.addExperiment(searchItem.relatedItems);
       }
     },
 
     hasItem: function(searchItem) {
-      if (searchItem.item_type === 'sample') {
+      if (searchItem.itemType === 'sample') {
         if (this.heatmapData.samples.indexOf(+searchItem.pk) !== -1) {
           return true;
         } else {
           return false;
         }
-      } else if (searchItem.item_type === 'experiment') {
+      } else if (searchItem.itemType === 'experiment') {
         // what we want to know, in the case of an experiment, is 'are
         // all of the samples from this experiment already added?'
-        for (var i = 0; i < searchItem.related_items.length; i++) {
+        for (var i = 0; i < searchItem.relatedItems.length; i++) {
           if (this.heatmapData.samples.indexOf(
-              +searchItem.related_items[i]) === -1) {
+              +searchItem.relatedItems[i]) === -1) {
             return false;
           }
         }

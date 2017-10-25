@@ -21,13 +21,13 @@ angular.module('adage.sampleBin.addItem', [
         if (SampleBin.hasItem(ctrl.item)) {
           return 'Already added to analysis';
         }
-        if (ctrl.item.item_type === 'sample') {
+        if (ctrl.item.itemType === 'sample') {
           return 'Add this sample to analysis';
         }
-        if (ctrl.item.item_type === 'experiment') {
+        if (ctrl.item.itemType === 'experiment') {
           return 'Add these samples to analysis';
         }
-        $log.warn('itemTooltip: unknown item_type', ctrl.item);
+        $log.warn('itemTooltip: unknown itemType', ctrl.item);
         return 'Unknown search item type';
       };
     }

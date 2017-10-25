@@ -41,19 +41,19 @@ angular.module('adage.analyze', [
     $scope.modelInUrl = $stateParams.mlmodel;
 
     $scope.analyze = {
-      item_style: function(search_item) {
-        // Determine which CSS classes should apply to this search_item.
+      itemStyle: function(searchItem) {
+        // Determine which CSS classes should apply to this searchItem.
         // We want Experiments and Samples to look different. Also, if we are
-        // looking at detail on this search_item, it should be highlighted.
-        var classList = search_item.item_type;
+        // looking at detail on this searchItem, it should be highlighted.
+        var classList = searchItem.itemType;
         if ($scope.detail.showing &&
-            search_item.pk === $scope.detail.search_item.pk) {
+            searchItem.pk === $scope.detail.searchItem.pk) {
           classList += ' active';
         }
         return classList;
       },
 
-      scroll_to_id: function(id) {
+      scrollToId: function(id) {
         $location.hash(id);
       }
     };

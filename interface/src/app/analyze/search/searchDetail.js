@@ -7,22 +7,22 @@ angular.module('adage.analyze.detail', [
   function SearchDetailCtrl($scope, $location, $timeout, $state) {
     $scope.detail = {
       // The detail object contains all of the information needed for
-      // displaying the detail page for search_item and includes convenience
+      // displaying the detail page for searchItem and includes convenience
       // methods for managing that information.
       showing: false,
-      search_item: null,
+      searchItem: null,
       status: 'retrieving...',
-      related_items: [],
+      relatedItems: [],
 
-      show: function(search_item) {
-        $scope.detail.search_item = search_item;
-        if (search_item.item_type === 'experiment') {
+      show: function(searchItem) {
+        $scope.detail.searchItem = searchItem;
+        if (searchItem.itemType === 'experiment') {
           $scope.detail.showing = false;
-          $state.go('experiment', {'id': search_item.pk});
+          $state.go('experiment', {'id': searchItem.pk});
         } else {
-          // only other valid item_type is sample
+          // only other valid itemType is sample
           $scope.detail.showing = false;
-          $state.go('sample', {'id': search_item.pk});
+          $state.go('sample', {'id': searchItem.pk});
         }
       },
 
@@ -34,7 +34,7 @@ angular.module('adage.analyze.detail', [
         // potentially move the scroll point
         if ($location.hash()) {
           $timeout(function() {
-            $scope.analyze.scroll_to_id($location.hash());
+            $scope.analyze.scrollToId($location.hash());
           }, 500);
         }
       }

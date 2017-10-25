@@ -22,25 +22,25 @@
         <search placeholder="query text" results="analyze.query_results">
         </search>
         <ul class="list-group">
-          <li ng-repeat="search_item in analyze.query_results"
-              ng-class="analyze.item_style(search_item)"
+          <li ng-repeat="searchItem in analyze.query_results"
+              ng-class="analyze.itemStyle(searchItem)"
               class="list-group-item">
-            <a id="{{search_item.pk}}" ng-click="detail.show(search_item)">
+            <a id="{{searchItem.pk}}" ng-click="detail.show(searchItem)">
               <div class="media-left">
-                <span ng-if="search_item.item_type === 'experiment'"
+                <span ng-if="searchItem.itemType === 'experiment'"
                       class="badge">
-                  {{ search_item.related_items.length }}
+                  {{ searchItem.relatedItems.length }}
                 </span>
               </div>
               <div class="media-body">
-                <add-item-analyze-button item="search_item">
+                <add-item-analyze-button item="searchItem">
                 </add-item-analyze-button>
-                <add-item-button item="search_item"></add-item-button>
+                <add-item-button item="searchItem"></add-item-button>
                 <h4 class="list-group-item-heading">
-                  {{search_item.description}}
+                  {{searchItem.description}}
                 </h4>
-                <p class="list-group-item-text">{{ search_item.pk }}:
-                  ...<span ng-bind-html="search_item.snippet"></span>...
+                <p class="list-group-item-text">{{ searchItem.pk }}:
+                  ...<span ng-bind-html="searchItem.snippet"></span>...
                 </p>
               </div>
             </a>

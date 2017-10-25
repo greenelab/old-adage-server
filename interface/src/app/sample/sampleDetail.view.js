@@ -28,9 +28,9 @@ angular.module('adage.sampleDetail.view', [
     ctrl.id = $stateParams.id;
     ctrl.sampleItem = {
       pk: ctrl.id,
-      item_type: 'sample',
+      itemType: 'sample',
       description: '',
-      related_items: []
+      relatedItems: []
     };
     ctrl.loaded = function(sample) {
       ctrl.sampleItem.description = sample.description;
