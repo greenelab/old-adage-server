@@ -113,6 +113,7 @@ angular.module('adage.gene.network', [
           .geneText(function(d) {
             return d.label;
           })
+          .bgCorrection(false)    // disable background correction
           .edgeLegendStart(minCorrelation)
           .edgeLegendEnd(maxCorrelation)
           .edgeLegendText('Edge Correlation');
@@ -130,16 +131,17 @@ angular.module('adage.gene.network', [
         } else {
           correlationSign = 1;
         }
-        network.filterEdgeWeight(self.slider.min, maxCorrelation,
-                                 correlationSign);
+        network.filterWithWeightSign(
+          self.minEdgeWeightSlider.value, maxCorrelation,
+          self.maxGeneNumSlider.value, correlationSign);
         network.draw();
       };
 
-      self.slider = {  // range slider configuration
-        min: 0,                  // initial position of slider on the left
+      self.minEdgeWeightSlider = {  // slider that controls min edge weight
+        value: 0,                   // initial position of slider
         options: {
-          floor: 0,              // minimum of the slider bar
-          ceil: maxCorrelation,  // maximum of the slider bar
+          floor: 0,                 // minimum of the slider bar
+          ceil: maxCorrelation,     // maximum of the slider bar
           step: 0.01,
           precision: 2,
           showSelectionBarEnd: true,
@@ -149,31 +151,18 @@ angular.module('adage.gene.network', [
         }
       };
 
-      // After machine learning model in the URL has been validated,
-      // reconfigure the slider and force render it. See the discussion at:
-      // https://github.com/angular-slider/angularjs-slider/issues/79#issuecomment-225438841
-      // (Also tried $scope.$$postDigest, not work.)
-      var refreshSlider = function() {
-        $timeout(function() {
-          $scope.$broadcast('rzSliderForceRender');
-        }, 1000);
-        // Note by dhu: 1000ms is an arbitrary timeout value. The minimum
-        // timeout value that worked on my desktop is 150ms.
-      };
-      // Monitor "self.isValidModel". Once it is true, reconfigure a few slider
-      // parameters and call refreshSlider().
-      $scope.$watch(
-        function() {
-          return self.isValidModel;
-        },
-        function() {
-          if (self.isValidModel) {
-            self.slider.min = MlModelTracker.g2gEdgeCutoff;
-            self.slider.options.floor = MlModelTracker.g2gEdgeCutoff;
-            refreshSlider();
+      self.maxGeneNumSlider = {  // slider that controls max number of genes
+        value: 0,                // initial position of slider
+        options: {
+          floor: 1,              // minimum of the slider bar
+          ceil: 100,             // maximum of the slider bar
+          step: 1,
+          showSelectionBar: true,
+          onEnd: function() {
+            self.renderNetwork();
           }
         }
-      );
+      };
 
       // Function that returns unique numerical gene IDs included in the URL.
       var getGenesInURL = function(genesParam) {
@@ -253,6 +242,21 @@ angular.module('adage.gene.network', [
         // edge.source and edge.target to the gene object later, so the values
         // of "source" and "target" properties of the edge won't be integers
         // any more.
+      };
+
+      var renderSliders = function() {
+        // Reset default position and floor of minEdgeWeightSlider.
+        self.minEdgeWeightSlider.value = MlModelTracker.g2gEdgeCutoff;
+        self.minEdgeWeightSlider.options.floor = MlModelTracker.g2gEdgeCutoff;
+        // Reset default position and ceiling of maxGeneNumSlider.
+        self.maxGeneNumSlider.value = Math.min(genes.length, 50);
+        self.maxGeneNumSlider.options.ceil = genes.length;
+        // Reconfigure the slider and force render it. See the discussion at:
+        // https://github.com/angular-slider/angularjs-slider/issues/79#issuecomment-225438841
+        // (Also tried $scope.$$postDigest, not work.)
+        $timeout(function() {
+          $scope.$broadcast('rzSliderForceRender');
+        });
       };
 
       /**
@@ -368,6 +372,7 @@ angular.module('adage.gene.network', [
         geneTip.html(getGeneInfo);
         network.onGene('click.custom', showGeneTip);
         network.onEdge('click.custom', showEdgeTip);
+        renderSliders();
 
         // Draw network svg with edge and gene legend bars.
         network.showEdgeLegend();

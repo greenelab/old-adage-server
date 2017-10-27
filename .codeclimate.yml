@@ -4,6 +4,7 @@ engines:
     enabled: true
     exclude_paths:
     - "interface/Gruntfile.js"
+    - "interface/d3.network.js"
     config:
       languages:
         python:
@@ -18,6 +19,7 @@ engines:
     exclude_paths:
     - "interface/Gruntfile.js"
     - "interface/eslint.google.js"
+    - "interface/d3.network.js"
   fixme:
     enabled: false
   radon:

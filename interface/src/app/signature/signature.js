@@ -42,7 +42,6 @@ angular.module('adage.signature', [
         self.name = response.name;
         MlModelTracker.set(response.mlmodel);
         self.modelID = MlModelTracker.id;
-        console.log('self.modelID: ' + self.modelID);
         self.mlmodel = MlModelTracker.title;
         self.organism = MlModelTracker.organism.scientific_name;
         self.statusMessage = '';

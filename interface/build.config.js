@@ -78,6 +78,7 @@ module.exports = {
       'vendor/ng-sortable/dist/ng-sortable.min.js',
       'vendor/angularjs-slider/dist/rzslider.min.js',
       'vendor/d3-tip/index.js',
+      'd3.network.js',
       'node_modules/hclusterjs/hcluster.js',
 
       // Note: greenelab.stats.ttest.js and greenelab.stats.multtest.js are
