@@ -187,6 +187,16 @@ def import_data_and_index():
         '--tax_id_col=1 --discontinued_id_col=3 --discontinued_symbol_col=4') %
         CONFIG['data']['gene_history_file'])
 
+    # Create participation type
+    participation_type_name = "High-weight genes"
+    participation_type_desc = (
+        "High-weight genes are those that most strongly influence the "
+        "signature's activity, and we have found that they often reveal the "
+        "underlying process or processes captured by the signature."
+    )
+    run('python manage.py create_or_update_participation_type "%s" "%s"'
+        % (participation_type_name, participation_type_desc))
+
     mlmodel_basic = {
         "title": "Ensemble ADAGE 300",
         "cutoff": 0.4
@@ -211,14 +221,12 @@ def import_data_and_index():
         # Import activity data
         run('python manage.py import_activity "%s" "%s"' %
             (CONFIG['data']['activity_file'], mlmodel["title"]))
-        # Import participation data.  Note that the ParticipationType
-        # "High-weight genes" has been created in:
-        # migrations/0009_auto_20170503_1700.py
-        run('python manage.py import_signature_gene_network "%s" "%s" '
-            '"High-weight genes"' % (
-                CONFIG['data']['signature_gene_network_file'],
-                mlmodel["title"]
-            ))
+        # Import participation data
+        run('python manage.py import_signature_gene_network "%s" "%s" "%s"' % (
+            CONFIG['data']['signature_gene_network_file'],
+            mlmodel["title"],
+            participation_type_name
+        ))
         # Import gene-gene network data
         run('python manage.py import_gene_network "%s" "%s"' %
             (gene_gene_network_file, mlmodel["title"]))
