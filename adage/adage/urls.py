@@ -20,7 +20,7 @@ from organisms.api import OrganismResource
 from genes.api import GeneResource
 from analyze.api import (SearchResource, ExperimentResource,
                          AnnotationTypeResource, SampleResource,
-                         MLModelResource, NodeResource, ActivityResource,
+                         MLModelResource, SignatureResource, ActivityResource,
                          EdgeResource, ParticipationTypeResource,
                          ParticipationResource, ExpressionValueResource)
 
@@ -32,7 +32,7 @@ v0_api.register(SampleResource())
 v0_api.register(OrganismResource())
 v0_api.register(GeneResource())
 v0_api.register(MLModelResource())
-v0_api.register(NodeResource())
+v0_api.register(SignatureResource())
 v0_api.register(ActivityResource())
 v0_api.register(EdgeResource())
 v0_api.register(ParticipationTypeResource())

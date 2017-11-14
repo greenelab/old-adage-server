@@ -18,7 +18,7 @@ from django.conf import settings
 from organisms.models import Organism
 from genes.models import Gene
 from analyze.models import (
-    Experiment, Sample, AnnotationType, SampleAnnotation, MLModel, Node,
+    Experiment, Sample, AnnotationType, SampleAnnotation, MLModel, Signature,
     Activity, Edge, Participation, ParticipationType, ExpressionValue)
 from analyze.management.commands.import_data import (
     bootstrap_database, JSON_CACHE_FILE_NAME)
@@ -143,21 +143,21 @@ class ModelsTestCase(TestCase):
         # 1 ML model record
         ml_model = MLModel.objects.create(title="test model",
                                           organism=organism)
-        # 2 node records
-        node1 = Node.objects.create(name="node #1", mlmodel=ml_model)
-        Node.objects.create(name="node #2", mlmodel=ml_model)
+        # 2 signature records
+        sig1 = Signature.objects.create(name="signature #1", mlmodel=ml_model)
+        Signature.objects.create(name="signature #2", mlmodel=ml_model)
         # 5 sample records
         sample_counter = 5
         factory.create(Sample, sample_counter)
         # 2 * 5 = 10 activity records
         for s in Sample.objects.all():
-            for n in Node.objects.all():
-                Activity.objects.create(sample=s, node=n,
+            for sig in Signature.objects.all():
+                Activity.objects.create(sample=s, signature=sig,
                                         value=random.random())
-        # Check activities on node1
-        node1_activities = Activity.objects.filter(node=node1)
-        self.assertEqual(node1_activities.count(), sample_counter)
-        self.assertEqual(node1_activities[0].node.name, node1.name)
+        # Check activities on sig1
+        sig1_activities = Activity.objects.filter(signature=sig1)
+        self.assertEqual(sig1_activities.count(), sample_counter)
+        self.assertEqual(sig1_activities[0].signature.name, sig1.name)
 
     @staticmethod
     def create_edges(gene_counter, num_gene1, num_gene2):
@@ -210,10 +210,10 @@ class ModelsTestCase(TestCase):
         self.assertEqual(edges.count(), num_gene1)
 
     @staticmethod
-    def create_participations(num_nodes, num_genes):
+    def create_participations(num_signatures, num_genes):
         """
         Static method that builds Participation table based on the input
-        number of nodes and number of genes.
+        number of signatures and number of genes.
         """
         if Organism.objects.exists():
             organism = Organism.objects.first()
@@ -230,10 +230,13 @@ class ModelsTestCase(TestCase):
         else:
             participation_type = factory.create(ParticipationType)
 
-        # Create nodes manually instead of calling factory.create(),
+        # Create signatures manually instead of calling factory.create(),
         # because the latter does not respect database constraint.
-        for i in range(num_nodes):
-            Node.objects.create(name=("node_%s" % (i + 1)), mlmodel=ml_model)
+        for i in range(num_signatures):
+            Signature.objects.create(
+                name=("sig_%s" % (i + 1)),
+                mlmodel=ml_model
+            )
 
         # Create genes manually.  factory.create(Gene, num_genes) does
         # NOT work due to the contraint that standard_name and
@@ -243,21 +246,26 @@ class ModelsTestCase(TestCase):
                                 systematic_name="sys_name #" + str(i + 1),
                                 standard_name="std_name #" + str(i + 1),
                                 organism=organism)
-        # Build a complete node-gene network.
-        for node in Node.objects.all():
+        # Build a complete signature-gene network.
+        for sig in Signature.objects.all():
             for gene in Gene.objects.all():
                 Participation.objects.create(
-                    node=node, gene=gene, participation_type=participation_type
+                    signature=sig,
+                    gene=gene,
+                    participation_type=participation_type
                 )
 
     def test_participations(self):
-        num_nodes = 23
+        num_signatures = 23
         num_genes = 17
-        self.create_participations(num_nodes, num_genes)
-        self.assertEqual(Participation.objects.count(), num_nodes * num_genes)
-        for node in Node.objects.all():
-            self.assertEqual(Participation.objects.filter(node=node).count(),
-                             num_genes)
+        self.create_participations(num_signatures, num_genes)
+        self.assertEqual(Participation.objects.count(),
+                         num_signatures * num_genes)
+        for sig in Signature.objects.all():
+            self.assertEqual(
+                Participation.objects.filter(signature=sig).count(),
+                num_genes
+            )
 
 
 # @unittest.skip("focus on other tests for now")
@@ -423,8 +431,8 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
                                    '/get_experiments/')
 
         # Create activity records
-        self.node_counter = 50
-        self.create_activities(self.node_counter)
+        self.signature_counter = 50
+        self.create_activities(self.signature_counter)
 
         self.activityURI = (self.baseURI + "activity/" +
                             str(self.random_object(Activity).id) + "/")
@@ -446,26 +454,26 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         self.expressionvalueURI = self.baseURI + 'expressionvalue/'
 
     @staticmethod
-    def create_activities(node_counter):
-        """
-        Create activity related records. "node_counter" is the number of
-        records that will be created in Node table.
-        Note that "factory.create(ModelName, n)" in fixtureless module is not
-        used here because it does NOT gurantee unique_together constraint.
+    def create_activities(signature_counter):
+        """Create activity related records.  "signature_counter" is the
+        number of records that will be created in Signature table.
+        Note that "factory.create(ModelName, n)" in fixtureless module
+        is not used here because it does NOT gurantee unique_together
+        constraint.
         """
         organism = factory.create(Organism)
         ml_model_1 = MLModel.objects.create(title="test model #1",
                                             organism=organism)
         ml_model_2 = MLModel.objects.create(title="test model #2",
                                             organism=organism)
-        for i in xrange(node_counter // 2):
-            node_name = "node " + str(i + 1)
-            Node.objects.create(name=node_name, mlmodel=ml_model_1)
-            Node.objects.create(name=node_name, mlmodel=ml_model_2)
+        for i in xrange(signature_counter // 2):
+            sig_name = "signature " + str(i + 1)
+            Signature.objects.create(name=sig_name, mlmodel=ml_model_1)
+            Signature.objects.create(name=sig_name, mlmodel=ml_model_2)
 
         for s in Sample.objects.all():
-            for n in Node.objects.all():
-                Activity.objects.create(sample=s, node=n,
+            for sig in Signature.objects.all():
+                Activity.objects.create(sample=s, signature=sig,
                                         value=random.random())
 
     def call_get_API(self, uri):
@@ -692,7 +700,7 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
 
         # Confirm the number of records returned.
         records = self.deserialize(resp)
-        self.assertEqual(len(records['objects']), self.node_counter // 2)
+        self.assertEqual(len(records['objects']), self.signature_counter // 2)
 
         # Test non-GET methods
         self.call_non_get_API(uri, data=data)
@@ -856,12 +864,12 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
 
     def test_heavy_genes(self):
         """
-        Test "heavy_genes" queries in NodeResource.
+        Test "heavy_genes" queries in SignatureResource.
         """
         ModelsTestCase.create_participations(13, 29)
         g1 = Gene.objects.first().id  # The first gene
         g2 = Gene.objects.last().id   # The last gene
-        uri = self.baseURI + "node/"
+        uri = self.baseURI + "signature/"
         data = {
             'heavy_genes': "%s,%s" % (g1, g2),
             'limit': 0
@@ -869,7 +877,7 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         resp = self.api_client.get(uri, data=data)
         resp = self.deserialize(resp)
         api_result = len(resp['objects'])
-        self.assertEqual(api_result, Node.objects.count())
+        self.assertEqual(api_result, Signature.objects.count())
 
         self.call_non_get_API(uri, data=data)  # Test non-get methods too.
 
@@ -888,23 +896,26 @@ class APIResourceTestCase(ResourceTestCaseMixin, TestCase):
         factory.create(Experiment, 3)
         return exp2
 
-    def test_node_filter_in_experiment(self):
+    def test_signature_filter_in_experiment(self):
         """
-        Test the "node" filter in ExperimentResource.
+        Test the "signature" filter in ExperimentResource.
         """
         exp2 = self.create_extra_experiments()  # Create new experiments.
 
-        # Confirm that a random node is related to both the experiment
+        # Confirm that a random signature is related to both the experiment
         # that was created from ModelsTestCase.experiment_data and exp2.
         # Note that when the database was initialized in setup(), the
         # experiment created from ModelsTestCase.experiment_data was
-        # related to all samples, and each sample was related to all nodes.
-        node = self.random_object(Node)
-        self.assertEqual(Activity.objects.filter(node=node).count(),
-                         self.s_counter)
+        # related to all samples, and each sample was related to all
+        # signatures.
+        signature = self.random_object(Signature)
+        self.assertEqual(
+            Activity.objects.filter(signature=signature).count(),
+            self.s_counter
+        )
         filter_uri = self.baseURI + "experiment/"
         data = {
-            'node': node.id,
+            'signature': signature.id,
             'limit': 0
         }
         resp = self.api_client.get(filter_uri, data=data)

@@ -12,7 +12,7 @@ from tastypie.exceptions import BadRequest
 from haystack.query import SearchQuerySet
 from haystack.inputs import AutoQuery
 from models import (
-    Experiment, Sample, SampleAnnotation, AnnotationType, MLModel, Node,
+    Experiment, Sample, SampleAnnotation, AnnotationType, MLModel, Signature,
     Activity, Edge, ParticipationType, Participation, ExpressionValue
 )
 
@@ -101,28 +101,29 @@ class ExperimentResource(ModelResource):
         queryset = Experiment.objects.all()
         allowed_methods = ['get']
         filtering = {
-            'node': ('exact', ),  # See apply_filters().
+            'signature': ('exact', ),  # See apply_filters().
         }
 
-    # Implementation of "node" filter, which allows the API to get the
-    # experiements that are related to a given node.  According to the
-    # database schema, "Node" model has many-to-many relationship with
-    # "Sample" model through "Activity" model; and "Sample" model has
-    # (implicit) many-to-many relationship with "Experiment" model
-    # through the "experiments" field in "Sample".
+    # Implementation of "signature" filter, which allows the API to get
+    # the experiements that are related to a given signature.  According
+    # to the database schema, "Signature" model has many-to-many
+    # relationship with "Sample" model through "Activity" model; and
+    # "Sample" model has (implicit) many-to-many relationship with
+    # "Experiment" model through the "experiments" field in "Sample".
     def apply_filters(self, request, applicable_filters):
         object_list = super(ExperimentResource, self).apply_filters(
             request, applicable_filters)
-        node = request.GET.get('node', None)
-        if node:
+        signature = request.GET.get('signature', None)
+        if signature:
             # Catch ValueError exception that may be raised by int() below,
             # and raise a customized BadRequest exception with more details.
             try:
-                node_id = int(node)
+                sig_id = int(signature)
             except ValueError:
-                raise BadRequest("Invalid node ID: %s" % node)
+                raise BadRequest("Invalid signature ID: %s" % signature)
 
-            samples = Activity.objects.filter(node=node_id).values('sample')
+            samples = Activity.objects.filter(signature=sig_id).values(
+                'sample')
             experiments = Sample.objects.filter(pk__in=samples).values(
                 'experiments').distinct()
             object_list = object_list.filter(pk__in=experiments)
@@ -267,13 +268,13 @@ class MLModelResource(ModelResource):
         allowed_methods = ['get']
 
 
-class NodeResource(ModelResource):
+class SignatureResource(ModelResource):
     mlmodel = fields.ForeignKey(MLModelResource, "mlmodel",
                                 full=True, full_list=False)
 
     class Meta:
-        queryset = Node.objects.all()
-        resource_name = 'node'
+        queryset = Signature.objects.all()
+        resource_name = 'signature'
         allowed_methods = ['get']
         multiple_allowed_methods = ['post']
         filtering = {
@@ -297,7 +298,7 @@ class NodeResource(ModelResource):
 
     def post_multiple(self, request, **kwargs):
         """
-        use POSTs for retrieving long lists of Nodes
+        use POSTs for retrieving long lists of Signatures
         """
         # we use the built-in Tastypie get_multiple implementation
         # but to do so, we need to convert the request to a GET
@@ -308,7 +309,7 @@ class NodeResource(ModelResource):
         return self.get_multiple(converted_request, **kwargs)
 
     def apply_filters(self, request, applicable_filters):
-        object_list = super(NodeResource, self).apply_filters(
+        object_list = super(SignatureResource, self).apply_filters(
             request, applicable_filters)
         heavy_genes = request.GET.get('heavy_genes', None)
         if heavy_genes:
@@ -324,19 +325,19 @@ class NodeResource(ModelResource):
                 raise BadRequest("Invalid gene IDs: %s" % heavy_genes)
 
             for (i, q) in enumerate(query_genes):
-                q_nodes = {p.node.id for p in
-                           Participation.objects.filter(gene=q)}
+                q_signatures = {p.signature.id for p in
+                                Participation.objects.filter(gene=q)}
                 if i == 0:
-                    related_nodes = q_nodes
+                    related_signatures = q_signatures
                 else:
-                    related_nodes = related_nodes & q_nodes
-            object_list = object_list.filter(id__in=related_nodes)
+                    related_signatures = related_signatures & q_signatures
+            object_list = object_list.filter(id__in=related_signatures)
         return object_list
 
 
 class ActivityResource(ModelResource):
     sample = fields.IntegerField(attribute='sample_id', null=False)
-    node = fields.IntegerField(attribute='node_id', null=False)
+    signature = fields.IntegerField(attribute='signature_id', null=False)
 
     class Meta:
         queryset = Activity.objects.all()
@@ -347,11 +348,11 @@ class ActivityResource(ModelResource):
         max_limit = 0  # Disable pagination
         filtering = {
             'sample': ('exact', 'in', ),
-            'node': ('exact', 'in', ),
+            'signature': ('exact', 'in', ),
             'mlmodel': ('exact', ),  # See apply_filters()
         }
         ordering = [
-            'sample', 'node'
+            'sample', 'signature'
         ]
 
     def apply_filters(self, request, applicable_filters):
@@ -373,7 +374,7 @@ class ActivityResource(ModelResource):
                 mlmodel_id = int(mlmodel)
             except ValueError:
                 raise BadRequest("Invalid mlmodel ID: %s" % mlmodel)
-            object_list = object_list.filter(node__mlmodel=mlmodel_id)
+            object_list = object_list.filter(signature__mlmodel=mlmodel_id)
         return object_list
 
 
@@ -449,14 +450,14 @@ class ParticipationTypeResource(ModelResource):
 
 
 class ParticipationResource(ModelResource):
+    """To avoid unnecessary table joins and improve the query
+    performance, only "gene" is enabled as a foreign key (because the
+    Signature page on frontend needs the gene details given a certain
+    signature); "signature" is not set as a foreign key because at this
+    time, we don't intend to do a query that returns signature details
+    given an input gene.
     """
-    To avoid unnecessary table joins and improve the query performance, only
-    "gene" is enabled as a foreign key (because the Node page on frontend needs
-    the gene details given a certain node); "node" is not set as a foreign key
-    because at this time, we don't intend to do a query that returns node
-    details given an input gene.
-    """
-    node = fields.IntegerField(attribute='node_id', null=False)
+    signature = fields.IntegerField(attribute='signature_id', null=False)
     gene = fields.ForeignKey(GeneResource, "gene", full=True)
     participation_type = fields.ForeignKey(ParticipationTypeResource,
                                            "participation_type", full=True)
@@ -468,7 +469,7 @@ class ParticipationResource(ModelResource):
         limit = 0      # Disable default pagination
         max_limit = 0  # Disable default pagination
         filtering = {
-            'node': ('exact', 'in', ),
+            'signature': ('exact', 'in', ),
             'gene': ('exact', 'in', ),
             'participation_type': ('exact', 'in', ),
         }

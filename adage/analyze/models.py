@@ -156,13 +156,13 @@ class MLModel(models.Model):
                 (self.title, self.organism.common_name, edge_info))
 
 
-class Node(models.Model):
+class Signature(models.Model):
     name = models.CharField(max_length=100, blank=False)
     mlmodel = models.ForeignKey(MLModel, on_delete=models.PROTECT)
     samples = models.ManyToManyField(Sample, through='Activity')
 
     def __unicode__(self):
-        return "Node %s of Model %s" % (self.name, self.mlmodel.title)
+        return "Signature %s of Model %s" % (self.name, self.mlmodel.title)
 
     class Meta:
         unique_together = ('name', 'mlmodel')
@@ -170,16 +170,16 @@ class Node(models.Model):
 
 class Activity(models.Model):
     sample = models.ForeignKey(Sample, db_index=True, on_delete=models.PROTECT)
-    node = models.ForeignKey(Node, db_index=True, on_delete=models.PROTECT)
+    signature = models.ForeignKey(Signature, db_index=True,
+                                  on_delete=models.PROTECT)
     value = models.FloatField()
 
     def __unicode__(self):
-        return "Sample %s at Node %s with value %f" % (self.sample.name,
-                                                       self.node.name,
-                                                       self.value)
+        return "Sample %s at Signature %s with value %f" % (
+            self.sample.name, self.signature.name, self.value)
 
     class Meta:
-        unique_together = ('sample', 'node')
+        unique_together = ('sample', 'signature')
 
 
 class Edge(models.Model):
@@ -202,9 +202,9 @@ class Edge(models.Model):
 
 class ParticipationType(models.Model):
     """
-    A model to keep track to the types of gene participation in nodes
-    that are available. The 'Participation' objects in the database
-    (see below) will have a Foreign Key to this model.
+    A model to keep track of the types of gene participation in
+    signatures that are available. The 'Participation' objects in the
+    database (see below) will have a Foreign Key to this model.
     """
     name = models.CharField(max_length=256, unique=True, blank=False)
     description = models.TextField()
@@ -214,26 +214,25 @@ class ParticipationType(models.Model):
 
 
 class Participation(models.Model):
+    """This class models the many-to-many relationship between Signature
+    and Gene.  It shows which genes are related to which signatures and
+    vice versa.  Although this relationship can be modeled implicitly
+    because it doesn't include any other fields, we create the model
+    explicitly so that the corresponding API ("ParticipationResource" in
+    api.py) will be easier to handle.
     """
-    This class models the many-to-many relationship between Node and
-    Gene.  It shows which genes are related to which nodes and vice
-    versa.  Although this relationship can be modeled implicitly because
-    it doesn't include any other fields, we create the model explicitly
-    so that the corresponding API ("ParticipationResource" in api.py)
-    will be easier to handle.
-    """
-    node = models.ForeignKey(Node, on_delete=models.PROTECT)
+    signature = models.ForeignKey(Signature, on_delete=models.PROTECT)
     gene = models.ForeignKey(Gene, on_delete=models.PROTECT)
     participation_type = models.ForeignKey(ParticipationType,
                                            on_delete=models.PROTECT)
 
     class Meta:
-        unique_together = ('node', 'gene', 'participation_type')
+        unique_together = ('signature', 'gene', 'participation_type')
 
     def __unicode__(self):
-        return "Model: %s, Node: %s, Gene: %s" % (self.node.mlmodel.title,
-                                                  self.node.name,
-                                                  self.gene.entrezid)
+        return "Model: %s, Signature: %s, Gene: %s" % (
+            self.signature.mlmodel.title, self.signature.name,
+            self.gene.entrezid)
 
 
 class ExpressionValue(models.Model):
