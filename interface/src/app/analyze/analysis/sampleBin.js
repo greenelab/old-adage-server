@@ -15,7 +15,7 @@ angular.module('adage.analyze.sampleBin', [
 .factory('SignatureSet', ['$resource', 'ApiBasePath',
   function($resource, ApiBasePath) {
     return $resource(
-      ApiBasePath + 'node/post_multiple/',
+      ApiBasePath + 'signature/post_multiple/',
       {},
       {post: {
         method: 'POST',
@@ -190,15 +190,15 @@ MathFuncts, errGen) {
       //      and constructing a `signatureObject` for each. [outer .map()]
       var retval = firstSampleSignatures.map(function(val, index) {
         var signatureObject = {
-          'id': val.node,
+          'id': val.signature,
           'activity': this.heatmapData.samples.map(
             // (2b) the array of activity for each signature is built by
             //      plucking the activity `.value` for each sample within the
             //      `index`th signature from the `activityCache` [inner .map()]
             function(sampleId) {
               var cachedActivity = this.activityCache.get(sampleId);
-              if (cachedActivity[index].node !== val.node) {
-                // ensure we're pulling out the right node (aka signature)
+              if (cachedActivity[index].signature !== val.signature) {
+                // ensure we're pulling out the right signature (aka signature)
                 $log.error(
                   'getSignatureObjects: signature IDs do not match. First ' +
                   ' sample = ', val, ', but sample ' + sampleId + ' =',
@@ -325,7 +325,7 @@ MathFuncts, errGen) {
         .linkage('avg')
         .posKey('activity')
         .data(this.getSampleObjects());
-      this.heatmapData.samples = sampleClust.orderedNodes().map(
+      this.heatmapData.samples = sampleClust.orderedSignatures().map(
         this._getIDs);
     },
     clusterSignatures: function() {
@@ -349,7 +349,7 @@ MathFuncts, errGen) {
           .data(cbSampleBin.getSignatureObjects());
         // update the heatmap
         cbSampleBin.heatmapData.signatureOrder =
-          signatureClust.orderedNodes().map(cbSampleBin._getIDs);
+          signatureClust.orderedSignatures().map(cbSampleBin._getIDs);
       });
     },
 
@@ -393,7 +393,7 @@ MathFuncts, errGen) {
             if (cbSampleBin.heatmapData.signatureOrder.length === 0) {
               cbSampleBin.heatmapData.signatureOrder = sampleActivity.map(
                 function(val) {
-                  return val.node;
+                  return val.signature;
                 }
               );
             }
@@ -422,7 +422,7 @@ MathFuncts, errGen) {
           var p = Activity.get({
             'mlmodel': mlmodel,
             'sample': samples[i],
-            'order_by': 'node'
+            'order_by': 'signature'
           }).$promise;
           activityPromises.push(p);
           p.then(loadCache).catch(this.logError);
@@ -475,7 +475,7 @@ MathFuncts, errGen) {
       //      for the first sample in our volcano plot
       var firstSampleSignatures = this.activityCache.get(sg['base-group'][0])
         .map(function(val) {
-          return val.node;  // extract just the signature IDs
+          return val.signature;  // extract just the signature IDs
         }
       );
       // (1b) now obtain (and cache) a name for each signature id
@@ -495,8 +495,8 @@ MathFuncts, errGen) {
               //      `index`th signature from the `activityCache`
               //      [inner .map()]
               var cachedActivity = cbSampleBin.activityCache.get(sampleId);
-              if (cachedActivity[index].node !== signatureId) {
-                // ensure we're pulling out the right node
+              if (cachedActivity[index].signature !== signatureId) {
+                // ensure we're pulling out the right signature
                 $log.error(
                   'mapSignaturesToSignatureInfo: signature IDs do not match.' +
                   ' First sample = ' + signatureId + ', but sample ' +

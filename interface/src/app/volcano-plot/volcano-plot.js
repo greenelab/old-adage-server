@@ -22,7 +22,7 @@ angular.module('adage.volcano-plot', [
     return {
       getGenesForSignaturesPromise: function(signatures) {
         var promise = Participation.get(
-          {'node__in': signatures.join(), 'limit': 0}
+          {'signature__in': signatures.join(), 'limit': 0}
         ).$promise.then(
           function success(value) {
             // when the data come back, condense the reponse into a flat list
