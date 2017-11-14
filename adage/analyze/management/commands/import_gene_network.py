@@ -9,8 +9,8 @@ tab-delimited and each line should include 4 columns:
   (4) Sign of the weight (either "+" or "-").
 
 The file's first line will be ignored because it only has column names.
-Here is an example input file:
-  adage-server/data/eADAGE_net300_allNodes_ADAGEnet_PAID_corCutoff0.4.txt
+Here is a gzipped example input file:
+  adage-server/data/gene_gene_network_cutoff_0.2.txt.gz
 
 The command requires two arguments:
   (1) gene_network_file: the name of input gene-gene network file;

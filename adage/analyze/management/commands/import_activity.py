@@ -20,7 +20,7 @@ command "add_ml_model.py" to add it into the database.
 from __future__ import print_function
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
-from analyze.models import Sample, MLModel, Node, Activity
+from analyze.models import Sample, MLModel, Signature, Activity
 
 import logging
 logger = logging.getLogger(__name__)
@@ -50,8 +50,8 @@ def import_activity(file_handle, ml_model_name):
     """
     Read the data in activity sheet into the database.
     This function first checks whether ml_model_name exists in the
-    database, then call import_nodes() and import_activity_line() to
-    populate "Node" and "Activity" tables in the database.
+    database, then call import_signatures() and import_activity_line()
+    to populate "Signature" and "Activity" tables in the database.
     """
 
     # Raise an exception if ml_model_name doesn't exist in the database.
@@ -65,58 +65,61 @@ def import_activity(file_handle, ml_model_name):
     # manager.  Any exception raised inside the manager will
     # terminate the transaction and roll back the database.
     with transaction.atomic():
-        nodes = []
+        signatures = []
         for line_index, line in enumerate(file_handle):
             tokens = line.rstrip('\r\n').split('\t')
             if line_index == 0:
-                nodes = tokens[1:]
-                import_node_line(nodes, mlmodel)
+                signatures = tokens[1:]
+                import_signatures(signatures, mlmodel)
             else:
-                import_activity_line(line_index + 1, nodes, tokens, mlmodel)
+                import_activity_line(line_index + 1, signatures, tokens,
+                                     mlmodel)
 
 
-def import_node_line(nodes, mlmodel):
+def import_signatures(signatures, mlmodel):
     """
-    Load input nodes into "Node" table in the database.
+    Load input signatures into "Signaturee" table in the database.
 
     This function will raise an exception if any of the following errors
     are detected:
-      * Node name is blank (null or consists of space characters only);
-      * Node name is duplicate;
-      * The combination of Node name and given ml_model_name is not
+      * Signature name is blank (null or consists of space characters only);
+      * Signature name is duplicate;
+      * The combination of Signature name and given ml_model_name is not
         unique.
     """
-    node_set = set()
-    for index, name in enumerate(nodes):
+    signature_set = set()
+    for index, name in enumerate(signatures):
         if not name or name.isspace():
-            raise Exception("Input file line #1 column #%d: blank node name" %
-                            index + 2)
-        elif name in node_set:
+            raise Exception(
+                "Input file line #1 column #%d: blank signature name" %
+                index + 2)
+        elif name in signature_set:
             raise Exception("Input file line #1 column #%d: %s is NOT unique" %
                             (index + 2, name))
-        elif Node.objects.filter(name=name, mlmodel=mlmodel).exists():
-            raise Exception("Input file line #1 column #%d: Node name %s "
-                            "already exists in Node table" % (index + 2, name))
+        elif Signature.objects.filter(name=name, mlmodel=mlmodel).exists():
+            raise Exception("Input file line #1 column #%d: Signature name %s "
+                            "already exists in Signature table"
+                            % (index + 2, name))
         else:
-            node_set.add(name)
-            Node.objects.create(name=name, mlmodel=mlmodel)
+            signature_set.add(name)
+            Signature.objects.create(name=name, mlmodel=mlmodel)
 
 
-def import_activity_line(line_num, nodes, tokens, mlmodel):
+def import_activity_line(line_num, signatures, tokens, mlmodel):
     """
     Load numerical values in input tokens into "Activity" table.
 
     This function will raise an exception if any of the following errors
     are detected on the data line:
       * The number of columns on this line is not equal to the number of
-        nodes plus 1.
+        signatures plus 1.
       * The data source field (in column #1) is blank;
       * Any field from column #2 to the end can not be converted into a
         float type.
     """
-    if len(tokens) != len(nodes) + 1:
+    if len(tokens) != len(signatures) + 1:
         raise Exception("Input file line #%d: Number of columns is not %d" %
-                        (line_num, len(nodes) + 1))
+                        (line_num, len(signatures) + 1))
 
     data_source = tokens[0]
     if not data_source or data_source.isspace():
@@ -139,7 +142,7 @@ def import_activity_line(line_num, nodes, tokens, mlmodel):
     # line will be saved in "records" and created in bulk at the end.
     records = []
     col_num = 2   # The numerical values start from column #2.
-    for node_name, value in zip(nodes, values):
+    for signature_name, value in zip(signatures, values):
         try:
             float_val = float(value)
         except ValueError:
@@ -147,7 +150,9 @@ def import_activity_line(line_num, nodes, tokens, mlmodel):
                             "converted into a float type" %
                             (line_num, col_num, value))
 
-        node = Node.objects.get(name=node_name, mlmodel=mlmodel)
-        records.append(Activity(sample=sample, node=node, value=float_val))
+        signature = Signature.objects.get(name=signature_name, mlmodel=mlmodel)
+        records.append(
+            Activity(sample=sample, signature=signature, value=float_val)
+        )
         col_num += 1
     Activity.objects.bulk_create(records)  # Create records in bulk.
