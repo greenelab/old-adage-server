@@ -78,7 +78,7 @@ def import_activity(file_handle, ml_model_name):
 
 def import_signatures(signatures, mlmodel):
     """
-    Load input signatures into "Signaturee" table in the database.
+    Load input signatures into "Signature" table in the database.
 
     This function will raise an exception if any of the following errors
     are detected:
