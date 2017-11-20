@@ -1,7 +1,7 @@
 """
 This management command will read an input signature-gene network file and
 populate the "Participation" table in the database.  A valid input file
-must be tab-delimited and each line must start with a valid signaure name,
+must be tab-delimited and each line must start with a valid signature name,
 followed by systematic names of genes that are related to this signature.
 
 Here is an example input file:

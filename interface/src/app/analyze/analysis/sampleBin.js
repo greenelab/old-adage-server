@@ -198,7 +198,7 @@ MathFuncts, errGen) {
             function(sampleId) {
               var cachedActivity = this.activityCache.get(sampleId);
               if (cachedActivity[index].signature !== val.signature) {
-                // ensure we're pulling out the right signature (aka signature)
+                // ensure we're pulling out the right signature
                 $log.error(
                   'getSignatureObjects: signature IDs do not match. First ' +
                   ' sample = ', val, ', but sample ' + sampleId + ' =',
@@ -325,7 +325,7 @@ MathFuncts, errGen) {
         .linkage('avg')
         .posKey('activity')
         .data(this.getSampleObjects());
-      this.heatmapData.samples = sampleClust.orderedSignatures().map(
+      this.heatmapData.samples = sampleClust.orderedNodes().map(
         this._getIDs);
     },
     clusterSignatures: function() {
@@ -349,7 +349,7 @@ MathFuncts, errGen) {
           .data(cbSampleBin.getSignatureObjects());
         // update the heatmap
         cbSampleBin.heatmapData.signatureOrder =
-          signatureClust.orderedSignatures().map(cbSampleBin._getIDs);
+          signatureClust.orderedNodes().map(cbSampleBin._getIDs);
       });
     },
 

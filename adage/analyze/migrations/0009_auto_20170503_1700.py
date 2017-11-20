@@ -10,10 +10,6 @@ from __future__ import unicode_literals
 from django.db import migrations
 
 
-def create_participation_type_if_nonexistent(apps, schema_editor):
-    pass
-
-
 class Migration(migrations.Migration):
 
     dependencies = [
