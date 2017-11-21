@@ -27,7 +27,7 @@
     as the authors chose. Experiments vary in the number of samples they
     contain. Samples may be from different conditions or replicates. The
     annotations that accompany each experiment can help interpret the samples
-    and node activities within each experiment.
+    and signature activities within each experiment.
   </div>
   <br>
 
@@ -87,13 +87,13 @@
 
   <div class="lead" id="High Weight Gene">
     <h3><u>High Weight Gene</u></h3>
-    A high weight gene in a signature is a genes whose weight is more than 2.5
-    standard deviations away from the mean weight of genes in that node.
-    Because the weight vectors of nodes have different distributions, different
-    nodes have different numbers of high weight genes. High weight genes are
-    used to characterize a node because their expression levels have the
-    largest influence on the activity of the node. A signature is composed of
-    high weight genes on one side of a node.
+    The ADAGE model is made up of features (also known as nodes). For each
+    feature, every gene has a positive or negative weight. A signature is
+    composed of the genes on one side (positive or negative) of a feature.
+    The genes that are termed high weight are those that are 2.5 or more
+    standard deviations from the mean gene weight. These high weight genes
+    are used to characterize each signature because their expression levels
+    have the largest influence on the activity of the signature.
   </div>
   <br>
 

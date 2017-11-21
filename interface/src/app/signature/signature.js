@@ -84,7 +84,7 @@ angular.module('adage.signature', [
         $scope.$watch('selectedParticipationType', function() {
           if ($scope.selectedParticipationType) {
             Participation.get(
-              {'node': $scope.signatureId, 'limit': 0,
+              {'signature': $scope.signatureId, 'limit': 0,
                 'participation_type': $scope.selectedParticipationType.id},
               function success(response) {
                 $scope.genes = [];
@@ -219,7 +219,7 @@ angular.module('adage.signature', [
 
         // Get activities that are related to the current signature:
         var activityPromise = Activity.get(
-          {node: $scope.signatureId, limit: 0}
+          {signature: $scope.signatureId, limit: 0}
         ).$promise;
 
         // Function that will be called to handle experiment data
@@ -288,8 +288,9 @@ angular.module('adage.signature', [
               sampleID = response.objects[i].sample;
               $scope.activities[sampleID] = response.objects[i].value;
             }
-            return SignatureExperiment.get({node: $scope.signatureId, limit: 0})
-              .$promise;
+            return SignatureExperiment.get(
+              {signature: $scope.signatureId, limit: 0}
+            ).$promise;
           },
           function error(response) {
             var errMessage = errGen('Failed to get activities', response);

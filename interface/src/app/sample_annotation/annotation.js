@@ -61,7 +61,7 @@ angular.module('adage.sampleAnnotation', [
         self.activityDigits = ActivityDigits;
         var signatureID = $stateParams.signature;
         Activity.get(
-          {'node': signatureID, 'sample__in': samplesInUrl},
+          {'signature': signatureID, 'sample__in': samplesInUrl},
           function success(response) {
             var validSamples = [];
             response.objects.forEach(function(element) {

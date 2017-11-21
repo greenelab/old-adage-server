@@ -6,7 +6,7 @@ argument and the second is the 'description' argument.
 
 Example usage:
 python manage.py create_or_update_participation_type "High-weight genes" \
-    "High-weight genes are those that most strongly influence the node's ..."
+    "High-weight genes are those that most strongly influence ..."
 """
 
 from __future__ import print_function
@@ -20,7 +20,7 @@ logger.addHandler(logging.NullHandler())
 
 class Command(BaseCommand):
     help = ("Creates a participation type in the database for the "
-            "participation of genes in a node.")
+            "participation of genes in a signature.")
 
     def add_arguments(self, parser):
         parser.add_argument('name', type=str)

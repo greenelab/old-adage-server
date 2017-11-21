@@ -1,28 +1,13 @@
 # -*- coding: utf-8 -*-
+
+"""This migration file used to generate a default participation type and
+set all Participation records to the default type.  These operations
+have been moved to fabfile/adage_server.py now.
+"""
+
 from __future__ import unicode_literals
 
 from django.db import migrations
-
-from analyze.models import Participation, ParticipationType
-
-
-def create_participation_type_if_nonexistent(apps, schema_editor):
-    """
-    Function that creates the ParticipationType "High weight genes"
-    and assigns it to all the existing Participation objects if
-    no ParticipationTypes were previously in the database.
-    """
-    if not ParticipationType.objects.exists():
-        new_participation_type = ParticipationType.objects.create(
-            name="High-weight genes", description="High-weight genes are "
-            "those that most strongly influence the signature's activity, "
-            "and we have found that they often reveal the underlying process "
-            "or processes captured by the signature."
-        )
-
-        for participation_obj in Participation.objects.all():
-            participation_obj.participation_type = new_participation_type
-            participation_obj.save()
 
 
 class Migration(migrations.Migration):
@@ -31,6 +16,4 @@ class Migration(migrations.Migration):
         ('analyze', '0008_auto_20170501_1359'),
     ]
 
-    operations = [
-        migrations.RunPython(create_participation_type_if_nonexistent),
-    ]
+    operations = []

@@ -7,7 +7,7 @@ angular.module('adage.signature.resources', [
 
 .factory('Signature', ['$resource', 'ApiBasePath',
   function($resource, ApiBasePath) {
-    return $resource(ApiBasePath + 'node/:id');
+    return $resource(ApiBasePath + 'signature/:id');
   }
 ])
 
