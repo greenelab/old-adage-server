@@ -96,8 +96,7 @@ angular.module('adage.gene.network', [
       }
 
       // The following properties of "self" will be available to HTML.
-      self.includePositive = true;
-      self.includeNegative = true;
+      self.edgeSign = 'both';
       self.statusMessage = 'Connecting to the server ...';
 
       var minCorrelation = -1.0, maxCorrelation = 1.0;
@@ -124,9 +123,9 @@ angular.module('adage.gene.network', [
         geneTip.hide();
         edgeTip.hide();
         var correlationSign;
-        if (self.includeNegative && self.includePositive) {
+        if (self.edgeSign === 'both') {
           correlationSign = 0;
-        } else if (self.includeNegative) {
+        } else if (self.edgeSign === 'negOnly') {
           correlationSign = -1;
         } else {
           correlationSign = 1;
