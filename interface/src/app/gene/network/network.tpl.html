@@ -16,18 +16,18 @@
   <div ng-hide="ctrl.statusMessage">
     <div class="well well-sm">
     <form>
-      <strong>Min edge weight:</strong>
+      <strong>Min edge weight:</strong>&nbsp;
       <input type="radio" name="edgeSign" ng-model="ctrl.edgeSign"
-             ng-change="ctrl.renderNetwork()"
-             value="negOnly">Negative only
+             ng-change="ctrl.renderNetwork()" value="negOnly">
+      Negative only
       &nbsp;
       <input type="radio" name="edgeSign" ng-model="ctrl.edgeSign"
-             ng-change="ctrl.renderNetwork()"
-             value="posOnly">Positive only
+             ng-change="ctrl.renderNetwork()" value="posOnly">
+      Positive only
       &nbsp;
       <input type="radio" name="edgeSign" ng-model="ctrl.edgeSign"
-             ng-change="ctrl.renderNetwork()"
-             value="both">Both
+             ng-change="ctrl.renderNetwork()" value="both">
+      Both
     </form>
     <rzslider id="edge-slider"
               rz-slider-model="ctrl.minEdgeWeightSlider.value"
