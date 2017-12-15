@@ -112,10 +112,14 @@ angular.module('adage.gene.network', [
           .geneText(function(d) {
             return d.label;
           })
-          .bgCorrection(false)    // disable background correction
           .edgeLegendStart(minCorrelation)
           .edgeLegendEnd(maxCorrelation)
-          .edgeLegendText('Edge Correlation');
+          .edgeLegendText('Edge Correlation')
+          .forceSimulation(false) // disable force simulation
+          .bgCorrection(false);
+      // See the following discussion on why background correction is
+      // disabled in adage-server:
+      // https://github.com/greenelab/adage-server/issues/295
 
       var geneTip, edgeTip;
 
@@ -131,8 +135,8 @@ angular.module('adage.gene.network', [
           correlationSign = 1;
         }
         network.filterWithWeightSign(
-          self.minEdgeWeightSlider.value, maxCorrelation,
-          self.maxGeneNumSlider.value, correlationSign);
+          self.minEdgeWeightSlider.value, maxCorrelation, correlationSign,
+          self.maxGeneNumSlider.value);
         network.draw();
       };
 
