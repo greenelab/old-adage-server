@@ -1,32 +1,47 @@
 <div class="page-header">
   <h3>ADAGE: Home</h3>
+  The ADAGE web server allows users to analyze signatures from certain types
+  of unsupervised machine learning models. If you use the ADAGE server,
+  please cite:
+  <br>
+  Tan J, Huyck M, Hu D, Zelaya RA, Hogan DA, Greene CS.
+  <strong>
+    <a href="https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-017-1905-4">
+      ADAGE signature analysis: differential expression analysis with
+      data-defined gene sets
+    </a>
+  </strong>
+  <em>BMC Bioinformatics. 2017.</em>
+  <br>
+  Please also cite the relevant paper for the model that you use, which is shown
+  after a model is selected.
 </div>
 
-<h3>Step 1: Choose a machine learning model</h3>
+<p class="lead">Step 1: Choose a machine learning model</p>
 <ml-model-selector selected-ml-model="ctrl.modelInfo"
                    on-change="ctrl.changeModel(value)">
 </ml-model-selector>
 
 <hr>
 <div ng-show="ctrl.modelInfo.title">
-  <h3>Step 2: Now that the model is set, you have three options:</h3>
+  <p class="lead">Step 2: Now that the model is set, you have three options:</h3>
     <ul>
       <li>
-        <h4><a ui-sref="analyze({mlmodel: modelInfo.id})">
+        <p><a ui-sref="analyze({mlmodel: modelInfo.id})">
             Explore assays and experiments
-        </a></h4>
+        </a></p>
       </li>
 
       <li>
-        <h4><a ui-sref="gene_search({mlmodel: modelInfo.id})">
+        <p><a ui-sref="gene_search({mlmodel: modelInfo.id})">
             Explore genes' model similarities
-        </a></h4>
+        </a></p>
       </li>
 
       <li>
-        <h4><a ui-sref="signature_search({mlmodel: modelInfo.id})">
+        <p><a ui-sref="signature_search({mlmodel: modelInfo.id})">
             Explore model signatures
-        </a></h4>
+        </a></p>
       </li>
     </ul>
 </div>
