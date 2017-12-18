@@ -17,14 +17,18 @@
   after a model is selected.
 </div>
 
-<p class="lead">Step 1: Choose a machine learning model</p>
+<p class="lead">
+  Step 1: Choose a machine learning model
+</p>
 <ml-model-selector selected-ml-model="ctrl.modelInfo"
                    on-change="ctrl.changeModel(value)">
 </ml-model-selector>
 
 <hr>
 <div ng-show="ctrl.modelInfo.title">
-  <p class="lead">Step 2: Now that the model is set, you have three options:</h3>
+  <p class="lead">
+    Step 2: Now that the model is set, you have three options:
+  </p>
     <ul>
       <li>
         <p><a ui-sref="analyze({mlmodel: modelInfo.id})">
