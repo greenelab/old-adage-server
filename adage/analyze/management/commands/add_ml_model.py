@@ -6,7 +6,8 @@ name is ml_model_name into the database's ml_model table.  It should be
 invoked like this:
 
   python manage.py add_ml_model <ml_model_name> <organism_tax_id> \
- [--directed_edge] [--g2g_edge_cutoff <cutoff_value>]
+ [--directed_edge] [--g2g_edge_cutoff <cutoff_value>] \
+ [--desc_html <desc_html>]
 
 The two required arguments are:
   (1) ml_model_name: machine learning model name;
@@ -19,6 +20,9 @@ the edges in the gene-gene relationship table will be undirected.
 "--g2g_edge_cutoff" is another optional argument.  If it is specified,
 the numeric value that follows will be the cutoff value of the edges in
 gene-gene network; otherwise the edge cutoff value will be set to 0.
+
+"--desc_html" is another optional argument that is the model description
+in html format; the default is an empty string.
 
 IMPORTANT:
 Before running this command, please make sure that organism_tax_id
@@ -51,13 +55,20 @@ class Command(BaseCommand):
                             dest='g2g_edge_cutoff',
                             default=0.0,
                             help='Gene-gene network edge cutoff value')
+        parser.add_argument('--desc_html',
+                            type=str,
+                            dest='desc_html',
+                            default='',
+                            help='Model description in HTML format')
+
 
     def handle(self, **options):
         try:
             add_ml_model(options['ml_model_name'],
                          options['organism_tax_id'],
                          options['directed'],
-                         options['g2g_edge_cutoff'])
+                         options['g2g_edge_cutoff'],
+                         options['desc_html'])
             self.stdout.write(self.style.NOTICE(
                 "Added a new machine learning model successfully"))
         except Exception as e:
@@ -66,7 +77,8 @@ class Command(BaseCommand):
                 "raised an exception:\n%s" % e)
 
 
-def add_ml_model(ml_model_name, organism_tax_id, directed_edge, edge_cutoff):
+def add_ml_model(ml_model_name, organism_tax_id, directed_edge, edge_cutoff,
+                 desc_html):
     # Raise an exception if ml_model_name on the command line is "" or
     # "  ".
     if not ml_model_name or ml_model_name.isspace():
@@ -85,4 +97,5 @@ def add_ml_model(ml_model_name, organism_tax_id, directed_edge, edge_cutoff):
     MLModel.objects.create(title=ml_model_name,
                            organism=organism,
                            directed_g2g_edge=directed_edge,
-                           g2g_edge_cutoff=edge_cutoff)
+                           g2g_edge_cutoff=edge_cutoff,
+                           desc_html=desc_html)
