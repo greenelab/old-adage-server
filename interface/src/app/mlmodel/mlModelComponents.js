@@ -6,7 +6,7 @@ angular.module('adage.mlmodel.components', [
 .component('mlModelSelector', {
   templateUrl: 'mlmodel/selector.tpl.html',
   bindings: {
-    selectedMlModel: '=',
+    selectedMlModel: '<',
     onChange: '&'
   },
   controller: ['MlModel', '$log', function(MlModel, $log) {
@@ -65,7 +65,7 @@ angular.module('adage.mlmodel.components', [
           self.isValidModel = true;
         },
         function error(err) {
-          MlModelTracker.reset();
+          MlModelTracker.init();
           self.errMessage = errGen('Failed to get machine learning model', err);
           $log.error(self.errorMessage);
         }
