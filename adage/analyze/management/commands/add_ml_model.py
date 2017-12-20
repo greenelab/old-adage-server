@@ -61,7 +61,6 @@ class Command(BaseCommand):
                             default='',
                             help='Model description in HTML format')
 
-
     def handle(self, **options):
         try:
             add_ml_model(options['ml_model_name'],
