@@ -39,6 +39,8 @@ angular.module('adage.utils', [])
     }
   };
 
+  this.reset = this.init;
+
   this.init();
 }])
 ;

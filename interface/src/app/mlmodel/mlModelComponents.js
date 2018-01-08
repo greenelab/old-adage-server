@@ -65,7 +65,7 @@ angular.module('adage.mlmodel.components', [
           self.isValidModel = true;
         },
         function error(err) {
-          MlModelTracker.init();
+          MlModelTracker.reset();
           self.errMessage = errGen('Failed to get machine learning model', err);
           $log.error(self.errorMessage);
         }
