@@ -2,6 +2,7 @@
  * adage.home module.
  */
 angular.module('adage.home', [
+  'ngSanitize',    // required by ng-bind-html
   'ui.router',
   'ui.bootstrap',
   'adage.mlmodel.components',

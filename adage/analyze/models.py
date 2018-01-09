@@ -149,6 +149,7 @@ class MLModel(models.Model):
     # False (not directed).
     directed_g2g_edge = models.BooleanField(default=False)
     g2g_edge_cutoff = models.FloatField(default=0.0)
+    desc_html = models.CharField(max_length=2048, blank=True)
 
     def __unicode__(self):
         edge_info = "directed" if self.directed_g2g_edge else "undirected"

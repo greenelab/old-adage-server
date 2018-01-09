@@ -20,32 +20,36 @@
 <p class="lead">
   Step 1: Choose a machine learning model
 </p>
+
 <ml-model-selector selected-ml-model="ctrl.modelInfo"
                    on-change="ctrl.changeModel(value)">
 </ml-model-selector>
 
-<hr>
 <div ng-show="ctrl.modelInfo.title">
+  <div ng-bind-html="ctrl.modelInfo.desc">
+  </div>
+  <hr>
+
   <p class="lead">
     Step 2: Now that the model is set, you have three options:
   </p>
-    <ul>
-      <li>
-        <p><a ui-sref="analyze({mlmodel: modelInfo.id})">
-            Explore assays and experiments
-        </a></p>
-      </li>
+  <ul>
+    <li>
+      <a ui-sref="analyze({mlmodel: modelInfo.id})">
+        Explore assays and experiments
+      </a>
+    </li>
 
-      <li>
-        <p><a ui-sref="gene_search({mlmodel: modelInfo.id})">
-            Explore genes' model similarities
-        </a></p>
-      </li>
+    <li>
+      <a ui-sref="gene_search({mlmodel: modelInfo.id})">
+        Explore genes' model similarities
+      </a>
+    </li>
 
-      <li>
-        <p><a ui-sref="signature_search({mlmodel: modelInfo.id})">
-            Explore model signatures
-        </a></p>
-      </li>
-    </ul>
+    <li>
+      <a ui-sref="signature_search({mlmodel: modelInfo.id})">
+        Explore model signatures
+      </a>
+    </li>
+  </ul>
 </div>

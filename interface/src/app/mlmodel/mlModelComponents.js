@@ -6,7 +6,7 @@ angular.module('adage.mlmodel.components', [
 .component('mlModelSelector', {
   templateUrl: 'mlmodel/selector.tpl.html',
   bindings: {
-    selectedMlModel: '=',
+    selectedMlModel: '<',
     onChange: '&'
   },
   controller: ['MlModel', '$log', function(MlModel, $log) {

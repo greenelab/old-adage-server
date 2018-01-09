@@ -197,6 +197,17 @@ def import_data_and_index():
     run('python manage.py create_or_update_participation_type "%s" "%s"'
         % (participation_type_name, participation_type_desc))
 
+    mlmodel_desc = '<p>The eADAGE model is described in '
+    '<a href="http://www.cell.com/cell-systems/abstract/S2405-4712(17)30231-4">'
+    'Tan et al., 2017. <em>Cell Systems.</em></a> The development of this '
+    'model was supported by GBMF 4552 from the Gordon and Betty Moore '
+    'Foundation (PI, Casey Greene) and the Cystic Fibrosis Foundation '
+    'STANTO15R0 (Greene and Hogan, PIs).'
+    '<p>An R package that can be used to analyze datasets that have not yet '
+    'been shared is available and has been described in '
+    '<a href="https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-017-1905-4">'
+    'Tan et al., 2017. <em>BMC Bioinformatics.</em></a>'
+
     mlmodel_basic = {
         "title": "Ensemble ADAGE 300",
         "cutoff": 0.4
@@ -217,7 +228,7 @@ def import_data_and_index():
     for mlmodel in [mlmodel_basic, mlmodel_complex]:
         # Create ML model
         run('python manage.py add_ml_model "%s" 208964 --g2g_edge_cutoff %s'
-            % (mlmodel["title"], mlmodel["cutoff"]))
+            '\'%s\'' % (mlmodel["title"], mlmodel["cutoff"], mlmodel_desc))
         # Import activity data
         run('python manage.py import_activity "%s" "%s"' %
             (CONFIG['data']['activity_file'], mlmodel["title"]))
