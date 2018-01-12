@@ -52,7 +52,14 @@
     Information about the PAO1 genes used to build this server was obtained
     from the following NCBI website:
     <a href="ftp://ftp.ncbi.nih.gov/gene/DATA/GENE_INFO/Archaea_Bacteria/Pseudomonas_aeruginosa_PAO1.gene_info.gz"
-    target="_blank">NCBI</a>.
+       target="_blank">NCBI</a>.
+    <br>
+    Some genes are connected to many genes while others are connected to fewer
+    genes. Right now the genes in the network view are ranked without
+    background correction so that the view prioritizes the genes that are most
+    connected to the query genes. (If the correction were applied, the view
+    would prioritize genes that are more connected to the query genes than to
+    other genes.)
   </div>
   <br>
 
@@ -99,13 +106,23 @@
 
   <div class="lead" id="References">
     <h3><b>References:</b></h3>
-    1. Tan J, Doing G, Lewis KA, Price CE, Chen KM, Cady KC, Perchuk B, Laub MT,
-    Hogan DA, Greene CS.
-    <a href="http://dx.doi.org/10.1101/078659">
-      System-wide automatic extraction of functional signatures in Pseudomonas
-      aeruginosa with eADAGE.
-    </a>
-    <i>bioRxiv.</i> 2016. doi:10.1101/078659
+    <ol>
+      <li>
+        Tan J, Doing G, Lewis KA, Price CE, Chen KM, Cady KC, Perchuk B,
+        Laub MT, Hogan DA, Greene CS.
+        <a href="http://dx.doi.org/10.1101/078659">
+          System-wide automatic extraction of functional signatures in
+          Pseudomonas aeruginosa with eADAGE.
+        </a><i>bioRxiv.</i> 2016. doi:10.1101/078659
+      </li>
+      <li>
+        Tan J, Huyck M, Hu D, Zelaya RA, Hogan DA, Greene CS.
+        <a href="https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-017-1905-4">
+          ADAGE signature analysis: differential expression analysis with
+          data-defined gene sets
+        </a><em>BMC Bioinformatics.</em> 2017.
+      </li>
+    </ol>
   </div>
 
 </div>
