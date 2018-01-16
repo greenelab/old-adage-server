@@ -346,7 +346,7 @@ angular.module('adage.gene.network', [
               htmlText += 'related to both genes' + (n > 0 ? ':' : '.');
               for (; i < n; ++i) {
                 anchorTag = '<a href="#/signature/' + response.objects[i].id +
-                  '">';
+                  '" target="_blank">';
                 htmlText += '<br>* ' + anchorTag + response.objects[i].name;
                 htmlText += '</a>';
               }
