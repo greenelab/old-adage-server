@@ -1,8 +1,8 @@
 <li
  ng-class="{active: inStateArr(['analysis-detail', 'volcano'])}"
  class="sample-bin"
- ng-if="sb.mlModelInfo.title">
-  <a ui-sref="analysis-detail({mlmodel: sb.mlModelInfo.id})">
+ ng-if="modelInfo.title">
+  <a ui-sref="analysis-detail({mlmodel: modelInfo.id})">
     <img src="/static/assets/testtube-expt2.svg" alt="Samples"
      width="28" height="28">
     <span ng-if="sb.heatmapData.samples.length" class="badge">{{

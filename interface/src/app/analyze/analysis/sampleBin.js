@@ -26,13 +26,10 @@ angular.module('adage.analyze.sampleBin', [
 ])
 
 .factory('SampleBin', ['$log', '$cacheFactory', '$q', 'Sample', 'Activity',
-  'Signature', 'SignatureSet', 'MathFuncts', 'errGen',
+  'Signature', 'SignatureSet', 'MathFuncts', 'errGen', 'MlModelTracker',
 function($log, $cacheFactory, $q, Sample, Activity, Signature, SignatureSet,
-MathFuncts, errGen) {
+MathFuncts, errGen, MlModelTracker) {
   var SampleBin = {
-    mlModelInfo: {
-      id: null
-    },
     samples: [],  // When refactored, all SampleBin samples will be listed here.
                   // For now, this only holds samples without activity data.
     heatmapData: {
@@ -73,7 +70,7 @@ MathFuncts, errGen) {
       delete this.sampleToGroup[+id];
       this.heatmapData.signatureOrder = [];  // reset to default order
       this.rebuildHeatmapActivity(
-        this.mlModelInfo.id, this.heatmapData.samples
+        MlModelTracker.id, this.heatmapData.samples
       );
     },
 
@@ -81,7 +78,7 @@ MathFuncts, errGen) {
       this.heatmapData.samples = [];
       this.heatmapData.signatureOrder = [];  // reset to default order
       this.rebuildHeatmapActivity(
-        this.mlModelInfo.id, this.heatmapData.samples
+        MlModelTracker.id, this.heatmapData.samples
       );
     },
 
@@ -434,13 +431,13 @@ MathFuncts, errGen) {
 
     getActivityForSampleList: function(mlModelId) {
       // retrieve activity data for heatmap to display
-      if (!mlModelId && !this.mlModelInfo.id) {
+      if (!mlModelId && !MlModelTracker.id) {
         $log.warn('getActivityForSampleList called before setting mlmodel');
         return;
       }
       if (!mlModelId) {
-        // default to the current mlModelInfo
-        mlModelId = this.mlModelInfo.id;
+        // default to the current mlModelTracker.id
+        mlModelId = MlModelTracker.id;
       }
       // FIXME restore query progress messages (see rebuildHeatmapActivity)
       //  note: progress can be reported by returning a $promise to the caller
@@ -551,10 +548,9 @@ MathFuncts, errGen) {
 
 .controller('SampleBinCtrl', ['$scope', 'SampleBin', 'MlModelTracker',
   function SampleBinCtrl($scope, SampleBin, MlModelTracker) {
-    // initialize mlModelInfo property on SampleBin
-    SampleBin.mlModelInfo = MlModelTracker;
-    // give our templates a way to access the SampleBin service
+    // give templates a way to access the SampleBin & MlModelTracker services
     $scope.sb = SampleBin;
+    $scope.modelInfo = MlModelTracker;
   }
 ])
 
