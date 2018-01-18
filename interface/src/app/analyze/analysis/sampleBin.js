@@ -32,7 +32,7 @@ MathFuncts, errGen, MlModelTracker) {
   var SampleBin = {
     samples: [],  // When refactored, all SampleBin samples will be listed here.
                   // For now, this only holds samples without activity data.
-    heatmapData: {
+    vegaData: {
       samples: [],  // only samples with activity data can be in the heatmap
       signatureOrder: []
     },
@@ -46,39 +46,39 @@ MathFuncts, errGen, MlModelTracker) {
     signatureCache: $cacheFactory('signature'),
 
     addSample: function(id) {
-      if (this.heatmapData.samples.indexOf(+id) !== -1) {
+      if (this.vegaData.samples.indexOf(+id) !== -1) {
         // quietly ignore the double-add
         $log.warn('SampleBin.addSample: ' + id +
             ' already in the sample list; ignoring.');
       } else {
-        this.heatmapData.samples.push(+id);
+        this.vegaData.samples.push(+id);
         this.sampleToGroup[+id] = 'other';
         // TODO when cache generalized: start pre-fetching sample data here
-        this.heatmapData.signatureOrder = [];  // reset to default order
+        this.vegaData.signatureOrder = [];  // reset to default order
       }
     },
 
     removeSample: function(id) {
-      var pos = this.heatmapData.samples.indexOf(+id);
+      var pos = this.vegaData.samples.indexOf(+id);
       if (pos === -1) {
         // this sample must be in the "missing activity" list
         pos = this.samples.indexOf(+id);
         this.samples.splice(pos, 1);
         return;
       }
-      this.heatmapData.samples.splice(pos, 1);
+      this.vegaData.samples.splice(pos, 1);
       delete this.sampleToGroup[+id];
-      this.heatmapData.signatureOrder = [];  // reset to default order
+      this.vegaData.signatureOrder = [];  // reset to default order
       this.rebuildHeatmapActivity(
-        MlModelTracker.id, this.heatmapData.samples
+        MlModelTracker.id, this.vegaData.samples
       );
     },
 
     clearSamples: function() {
-      this.heatmapData.samples = [];
-      this.heatmapData.signatureOrder = [];  // reset to default order
+      this.vegaData.samples = [];
+      this.vegaData.signatureOrder = [];  // reset to default order
       this.rebuildHeatmapActivity(
-        MlModelTracker.id, this.heatmapData.samples
+        MlModelTracker.id, this.vegaData.samples
       );
     },
 
@@ -102,7 +102,7 @@ MathFuncts, errGen, MlModelTracker) {
 
     hasItem: function(searchItem) {
       if (searchItem.itemType === 'sample') {
-        if (this.heatmapData.samples.indexOf(+searchItem.pk) !== -1) {
+        if (this.vegaData.samples.indexOf(+searchItem.pk) !== -1) {
           return true;
         } else {
           return false;
@@ -111,7 +111,7 @@ MathFuncts, errGen, MlModelTracker) {
         // what we want to know, in the case of an experiment, is 'are
         // all of the samples from this experiment already added?'
         for (var i = 0; i < searchItem.relatedItems.length; i++) {
-          if (this.heatmapData.samples.indexOf(
+          if (this.vegaData.samples.indexOf(
               +searchItem.relatedItems[i]) === -1) {
             return false;
           }
@@ -122,7 +122,7 @@ MathFuncts, errGen, MlModelTracker) {
 
     length: function() {
       // make it easy to ask how many samples are in the sampleBin
-      return this.heatmapData.samples.length;
+      return this.vegaData.samples.length;
     },
 
     getSamplesByGroup: function() {
@@ -161,14 +161,14 @@ MathFuncts, errGen, MlModelTracker) {
     },
 
     getSampleObjects: function() {
-      // reformat data from heatmapData.activity to a form that can be used
+      // reformat data from vegaData.activity to a form that can be used
       // by hcluster.js: need a separate array of objects for each sample
-      return this.heatmapData.samples.map(function(val) {
+      return this.vegaData.samples.map(function(val) {
         return this.getSampleData(val) || {id: val};
       }, this);
     },
     getSignatureObjects: function() {
-      // The heatmapData.activity array organizes activity data in a
+      // The vegaData.activity array organizes activity data in a
       // representation convenient to render using vega.js: each element of the
       // array corresponds to one mark on the heatmap. For clustering by
       // hcluster.js, on the other hand, we need to reorganize the data so that
@@ -180,7 +180,7 @@ MathFuncts, errGen, MlModelTracker) {
       // (1) first, we obtain a list of signatures by retrieving signature
       //     activity for the first sample in our heatmap
       var firstSampleSignatures = this.activityCache.get(
-        this.heatmapData.samples[0]
+        this.vegaData.samples[0]
       );
       // (2a) next, we build a new array (`retval`) comprised of
       //      `signatureObject`s by walking through the `firstSampleSignatures`
@@ -188,7 +188,7 @@ MathFuncts, errGen, MlModelTracker) {
       var retval = firstSampleSignatures.map(function(val, index) {
         var signatureObject = {
           'id': val.signature,
-          'activity': this.heatmapData.samples.map(
+          'activity': this.vegaData.samples.map(
             // (2b) the array of activity for each signature is built by
             //      plucking the activity `.value` for each sample within the
             //      `index`th signature from the `activityCache` [inner .map()]
@@ -322,7 +322,7 @@ MathFuncts, errGen, MlModelTracker) {
         .linkage('avg')
         .posKey('activity')
         .data(this.getSampleObjects());
-      this.heatmapData.samples = sampleClust.orderedNodes().map(
+      this.vegaData.samples = sampleClust.orderedNodes().map(
         this._getIDs);
     },
     clusterSignatures: function() {
@@ -345,7 +345,7 @@ MathFuncts, errGen, MlModelTracker) {
           .posKey('activity')
           .data(cbSampleBin.getSignatureObjects());
         // update the heatmap
-        cbSampleBin.heatmapData.signatureOrder =
+        cbSampleBin.vegaData.signatureOrder =
           signatureClust.orderedNodes().map(cbSampleBin._getIDs);
       });
     },
@@ -372,7 +372,7 @@ MathFuncts, errGen, MlModelTracker) {
         // We detect this error and handle it in updateHeatmapActivity.
       };
       var updateHeatmapActivity = function(activityPromisesFulfilled) {
-        // when all promises are fulfilled, we can update heatmapData
+        // when all promises are fulfilled, we can update vegaData
         var newActivity = [];
         var excludeSamples = [];
 
@@ -387,8 +387,8 @@ MathFuncts, errGen, MlModelTracker) {
           } else {
             newActivity = newActivity.concat(sampleActivity);
             // re-initialize signatureOrder, if needed
-            if (cbSampleBin.heatmapData.signatureOrder.length === 0) {
-              cbSampleBin.heatmapData.signatureOrder = sampleActivity.map(
+            if (cbSampleBin.vegaData.signatureOrder.length === 0) {
+              cbSampleBin.vegaData.signatureOrder = sampleActivity.map(
                 function(val) {
                   return val.signature;
                 }
@@ -398,15 +398,15 @@ MathFuncts, errGen, MlModelTracker) {
         }
         excludeSamples.forEach(function(id) {
           // remove from the heatmap
-          pos = cbSampleBin.heatmapData.samples.indexOf(id);
-          cbSampleBin.heatmapData.samples.splice(pos, 1);
+          pos = cbSampleBin.vegaData.samples.indexOf(id);
+          cbSampleBin.vegaData.samples.splice(pos, 1);
           delete cbSampleBin.sampleToGroup[id];
           // add to the non-heatmap list if not already present
           if (cbSampleBin.samples.indexOf(id) === -1) {
             cbSampleBin.samples.push(id);
           }
         });
-        cbSampleBin.heatmapData.activity = newActivity;
+        cbSampleBin.vegaData.activity = newActivity;
       };
 
       // preflight the cache and request anything missing

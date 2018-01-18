@@ -9,14 +9,14 @@ angular.module('adage.heatmap-vgspec', [])
 
   'data': [
     {
-      // this dataset "streamed" in via ngVega from heatmapData
+      // this dataset "streamed" in via ngVega from heatmap vegaData
       'name': 'activity',
       'transform': [
         // we want to show "activity level" so ignore sign on values
         {'type': 'formula', 'field': 'normval', 'expr': 'abs(datum.value)'}
       ]
     }, {
-      // these datasets "streamed" in via ngVega from heatmapData
+      // these datasets "streamed" in via ngVega from heatmap vegaData
       'name': 'samples'
     }, {
       'name': 'signatureOrder'
