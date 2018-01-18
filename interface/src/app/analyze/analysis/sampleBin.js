@@ -429,22 +429,6 @@ MathFuncts, errGen, MlModelTracker) {
       $q.all(activityPromises).then(updateHeatmapActivity).catch(this.logError);
     },
 
-    getActivityForSampleList: function(mlModelId) {
-      // retrieve activity data for heatmap to display
-      if (!mlModelId && !MlModelTracker.id) {
-        $log.warn('getActivityForSampleList called before setting mlmodel');
-        return;
-      }
-      if (!mlModelId) {
-        // default to the current mlModelTracker.id
-        mlModelId = MlModelTracker.id;
-      }
-      // FIXME restore query progress messages (see rebuildHeatmapActivity)
-      //  note: progress can be reported by returning a $promise to the caller
-      // respObj.queryStatus = 'Retrieving sample activity...';
-      this.rebuildHeatmapActivity(mlModelId, this.heatmapData.samples);
-    },
-
     // volcano plot methods
     getVolcanoPlotData: function() {
       // use sample lists for base-group and comp-group to produce output for
