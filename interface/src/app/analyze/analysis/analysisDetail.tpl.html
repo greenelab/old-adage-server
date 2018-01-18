@@ -42,8 +42,8 @@
         }}</th>
       </tr>
     </thead>
-    <tbody ng-model="sb.vegaData.samples" as-sortable="sortableOptions">
-      <tr ng-repeat="id in sb.vegaData.samples"
+    <tbody ng-model="heatmap.vegaData.samples" as-sortable="sortableOptions">
+      <tr ng-repeat="id in heatmap.vegaData.samples"
           ng-mouseover="showControls = true"
           ng-mouseleave="showControls = false"
           ng-class="'sample-' + sb.sampleToGroup[id]" as-sortable-item>
@@ -129,7 +129,7 @@
 
   <p>Note: scroll to the right to see all signatures in the heatmap. Zooming
      feature to come in a future update.</p>
-  <div vega spec="heatmapSpec" vega-data="sb.vegaData"></div>
+  <div vega spec="heatmapSpec" vega-data="heatmap.vegaData"></div>
   <nav class="navbar navbar-default">
     <p class="navbar-text">Visualize</p>
     <div class="btn-group" role="group" aria-label="clustering">

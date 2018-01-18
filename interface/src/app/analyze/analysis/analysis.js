@@ -42,7 +42,7 @@ function AnalysisCtrl(
   $scope.modelInUrl = $stateParams.mlmodel;
   // TODO #278 move to Heatmap service
   Heatmap.getActivityForSampleList(
-    $scope.modelInUrl, SampleBin.vegaData.samples
+    $scope.modelInUrl, Heatmap.vegaData.samples
   );
   $scope.analysis = {
     status: '',
@@ -93,9 +93,9 @@ function AnalysisCtrl(
   $scope.analysis.status = 'Retrieving sample details';
   // TODO #278 implement this loop as a method in Sample
   var pArrSamples = [];
-  for (var i = 0; i < SampleBin.vegaData.samples.length; i++) {
+  for (var i = 0; i < Heatmap.vegaData.samples.length; i++) {
     pArrSamples.push(
-      SampleBin.getSampleDetails(SampleBin.vegaData.samples[i])
+      SampleBin.getSampleDetails(Heatmap.vegaData.samples[i])
     );
   }
   $q.all(pArrSamples).then(function() {

@@ -8,8 +8,9 @@ angular.module('adage.analyze.sampleBin', [
   'ngResource',
   'greenelab.stats',
   'adage.utils',
-  'adage.sample.service',     // provides Sample
-  'adage.signature.resources' // provides Activity, Signature
+  'adage.sample.service',       // provides Sample
+  'adage.signature.resources',  // provides Activity, Signature
+  'adage.heatmap.service'
 ])
 
 .factory('SignatureSet', ['$resource', 'ApiBasePath',
@@ -27,58 +28,54 @@ angular.module('adage.analyze.sampleBin', [
 
 .factory('SampleBin', ['$log', '$cacheFactory', '$q', 'Sample', 'Activity',
   'Signature', 'SignatureSet', 'MathFuncts', 'errGen', 'MlModelTracker',
+  'Heatmap',
 function($log, $cacheFactory, $q, Sample, Activity, Signature, SignatureSet,
-MathFuncts, errGen, MlModelTracker) {
+MathFuncts, errGen, MlModelTracker, Heatmap) {
   var SampleBin = {
     samples: [],  // When refactored, all SampleBin samples will be listed here.
                   // For now, this only holds samples without activity data.
-    vegaData: {
-      samples: [],  // only samples with activity data can be in the heatmap
-      signatureOrder: []
-    },
     volcanoData: {
       source: []
     },
     sampleToGroup: {}, // this is a hash from sample id to group name
     sampleData: {},
     sampleCache: $cacheFactory('sample'),
-    activityCache: $cacheFactory('activity'),
     signatureCache: $cacheFactory('signature'),
 
     addSample: function(id) {
-      if (this.vegaData.samples.indexOf(+id) !== -1) {
+      if (Heatmap.vegaData.samples.indexOf(+id) !== -1) {
         // quietly ignore the double-add
         $log.warn('SampleBin.addSample: ' + id +
             ' already in the sample list; ignoring.');
       } else {
-        this.vegaData.samples.push(+id);
+        Heatmap.vegaData.samples.push(+id);
         this.sampleToGroup[+id] = 'other';
         // TODO when cache generalized: start pre-fetching sample data here
-        this.vegaData.signatureOrder = [];  // reset to default order
+        Heatmap.vegaData.signatureOrder = [];  // reset to default order
       }
     },
 
     removeSample: function(id) {
-      var pos = this.vegaData.samples.indexOf(+id);
+      var pos = Heatmap.vegaData.samples.indexOf(+id);
       if (pos === -1) {
         // this sample must be in the "missing activity" list
         pos = this.samples.indexOf(+id);
         this.samples.splice(pos, 1);
         return;
       }
-      this.vegaData.samples.splice(pos, 1);
+      Heatmap.vegaData.samples.splice(pos, 1);
       delete this.sampleToGroup[+id];
-      this.vegaData.signatureOrder = [];  // reset to default order
-      this.rebuildHeatmapActivity(
-        MlModelTracker.id, this.vegaData.samples
+      Heatmap.vegaData.signatureOrder = [];  // reset to default order
+      Heatmap.rebuildHeatmapActivity(
+        MlModelTracker.id, Heatmap.vegaData.samples
       );
     },
 
     clearSamples: function() {
-      this.vegaData.samples = [];
-      this.vegaData.signatureOrder = [];  // reset to default order
-      this.rebuildHeatmapActivity(
-        MlModelTracker.id, this.vegaData.samples
+      Heatmap.vegaData.samples = [];
+      Heatmap.vegaData.signatureOrder = [];  // reset to default order
+      Heatmap.rebuildHeatmapActivity(
+        MlModelTracker.id, Heatmap.vegaData.samples
       );
     },
 
@@ -102,7 +99,7 @@ MathFuncts, errGen, MlModelTracker) {
 
     hasItem: function(searchItem) {
       if (searchItem.itemType === 'sample') {
-        if (this.vegaData.samples.indexOf(+searchItem.pk) !== -1) {
+        if (Heatmap.vegaData.samples.indexOf(+searchItem.pk) !== -1) {
           return true;
         } else {
           return false;
@@ -111,7 +108,7 @@ MathFuncts, errGen, MlModelTracker) {
         // what we want to know, in the case of an experiment, is 'are
         // all of the samples from this experiment already added?'
         for (var i = 0; i < searchItem.relatedItems.length; i++) {
-          if (this.vegaData.samples.indexOf(
+          if (Heatmap.vegaData.samples.indexOf(
               +searchItem.relatedItems[i]) === -1) {
             return false;
           }
@@ -122,7 +119,7 @@ MathFuncts, errGen, MlModelTracker) {
 
     length: function() {
       // make it easy to ask how many samples are in the sampleBin
-      return this.vegaData.samples.length;
+      return Heatmap.vegaData.samples.length;
     },
 
     getSamplesByGroup: function() {
@@ -146,7 +143,7 @@ MathFuncts, errGen, MlModelTracker) {
 
     getSampleData: function(id) {
       var sampleObj = this.sampleData[id];
-      sampleObj.activity = this.activityCache.get(id).map(
+      sampleObj.activity = Heatmap.activityCache.get(id).map(
         // distill .activity to an array of just "value"s
         function(val) {
           return val.value;
@@ -163,7 +160,7 @@ MathFuncts, errGen, MlModelTracker) {
     getSampleObjects: function() {
       // reformat data from vegaData.activity to a form that can be used
       // by hcluster.js: need a separate array of objects for each sample
-      return this.vegaData.samples.map(function(val) {
+      return Heatmap.vegaData.samples.map(function(val) {
         return this.getSampleData(val) || {id: val};
       }, this);
     },
@@ -179,8 +176,8 @@ MathFuncts, errGen, MlModelTracker) {
 
       // (1) first, we obtain a list of signatures by retrieving signature
       //     activity for the first sample in our heatmap
-      var firstSampleSignatures = this.activityCache.get(
-        this.vegaData.samples[0]
+      var firstSampleSignatures = Heatmap.activityCache.get(
+        Heatmap.vegaData.samples[0]
       );
       // (2a) next, we build a new array (`retval`) comprised of
       //      `signatureObject`s by walking through the `firstSampleSignatures`
@@ -188,12 +185,12 @@ MathFuncts, errGen, MlModelTracker) {
       var retval = firstSampleSignatures.map(function(val, index) {
         var signatureObject = {
           'id': val.signature,
-          'activity': this.vegaData.samples.map(
+          'activity': Heatmap.vegaData.samples.map(
             // (2b) the array of activity for each signature is built by
             //      plucking the activity `.value` for each sample within the
             //      `index`th signature from the `activityCache` [inner .map()]
             function(sampleId) {
-              var cachedActivity = this.activityCache.get(sampleId);
+              var cachedActivity = Heatmap.activityCache.get(sampleId);
               if (cachedActivity[index].signature !== val.signature) {
                 // ensure we're pulling out the right signature
                 $log.error(
@@ -322,7 +319,7 @@ MathFuncts, errGen, MlModelTracker) {
         .linkage('avg')
         .posKey('activity')
         .data(this.getSampleObjects());
-      this.vegaData.samples = sampleClust.orderedNodes().map(
+      Heatmap.vegaData.samples = sampleClust.orderedNodes().map(
         this._getIDs);
     },
     clusterSignatures: function() {
@@ -345,88 +342,9 @@ MathFuncts, errGen, MlModelTracker) {
           .posKey('activity')
           .data(cbSampleBin.getSignatureObjects());
         // update the heatmap
-        cbSampleBin.vegaData.signatureOrder =
+        Heatmap.vegaData.signatureOrder =
           signatureClust.orderedNodes().map(cbSampleBin._getIDs);
       });
-    },
-
-    rebuildHeatmapActivity: function(mlmodel, samples) {
-      // FIXME need a "reloading..." spinner or something while this happens
-      //  note: progress can be reported by returning a $promise to the caller
-      if (!mlmodel) {
-        // ignore "rebuild" requests until a model is specified
-        $log.info(
-          'rebuildHeatmapActivity: skipping because mlmodel=', mlmodel
-        );
-        return;
-      }
-      var cbSampleBin = this; // closure link to SampleBin for callbacks
-      var loadCache = function(responseObject) {
-        if (responseObject && responseObject.objects.length > 0) {
-          var sampleID = responseObject.objects[0].sample;
-          cbSampleBin.activityCache.put(sampleID, responseObject.objects);
-          $log.info('populating cache with ' + sampleID);
-        }
-        // Note: no else clause here on purpose.
-        // If responseObject is empty there's no activity data for this sample.
-        // We detect this error and handle it in updateHeatmapActivity.
-      };
-      var updateHeatmapActivity = function(activityPromisesFulfilled) {
-        // when all promises are fulfilled, we can update vegaData
-        var newActivity = [];
-        var excludeSamples = [];
-
-        for (var i = 0; i < samples.length; i++) {
-          var sampleActivity = cbSampleBin.activityCache.get(samples[i]);
-          if (sampleActivity === undefined) {
-            // this sample has no activity data, so move it out of the heatmap
-            $log.error(
-              'updateHeatmapActivity: no activity for sample id', samples[i]
-            );
-            excludeSamples.push(samples[i]);
-          } else {
-            newActivity = newActivity.concat(sampleActivity);
-            // re-initialize signatureOrder, if needed
-            if (cbSampleBin.vegaData.signatureOrder.length === 0) {
-              cbSampleBin.vegaData.signatureOrder = sampleActivity.map(
-                function(val) {
-                  return val.signature;
-                }
-              );
-            }
-          }
-        }
-        excludeSamples.forEach(function(id) {
-          // remove from the heatmap
-          pos = cbSampleBin.vegaData.samples.indexOf(id);
-          cbSampleBin.vegaData.samples.splice(pos, 1);
-          delete cbSampleBin.sampleToGroup[id];
-          // add to the non-heatmap list if not already present
-          if (cbSampleBin.samples.indexOf(id) === -1) {
-            cbSampleBin.samples.push(id);
-          }
-        });
-        cbSampleBin.vegaData.activity = newActivity;
-      };
-
-      // preflight the cache and request anything missing
-      var activityPromises = [];
-      for (var i = 0; i < samples.length; i++) {
-        var sampleActivity = this.activityCache.get(samples[i]);
-        if (!sampleActivity) {
-          $log.info('cache miss for ' + samples[i]);
-          // cache miss, so populate the entry
-          var p = Activity.get({
-            'mlmodel': mlmodel,
-            'sample': samples[i],
-            'order_by': 'signature'
-          }).$promise;
-          activityPromises.push(p);
-          p.then(loadCache).catch(this.logError);
-        }
-      }
-      // when the cache is ready, update the heatmap activity data
-      $q.all(activityPromises).then(updateHeatmapActivity).catch(this.logError);
     },
 
     // volcano plot methods
@@ -454,7 +372,7 @@ MathFuncts, errGen, MlModelTracker) {
 
       // (1a) we obtain a list of signatures by retrieving signature activity
       //      for the first sample in our volcano plot
-      var firstSampleSignatures = this.activityCache.get(sg['base-group'][0])
+      var firstSampleSignatures = Heatmap.activityCache.get(sg['base-group'][0])
         .map(function(val) {
           return val.signature;  // extract just the signature IDs
         }
@@ -475,7 +393,7 @@ MathFuncts, errGen, MlModelTracker) {
               //      plucking the activity `.value` for each sample within the
               //      `index`th signature from the `activityCache`
               //      [inner .map()]
-              var cachedActivity = cbSampleBin.activityCache.get(sampleId);
+              var cachedActivity = Heatmap.activityCache.get(sampleId);
               if (cachedActivity[index].signature !== signatureId) {
                 // ensure we're pulling out the right signature
                 $log.error(
@@ -530,10 +448,13 @@ MathFuncts, errGen, MlModelTracker) {
   return SampleBin;
 }])
 
-.controller('SampleBinCtrl', ['$scope', 'SampleBin', 'MlModelTracker',
-  function SampleBinCtrl($scope, SampleBin, MlModelTracker) {
+.controller('SampleBinCtrl', [
+  '$scope', 'SampleBin', 'MlModelTracker', 'Heatmap',
+  function SampleBinCtrl($scope, SampleBin, MlModelTracker, Heatmap) {
     // give templates a way to access the SampleBin & MlModelTracker services
     $scope.sb = SampleBin;
+    // TODO #278 split Heatmap service samples from sampleBin samples
+    $scope.heatmap = Heatmap;
     $scope.modelInfo = MlModelTracker;
   }
 ])
