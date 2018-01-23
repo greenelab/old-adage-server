@@ -1,11 +1,10 @@
 angular.module('adage.sample.service', [
   'ngResource',
-  'adage.utils',
-  'adage.heatmap.service'
+  'adage.utils'
 ])
 
-.factory('Sample', ['$resource', '$http', 'ApiBasePath', 'Heatmap',
-  function($resource, $http, ApiBasePath, Heatmap) {
+.factory('Sample', ['$resource', '$http', 'ApiBasePath',
+  function($resource, $http, ApiBasePath) {
     var Sample = $resource(
       ApiBasePath + 'sample/:id/',
       // TODO need to add logic for handling pagination of results.
@@ -56,15 +55,7 @@ angular.module('adage.sample.service', [
 
     Sample.sampleData = {};
     Sample.getSampleData = function(id) {
-      var sampleObj = this.sampleData[id];
-      // TODO #278 Sample should not need to know about Heatmap... fix this
-      sampleObj.activity = Heatmap.activityCache.get(id).map(
-        // distill .activity to an array of just "value"s
-        function(val) {
-          return val.value;
-        }
-      );
-      return sampleObj;
+      return this.sampleData[id];
     };
     Sample.setSampleData = function(id, obj) {
       this.sampleData[id] = obj;
