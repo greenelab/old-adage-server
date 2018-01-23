@@ -1,10 +1,11 @@
 angular.module('adage.sample.service', [
   'ngResource',
-  'adage.utils'
+  'adage.utils',
+  'adage.heatmap.service'
 ])
 
-.factory('Sample', ['$resource', '$http', 'ApiBasePath',
-  function($resource, $http, ApiBasePath) {
+.factory('Sample', ['$resource', '$http', 'ApiBasePath', 'Heatmap',
+  function($resource, $http, ApiBasePath, Heatmap) {
     var Sample = $resource(
       ApiBasePath + 'sample/:id/',
       // TODO need to add logic for handling pagination of results.
@@ -52,6 +53,42 @@ angular.module('adage.sample.service', [
       // this uses $http directly and returns the HttpPromise
       return $http({url: uri, method: 'GET'});
     };
+
+    Sample.sampleData = {};
+    Sample.getSampleData = function(id) {
+      var sampleObj = this.sampleData[id];
+      // TODO #278 Sample should not need to know about Heatmap... fix this
+      sampleObj.activity = Heatmap.activityCache.get(id).map(
+        // distill .activity to an array of just "value"s
+        function(val) {
+          return val.value;
+        }
+      );
+      return sampleObj;
+    };
+    Sample.setSampleData = function(id, obj) {
+      this.sampleData[id] = obj;
+      // TODO need to pre-fetch activity into cache here?
+      //      (if so, also need to track promises)
+    };
+    Sample.getSampleDetails = function(pk) {
+      // TODO caller can now implement user error reporting via $promise
+      var pSample = Sample.get({id: pk},
+        function success(responseObject, responseHeaders) {
+          if (responseObject) {
+            Sample.setSampleData(pk, responseObject);
+          } else {
+            $log.warn('Query for sample ' + pk + ' returned nothing.');
+            // TODO user error reporting
+          }
+        },
+        function error(responseObject, responseHeaders) {
+          $log.error($scope.analysis.queryStatus);
+        }
+      ).$promise;
+      return pSample;
+    };
+
     return Sample;
   }
 ])

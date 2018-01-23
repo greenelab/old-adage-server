@@ -42,6 +42,7 @@
         }}</th>
       </tr>
     </thead>
+    <!-- TODO #278 this should use a SampleBin.samples list, not heatmap -->
     <tbody ng-model="heatmap.vegaData.samples" as-sortable="sortableOptions">
       <tr ng-repeat="id in heatmap.vegaData.samples"
           ng-mouseover="showControls = true"
@@ -67,12 +68,12 @@
           <span class="row-control">
             <i class="fa fa-bars" aria-hidden="true"></i>
           </span>
-          {{sb.sampleData[id].ml_data_source | formatMissing}}
+          {{analysis.sampleDetails[id].ml_data_source | formatMissing}}
         </td>
         <td>{{id}}</td>
-        <td>{{sb.sampleData[id].name | formatMissing}}</td>
+        <td>{{analysis.sampleDetails[id].name | formatMissing}}</td>
         <td ng-repeat="at in analysis.exampleCols">{{
-          sb.sampleData[id].getAnnotation(at.typename) | formatMissing
+          analysis.sampleDetails[id].getAnnotation(at.typename) | formatMissing
         }}</td>
       </tr>
     </tbody>
@@ -115,12 +116,12 @@
             </button>
           </td>
           <td>
-            {{sb.sampleData[id].ml_data_source | formatMissing}}
+            {{analysis.sampleDetails[id].ml_data_source | formatMissing}}
           </td>
           <td>{{id}}</td>
-          <td>{{sb.sampleData[id].name | formatMissing}}</td>
+          <td>{{analysis.sampleDetails[id].name | formatMissing}}</td>
           <td ng-repeat="at in analysis.exampleCols">{{
-            sb.sampleData[id].getAnnotation(at.typename) | formatMissing
+            analysis.sampleDetails[id].getAnnotation(at.typename) | formatMissing
           }}</td>
         </tr>
       </tbody>

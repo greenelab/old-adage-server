@@ -38,8 +38,6 @@ MathFuncts, errGen, MlModelTracker, Heatmap) {
       source: []
     },
     sampleToGroup: {}, // this is a hash from sample id to group name
-    sampleData: {},
-    sampleCache: $cacheFactory('sample'),
     signatureCache: $cacheFactory('signature'),
 
     addSample: function(id) {
@@ -141,27 +139,11 @@ MathFuncts, errGen, MlModelTracker, Heatmap) {
       return samplesByGroup;
     },
 
-    getSampleData: function(id) {
-      var sampleObj = this.sampleData[id];
-      sampleObj.activity = Heatmap.activityCache.get(id).map(
-        // distill .activity to an array of just "value"s
-        function(val) {
-          return val.value;
-        }
-      );
-      return sampleObj;
-    },
-    setSampleData: function(id, obj) {
-      this.sampleData[id] = obj;
-      // TODO need to pre-fetch activity into cache here?
-      //      (if so, also need to track promises)
-    },
-
     getSampleObjects: function() {
       // reformat data from vegaData.activity to a form that can be used
       // by hcluster.js: need a separate array of objects for each sample
       return Heatmap.vegaData.samples.map(function(val) {
-        return this.getSampleData(val) || {id: val};
+        return Sample.getSampleData(val) || {id: val};
       }, this);
     },
     getSignatureObjects: function() {
@@ -212,24 +194,6 @@ MathFuncts, errGen, MlModelTracker, Heatmap) {
       return retval;
     },
 
-    getSampleDetails: function(pk) {
-      // TODO caller can now implement user error reporting via $promise
-      var cbSampleBin = this; // closure link to SampleBin for callbacks
-      var pSample = Sample.get({id: pk},
-        function success(responseObject, responseHeaders) {
-          if (responseObject) {
-            cbSampleBin.setSampleData(pk, responseObject);
-          } else {
-            $log.warn('Query for sample ' + pk + ' returned nothing.');
-            // TODO user error reporting
-          }
-        },
-        function error(responseObject, responseHeaders) {
-          $log.error($scope.analysis.queryStatus);
-        }
-      ).$promise;
-      return pSample;
-    },
     getCachedSignature: function(pk) {
       return this.signatureCache.get(pk);
     },

@@ -11,6 +11,7 @@ angular.module('adage.analyze.analysis', [
   'adage.formatMissing.filter',
   'adage.analyze.sampleBin',
   'adage.mlmodel.components',
+  'adage.sample.service',
   'adage.heatmap.service',
   'adage.heatmap-vgspec'
 ])
@@ -29,9 +30,9 @@ angular.module('adage.analyze.analysis', [
 }])
 
 .controller('AnalysisCtrl', ['$scope', '$log', '$q', '$state', '$stateParams',
-  'SampleBin', 'Heatmap', 'HeatmapSpec',
-function AnalysisCtrl(
-    $scope, $log, $q, $state, $stateParams, SampleBin, Heatmap, HeatmapSpec) {
+  'SampleBin', 'Sample', 'Heatmap', 'HeatmapSpec',
+function AnalysisCtrl($scope, $log, $q, $state, $stateParams,
+  SampleBin, Sample, Heatmap, HeatmapSpec) {
   $scope.isValidModel = false;
   // Do nothing if mlmodel in URL is falsey. The error will be taken
   // care of by "<ml-model-validator>" component.
@@ -54,7 +55,8 @@ function AnalysisCtrl(
       {'typename': 'medium'},
       {'typename': 'temperature'},
       {'typename': 'treatment'}
-    ]
+    ],
+    sampleDetails: {}
   };
 
   // give our templates a way to access the SampleBin service
@@ -91,13 +93,17 @@ function AnalysisCtrl(
 
   // populate sample details
   $scope.analysis.status = 'Retrieving sample details';
-  // TODO #278 implement this loop as a method in Sample
+  // TODO #278 implement this loop as a method in Sample -- hmm, maybe can't?
   var pArrSamples = [];
-  for (var i = 0; i < Heatmap.vegaData.samples.length; i++) {
-    pArrSamples.push(
-      SampleBin.getSampleDetails(Heatmap.vegaData.samples[i])
-    );
-  }
+  Heatmap.vegaData.samples.forEach(function(sampleID) {
+    var pSample = Sample
+      .getSampleDetails(sampleID)
+      .then(function() {
+        // pull data from Sample's cache to display on the page
+        $scope.analysis.sampleDetails[sampleID] = Sample.sampleData[sampleID];
+      });
+    pArrSamples.push(pSample);
+  });
   $q.all(pArrSamples).then(function() {
     $scope.analysis.status = '';
   }).catch(function(errObject) {
