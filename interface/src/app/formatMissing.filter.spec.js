@@ -22,6 +22,11 @@ describe('adage.formatMissing', function() {
       expect(filter).toEqual('N/A');
     }));
 
+    it('should not fail when input is missing', inject(function() {
+      var filter = $filter('formatMissing')();
+      expect(filter).toEqual('N/A');
+    }));
+
     it('should return input for non-empty string by default', inject(
       function() {
         var filter = $filter('formatMissing')('non-blank text');
