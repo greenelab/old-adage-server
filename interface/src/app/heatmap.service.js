@@ -104,12 +104,10 @@ angular.module('adage.heatmap.service', [
           );
           return;
         }
-        // var cbSampleBin = this; // closure link to SampleBin for callbacks
-        var cbHeatmap = this;   // closure link to Heatmap for callbacks
         var loadCache = function(responseObject) {
           if (responseObject && responseObject.objects.length > 0) {
             var sampleID = responseObject.objects[0].sample;
-            cbHeatmap.activityCache.put(sampleID, responseObject.objects);
+            Heatmap.activityCache.put(sampleID, responseObject.objects);
             $log.info('populating cache with ' + sampleID);
           }
           // Note: no else clause here on purpose.
@@ -122,7 +120,7 @@ angular.module('adage.heatmap.service', [
           var excludeSamples = [];
 
           for (var i = 0; i < samples.length; i++) {
-            var sampleActivity = cbHeatmap.activityCache.get(samples[i]);
+            var sampleActivity = Heatmap.activityCache.get(samples[i]);
             if (sampleActivity === undefined) {
               // this sample has no activity data, so move it out of the heatmap
               $log.error(
@@ -132,8 +130,8 @@ angular.module('adage.heatmap.service', [
             } else {
               newActivity = newActivity.concat(sampleActivity);
               // re-initialize signatureOrder, if needed
-              if (cbHeatmap.vegaData.signatureOrder.length === 0) {
-                cbHeatmap.vegaData.signatureOrder = sampleActivity.map(
+              if (Heatmap.vegaData.signatureOrder.length === 0) {
+                Heatmap.vegaData.signatureOrder = sampleActivity.map(
                   function(val) {
                     return val.signature;
                   }
@@ -143,8 +141,8 @@ angular.module('adage.heatmap.service', [
           }
           excludeSamples.forEach(function(id) {
             // remove from the heatmap
-            pos = cbHeatmap.vegaData.samples.indexOf(id);
-            cbHeatmap.vegaData.samples.splice(pos, 1);
+            pos = Heatmap.vegaData.samples.indexOf(id);
+            Heatmap.vegaData.samples.splice(pos, 1);
 
             // TODO #278 Heatmap cannot modify SampleBin - check for regression
             // delete cbSampleBin.sampleToGroup[id];
@@ -153,13 +151,13 @@ angular.module('adage.heatmap.service', [
             //   cbSampleBin.samples.push(id);
             // }
           });
-          cbHeatmap.vegaData.activity = newActivity;
+          Heatmap.vegaData.activity = newActivity;
         };
 
         // preflight the cache and request anything missing
         var activityPromises = [];
         for (var i = 0; i < samples.length; i++) {
-          var sampleActivity = cbHeatmap.activityCache.get(samples[i]);
+          var sampleActivity = Heatmap.activityCache.get(samples[i]);
           if (!sampleActivity) {
             $log.info('cache miss for ' + samples[i]);
             // cache miss, so populate the entry
@@ -176,6 +174,44 @@ angular.module('adage.heatmap.service', [
         $q.all(activityPromises)
           .then(updateHeatmapActivity)
           .catch(this.logError);
+      },
+
+      _getIDs: function(val) {
+        return val.id;
+      },
+      clusterSamples: function() {
+        // TODO implement non-blocking response here as done for
+        // clusterSignatures()
+        var sampleClust = hcluster()
+          .distance('euclidean')
+          .linkage('avg')
+          .posKey('activity')
+          .data(this.getSampleObjects());
+        this.vegaData.samples = sampleClust.orderedNodes().map(
+          this._getIDs);
+      },
+      clusterSignatures: function() {
+        // declare some closure variables our callbacks will need
+        var defer = $q.defer();
+
+        setTimeout(function() {
+          // We'd like the clustering code to run asynchronously so our caller
+          // can display a status update and then remove it when finished.
+          // setTimeout(fn, 0) is a trick for triggering this behavior
+          defer.resolve(true);  // triggers the cascade of .then() calls below
+        }, 0);
+
+        return defer.promise.then(function() {
+          // do the actual clustering (in the .data call here)
+          var signatureClust = hcluster()
+            .distance('euclidean')
+            .linkage('avg')
+            .posKey('activity')
+            .data(Heatmap.getSignatureObjects());
+          // update the heatmap
+          Heatmap.vegaData.signatureOrder =
+            signatureClust.orderedNodes().map(Heatmap._getIDs);
+        });
       }
     };
     return Heatmap;

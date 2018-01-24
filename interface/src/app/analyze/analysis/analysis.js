@@ -70,8 +70,7 @@ function AnalysisCtrl($scope, $log, $q, $state, $stateParams,
   // wrap some SampleBin features to implement status updates
   $scope.clusterSignatures = function() {
     $scope.analysis.status = 'clustering signatures (this will take a minute)';
-    // TODO #278 move to Heatmap service
-    SampleBin.clusterSignatures().then(function() {
+    Heatmap.clusterSignatures().then(function() {
       $scope.analysis.status = '';
     });
   };

@@ -214,48 +214,6 @@ MathFuncts, errGen, MlModelTracker, Heatmap) {
       return defer.promise;
     },
 
-    _getIDs: function(val) {
-      return val.id;
-    },
-    logError: function(httpResponse) {
-      $log.error(errGen('Query errored', httpResponse));
-    },
-    clusterSamples: function() {
-      // TODO implement non-blocking response here as done for
-      // clusterSignatures()
-      var sampleClust = hcluster()
-        .distance('euclidean')
-        .linkage('avg')
-        .posKey('activity')
-        .data(Heatmap.getSampleObjects());
-      Heatmap.vegaData.samples = sampleClust.orderedNodes().map(
-        this._getIDs);
-    },
-    clusterSignatures: function() {
-      // declare some closure variables our callbacks will need
-      var cbSampleBin = this,
-        defer = $q.defer();
-
-      setTimeout(function() {
-        // We'd like the clustering code to run asynchronously so our caller
-        // can display a status update and then remove it when finished.
-        // setTimeout(fn, 0) is a trick for triggering this behavior
-        defer.resolve(true);  // triggers the cascade of .then() calls below
-      }, 0);
-
-      return defer.promise.then(function() {
-        // do the actual clustering (in the .data call here)
-        var signatureClust = hcluster()
-          .distance('euclidean')
-          .linkage('avg')
-          .posKey('activity')
-          .data(Heatmap.getSignatureObjects());
-        // update the heatmap
-        Heatmap.vegaData.signatureOrder =
-          signatureClust.orderedNodes().map(cbSampleBin._getIDs);
-      });
-    },
-
     // volcano plot methods
     getVolcanoPlotData: function() {
       // use sample lists for base-group and comp-group to produce output for
@@ -350,7 +308,9 @@ MathFuncts, errGen, MlModelTracker, Heatmap) {
       // fulfilled
       signatureSetPromise
         .then(mapSignaturesToSignatureInfo)
-        .catch(this.logError);
+        .catch(function(httpResponse) {
+          $log.error(errGen('Query errored', httpResponse));
+        });
     }
   };
 
