@@ -249,7 +249,7 @@ MathFuncts, errGen, MlModelTracker, Heatmap) {
           .distance('euclidean')
           .linkage('avg')
           .posKey('activity')
-          .data(cbSampleBin.getSignatureObjects());
+          .data(Heatmap.getSignatureObjects());
         // update the heatmap
         Heatmap.vegaData.signatureOrder =
           signatureClust.orderedNodes().map(cbSampleBin._getIDs);

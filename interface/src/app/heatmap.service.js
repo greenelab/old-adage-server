@@ -33,7 +33,7 @@ angular.module('adage.heatmap.service', [
             // we haven't yet loaded full sample data so yield a stubby version
             return {id: val};
           }
-          sampleObject.activity = this.activityCache.get(id).map(
+          sampleObject.activity = this.activityCache.get(val).map(
             // distill .activity to an array of just "value"s
             function(val) {
               return val.value;
