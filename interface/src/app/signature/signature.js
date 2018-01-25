@@ -7,6 +7,7 @@ angular.module('adage.signature', [
   'ui.bootstrap',
   'adage.participation',
   'adage.signature.resources',
+  'adage.activity.service',
   'adage.utils',
   'adage.tribe_client.resource', // required by PickledGenesetsService
   'greenelab.stats'

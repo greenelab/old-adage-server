@@ -7,6 +7,7 @@ angular.module('adage.sampleAnnotation', [
   'ui.bootstrap',
   'adage.utils',
   'adage.signature.resources',
+  'adage.activity.service',
   'adage.sample.service'
 ])
 

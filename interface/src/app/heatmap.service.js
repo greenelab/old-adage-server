@@ -1,16 +1,16 @@
 angular.module('adage.heatmap.service', [
-  'adage.signature.resources',   // provides Activity, Signature
+  'adage.sample.service',
+  'adage.activity.service',
   'adage.utils'
 ])
 
-.factory('Heatmap', ['$log', '$cacheFactory', '$q', 'Activity', 'Sample',
-  function($log, $cacheFactory, $q, Activity, Sample) {
+.factory('Heatmap', ['$log', '$cacheFactory', '$q', 'Sample', 'Activity',
+  function($log, $cacheFactory, $q, Sample, Activity) {
     var Heatmap = {
       vegaData: {
         samples: [],  // only samples with activity data can be in the heatmap
         signatureOrder: []
       },
-      activityCache: $cacheFactory('activity'),
 
       getActivityForSampleList: function(mlModelId, samples) {
         // retrieve activity data for heatmap to display
@@ -33,7 +33,7 @@ angular.module('adage.heatmap.service', [
             // we haven't yet loaded full sample data so yield a stubby version
             return {id: val};
           }
-          sampleObject.activity = this.activityCache.get(val).map(
+          sampleObject.activity = Activity.cache.get(val).map(
             // distill .activity to an array of just "value"s
             function(val) {
               return val.value;
@@ -54,7 +54,7 @@ angular.module('adage.heatmap.service', [
 
         // (1) first, we obtain a list of signatures by retrieving signature
         //     activity for the first sample in our heatmap
-        var firstSampleSignatures = this.activityCache.get(
+        var firstSampleSignatures = Activity.cache.get(
           this.vegaData.samples[0]
         );
         // (2a) next, we build a new array (`retval`) comprised of
@@ -67,9 +67,9 @@ angular.module('adage.heatmap.service', [
             'activity': Heatmap.vegaData.samples.map(
               // (2b) the array of activity for each signature is built by
               //      plucking the activity `.value` for each sample within the
-              //      `index`th signature from `activityCache` [inner .map()]
+              //      `index`th signature from `Activity.cache` [inner .map()]
               function(sampleId) {
-                var cachedActivity = Heatmap.activityCache.get(sampleId);
+                var cachedActivity = Activity.cache.get(sampleId);
                 if (cachedActivity[index].signature !== val.signature) {
                   // ensure we're pulling out the right signature
                   $log.error(
@@ -107,7 +107,7 @@ angular.module('adage.heatmap.service', [
         var loadCache = function(responseObject) {
           if (responseObject && responseObject.objects.length > 0) {
             var sampleID = responseObject.objects[0].sample;
-            Heatmap.activityCache.put(sampleID, responseObject.objects);
+            Activity.cache.put(sampleID, responseObject.objects);
             $log.info('populating cache with ' + sampleID);
           }
           // Note: no else clause here on purpose.
@@ -120,7 +120,7 @@ angular.module('adage.heatmap.service', [
           var excludeSamples = [];
 
           for (var i = 0; i < samples.length; i++) {
-            var sampleActivity = Heatmap.activityCache.get(samples[i]);
+            var sampleActivity = Activity.cache.get(samples[i]);
             if (sampleActivity === undefined) {
               // this sample has no activity data, so move it out of the heatmap
               $log.error(
@@ -157,7 +157,7 @@ angular.module('adage.heatmap.service', [
         // preflight the cache and request anything missing
         var activityPromises = [];
         for (var i = 0; i < samples.length; i++) {
-          var sampleActivity = Heatmap.activityCache.get(samples[i]);
+          var sampleActivity = Activity.cache.get(samples[i]);
           if (!sampleActivity) {
             $log.info('cache miss for ' + samples[i]);
             // cache miss, so populate the entry
