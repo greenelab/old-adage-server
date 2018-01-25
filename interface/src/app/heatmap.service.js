@@ -28,7 +28,7 @@ angular.module('adage.heatmap.service', [
         // reformat data from vegaData.activity to a form that can be used
         // by hcluster.js: need a separate array of objects for each sample
         return this.vegaData.samples.map(function(val) {
-          var sampleObject = Sample.getSampleData(val);
+          var sampleObject = Sample.getCached(val);
           if (!sampleObject) {
             // we haven't yet loaded full sample data so yield a stubby version
             return {id: val};

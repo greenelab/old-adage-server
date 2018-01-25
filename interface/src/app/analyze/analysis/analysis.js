@@ -99,7 +99,7 @@ function AnalysisCtrl($scope, $log, $q, $state, $stateParams,
       .getSampleDetails(sampleID)
       .then(function() {
         // pull data from Sample's cache to display on the page
-        $scope.analysis.sampleDetails[sampleID] = Sample.sampleData[sampleID];
+        $scope.analysis.sampleDetails[sampleID] = Sample.getCached(sampleID);
       });
     pArrSamples.push(pSample);
   });

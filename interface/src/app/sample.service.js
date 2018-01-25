@@ -53,12 +53,12 @@ angular.module('adage.sample.service', [
       return $http({url: uri, method: 'GET'});
     };
 
-    Sample.sampleData = {};
-    Sample.getSampleData = function(id) {
-      return this.sampleData[id];
+    Sample.cache = {};
+    Sample.getCached = function(id) {
+      return this.cache[id];
     };
-    Sample.setSampleData = function(id, obj) {
-      this.sampleData[id] = obj;
+    Sample.setCache = function(id, obj) {
+      this.cache[id] = obj;
       // TODO #278 need to pre-fetch activity into cache here?
       //      (if so, also need to track promises)
     };
@@ -67,7 +67,7 @@ angular.module('adage.sample.service', [
       var pSample = Sample.get({id: pk},
         function success(responseObject, responseHeaders) {
           if (responseObject) {
-            Sample.setSampleData(pk, responseObject);
+            Sample.setCache(pk, responseObject);
           } else {
             $log.warn('Query for sample ' + pk + ' returned nothing.');
             // TODO user error reporting
