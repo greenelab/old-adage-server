@@ -4,8 +4,8 @@ angular.module('adage.heatmap.service', [
   'adage.utils'
 ])
 
-.factory('Heatmap', ['$log', '$cacheFactory', '$q', 'Sample', 'Activity',
-  function($log, $cacheFactory, $q, Sample, Activity) {
+.factory('Heatmap', ['$log', '$q', 'Sample', 'Activity',
+  function($log, $q, Sample, Activity) {
     var Heatmap = {
       vegaData: {
         samples: [],  // only samples with activity data can be in the heatmap
@@ -40,7 +40,7 @@ angular.module('adage.heatmap.service', [
             }
           );
           return sampleObject;
-        }, this);
+        });
       },
       getSignatureObjects: function() {
         // The vegaData.activity array organizes activity data in a
@@ -79,12 +79,11 @@ angular.module('adage.heatmap.service', [
                   );
                 }
                 return cachedActivity[index].value;
-              },
-              this
+              }
             )
           };
           return signatureObject;
-        }, this);
+        });
 
         // (3) the two nested .map()s are all we need to do to organize the
         //     data for the convenience of hcluster.js, so we're done
@@ -119,14 +118,14 @@ angular.module('adage.heatmap.service', [
           var newActivity = [];
           var excludeSamples = [];
 
-          for (var i = 0; i < samples.length; i++) {
-            var sampleActivity = Activity.cache.get(samples[i]);
+          samples.forEach(function(sampleID) {
+            var sampleActivity = Activity.cache.get(sampleID);
             if (sampleActivity === undefined) {
               // this sample has no activity data, so move it out of the heatmap
               $log.error(
-                'updateHeatmapActivity: no activity for sample id', samples[i]
+                'updateHeatmapActivity: no activity for sample id', sampleID
               );
-              excludeSamples.push(samples[i]);
+              excludeSamples.push(sampleID);
             } else {
               newActivity = newActivity.concat(sampleActivity);
               // re-initialize signatureOrder, if needed
@@ -138,7 +137,7 @@ angular.module('adage.heatmap.service', [
                 );
               }
             }
-          }
+          });
           excludeSamples.forEach(function(id) {
             // remove from the heatmap
             pos = Heatmap.vegaData.samples.indexOf(id);
@@ -156,20 +155,20 @@ angular.module('adage.heatmap.service', [
 
         // preflight the cache and request anything missing
         var activityPromises = [];
-        for (var i = 0; i < samples.length; i++) {
-          var sampleActivity = Activity.cache.get(samples[i]);
+        samples.forEach(function(sampleID) {
+          var sampleActivity = Activity.cache.get(sampleID);
           if (!sampleActivity) {
-            $log.info('cache miss for ' + samples[i]);
+            $log.info('cache miss for ' + sampleID);
             // cache miss, so populate the entry
             var p = Activity.get({
               'mlmodel': mlmodel,
-              'sample': samples[i],
+              'sample': sampleID,
               'order_by': 'signature'
             }).$promise;
             activityPromises.push(p);
             p.then(loadCache).catch(this.logError);
           }
-        }
+        });
         // when the cache is ready, update the heatmap activity data
         $q.all(activityPromises)
           .then(updateHeatmapActivity)
@@ -188,7 +187,8 @@ angular.module('adage.heatmap.service', [
           .posKey('activity')
           .data(this.getSampleObjects());
         this.vegaData.samples = sampleClust.orderedNodes().map(
-          this._getIDs);
+          this._getIDs
+        );
       },
       clusterSignatures: function() {
         // declare some closure variables our callbacks will need
