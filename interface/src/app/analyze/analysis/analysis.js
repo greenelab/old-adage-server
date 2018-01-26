@@ -68,6 +68,12 @@ function AnalysisCtrl($scope, $log, $q, $state, $stateParams,
 
   // TODO #280 separate to new heatmap view
   // wrap some SampleBin features to implement status updates
+  $scope.clusterSamples = function() {
+    $scope.analysis.status = 'clustering samples';
+    Heatmap.clusterSamples().then(function() {
+      $scope.analysis.status = '';
+    });
+  };
   $scope.clusterSignatures = function() {
     $scope.analysis.status = 'clustering signatures (this will take a minute)';
     Heatmap.clusterSignatures().then(function() {

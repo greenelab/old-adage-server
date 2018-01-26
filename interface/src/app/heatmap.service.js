@@ -113,7 +113,7 @@ angular.module('adage.heatmap.service', [
           // An empty responseObject means no activity data for this sample.
           // We detect this error and handle it in updateHeatmapActivity.
         };
-        var updateHeatmapActivity = function(activityPromisesFulfilled) {
+        var updateHeatmapActivity = function() {
           // when all promises are fulfilled, we can update vegaData
           var newActivity = [];
           var excludeSamples = [];
@@ -179,25 +179,34 @@ angular.module('adage.heatmap.service', [
         return val.id;
       },
       clusterSamples: function() {
-        // TODO implement non-blocking response here as done for
-        // clusterSignatures()
-        var sampleClust = hcluster()
-          .distance('euclidean')
-          .linkage('avg')
-          .posKey('activity')
-          .data(this.getSampleObjects());
-        this.vegaData.samples = sampleClust.orderedNodes().map(
-          this._getIDs
-        );
-      },
-      clusterSignatures: function() {
-        // declare some closure variables our callbacks will need
+        // our callbacks will need this closure defined here
         var defer = $q.defer();
 
         setTimeout(function() {
           // We'd like the clustering code to run asynchronously so our caller
           // can display a status update and then remove it when finished.
           // setTimeout(fn, 0) is a trick for triggering this behavior
+          defer.resolve(true);  // triggers the cascade of .then() calls below
+        }, 0);
+
+        return defer.promise.then(function() {
+          // do the actual clustering (in the .data call here)
+          var sampleClust = hcluster()
+            .distance('euclidean')
+            .linkage('avg')
+            .posKey('activity')
+            .data(Heatmap.getSampleObjects());
+          Heatmap.vegaData.samples = sampleClust.orderedNodes().map(
+            Heatmap._getIDs
+          );
+        });
+      },
+      clusterSignatures: function() {
+        // our callbacks will need this closure defined here
+        var defer = $q.defer();
+
+        setTimeout(function() {
+          // Using the setTimeout(fn, 0) trick as described above
           defer.resolve(true);  // triggers the cascade of .then() calls below
         }, 0);
 
