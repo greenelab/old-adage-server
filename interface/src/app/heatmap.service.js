@@ -4,24 +4,41 @@ angular.module('adage.heatmap.service', [
   'adage.utils'
 ])
 
-.factory('Heatmap', ['$log', '$q', 'Sample', 'Activity',
-  function($log, $q, Sample, Activity) {
+.factory('Heatmap', ['$log', '$q', 'Sample', 'Activity', 'errGen',
+  function($log, $q, Sample, Activity, errGen) {
     var Heatmap = {
+      mlmodel: {
+        id: undefined
+      },
       vegaData: {
         samples: [],  // only samples with activity data can be in the heatmap
         signatureOrder: []
       },
 
-      getActivityForSampleList: function(mlModelId, samples) {
+      init: function(mlModelId, samples) {
+        this.mlmodel = {
+          id: mlModelId
+        };
+        this.vegaData = {
+          samples: samples,
+          signatureOrder: []
+        };
+      },
+
+      loadData: function() {
         // retrieve activity data for heatmap to display
-        if (!mlModelId) {
-          $log.warn('getActivityForSampleList called before setting mlmodel');
+        if (!this.mlmodel.id) {
+          $log.warn('Heatmap.loadData called before setting mlmodel');
+          return;
+        }
+        if (!this.vegaData.samples) {
+          $log.warn('Heatmap.loadData called before setting sample list');
           return;
         }
         // FIXME restore query progress messages (see rebuildHeatmapActivity)
         //  note: progress can be reported by returning a $promise to the caller
         // respObj.queryStatus = 'Retrieving sample activity...';
-        this.rebuildHeatmapActivity(mlModelId, samples);
+        this.rebuildHeatmapActivity();
       },
 
       getSampleObjects: function() {
@@ -93,14 +110,18 @@ angular.module('adage.heatmap.service', [
       logError: function(httpResponse) {
         $log.error(errGen('Query errored', httpResponse));
       },
-      rebuildHeatmapActivity: function(mlmodel, samples) {
+      rebuildHeatmapActivity: function() {
         // FIXME need a "reloading..." spinner or something while this happens
         //  note: progress can be reported by returning a $promise to the caller
-        if (!mlmodel) {
+        if (!this.mlmodel.id) {
           // ignore "rebuild" requests until a model is specified
           $log.info(
-            'rebuildHeatmapActivity: skipping because mlmodel=', mlmodel
+            'rebuildHeatmapActivity: skipping because mlmodel=', this.mlmodel
           );
+          return;
+        }
+        if (!this.vegaData.samples) {
+          $log.warn('Heatmap.loadData called before setting sample list');
           return;
         }
         var loadCache = function(responseObject) {
@@ -118,7 +139,7 @@ angular.module('adage.heatmap.service', [
           var newActivity = [];
           var excludeSamples = [];
 
-          samples.forEach(function(sampleID) {
+          Heatmap.vegaData.samples.forEach(function(sampleID) {
             var sampleActivity = Activity.cache.get(sampleID);
             if (sampleActivity === undefined) {
               // this sample has no activity data, so move it out of the heatmap
@@ -155,18 +176,18 @@ angular.module('adage.heatmap.service', [
 
         // preflight the cache and request anything missing
         var activityPromises = [];
-        samples.forEach(function(sampleID) {
+        Heatmap.vegaData.samples.forEach(function(sampleID) {
           var sampleActivity = Activity.cache.get(sampleID);
           if (!sampleActivity) {
             $log.info('cache miss for ' + sampleID);
             // cache miss, so populate the entry
             var p = Activity.get({
-              'mlmodel': mlmodel,
+              'mlmodel': Heatmap.mlmodel.id,
               'sample': sampleID,
               'order_by': 'signature'
             }).$promise;
             activityPromises.push(p);
-            p.then(loadCache).catch(this.logError);
+            p.then(loadCache).catch(Heatmap.logError);
           }
         });
         // when the cache is ready, update the heatmap activity data

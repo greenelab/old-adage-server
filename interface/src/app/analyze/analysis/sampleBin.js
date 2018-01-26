@@ -64,21 +64,19 @@ MathFuncts, errGen, MlModelTracker, Heatmap) {
       Heatmap.vegaData.samples.splice(pos, 1);
       delete this.sampleToGroup[+id];
       Heatmap.vegaData.signatureOrder = [];  // reset to default order
-      Heatmap.rebuildHeatmapActivity(
-        MlModelTracker.id, Heatmap.vegaData.samples
-      );
+      // TODO #278 still need this?
+      // Heatmap.rebuildHeatmapActivity(
+      //   MlModelTracker.id, Heatmap.vegaData.samples
+      // );
     },
 
     clearSamples: function() {
       Heatmap.vegaData.samples = [];
       Heatmap.vegaData.signatureOrder = [];  // reset to default order
-      Heatmap.rebuildHeatmapActivity(
-        MlModelTracker.id, Heatmap.vegaData.samples
-      );
-    },
-
-    clearSamplesMissingActivity: function() {
-      this.samples = [];
+      // TODO #278 still need this?
+      // Heatmap.rebuildHeatmapActivity(
+      //   MlModelTracker.id, Heatmap.vegaData.samples
+      // );
     },
 
     addExperiment: function(sampleIdList) {

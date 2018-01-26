@@ -78,71 +78,9 @@
       </tr>
     </tbody>
   </table>
-  <div ng-if="sb.samples.length">
-    <h4>Samples Missing Activity</h4>
-    <p>The samples below are missing activity data, either because raw data
-      are unavailable or because they have been omitted from the ADAGE
-      compendium for another reason. Because data are not available, these
-      samples cannot be included in further analysis.
-    </p>
-    <button type="button" class="btn btn-default btn-sm"
-            ng-click="sb.clearSamplesMissingActivity()"
-            uib-tooltip="Remove all samples missing activity data"
-            tooltip-placement="right">
-      <i class="fa fa-times" aria-hidden="true"></i> Remove
-    </button>
-    <table class="table table-hover">
-      <thead>
-        <tr>
-          <th>&nbsp;</th>
-          <th>
-            ML Data Source
-          </th>
-          <th>id</th>
-          <th>Sample Name</th>
-          <th ng-repeat="at in analysis.exampleCols">{{
-            at.typename
-          }}</th>
-        </tr>
-      </thead>
-      <tbody ng-model="sb.samples">
-        <tr ng-repeat="id in sb.samples"
-            ng-mouseover="showControls = true"
-            ng-mouseleave="showControls = false">
-          <td class="row-control">
-            <button type="button" class="btn row-control"
-                    ng-click="sb.removeSample(id)" aria-label="Delete">
-              <i class="fa fa-times" aria-hidden="true"></i>
-            </button>
-          </td>
-          <td>
-            {{analysis.sampleDetails[id].ml_data_source | formatMissing}}
-          </td>
-          <td>{{id}}</td>
-          <td>{{analysis.sampleDetails[id].name | formatMissing}}</td>
-          <td ng-repeat="at in analysis.exampleCols">{{
-            analysis.sampleDetails[id].getAnnotation(at.typename) | formatMissing
-          }}</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <p>Note: scroll to the right to see all signatures in the heatmap. Zooming
-     feature to come in a future update.</p>
-  <div vega spec="heatmapSpec" vega-data="heatmap.vegaData"></div>
+  <heatmap mlmodel="modelInUrl" samples="heatmap.vegaData.samples"></heatmap>
   <nav class="navbar navbar-default">
     <p class="navbar-text">Visualize</p>
-    <div class="btn-group" role="group" aria-label="clustering">
-      <button type="button" class="btn btn-default navbar-btn"
-      ng-click="clusterSamples()">
-        Cluster Samples
-      </button>
-      <button type="button" class="btn btn-default navbar-btn"
-      ng-click="clusterSignatures()">
-        Cluster Signatures
-      </button>
-    </div>
     <button type="button" class="btn btn-default navbar-btn"
     ng-click="showVolcanoPlot()">
       Volcano Plot

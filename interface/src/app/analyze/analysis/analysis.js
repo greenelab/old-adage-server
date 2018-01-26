@@ -12,8 +12,8 @@ angular.module('adage.analyze.analysis', [
   'adage.analyze.sampleBin',
   'adage.mlmodel.components',
   'adage.sample.service',
-  'adage.heatmap.service',
-  'adage.heatmap-vgspec'
+  'adage.heatmap.component',
+  'adage.heatmap.service'
 ])
 
 .config(['$stateProvider', function($stateProvider) {
@@ -30,9 +30,9 @@ angular.module('adage.analyze.analysis', [
 }])
 
 .controller('AnalysisCtrl', ['$scope', '$log', '$q', '$state', '$stateParams',
-  'SampleBin', 'Sample', 'Heatmap', 'HeatmapSpec',
+  'SampleBin', 'Sample', 'Heatmap',
 function AnalysisCtrl($scope, $log, $q, $state, $stateParams,
-  SampleBin, Sample, Heatmap, HeatmapSpec) {
+  SampleBin, Sample, Heatmap) {
   $scope.isValidModel = false;
   // Do nothing if mlmodel in URL is falsey. The error will be taken
   // care of by "<ml-model-validator>" component.
@@ -41,10 +41,6 @@ function AnalysisCtrl($scope, $log, $q, $state, $stateParams,
   }
 
   $scope.modelInUrl = $stateParams.mlmodel;
-  // TODO #278 move to Heatmap service
-  Heatmap.getActivityForSampleList(
-    $scope.modelInUrl, Heatmap.vegaData.samples
-  );
   $scope.analysis = {
     status: '',
     // TODO these exampleCols are temporarily hard-coded until a column chooser
@@ -62,26 +58,6 @@ function AnalysisCtrl($scope, $log, $q, $state, $stateParams,
   // give our templates a way to access the SampleBin service
   $scope.sb = SampleBin;
 
-  // TODO #280 separate to new heatmap view
-  // give our template a way to access the Heatmap service (during refactor)
-  $scope.heatmap = Heatmap;
-
-  // TODO #280 separate to new heatmap view
-  // wrap some SampleBin features to implement status updates
-  $scope.clusterSamples = function() {
-    $scope.analysis.status = 'clustering samples';
-    Heatmap.clusterSamples().then(function() {
-      $scope.analysis.status = '';
-    });
-  };
-  $scope.clusterSignatures = function() {
-    $scope.analysis.status = 'clustering signatures (this will take a minute)';
-    Heatmap.clusterSignatures().then(function() {
-      $scope.analysis.status = '';
-    });
-  };
-
-  // TODO #280 separate to new heatmap view
   $scope.showVolcanoPlot = function() {
     $state.go('volcano', {'mlmodel': $scope.modelInUrl});
   };
@@ -91,10 +67,6 @@ function AnalysisCtrl($scope, $log, $q, $state, $stateParams,
     containerPositioning: 'relative',
     placeholder: '<tr style="display: table-row;"></tr>'
   };
-
-  // TODO #280 separate to new heatmap view
-  // Vega objects
-  $scope.heatmapSpec = HeatmapSpec;
 
   // populate sample details
   $scope.analysis.status = 'Retrieving sample details';
