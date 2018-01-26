@@ -41,12 +41,12 @@ MathFuncts, errGen, MlModelTracker, Heatmap) {
     signatureCache: $cacheFactory('signature'),
 
     addSample: function(id) {
-      if (Heatmap.vegaData.samples.indexOf(+id) !== -1) {
+      if (this.samples.indexOf(+id) !== -1) {
         // quietly ignore the double-add
         $log.warn('SampleBin.addSample: ' + id +
             ' already in the sample list; ignoring.');
       } else {
-        Heatmap.vegaData.samples.push(+id);
+        this.samples.push(+id);
         this.sampleToGroup[+id] = 'other';
         // TODO when cache generalized: start pre-fetching sample data here
         Heatmap.vegaData.signatureOrder = [];  // reset to default order
@@ -54,26 +54,27 @@ MathFuncts, errGen, MlModelTracker, Heatmap) {
     },
 
     removeSample: function(id) {
-      var pos = Heatmap.vegaData.samples.indexOf(+id);
-      if (pos === -1) {
-        // this sample must be in the "missing activity" list
-        pos = this.samples.indexOf(+id);
-        this.samples.splice(pos, 1);
-        return;
-      }
-      Heatmap.vegaData.samples.splice(pos, 1);
-      delete this.sampleToGroup[+id];
-      Heatmap.vegaData.signatureOrder = [];  // reset to default order
+      var pos = this.samples.indexOf(+id);
       // TODO #278 still need this?
+      // if (pos === -1) {
+      //   // this sample must be in the "missing activity" list
+      //   pos = this.samples.indexOf(+id);
+      //   this.samples.splice(pos, 1);
+      //   return;
+      // }
+      this.samples.splice(pos, 1);
+      delete this.sampleToGroup[+id];
+      // TODO #278 still need this? We are decoupling sampleBin from heatmap
+      // Heatmap.vegaData.signatureOrder = [];  // reset to default order
       // Heatmap.rebuildHeatmapActivity(
       //   MlModelTracker.id, Heatmap.vegaData.samples
       // );
     },
 
     clearSamples: function() {
-      Heatmap.vegaData.samples = [];
-      Heatmap.vegaData.signatureOrder = [];  // reset to default order
-      // TODO #278 still need this?
+      this.samples = [];
+      // TODO #278 still need this? We are decoupling sampleBin from heatmap
+      // Heatmap.vegaData.signatureOrder = [];  // reset to default order
       // Heatmap.rebuildHeatmapActivity(
       //   MlModelTracker.id, Heatmap.vegaData.samples
       // );
@@ -95,7 +96,7 @@ MathFuncts, errGen, MlModelTracker, Heatmap) {
 
     hasItem: function(searchItem) {
       if (searchItem.itemType === 'sample') {
-        if (Heatmap.vegaData.samples.indexOf(+searchItem.pk) !== -1) {
+        if (this.samples.indexOf(+searchItem.pk) !== -1) {
           return true;
         } else {
           return false;
@@ -104,7 +105,7 @@ MathFuncts, errGen, MlModelTracker, Heatmap) {
         // what we want to know, in the case of an experiment, is 'are
         // all of the samples from this experiment already added?'
         for (var i = 0; i < searchItem.relatedItems.length; i++) {
-          if (Heatmap.vegaData.samples.indexOf(
+          if (this.samples.indexOf(
               +searchItem.relatedItems[i]) === -1) {
             return false;
           }
@@ -115,7 +116,7 @@ MathFuncts, errGen, MlModelTracker, Heatmap) {
 
     length: function() {
       // make it easy to ask how many samples are in the sampleBin
-      return Heatmap.vegaData.samples.length;
+      return this.samples.length;
     },
 
     getSamplesByGroup: function() {

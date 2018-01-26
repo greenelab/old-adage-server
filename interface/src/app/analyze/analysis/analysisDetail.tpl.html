@@ -42,9 +42,8 @@
         }}</th>
       </tr>
     </thead>
-    <!-- TODO #278 this should use a SampleBin.samples list, not heatmap -->
-    <tbody ng-model="heatmap.vegaData.samples" as-sortable="sortableOptions">
-      <tr ng-repeat="id in heatmap.vegaData.samples"
+    <tbody ng-model="sb.samples" as-sortable="sortableOptions">
+      <tr ng-repeat="id in sb.samples"
           ng-mouseover="showControls = true"
           ng-mouseleave="showControls = false"
           ng-class="'sample-' + sb.sampleToGroup[id]" as-sortable-item>
@@ -78,7 +77,7 @@
       </tr>
     </tbody>
   </table>
-  <heatmap mlmodel="modelInUrl" samples="heatmap.vegaData.samples"></heatmap>
+  <heatmap mlmodel="modelInUrl" samples="sb.samples"></heatmap>
   <nav class="navbar navbar-default">
     <p class="navbar-text">Visualize</p>
     <button type="button" class="btn btn-default navbar-btn"

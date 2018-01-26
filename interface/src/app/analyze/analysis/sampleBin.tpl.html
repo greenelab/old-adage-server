@@ -5,9 +5,8 @@
   <a ui-sref="analysis-detail({mlmodel: modelInfo.id})">
     <img src="/static/assets/testtube-expt2.svg" alt="Samples"
      width="28" height="28">
-    <!-- TODO #278 split Heatmap service samples from sampleBin samples -->
-    <span ng-if="heatmap.vegaData.samples.length" class="badge">{{
-      heatmap.vegaData.samples.length }}
+    <span ng-if="sb.samples.length" class="badge">{{
+      sb.samples.length }}
     </span>
   </a>
 </li>

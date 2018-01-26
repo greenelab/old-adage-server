@@ -72,7 +72,7 @@ function AnalysisCtrl($scope, $log, $q, $state, $stateParams,
   $scope.analysis.status = 'Retrieving sample details';
   // TODO #278 implement this loop as a method in Sample -- hmm, maybe can't?
   var pArrSamples = [];
-  Heatmap.vegaData.samples.forEach(function(sampleID) {
+  SampleBin.samples.forEach(function(sampleID) {
     var pSample = Sample
       .getSampleDetails(sampleID)
       .then(function() {
