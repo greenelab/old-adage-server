@@ -30,9 +30,9 @@ angular.module('adage.analyze.analysis', [
 }])
 
 .controller('AnalysisCtrl', ['$scope', '$log', '$q', '$state', '$stateParams',
-  'SampleBin', 'Sample', 'Heatmap',
+  'SampleBin', 'Sample',
 function AnalysisCtrl($scope, $log, $q, $state, $stateParams,
-  SampleBin, Sample, Heatmap) {
+  SampleBin, Sample) {
   $scope.isValidModel = false;
   // Do nothing if mlmodel in URL is falsey. The error will be taken
   // care of by "<ml-model-validator>" component.

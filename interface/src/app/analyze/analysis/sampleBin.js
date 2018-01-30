@@ -322,8 +322,6 @@ MathFuncts, errGen, MlModelTracker, Heatmap) {
   function SampleBinCtrl($scope, SampleBin, MlModelTracker, Heatmap) {
     // give templates a way to access the SampleBin & MlModelTracker services
     $scope.sb = SampleBin;
-    // TODO #278 split Heatmap service samples from sampleBin samples
-    $scope.heatmap = Heatmap;
     $scope.modelInfo = MlModelTracker;
   }
 ])

@@ -14,13 +14,14 @@ angular.module('adage.heatmap.service', [
         samples: [],  // only samples with activity data can be in the heatmap
         signatureOrder: []
       },
+      samplesMissingActivity: [],
 
       init: function(mlModelId, samples) {
         this.mlmodel = {
           id: mlModelId
         };
         this.vegaData = {
-          samples: samples,
+          samples: angular.copy(samples),
           signatureOrder: []
         };
       },
@@ -166,10 +167,10 @@ angular.module('adage.heatmap.service', [
 
             // TODO #278 Heatmap cannot modify SampleBin - check for regression
             // delete cbSampleBin.sampleToGroup[id];
-            // // add to the non-heatmap list if not already present
-            // if (cbSampleBin.samples.indexOf(id) === -1) {
-            //   cbSampleBin.samples.push(id);
-            // }
+            // add to the non-heatmap list if not already present
+            if (Heatmap.samplesMissingActivity.indexOf(id) === -1) {
+              Heatmap.samplesMissingActivity.push(id);
+            }
           });
           Heatmap.vegaData.activity = newActivity;
         };

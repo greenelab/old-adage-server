@@ -1,6 +1,7 @@
 angular.module('adage.heatmap.component', [
   'adage.heatmap.service',
   'adage.heatmap-vgspec',
+  'adage.sample.service',
   'statusBar'
 ])
 
@@ -11,17 +12,20 @@ angular.module('adage.heatmap.component', [
     samples: '<',
     onLoad: '&'
   },
-  controller: ['$log', 'Heatmap', 'HeatmapSpec',
-    function($log, Heatmap, HeatmapSpec) {
+  controller: ['$log', 'Heatmap', 'HeatmapSpec', 'Sample',
+    function($log, Heatmap, HeatmapSpec, Sample) {
       var ctrl = this;
 
       // objects needed for Vega
       ctrl.heatmapSpec = HeatmapSpec;
       ctrl.heatmap = Heatmap;
 
+      // sample details to show for any samplesMissingActivity
+      ctrl.sampleDetails = Sample.cache;
+
       ctrl.$onInit = function() {
         ctrl.status = '';
-        ctrl.samplesMissingActivity = [];
+        Heatmap.samplesMissingActivity = [];
       };
       ctrl.$onChanges = function(changesObj) {
         ctrl.show(
@@ -45,11 +49,11 @@ angular.module('adage.heatmap.component', [
         ctrl.status = '';
       };
       ctrl.clearSamplesMissingActivity = function() {
-        ctrl.samplesMissingActivity = [];
+        Heatmap.samplesMissingActivity = [];
       };
       ctrl.removeSample = function(id) {
-        var pos = ctrl.samplesMissingActivity.indexOf(+id);
-        ctrl.samplesMissingActivity.splice(pos, 1);
+        var pos = Heatmap.samplesMissingActivity.indexOf(+id);
+        Heatmap.samplesMissingActivity.splice(pos, 1);
         return;
       };
 

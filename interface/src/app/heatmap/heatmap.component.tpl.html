@@ -1,5 +1,5 @@
 <status-bar msg-text="$ctrl.status"></status-bar>
-<div ng-if="$ctrl.samplesMissingActivity.length">
+<div ng-if="$ctrl.heatmap.samplesMissingActivity.length">
   <h4>Samples Missing Activity</h4>
   <p>The samples below are missing activity data, either because raw data
     are unavailable or because they have been omitted from the ADAGE
@@ -23,8 +23,8 @@
         <th>Sample Name</th>
       </tr>
     </thead>
-    <tbody ng-model="$ctrl.samplesMissingActivity">
-      <tr ng-repeat="id in $ctrl.samplesMissingActivity"
+    <tbody ng-model="$ctrl.heatmap.samplesMissingActivity">
+      <tr ng-repeat="id in $ctrl.heatmap.samplesMissingActivity"
           ng-mouseover="showControls = true"
           ng-mouseleave="showControls = false">
         <td class="row-control">
@@ -34,10 +34,10 @@
           </button>
         </td>
         <td>
-          {{$ctrl.samplesMissingActivity[id].ml_data_source | formatMissing}}
+          {{$ctrl.sampleDetails[id].ml_data_source | formatMissing}}
         </td>
         <td>{{id}}</td>
-        <td>{{$ctrl.samplesMissingActivity[id].name | formatMissing}}</td>
+        <td>{{$ctrl.sampleDetails[id].name | formatMissing}}</td>
       </tr>
     </tbody>
   </table>
