@@ -6,7 +6,8 @@
 angular.module('adage.volcano-plot.view', [
   'ui.router',
   'adage.analyze.sampleBin',
-  'adage.volcano-plot'
+  'adage.volcano-plot',
+  'statusBar'
 ])
 
 .config(['$stateProvider', function($stateProvider) {
@@ -37,7 +38,31 @@ angular.module('adage.volcano-plot.view', [
     }
 
     this.mlModel = $stateParams.mlmodel;
-    SampleBin.getVolcanoPlotData();
+    this.status = 'Retrieving plot data';
+    var volcanoStatus;
+    try {
+      volcanoStatus = SampleBin.getVolcanoPlotData();
+    } catch (e) {
+      if (e instanceof RangeError) {
+        var details = '';
+        if (e.message) {
+          details = ' (' + e.message + ')';
+        }
+        this.status = (
+          'Error: make sure you have assigned at least one sample ' +
+          'to each group' + details
+        );
+      } else if (e instanceof Error) {
+        this.status = 'Error: ' + e.message;
+      }
+      return;
+    }
+    volcanoStatus.then(function() {
+      ctrl.status = '';
+    }).catch(function() {
+      ctrl.status =
+        'Data error: please ensure that all samples have activity data';
+    });
     this.sampleGroups = SampleBin.getSamplesByGroup();
     this.data = SampleBin.volcanoData;
     this.selection = [];

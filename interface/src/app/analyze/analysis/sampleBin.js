@@ -230,10 +230,17 @@ MathFuncts, errGen, MlModelTracker, Heatmap) {
       // verify that we have at least one sample each in base-group
       // and comp-group
       if (!sg['base-group'] || sg['base-group'].length === 0) {
-        return null;
+        throw new RangeError('no samples in base group');
       }
       if (!sg['comp-group'] || sg['comp-group'].length === 0) {
-        return null;
+        throw new RangeError('no samples in comparison group');
+      }
+
+      // verify that all requested samples have activity
+      var groupedSamples = sg['base-group'].concat(sg['comp-group']);
+      var notCached = Activity.listSamplesNotCached(groupedSamples);
+      if (notCached) {
+        throw new Error('samples missing data: ' + notCached);
       }
 
       // (1a) we obtain a list of signatures by retrieving signature activity
@@ -311,6 +318,7 @@ MathFuncts, errGen, MlModelTracker, Heatmap) {
         .catch(function(httpResponse) {
           $log.error(errGen('Query errored', httpResponse));
         });
+      return signatureSetPromise;
     }
   };
 
