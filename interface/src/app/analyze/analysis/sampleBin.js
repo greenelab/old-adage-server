@@ -55,29 +55,12 @@ MathFuncts, errGen, MlModelTracker, Heatmap) {
 
     removeSample: function(id) {
       var pos = this.samples.indexOf(+id);
-      // TODO #278 still need this?
-      // if (pos === -1) {
-      //   // this sample must be in the "missing activity" list
-      //   pos = this.samples.indexOf(+id);
-      //   this.samples.splice(pos, 1);
-      //   return;
-      // }
       this.samples.splice(pos, 1);
       delete this.sampleToGroup[+id];
-      // TODO #278 still need this? We are decoupling sampleBin from heatmap
-      // Heatmap.vegaData.signatureOrder = [];  // reset to default order
-      // Heatmap.rebuildHeatmapActivity(
-      //   MlModelTracker.id, Heatmap.vegaData.samples
-      // );
     },
 
     clearSamples: function() {
       this.samples = [];
-      // TODO #278 still need this? We are decoupling sampleBin from heatmap
-      // Heatmap.vegaData.signatureOrder = [];  // reset to default order
-      // Heatmap.rebuildHeatmapActivity(
-      //   MlModelTracker.id, Heatmap.vegaData.samples
-      // );
     },
 
     addExperiment: function(sampleIdList) {
@@ -265,7 +248,7 @@ MathFuncts, errGen, MlModelTracker, Heatmap) {
             var mapSampleIdsToActivity = function(sampleId) {
               // (2b) the array of activity for each signature is built by
               //      plucking the activity `.value` for each sample within the
-              //      `index`th signature from the `cache`
+              //      `index`th signature from the `Activity.cache`
               //      [inner .map()]
               var cachedActivity = Activity.cache.get(sampleId);
               if (cachedActivity[index].signature !== signatureId) {

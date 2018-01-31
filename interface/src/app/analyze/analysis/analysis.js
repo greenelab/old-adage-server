@@ -70,7 +70,6 @@ function AnalysisCtrl($scope, $log, $q, $state, $stateParams,
 
   // populate sample details
   $scope.analysis.status = 'Retrieving sample details';
-  // TODO #278 implement this loop as a method in Sample -- hmm, maybe can't?
   var pArrSamples = [];
   SampleBin.samples.forEach(function(sampleID) {
     var pSample = Sample

@@ -112,7 +112,7 @@ angular.module('adage.heatmap.service', [
         $log.error(errGen('Query errored', httpResponse));
       },
       rebuildHeatmapActivity: function() {
-        // FIXME need a "reloading..." spinner or something while this happens
+        // TODO #280 need a "reloading..." notice while this happens
         //  note: progress can be reported by returning a $promise to the caller
         if (!this.mlmodel.id) {
           // ignore "rebuild" requests until a model is specified
@@ -165,8 +165,6 @@ angular.module('adage.heatmap.service', [
             pos = Heatmap.vegaData.samples.indexOf(id);
             Heatmap.vegaData.samples.splice(pos, 1);
 
-            // TODO #278 Heatmap cannot modify SampleBin - check for regression
-            // delete cbSampleBin.sampleToGroup[id];
             // add to the non-heatmap list if not already present
             if (Heatmap.samplesMissingActivity.indexOf(id) === -1) {
               Heatmap.samplesMissingActivity.push(id);

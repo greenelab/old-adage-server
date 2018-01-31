@@ -44,7 +44,7 @@ angular.module('adage.heatmap.component', [
         ctrl.$onInit();   // re-initialize properties
         ctrl.status = 'reloading...';
         Heatmap.init(mlmodel, samples);
-        // TODO #278 need to make this call asynchronous
+        // TODO #280 need to make this call asynchronous
         Heatmap.loadData();
         ctrl.status = '';
       };
@@ -57,7 +57,6 @@ angular.module('adage.heatmap.component', [
         return;
       };
 
-      // TODO #280 separate to new heatmap view
       // wrap some SampleBin features to implement status updates
       ctrl.clusterSamples = function() {
         ctrl.status = 'clustering samples';

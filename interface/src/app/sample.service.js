@@ -59,11 +59,8 @@ angular.module('adage.sample.service', [
     };
     Sample.setCache = function(id, obj) {
       this.cache[id] = obj;
-      // TODO #278 need to pre-fetch activity into cache here?
-      //      (if so, also need to track promises)
     };
     Sample.getSampleDetails = function(pk) {
-      // TODO #278 caller can now implement user error reporting via $promise
       var pSample = Sample.get({id: pk},
         function success(responseObject, responseHeaders) {
           if (responseObject) {
