@@ -222,7 +222,7 @@ MathFuncts, errGen, MlModelTracker, Heatmap) {
       // verify that all requested samples have activity
       var groupedSamples = sg['base-group'].concat(sg['comp-group']);
       var notCached = Activity.listSamplesNotCached(groupedSamples);
-      if (notCached) {
+      if (notCached.length > 0) {
         throw new Error('samples missing data: ' + notCached);
       }
 
