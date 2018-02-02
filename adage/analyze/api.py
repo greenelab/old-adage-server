@@ -477,7 +477,7 @@ class ParticipationResource(ModelResource):
 
     def apply_filters(self, request, applicable_filters):
         """Implementation of "related_genes" filter, which allows the
-        API to get all pratitipation records of signatures that includes
+        API to get all participation records of signatures that include
         at least one of the entries in "related_genes" list.
         This filter is used to calculate enriched signatures given a
         list of genes.
