@@ -1,5 +1,5 @@
 angular.module('adage.gene.utils', [
-
+  'adage.enrichedSignatures'
 ])
 
 .factory('CommonGeneFuncts', [function() {
@@ -21,6 +21,16 @@ angular.module('adage.gene.utils', [
       var geneString = geneIds.join();
 
       state.go('gene_network', {
+        'genes': geneString,
+        'mlmodel': scope.mlModel
+      });
+    },
+
+    findEnrichedSignatures: function(scope, state) {
+      var geneIds = Object.keys(scope.selectedGenes);
+      var geneString = geneIds.join();
+
+      state.go('enriched_signatures', {
         'genes': geneString,
         'mlmodel': scope.mlModel
       });

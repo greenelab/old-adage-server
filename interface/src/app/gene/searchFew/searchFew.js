@@ -76,6 +76,10 @@ angular.module('adage.gene.searchFew', [
         $scope.sendToNetwork = function() {
           CommonGeneFuncts.sendToNetwork($scope, $state);
         };
+
+        $scope.findEnrichedSignatures = function() {
+          CommonGeneFuncts.findEnrichedSignatures($scope, $state);
+        };
       }
     ],
     scope: {

@@ -1,0 +1,41 @@
+<div class="page-header">
+  <h3>ADAGE: Enriched Signatures</h3>
+  <ml-model-view></ml-model-view>
+  <ml-model-validator model-id="ctrl.modelInUrl"
+                      is-valid-model="ctrl.isValidModel">
+  </ml-model-validator>
+</div>
+
+<div ng-if="ctrl.isValidModel">
+  <h4 class="text-warning" ng-bind="ctrl.statusMessage"></h4>
+
+  <p>
+    Explore signatures that significantly overlap with the genes you selected.
+    This can help with interpretation of the underlying process or processes.
+  </p>
+
+  <div class="container" ng-hide="ctrl.statusMessage">
+    <table id="enrichment-table" class="table table-striped">
+      <thead>
+        <tr>
+          <th>Signature</th>
+          <th>Gene participation type in signature</th>
+          <th>Overlapping genes in this signature</th>
+          <th>P-Value (FDR Corrected)</th>
+        </tr>
+      </thead>
+
+      <tr ng-repeat="signature in ctrl.enrichedSignatures">
+        <td><a href="{{signature.url}}">{{signature.name}}</a></td>
+        <td>{{signature.participationType}}</td>
+        <td>{{signature.genes}}</td>
+        <td>{{signature.pValue}}</td>
+      </tr>
+    </table>
+
+    <div ng-if="ctrl.enrichedSignatures.length === 0">
+      No enriched signatures were found with a P-Value of less than
+      {{ctrl.pValueCutoff}}.
+    </div>
+  </div>
+</div>
