@@ -114,9 +114,9 @@ angular.module('adage.enrichedSignatures', [
       var N = self.geneNum;
       var pValueArray = [];
       var matchedGenesBySignature = [];
-      var signatures = Object.keys(genesBySignatures);
-      signatures.forEach(function(signatureID) {
-        var genes = genesBySignatures[signatureID];
+      var signatureIDs = Object.keys(genesBySignatures);
+      signatureIDs.forEach(function(sigID) {
+        var genes = genesBySignatures[sigID];
         var n = Object.keys(genes).length, k = 0;
         var matchedGenes = [], selectedGene;
         var pValue;
@@ -137,10 +137,10 @@ angular.module('adage.enrichedSignatures', [
       correctedPValues.forEach(function(element, index) {
         var correctedPValue = element.toPrecision(pValueSigDigits);
         if (correctedPValue < self.pValueCutoff) {
-          var signatureID = signatures[index];
+          var sigID = signatureIDs[index];
           significantSignatures.push({
-            'url': '#/signature/' + signatureID,
-            'name': self.signatures[signatureID],
+            'url': '#/signature/' + sigID,
+            'name': self.signatures[sigID],
             'participationType': typeName,
             'genes': matchedGenesBySignature[index].join(', '),
             'pValue': correctedPValue
@@ -157,39 +157,35 @@ angular.module('adage.enrichedSignatures', [
 
     // Main function to calculate the enrichment.
     var getEnrichedSignatures = function() {
-      var i, j, typeName, signatureID;
-      for (i = 0; i < participations.length; i++) {
-        signatureID = participations[i].signature;
-        // Ignore signatures that are not in current mlmodel
-        if (!self.signatures[signatureID]) {
-          continue;
-        }
+      participations.forEach(function(element) {
+        var sigID = element.signature;
+        if (!self.signatures[sigID]) {
+          return;
+        } // Ignore signatures that are not in current mlmodel
 
-        typeName = participations[i].participation_type.name;
+        var typeName = element.participation_type.name;
         if (!groupedGenes[typeName]) {
           groupedGenes[typeName] = Object.create(null);
         }
 
-        if (!groupedGenes[typeName][signatureID]) {
-          groupedGenes[typeName][signatureID] = Object.create(null);
+        if (!groupedGenes[typeName][sigID]) {
+          groupedGenes[typeName][sigID] = Object.create(null);
         }
-        geneID = participations[i].gene.id;
-        geneName = (participations[i].gene.standard_name ?
-                    participations[i].gene.standard_name :
-                    participations[i].gene.systematic_name);
-        groupedGenes[typeName][signatureID][geneID] = geneName;
-      }
+        geneID = element.gene.id;
+        geneName = (element.gene.standard_name ?
+                    element.gene.standard_name :
+                    element.gene.systematic_name);
+        groupedGenes[typeName][sigID][geneID] = geneName;
+      });
 
       var participationTypes = Object.keys(groupedGenes);
-      var genesBySignatures, enrichment;
-      for (i = 0; i < participationTypes.length; i++) {
-        typeName = participationTypes[i];
-        genesBySignatures = groupedGenes[typeName];
-        enrichment = calculateEnrichments(typeName, genesBySignatures);
-        for (j = 0; j < enrichment.length; j++) {
-          self.enrichedSignatures.push(enrichment[j]);
+      participationTypes.forEach(function(typeName) {
+        var genesBySignatures = groupedGenes[typeName];
+        var enrichment = calculateEnrichments(typeName, genesBySignatures);
+        for (var i = 0; i < enrichment.length; i++) {
+          self.enrichedSignatures.push(enrichment[i]);
         }
-      }
+      });
       self.statusMessage = '';
     };
 
