@@ -128,6 +128,12 @@ angular.module('adage.enrichedSignatures', [
           }
         }
         matchedGenesBySignature.push(matchedGenes);
+        // Four parameters are needed in the formula:
+        //     hyperGeometricTest(k, m, n, N)
+        // k: the number of heavy genes related to sigID in genesInUrl;
+        // m: the number of genes in genesInUrl;
+        // n: the total number of heavy genes related to sigID;
+        // N: the total number of genes.
         pValue = 1 - MathFuncts.hyperGeometricTest(k, m, n, N);
         pValueArray.push(pValue);
       });
