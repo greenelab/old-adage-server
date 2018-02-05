@@ -161,7 +161,7 @@ angular.module('adage.enrichedSignatures', [
         var sigID = element.signature;
         if (!self.signatures[sigID]) {
           return;
-        } // Ignore signatures that are not in current mlmodel
+        } // ignore signatures that are not in current mlmodel
 
         var typeName = element.participation_type.name;
         if (!groupedGenes[typeName]) {
@@ -189,8 +189,8 @@ angular.module('adage.enrichedSignatures', [
       self.statusMessage = '';
     };
 
-    // Wait for the previous wo promises to finish before calculating
-    // the enriched signatures.
+    // Wait for all three promises to finish before calculating the
+    // enriched signatures.
     $q.all([p1, p2, p3]).then(getEnrichedSignatures);
   }
 ])
