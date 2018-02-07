@@ -18,6 +18,9 @@ angular.module('adage.utils', [])
 // Number of digits in activity value shown on frontend:
 .constant('ActivityDigits', 5)
 
+// Number of digits in p-value shown on frontend:
+.constant('pValueDigits', 3)
+
 // Service of global machine learning model, which is shared by multiple
 // modules.
 .service('MlModelTracker', [function() {
