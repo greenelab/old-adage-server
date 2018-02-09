@@ -40,13 +40,14 @@ angular.module('adage.gene.enrichedSignatures', [
 
     self.modelInUrl = $stateParams.mlmodel;
     self.statusMessage = 'Connecting to the server ...';
+    self.inProgress = true;
     self.pValueCutoff = pValueCutoff;
     self.enrichedSignatures = [];
 
     // Do nothing if no genes are specified in URL.
     if (!$stateParams.genes || !$stateParams.genes.split(',').length) {
       self.statusMessage = 'No genes are specified.';
-      self.enrichedSignatures = [];
+      self.inProgress = false;
       return;
     }
 
@@ -72,6 +73,7 @@ angular.module('adage.gene.enrichedSignatures', [
         var message = errGen('Failed to get signatures: ', err);
         $log.error(message);
         self.statusMessage = message + '. Please try again later.';
+        self.inProgress = false;
       }
     ).$promise);
 
@@ -88,6 +90,7 @@ angular.module('adage.gene.enrichedSignatures', [
           'Failed to get signature-gene participations: ', err);
         $log.error(message);
         self.statusMessage = message + '. Please try again later.';
+        self.inProgress = false;
       }
     ).$promise);
 
@@ -184,6 +187,7 @@ angular.module('adage.gene.enrichedSignatures', [
         }
       });
       self.statusMessage = '';
+      self.inProgress = false;
     };
 
     // Do not retrieve genes from backend until mlmodel is ready,
@@ -205,6 +209,7 @@ angular.module('adage.gene.enrichedSignatures', [
             var message = errGen('Failed to get total gene number: ', err);
             $log.error(message);
             self.statusMessage = message + '. Please try again later.';
+            self.inProgress = false;
           }
         ).$promise);
         // Wait for all promises to finish before calculating the

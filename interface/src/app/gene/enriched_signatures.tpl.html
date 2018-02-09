@@ -7,8 +7,12 @@
 </div>
 
 <div ng-if="ctrl.isValidModel">
-  <h4 class="text-warning" ng-bind="ctrl.statusMessage"></h4>
-
+  <div class="text-warning" ng-if="ctrl.statusMessage">
+    {{ ctrl.statusMessage }}
+    <i ng-if="ctrl.inProgress"
+       class="fa fa-spinner fa-spin" style="font-size: 24px">
+    </i>
+  </div>
   <p>
     Explore signatures that significantly overlap with the genes you selected.
     This can help with interpretation of the underlying process or processes.
