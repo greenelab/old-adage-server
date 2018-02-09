@@ -151,7 +151,7 @@ angular.module('adage.gene.enrichedSignatures', [
 
     // groupedGenes is an object that behaves like a 2-D table of genes.
     // groupedGenes[participationTypeID][signatureID] is an object whose
-    // keys are gene IDs and values are genes names of those genes that
+    // keys are gene IDs and values are gene names of those genes that
     // participate with signatureID and with participationTypeID.
     var groupedGenes = Object.create(null);
 
