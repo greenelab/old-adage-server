@@ -25,7 +25,6 @@ angular.module('adage.signature', [
   });
 }])
 
-
 .controller('SignatureCtrl', ['Signature', '$stateParams', 'MlModelTracker',
   '$log', 'errGen',
   function SignatureController(Signature, $stateParams, MlModelTracker, $log,
@@ -320,9 +319,10 @@ angular.module('adage.signature', [
   }
 ])
 
-.directive('enrichedGenesets', ['MathFuncts', 'pValueDigits',
+.directive('enrichedGenesets', ['MathFuncts', 'pValueCutoff', 'pValueDigits',
   'PickledGenesetsService', '$log',
-  function(MathFuncts, pValueDigits, PickledGenesetsService, $log) {
+  function(MathFuncts, pValueCutoff, pValueDigits, PickledGenesetsService,
+           $log) {
     return {
       templateUrl: 'signature/enriched_genesets.tpl.html',
       restrict: 'E',
@@ -344,7 +344,7 @@ angular.module('adage.signature', [
             $scope.topMode ? $scope.topNum : $scope.enrichedGenesets.length;
         };
 
-        $scope.pValueCutoff = 0.05;
+        $scope.pValueCutoff = pValueCutoff;
 
         // This is an object, where each key is the geneset ID, and each value
         // is an array of the genes that this geneset contains.

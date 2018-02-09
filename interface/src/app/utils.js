@@ -18,6 +18,10 @@ angular.module('adage.utils', [])
 // Number of digits in activity value shown on frontend:
 .constant('ActivityDigits', 5)
 
+// p-value cutoff
+// Number of digits in p-value shown on frontend:
+.constant('pValueCutoff', 0.05)
+
 // Number of digits in p-value shown on frontend:
 .constant('pValueDigits', 3)
 

@@ -1,8 +1,8 @@
 /**
- * "adage.enrichedSignatures" module.
+ * "adage.gene.enrichedSignatures" module.
  */
 
-angular.module('adage.enrichedSignatures', [
+angular.module('adage.gene.enrichedSignatures', [
   'adage.signature.resources',
   'adage.participation.resources',
   'adage.gene.resource',
@@ -24,10 +24,11 @@ angular.module('adage.enrichedSignatures', [
 }])
 
 .controller('EnrichedSignaturesCtrl', ['$stateParams', 'Signature',
-  'Participation', 'Gene', 'MlModelTracker', 'MathFuncts', 'pValueDigits',
-  '$scope', '$q', '$log', 'errGen',
+  'Participation', 'Gene', 'MlModelTracker', 'MathFuncts', 'pValueCutoff',
+  'pValueDigits', '$scope', '$q', '$log', 'errGen',
   function EnrichedSignatureController($stateParams, Signature, Participation,
-    Gene, MlModelTracker, MathFuncts, pValueDigits, $scope, $q, $log, errGen) {
+    Gene, MlModelTracker, MathFuncts, pValueCutoff, pValueDigits, $scope, $q,
+    $log, errGen) {
     var self = this;
     self.isValidModel = false;
     $scope.mlmodel = MlModelTracker;
@@ -39,7 +40,7 @@ angular.module('adage.enrichedSignatures', [
 
     self.modelInUrl = $stateParams.mlmodel;
     self.statusMessage = 'Connecting to the server ...';
-    self.pValueCutoff = 0.05;
+    self.pValueCutoff = pValueCutoff;
     self.enrichedSignatures = [];
 
     // Do nothing if no genes are specified in URL.
