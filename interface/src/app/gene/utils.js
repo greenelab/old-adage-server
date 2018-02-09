@@ -1,6 +1,4 @@
-angular.module('adage.gene.utils', [
-  'adage.enrichedSignatures'
-])
+angular.module('adage.gene.utils', [])
 
 .factory('CommonGeneFuncts', [function() {
   return {

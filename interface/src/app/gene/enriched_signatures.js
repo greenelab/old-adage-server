@@ -15,7 +15,7 @@ angular.module('adage.gene.enrichedSignatures', [
     url: '/signature/enriched_signatures?mlmodel&genes',
     views: {
       main: {
-        templateUrl: 'signature/enriched_signatures.tpl.html',
+        templateUrl: 'gene/enriched_signatures.tpl.html',
         controller: 'EnrichedSignaturesCtrl as ctrl'
       }
     },

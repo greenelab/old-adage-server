@@ -3,7 +3,6 @@ angular.module('adage.gene.searchFew', [
   'adage.gene.selected'
 ])
 
-
 // Directive for whole gene search form
 .directive('autocompleteSearchPanel', [function() {
   return {

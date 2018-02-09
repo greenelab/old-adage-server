@@ -1,5 +1,6 @@
 angular.module('adage.gene.selected', [
-  'adage.gene.utils'
+  'adage.gene.utils',
+  'adage.gene.enrichedSignatures'
 ])
 
 .factory('SelectedGenesFactory', [function() {
