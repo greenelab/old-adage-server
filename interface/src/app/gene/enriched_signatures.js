@@ -12,7 +12,7 @@ angular.module('adage.gene.enrichedSignatures', [
 
 .config(['$stateProvider', function($stateProvider) {
   $stateProvider.state('enriched_signatures', {
-    url: '/signature/enriched_signatures?mlmodel&genes',
+    url: '/gene/enriched_signatures?mlmodel&genes',
     views: {
       main: {
         templateUrl: 'gene/enriched_signatures.tpl.html',
