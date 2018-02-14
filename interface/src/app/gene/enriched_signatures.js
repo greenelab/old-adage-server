@@ -71,9 +71,7 @@ angular.module('adage.gene.enrichedSignatures', [
       },
       function error(err) {
         var message = errGen('Failed to get signatures: ', err);
-        $log.error(message);
-        self.statusMessage = message + '. Please try again later.';
-        self.inProgress = false;
+        throw new Error(message);
       }
     ).$promise);
 
@@ -88,9 +86,7 @@ angular.module('adage.gene.enrichedSignatures', [
       function error(err) {
         var message = errGen(
           'Failed to get signature-gene participations: ', err);
-        $log.error(message);
-        self.statusMessage = message + '. Please try again later.';
-        self.inProgress = false;
+        throw new Error(message);
       }
     ).$promise);
 
@@ -104,8 +100,11 @@ angular.module('adage.gene.enrichedSignatures', [
         signatureIDs = Object.keys(genesBySignatures);
       signatureIDs.forEach(function(sigID) {
         var genes = genesBySignatures[sigID],
-          n = Object.keys(genes).length, k = 0,
-          matchedGenes = [], selectedGene, pValue;
+          n = Object.keys(genes).length,
+          k = 0,
+          matchedGenes = [],
+          selectedGene,
+          pValue;
         for (var i = 0; i < genesInUrl.length; i++) {
           selectedGene = genesInUrl[i];
           if (genes[selectedGene]) {
@@ -186,8 +185,6 @@ angular.module('adage.gene.enrichedSignatures', [
           self.enrichedSignatures.push(enrichment[i]);
         }
       });
-      self.statusMessage = '';
-      self.inProgress = false;
     };
 
     // Do not retrieve genes from backend until mlmodel is ready,
@@ -206,15 +203,24 @@ angular.module('adage.gene.enrichedSignatures', [
             self.geneNum = response.meta.total_count;
           },
           function error(err) {
-            var message = errGen('Failed to get total gene number: ', err);
-            $log.error(message);
-            self.statusMessage = message + '. Please try again later.';
-            self.inProgress = false;
+            var message = errGen('Failed to get total number of genes: ', err);
+            throw new Error(message);
           }
         ).$promise);
         // Wait for all promises to finish before calculating the
         // enriched signatures.
-        $q.all(apiPromises).then(getEnrichedSignatures);
+        $q.all(apiPromises)
+          .then(getEnrichedSignatures)
+          .then(function() {
+            self.statusMessage = '';
+          })
+          .catch(function(e) {
+            $log.error(e.message);
+            self.statusMessage = e.message + '. Please try again later.';
+          })
+          .finally(function() {
+            self.inProgress = false;
+          });
       }
     });
   }
