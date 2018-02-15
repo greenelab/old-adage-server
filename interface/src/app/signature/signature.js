@@ -8,6 +8,7 @@ angular.module('adage.signature', [
   'adage.participation',
   'adage.signature.resources',
   'adage.utils',
+  'adage.tribe_client.resource', // required by PickledGenesetsService
   'greenelab.stats'
 ])
 
@@ -23,7 +24,6 @@ angular.module('adage.signature', [
     data: {pageTitle: 'Signature Information'}
   });
 }])
-
 
 .controller('SignatureCtrl', ['Signature', '$stateParams', 'MlModelTracker',
   '$log', 'errGen',
@@ -319,8 +319,10 @@ angular.module('adage.signature', [
   }
 ])
 
-.directive('enrichedGenesets', ['MathFuncts', 'PickledGenesetsService', '$log',
-  function(MathFuncts, PickledGenesetsService, $log) {
+.directive('enrichedGenesets', ['MathFuncts', 'pValueCutoff', 'pValueDigits',
+  'PickledGenesetsService', '$log',
+  function(MathFuncts, pValueCutoff, pValueDigits, PickledGenesetsService,
+           $log) {
     return {
       templateUrl: 'signature/enriched_genesets.tpl.html',
       restrict: 'E',
@@ -342,8 +344,7 @@ angular.module('adage.signature', [
             $scope.topMode ? $scope.topNum : $scope.enrichedGenesets.length;
         };
 
-        $scope.pValueCutoff = 0.05;
-        var pValueSigDigits = 3;
+        $scope.pValueCutoff = pValueCutoff;
 
         // This is an object, where each key is the geneset ID, and each value
         // is an array of the genes that this geneset contains.
@@ -407,10 +408,9 @@ angular.module('adage.signature', [
           var correctedPValues = MathFuncts.multTest.fdr(pValueArray);
 
           for (i = 0; i < enrichedGenesetIDs.length; i++) {
-            var correctedPValue = correctedPValues[i].toPrecision(
-              pValueSigDigits);
-
-            if (correctedPValue < $scope.pValueCutoff) {
+            if (correctedPValues[i] < $scope.pValueCutoff) {
+              var correctedPValue = correctedPValues[i].toPrecision(
+                pValueDigits);
               var gsID = enrichedGenesetIDs[i];
               var genesetInfoObj = allGenesetInfo[gsID];
 

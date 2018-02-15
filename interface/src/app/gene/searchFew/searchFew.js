@@ -3,7 +3,6 @@ angular.module('adage.gene.searchFew', [
   'adage.gene.selected'
 ])
 
-
 // Directive for whole gene search form
 .directive('autocompleteSearchPanel', [function() {
   return {
@@ -75,6 +74,10 @@ angular.module('adage.gene.searchFew', [
 
         $scope.sendToNetwork = function() {
           CommonGeneFuncts.sendToNetwork($scope, $state);
+        };
+
+        $scope.findEnrichedSignatures = function() {
+          CommonGeneFuncts.findEnrichedSignatures($scope, $state);
         };
       }
     ],

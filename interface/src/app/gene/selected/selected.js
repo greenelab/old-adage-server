@@ -1,5 +1,6 @@
 angular.module('adage.gene.selected', [
-  'adage.gene.utils'
+  'adage.gene.utils',
+  'adage.gene.enrichedSignatures'
 ])
 
 .factory('SelectedGenesFactory', [function() {
@@ -34,6 +35,10 @@ angular.module('adage.gene.selected', [
 
         $scope.sendToNetwork = function() {
           CommonGeneFuncts.sendToNetwork($scope, $state);
+        };
+
+        $scope.findEnrichedSignatures = function() {
+          CommonGeneFuncts.findEnrichedSignatures($scope, $state);
         };
       }
     ],

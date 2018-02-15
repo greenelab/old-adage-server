@@ -472,7 +472,29 @@ class ParticipationResource(ModelResource):
             'signature': ('exact', 'in', ),
             'gene': ('exact', 'in', ),
             'participation_type': ('exact', 'in', ),
+            'related_genes': ('exact')  # see apply_filters()
         }
+
+    def apply_filters(self, request, applicable_filters):
+        """Implementation of "related_genes" filter, which allows the
+        API to get all participation records of signatures that include
+        at least one of the entries in "related_genes" list.
+        This filter is used to calculate enriched signatures given a
+        list of genes.
+        """
+        object_list = super(ParticipationResource, self).apply_filters(
+            request, applicable_filters)
+        related_genes = request.GET.get('related_genes', None)
+        if related_genes:
+            try:
+                query_genes = {int(id) for id in related_genes.split(',')}
+            except ValueError:
+                raise BadRequest("Invalid gene IDs: %s" % related_genes)
+
+            signatures = Participation.objects.filter(
+                gene__in=query_genes).values('signature').distinct()
+            object_list = object_list.filter(signature__in=signatures)
+        return object_list
 
 
 class ExpressionValueResource(ModelResource):

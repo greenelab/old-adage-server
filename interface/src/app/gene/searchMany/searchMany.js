@@ -1,7 +1,6 @@
 angular.module('adage.gene.searchMany', [
   'ui.router',
   'adage.gene.resource',
-  'adage.gene.utils',
   'adage.gene.selected',
   'adage.utils',
   'adage.mlmodel.components'
