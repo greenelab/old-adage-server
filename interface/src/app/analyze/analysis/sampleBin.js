@@ -8,8 +8,9 @@ angular.module('adage.analyze.sampleBin', [
   'ngResource',
   'greenelab.stats',
   'adage.utils',
-  'adage.sample.service',       // provides Sample
-  'adage.signature.resources',  // provides Activity, Signature
+  'adage.sample.service',
+  'adage.signature.resources',
+  'adage.activity.service',
   'adage.heatmap.service'
 ])
 
