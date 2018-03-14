@@ -53,6 +53,40 @@ text.legend-title {
 // slider styles:
 .rzslider {
   width: 600px;  // Default: 100%
+  margin: 28px 0 8px 0;
+}
+
+.rzslider .rz-pointer {
+  width: 12px;
+  height: 12px;
+  top: -4px;
+  -webkit-border-radius: 6px;
+     -moz-border-radius: 6px;
+          border-radius: 6px;
+}
+
+.rzslider .rz-pointer:after {
+  top: 4px;
+  left: 4px;
+  width: 4px;
+  height: 4px;
+  -webkit-border-radius: 2px;
+     -moz-border-radius: 2px;
+          border-radius: 2px;
+}
+
+.rzslider .rz-bar {
+  height: 3px;
+}
+
+.rzslider .rz-bar-wrapper {
+  height: 10px;
+  padding-top: 12px;
+  margin-top: -12px;
+}
+
+.rzslider .rz-bubble {
+  bottom: 10px;
 }
 
 #gene-slider .rz-pointer {
