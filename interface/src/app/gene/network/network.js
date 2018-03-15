@@ -221,6 +221,22 @@ angular.module('adage.gene.network', [
             g.query = true;
           }
         });
+
+        // format a list of genes for download
+        if (self.geneDownload !== null && self.geneDownload !== undefined) {
+          // release a previously-created Blob
+          URL.revokeObjectURL(self.geneDownload);
+        }
+        self.geneDownload = URL.createObjectURL(new Blob(
+          genes.map(function(g, index) {
+            var geneStr = g.label + '|' + g.entrezid + '\n';
+            if (index === 0) {
+              // prepend a column header
+              geneStr = 'Gene|EntrezID\n' + geneStr;
+            }
+            return geneStr;
+          })
+        ));
       };
 
       // Function that sets edges in the network.
@@ -245,6 +261,26 @@ angular.module('adage.gene.network', [
         // edge.source and edge.target to the gene object later, so the values
         // of "source" and "target" properties of the edge won't be integers
         // any more.
+
+        // format a list of edges for download
+        if (self.edgeDownload !== null && self.edgeDownload !== undefined) {
+          // release a previously-created Blob
+          URL.revokeObjectURL(self.edgeDownload);
+        }
+        self.edgeDownload = URL.createObjectURL(new Blob(
+          edges.map(function(e, index) {
+            var edgeStr = (
+              e.gene1.label + '|' + e.gene1.entrezid + ',' +
+              e.gene2.label + '|' + e.gene2.entrezid + ',' +
+              e.weight + '\n'
+            );
+            if (index === 0) {
+              // prepend a column header
+              edgeStr = 'Gene1|EntrezID1,Gene2|EntrezID2,Weight\n' + edgeStr;
+            }
+            return edgeStr;
+          })
+        ));
       };
 
       var renderSliders = function() {

@@ -33,13 +33,36 @@
                 rz-slider-model="ctrl.minEdgeWeightSlider.value"
                 rz-slider-options="ctrl.minEdgeWeightSlider.options">
       </rzslider>
-      <br />
+      <br>
       <strong>Max # of genes:</strong>
       <br>
       <rzslider id="gene-slider"
                 rz-slider-model="ctrl.maxGeneNumSlider.value"
                 rz-slider-options="ctrl.maxGeneNumSlider.options">
       </rzslider>
+    </div>
+    <div class="btn-group" uib-dropdown
+      style="float: right; margin-top: -12px;">
+      <button class="btn btn-secondary dropdown-toggle"
+        type="button" id="downloadButton" uib-dropdown-toggle
+        aria-haspopup="true" aria-expanded="false">
+        Download <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu" uib-dropdown-menu role="menu"
+        aria-labelledby="downloadButton">
+        <li role="menuitem">
+          <a href="{{ctrl.geneDownload}}"
+            download="genes.txt" type="text/plain">
+            Genes
+          </a>
+        </li>
+        <li role="menuitem">
+          <a href="{{ctrl.edgeDownload}}"
+            download="edges.csv" type="text/csv">
+            Edges (CSV)
+          </a>
+        </li>
+      </ul>
     </div>
   </div>
 </div>

@@ -33,6 +33,11 @@ angular.module('adage', [
   $resourceProvider.defaults.stripTrailingSlashes = false;
 }])
 
+// To download `blob:` objects, we need that scheme in our whitelist
+.config(['$compileProvider', function($compileProvider) {
+  $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|blob):/);
+}])
+
 .controller('AppCtrl', ['$scope', '$state', 'UserFactory', 'MlModelTracker',
   function AppCtrl($scope, $state, UserFactory, MlModelTracker) {
     // Machine learning model
