@@ -41,18 +41,17 @@
                 rz-slider-options="ctrl.maxGeneNumSlider.options">
       </rzslider>
     </div>
-    <div class="btn-group" uib-dropdown
-      style="float: right; margin-top: -12px;">
+    <div class="btn-group" id="download-menu" uib-dropdown>
       <button class="btn btn-secondary dropdown-toggle"
-        type="button" id="downloadButton" uib-dropdown-toggle
+        type="button" id="download-button" uib-dropdown-toggle
         aria-haspopup="true" aria-expanded="false">
         Download <span class="caret"></span>
       </button>
       <ul class="dropdown-menu" uib-dropdown-menu role="menu"
-        aria-labelledby="downloadButton">
+        aria-labelledby="download-button">
         <li role="menuitem">
           <a href="{{ctrl.geneDownload}}"
-            download="genes.txt" type="text/plain">
+            download="genes.csv" type="text/csv">
             Genes
           </a>
         </li>

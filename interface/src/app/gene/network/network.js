@@ -229,10 +229,10 @@ angular.module('adage.gene.network', [
         }
         self.geneDownload = URL.createObjectURL(new Blob(
           genes.map(function(g, index) {
-            var geneStr = g.label + '|' + g.entrezid + '\n';
+            var geneStr = g.label + ',' + g.entrezid + '\n';
             if (index === 0) {
               // prepend a column header
-              geneStr = 'Gene|EntrezID\n' + geneStr;
+              geneStr = 'Gene,EntrezID\n' + geneStr;
             }
             return geneStr;
           })
@@ -270,13 +270,13 @@ angular.module('adage.gene.network', [
         self.edgeDownload = URL.createObjectURL(new Blob(
           edges.map(function(e, index) {
             var edgeStr = (
-              e.gene1.label + '|' + e.gene1.entrezid + ',' +
-              e.gene2.label + '|' + e.gene2.entrezid + ',' +
+              e.gene1.label + ',' + e.gene1.entrezid + ',' +
+              e.gene2.label + ',' + e.gene2.entrezid + ',' +
               e.weight + '\n'
             );
             if (index === 0) {
               // prepend a column header
-              edgeStr = 'Gene1|EntrezID1,Gene2|EntrezID2,Weight\n' + edgeStr;
+              edgeStr = 'Gene1,EntrezID1,Gene2,EntrezID2,Weight\n' + edgeStr;
             }
             return edgeStr;
           })
