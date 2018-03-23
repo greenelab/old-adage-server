@@ -29,19 +29,19 @@
                ng-change="ctrl.renderNetwork()" value="both">
         Both
       </form>
-      <rzslider id="edge-slider"
+      <rzslider class="edge-slider"
                 rz-slider-model="ctrl.minEdgeWeightSlider.value"
                 rz-slider-options="ctrl.minEdgeWeightSlider.options">
       </rzslider>
       <br>
       <strong>Max # of genes:</strong>
       <br>
-      <rzslider id="gene-slider"
+      <rzslider class="gene-slider"
                 rz-slider-model="ctrl.maxGeneNumSlider.value"
                 rz-slider-options="ctrl.maxGeneNumSlider.options">
       </rzslider>
     </div>
-    <div class="btn-group" id="download-menu" uib-dropdown>
+    <div class="btn-group download-menu" uib-dropdown>
       <button class="btn btn-secondary dropdown-toggle"
         type="button" id="download-button" uib-dropdown-toggle
         aria-haspopup="true" aria-expanded="false">
