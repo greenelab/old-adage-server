@@ -223,7 +223,7 @@ angular.module('adage.gene.network', [
         });
 
         // format a list of genes for download
-        if (self.geneDownload !== null && self.geneDownload !== undefined) {
+        if (!!self.geneDownload) {
           // release a previously-created Blob
           URL.revokeObjectURL(self.geneDownload);
         }
@@ -263,7 +263,7 @@ angular.module('adage.gene.network', [
         // any more.
 
         // format a list of edges for download
-        if (self.edgeDownload !== null && self.edgeDownload !== undefined) {
+        if (!!self.edgeDownload) {
           // release a previously-created Blob
           URL.revokeObjectURL(self.edgeDownload);
         }
