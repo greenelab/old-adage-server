@@ -3,9 +3,9 @@ angular.module('adage.heatmap-vgspec', [])
 .constant('HeatmapSpec', {
   // TODO dynamic layout: compute constants w=numSignatures*4, h=numSamples*12
   'width': 2400,
-  'height': 200,
-  'padding': {'left': 50, 'right': 10, 'top': 10, 'bottom': 20},
-  'viewport': [868, 250],
+  'height': 210,
+  'padding': {'left': 120, 'right': 10, 'top': 10, 'bottom': 20},
+  'viewport': [868, 260],
 
   'data': [
     {
@@ -17,11 +17,17 @@ angular.module('adage.heatmap-vgspec', [])
       ]
     }, {
       // these datasets "streamed" in via ngVega from heatmap vegaData
-      'name': 'samples'
+      'name': 'samples',
+      'transform': [
+        {
+          'type': 'rank',
+          'as': 'rank'
+        }
+      ]
     }, {
       'name': 'signatureOrder'
     }, {
-      'name': 'sample_objects'
+      'name': 'sampleObjects'
     }, {
       // compute minimum normalized value for each signature (across samples)
       'name': 'signature_summary',
@@ -31,6 +37,18 @@ angular.module('adage.heatmap-vgspec', [])
           'type': 'aggregate',
           'groupby': ['signature'],
           'summarize': [{'field': 'normval', 'ops': ['min']}]
+        }
+      ]
+    }, {
+      'name': 'samples_labeled',
+      'source': 'samples',
+      'transform': [
+        {
+          'type': 'lookup',
+          'on': 'sampleObjects',
+          'onKey': 'id',
+          'keys': ['data'],
+          'as': ['sample_object']
         }
       ]
     }, {
@@ -80,8 +98,8 @@ angular.module('adage.heatmap-vgspec', [])
       'name': 'samples',
       'type': 'ordinal',
       'domain': {
-        'data': 'activity_normalized',
-        'field': 'sample_order._id',
+        'data': 'samples_labeled',
+        'field': 'rank',
         'sort': true
       },
       'range': 'height'
@@ -144,26 +162,26 @@ angular.module('adage.heatmap-vgspec', [])
         'enter': {
           'x': {'scale': 'signatures', 'field': 'signature_order._id'},
           'width': {'scale': 'signatures', 'band': true},
-          'y': {'scale': 'samples', 'field': 'sample_order._id'},
+          'y': {'scale': 'samples', 'field': 'sample_order.rank'},
           'height': {'scale': 'samples', 'band': true},
           'fill': {'scale': 's', 'field': 'normval'}
         }
       }
     }, {
       'type': 'text',
-      'from': {'data': 'samples'},
+      'from': {'data': 'samples_labeled'},
       // TODO dynamic layout: adjust these "magic numbers" automatically
       'properties': {
         'update': {
-          'text': {'field': 'data'},
+          'text': {'field': 'sample_object.ml_data_source'},
           'x': {'value': -5},
           'y': {
             'scale': 'samples',
-            'field': '_id',
-            'offset': 18
+            'field': 'rank',
+            'offset': 0
           },
           'align': {'value': 'right'},
-          'fontWeight': {'value': 'bold'},
+          'baseline': {'value': 'top'},
           'fill': {'value': 'black'}
         }
       }

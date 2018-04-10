@@ -39,10 +39,23 @@ angular.module('adage.heatmap.service', [
         // FIXME restore query progress messages (see rebuildHeatmapActivity)
         //  note: progress can be reported by returning a $promise to the caller
         // respObj.queryStatus = 'Retrieving sample activity...';
+        this.loadSampleObjects();
         this.rebuildHeatmapActivity();
       },
 
-      getSampleObjects: function() {
+      loadSampleObjects: function() {
+        this.vegaData.sampleObjects = this.vegaData.samples.map(function(val) {
+          var sampleObject = Sample.getCached(val);
+          if (!sampleObject) {
+            $log.warn(
+              'Heatmap.loadSampleObjects: sample object not found:', val
+            );
+            sampleObject = {id: val};
+          }
+          return sampleObject;
+        });
+      },
+      getSampleActivity: function() {
         // reformat data from vegaData.activity to a form that can be used
         // by hcluster.js: need a separate array of objects for each sample
         return this.vegaData.samples.map(function(val) {
@@ -66,7 +79,7 @@ angular.module('adage.heatmap.service', [
         // the array corresponds to one mark on the heatmap. For clustering by
         // hcluster.js, on the other hand, we need to reorganize the data so
         // that all activity for each *signature* is collected in an array. The
-        // result is essentially the same as that from `getSampleObjects`
+        // result is essentially the same as that from `getSampleActivity`
         // above, but transposed. We achieve this without too many intermediate
         // steps via two nested Array.prototype.map() operations:
 
@@ -215,7 +228,7 @@ angular.module('adage.heatmap.service', [
             .distance('euclidean')
             .linkage('avg')
             .posKey('activity')
-            .data(Heatmap.getSampleObjects());
+            .data(Heatmap.getSampleActivity());
           Heatmap.vegaData.samples = sampleClust.orderedNodes().map(
             Heatmap._getIDs
           );
