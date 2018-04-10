@@ -73,7 +73,7 @@ function AnalysisCtrl($scope, $log, $q, $state, $stateParams,
   var pArrSamples = [];
   SampleBin.samples.forEach(function(sampleID) {
     var pSample = Sample
-      .getSampleDetails(sampleID)
+      .getSamplePromise(sampleID)
       .then(function() {
         // pull data from Sample's cache to display on the page
         $scope.analysis.sampleDetails[sampleID] = Sample.getCached(sampleID);

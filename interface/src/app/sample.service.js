@@ -60,7 +60,7 @@ angular.module('adage.sample.service', [
     Sample.setCache = function(id, obj) {
       this.cache[id] = obj;
     };
-    Sample.getSampleDetails = function(pk) {
+    Sample.getSamplePromise = function(pk) {
       var pSample = Sample.get({id: pk},
         function success(responseObject, responseHeaders) {
           if (responseObject) {
