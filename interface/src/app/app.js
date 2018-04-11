@@ -19,6 +19,7 @@ angular.module('adage', [
   'adage.signatureSearch',
   'adage.help',
   'adage.sampleAnnotation',
+  'adage.heatmap.view',
   'adage.volcano-plot.view',
   'adage.utils'
 ])

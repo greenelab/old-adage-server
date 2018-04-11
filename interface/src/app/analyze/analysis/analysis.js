@@ -58,6 +58,12 @@ function AnalysisCtrl($scope, $log, $q, $state, $stateParams,
   // give our templates a way to access the SampleBin service
   $scope.sb = SampleBin;
 
+  $scope.showHeatmap = function() {
+    $state.go('heatmap', {
+      'mlmodel': $scope.modelInUrl,
+      'samplelist': SampleBin.samples.join()
+    });
+  };
   $scope.showVolcanoPlot = function() {
     $state.go('volcano', {'mlmodel': $scope.modelInUrl});
   };

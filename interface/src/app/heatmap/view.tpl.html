@@ -1,0 +1,12 @@
+<div class="page-header">
+  <h3>Heatmap</h3>
+  <ml-model-view></ml-model-view>
+  <ml-model-validator model-id="ctrl.mlModel"
+                      is-valid-model="ctrl.isValidModel">
+  </ml-model-validator>
+</div>
+
+<status-bar msg-text="ctrl.status"></status-bar>
+<div ng-if="ctrl.isValidModel">
+  <heatmap mlmodel="ctrl.mlModel" samples="ctrl.sampleList"></heatmap>
+</div>
