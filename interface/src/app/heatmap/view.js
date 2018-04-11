@@ -3,8 +3,7 @@
  * in the url via the ui.router $stateProvider api
  */
 angular.module('adage.heatmap.view', [
-  'ui.router',
-  'statusBar'
+  'ui.router'
 ])
 
 .config(['$stateProvider', function($stateProvider) {
