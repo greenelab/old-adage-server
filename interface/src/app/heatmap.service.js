@@ -36,15 +36,14 @@ angular.module('adage.heatmap.service', [
           $log.warn('Heatmap.loadData called before setting sample list');
           return;
         }
-        // FIXME restore query progress messages (see rebuildHeatmapActivity)
-        //  note: progress can be reported by returning a $promise to the caller
-        // respObj.queryStatus = 'Retrieving sample activity...';
-        this.loadSampleObjects();
-        this.rebuildHeatmapActivity();
+        var promises = [];
+        promises.push(this.loadSampleObjects());
+        promises.push(this.rebuildHeatmapActivity());
+        return $q.all(promises);
       },
 
       loadSampleObjects: function() {
-        Sample.getSampleListPromise(this.vegaData.samples)
+        return Sample.getSampleListPromise(this.vegaData.samples)
           .then(function(sampleList) {
             Heatmap.vegaData.sampleObjects = sampleList;
           }).catch(function(errObject) {
@@ -121,8 +120,6 @@ angular.module('adage.heatmap.service', [
         $log.error(errGen('Query errored', httpResponse));
       },
       rebuildHeatmapActivity: function() {
-        // TODO #280 need a "reloading..." notice while this happens
-        //  note: progress can be reported by returning a $promise to the caller
         if (!this.mlmodel.id) {
           // ignore "rebuild" requests until a model is specified
           $log.info(
@@ -199,7 +196,7 @@ angular.module('adage.heatmap.service', [
           }
         });
         // when the cache is ready, update the heatmap activity data
-        $q.all(activityPromises)
+        return $q.all(activityPromises)
           .then(updateHeatmapActivity)
           .catch(this.logError);
       },
