@@ -44,16 +44,12 @@ angular.module('adage.heatmap.service', [
       },
 
       loadSampleObjects: function() {
-        this.vegaData.sampleObjects = this.vegaData.samples.map(function(val) {
-          var sampleObject = Sample.getCached(val);
-          if (!sampleObject) {
-            $log.warn(
-              'Heatmap.loadSampleObjects: sample object not found:', val
-            );
-            sampleObject = {id: val};
-          }
-          return sampleObject;
-        });
+        Sample.getSampleListPromise(this.vegaData.samples)
+          .then(function(sampleList) {
+            Heatmap.vegaData.sampleObjects = sampleList;
+          }).catch(function(errObject) {
+            $log.warn('Heatmap.loadSampleObjects error:', errObject);
+          });
       },
       getSampleActivity: function() {
         // reformat data from vegaData.activity to a form that can be used
