@@ -40,7 +40,7 @@ angular.module('adage.heatmap-vgspec', [])
         }
       ]
     }, {
-      'name': 'samples_labeled',
+      'name': 'samplesLabeled',
       'source': 'samples',
       'transform': [
         {
@@ -98,7 +98,7 @@ angular.module('adage.heatmap-vgspec', [])
       'name': 'samples',
       'type': 'ordinal',
       'domain': {
-        'data': 'samples_labeled',
+        'data': 'samplesLabeled',
         'field': 'rank',
         'sort': true
       },
@@ -169,7 +169,7 @@ angular.module('adage.heatmap-vgspec', [])
       }
     }, {
       'type': 'text',
-      'from': {'data': 'samples_labeled'},
+      'from': {'data': 'samplesLabeled'},
       // TODO dynamic layout: adjust these "magic numbers" automatically
       'properties': {
         'update': {

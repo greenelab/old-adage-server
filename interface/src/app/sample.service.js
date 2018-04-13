@@ -62,6 +62,7 @@ angular.module('adage.sample.service', [
     };
 
     Sample.promises = {};
+
     Sample.getSamplePromise = function(pk) {
       var pSample = Sample.get({id: pk},
         function success(responseObject, responseHeaders) {
@@ -79,6 +80,7 @@ angular.module('adage.sample.service', [
       Sample.promises[pk] = pSample;
       return pSample;
     };
+
     Sample.getSampleListPromise = function(pkList) {
       return $q(function(resolve, reject) {
         var cachedSamples = [];
