@@ -128,6 +128,46 @@ angular.module('adage.gene.network', [
 
       var geneTip, edgeTip;
 
+      var updateGeneDownload = function() {
+        // format a list of genes for download & update self.geneDownload
+        if (!!self.geneDownload) {
+          // release a previously-created Blob
+          URL.revokeObjectURL(self.geneDownload);
+        }
+        self.geneDownload = URL.createObjectURL(new Blob(
+          network.drawGenes().map(function(g, index) {
+            var geneStr = g.label + ',' + g.entrezid + '\n';
+            if (index === 0) {
+              // prepend a column header
+              geneStr = 'Gene,EntrezID\n' + geneStr;
+            }
+            return geneStr;
+          })
+        ));
+      };
+
+      var updateEdgeDownload = function() {
+        // format a list of edges for download & update self.edgeDownload
+        if (!!self.edgeDownload) {
+          // release a previously-created Blob
+          URL.revokeObjectURL(self.edgeDownload);
+        }
+        self.edgeDownload = URL.createObjectURL(new Blob(
+          network.drawEdges().map(function(e, index) {
+            var edgeStr = (
+              e.gene1.label + ',' + e.gene1.entrezid + ',' +
+              e.gene2.label + ',' + e.gene2.entrezid + ',' +
+              e.weight + '\n'
+            );
+            if (index === 0) {
+              // prepend a column header
+              edgeStr = 'Gene1,EntrezID1,Gene2,EntrezID2,Weight\n' + edgeStr;
+            }
+            return edgeStr;
+          })
+        ));
+      };
+
       self.renderNetwork = function() {
         geneTip.hide();
         edgeTip.hide();
@@ -217,46 +257,6 @@ angular.module('adage.gene.network', [
           }
         });
         return geneList;
-      };
-
-      var updateGeneDownload = function() {
-        // format a list of genes for download & update self.geneDownload
-        if (!!self.geneDownload) {
-          // release a previously-created Blob
-          URL.revokeObjectURL(self.geneDownload);
-        }
-        self.geneDownload = URL.createObjectURL(new Blob(
-          network.drawGenes().map(function(g, index) {
-            var geneStr = g.label + ',' + g.entrezid + '\n';
-            if (index === 0) {
-              // prepend a column header
-              geneStr = 'Gene,EntrezID\n' + geneStr;
-            }
-            return geneStr;
-          })
-        ));
-      };
-
-      var updateEdgeDownload = function() {
-        // format a list of edges for download & update self.edgeDownload
-        if (!!self.edgeDownload) {
-          // release a previously-created Blob
-          URL.revokeObjectURL(self.edgeDownload);
-        }
-        self.edgeDownload = URL.createObjectURL(new Blob(
-          network.drawEdges().map(function(e, index) {
-            var edgeStr = (
-              e.gene1.label + ',' + e.gene1.entrezid + ',' +
-              e.gene2.label + ',' + e.gene2.entrezid + ',' +
-              e.weight + '\n'
-            );
-            if (index === 0) {
-              // prepend a column header
-              edgeStr = 'Gene1,EntrezID1,Gene2,EntrezID2,Weight\n' + edgeStr;
-            }
-            return edgeStr;
-          })
-        ));
       };
 
       // Function that sets genes in the network.
