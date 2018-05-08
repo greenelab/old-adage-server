@@ -143,6 +143,8 @@ angular.module('adage.gene.network', [
           self.minEdgeWeightSlider.value, maxCorrelation, correlationSign,
           self.maxGeneNumSlider.value);
         network.draw();
+        updateGeneDownload();
+        updateEdgeDownload();
       };
 
       self.minEdgeWeightSlider = {  // slider that controls min edge weight
@@ -218,16 +220,13 @@ angular.module('adage.gene.network', [
       };
 
       var updateGeneDownload = function() {
-        // TODO remove this debugging code
-        console.log('updateGeneDownload called');
-        console.log('drawGenes is:', network.drawGenes());
         // format a list of genes for download & update self.geneDownload
         if (!!self.geneDownload) {
           // release a previously-created Blob
           URL.revokeObjectURL(self.geneDownload);
         }
         self.geneDownload = URL.createObjectURL(new Blob(
-          genes.map(function(g, index) {
+          network.drawGenes().map(function(g, index) {
             var geneStr = g.label + ',' + g.entrezid + '\n';
             if (index === 0) {
               // prepend a column header
@@ -239,15 +238,13 @@ angular.module('adage.gene.network', [
       };
 
       var updateEdgeDownload = function() {
-        // TODO remove this debugging code
-        console.log('updateEdgeDownload called');
         // format a list of edges for download & update self.edgeDownload
         if (!!self.edgeDownload) {
           // release a previously-created Blob
           URL.revokeObjectURL(self.edgeDownload);
         }
         self.edgeDownload = URL.createObjectURL(new Blob(
-          edges.map(function(e, index) {
+          network.drawEdges().map(function(e, index) {
             var edgeStr = (
               e.gene1.label + ',' + e.gene1.entrezid + ',' +
               e.gene2.label + ',' + e.gene2.entrezid + ',' +
@@ -271,8 +268,6 @@ angular.module('adage.gene.network', [
             g.query = true;
           }
         });
-
-        updateGeneDownload();
       };
 
       // Function that sets edges in the network.
@@ -297,8 +292,6 @@ angular.module('adage.gene.network', [
         // edge.source and edge.target to the gene object later, so the values
         // of "source" and "target" properties of the edge won't be integers
         // any more.
-
-        updateEdgeDownload();
       };
 
       var renderSliders = function() {
