@@ -121,6 +121,11 @@ angular.module('adage.gene.network', [
       // disabled in adage-server:
       // https://github.com/greenelab/adage-server/issues/295
 
+      // This method is very helpful for debugging internal network state
+      self.getNetwork = function() {
+        return network;
+      };
+
       var geneTip, edgeTip;
 
       self.renderNetwork = function() {
@@ -212,17 +217,11 @@ angular.module('adage.gene.network', [
         return geneList;
       };
 
-      // Function that sets genes in the network.
-      var setGenes = function(responseObject) {
-        genes = responseObject.objects;
-        genes.forEach(function(g) {
-          g.label = g.standard_name ? g.standard_name : g.systematic_name;
-          if (genesInURL.indexOf(g.id) !== -1) {
-            g.query = true;
-          }
-        });
-
-        // format a list of genes for download
+      var updateGeneDownload = function() {
+        // TODO remove this debugging code
+        console.log('updateGeneDownload called');
+        console.log('drawGenes is:', network.drawGenes());
+        // format a list of genes for download & update self.geneDownload
         if (!!self.geneDownload) {
           // release a previously-created Blob
           URL.revokeObjectURL(self.geneDownload);
@@ -237,6 +236,43 @@ angular.module('adage.gene.network', [
             return geneStr;
           })
         ));
+      };
+
+      var updateEdgeDownload = function() {
+        // TODO remove this debugging code
+        console.log('updateEdgeDownload called');
+        // format a list of edges for download & update self.edgeDownload
+        if (!!self.edgeDownload) {
+          // release a previously-created Blob
+          URL.revokeObjectURL(self.edgeDownload);
+        }
+        self.edgeDownload = URL.createObjectURL(new Blob(
+          edges.map(function(e, index) {
+            var edgeStr = (
+              e.gene1.label + ',' + e.gene1.entrezid + ',' +
+              e.gene2.label + ',' + e.gene2.entrezid + ',' +
+              e.weight + '\n'
+            );
+            if (index === 0) {
+              // prepend a column header
+              edgeStr = 'Gene1,EntrezID1,Gene2,EntrezID2,Weight\n' + edgeStr;
+            }
+            return edgeStr;
+          })
+        ));
+      };
+
+      // Function that sets genes in the network.
+      var setGenes = function(responseObject) {
+        genes = responseObject.objects;
+        genes.forEach(function(g) {
+          g.label = g.standard_name ? g.standard_name : g.systematic_name;
+          if (genesInURL.indexOf(g.id) !== -1) {
+            g.query = true;
+          }
+        });
+
+        updateGeneDownload();
       };
 
       // Function that sets edges in the network.
@@ -262,25 +298,7 @@ angular.module('adage.gene.network', [
         // of "source" and "target" properties of the edge won't be integers
         // any more.
 
-        // format a list of edges for download
-        if (!!self.edgeDownload) {
-          // release a previously-created Blob
-          URL.revokeObjectURL(self.edgeDownload);
-        }
-        self.edgeDownload = URL.createObjectURL(new Blob(
-          edges.map(function(e, index) {
-            var edgeStr = (
-              e.gene1.label + ',' + e.gene1.entrezid + ',' +
-              e.gene2.label + ',' + e.gene2.entrezid + ',' +
-              e.weight + '\n'
-            );
-            if (index === 0) {
-              // prepend a column header
-              edgeStr = 'Gene1,EntrezID1,Gene2,EntrezID2,Weight\n' + edgeStr;
-            }
-            return edgeStr;
-          })
-        ));
+        updateEdgeDownload();
       };
 
       var renderSliders = function() {
