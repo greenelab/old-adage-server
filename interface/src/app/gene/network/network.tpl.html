@@ -14,7 +14,7 @@
   <h3 class="text-warning" ng-bind="ctrl.statusMessage"></h3>
 
   <div ng-hide="ctrl.statusMessage">
-    <div class="well well-sm">
+    <div class="network-filters well well-sm">
       <form>
         <strong>Min edge weight:</strong>&nbsp;
         <input type="radio" name="edgeSign" ng-model="ctrl.edgeSign"
@@ -44,6 +44,7 @@
     <div class="btn-group download-menu" uib-dropdown>
       <button class="btn btn-secondary dropdown-toggle"
         type="button" id="download-button" uib-dropdown-toggle
+        uib-tooltip="Download network data shown below"
         aria-haspopup="true" aria-expanded="false">
         Download <span class="caret"></span>
       </button>
@@ -63,6 +64,10 @@
         </li>
       </ul>
     </div>
+    <p>
+      Showing {{ctrl.filterInfo.showingEdgesText}} edges and
+      {{ctrl.filterInfo.showingGenesText}} genes.
+    </p>
   </div>
 </div>
 
