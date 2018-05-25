@@ -17,7 +17,7 @@ RUN pip install --upgrade pip
 # Copy requirements.txt file and install requirements here to save time
 # when building this docker image again if no requirements have changed
 COPY adage/requirements.txt requirements.txt
-RUN pip install -r requirements.txt
+RUN pip install -r requirements.txt --ignore-installed
 
 # Clean up APT when done.
 RUN apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
