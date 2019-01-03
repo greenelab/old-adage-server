@@ -29,5 +29,8 @@
     "angular": "~1.5.5",
     "d3": "~3.5.5",
     "vega": "^2.6.0"
+  },
+  "dependencies": {
+    "angulartics-google-analytics": "^0.5.0"
   }
 }

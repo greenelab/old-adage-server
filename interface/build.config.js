@@ -78,6 +78,8 @@ module.exports = {
       'vendor/ng-sortable/dist/ng-sortable.min.js',
       'vendor/angularjs-slider/dist/rzslider.min.js',
       'vendor/d3-tip/index.js',
+      'vendor/angulartics/dist/angulartics.min.js',
+      'vendor/angulartics-google-analytics/dist/angulartics-ga.min.js',
       'node_modules/d3-network/d3.network.js',
       'node_modules/hclusterjs/hcluster.js',
 
