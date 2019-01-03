@@ -4,7 +4,6 @@
  */
 angular.module('adage.analyze', [
   'adage.analyze.search',
-  'adage.analyze.detail',
   'adage.analyze.analysis', // includes sample-bin
   'adage.sampleBin.addItem',
   'ui.router',
@@ -27,10 +26,9 @@ angular.module('adage.analyze', [
   });
 })
 
-.controller('AnalyzeCtrl', ['$scope', '$stateParams', '$log', '$location',
+.controller('AnalyzeCtrl', ['$scope', '$stateParams', '$log', '$state',
   'Sample', 'SampleBin',
-  function AnalyzeCtrl($scope, $stateParams, $log, $location, Sample,
-                       SampleBin) {
+  function AnalyzeCtrl($scope, $stateParams, $log, $state, Sample, SampleBin) {
     $scope.isValidModel = false;
     // Do nothing if mlmodel in URL is falsey. The error will be taken
     // care of by "<ml-model-validator>" component.
@@ -43,18 +41,17 @@ angular.module('adage.analyze', [
     $scope.analyze = {
       itemStyle: function(searchItem) {
         // Determine which CSS classes should apply to this searchItem.
-        // We want Experiments and Samples to look different. Also, if we are
-        // looking at detail on this searchItem, it should be highlighted.
-        var classList = searchItem.itemType;
-        if ($scope.detail.showing &&
-            searchItem.pk === $scope.detail.searchItem.pk) {
-          classList += ' active';
-        }
-        return classList;
+        // We want Experiments and Samples to look different.
+        return searchItem.itemType;
       },
 
-      scrollToId: function(id) {
-        $location.hash(id);
+      showDetail: function(searchItem) {
+        if (searchItem.itemType === 'experiment') {
+          $state.go('experiment', {'id': searchItem.pk});
+        } else {
+          // only other valid itemType is sample
+          $state.go('sample', {'id': searchItem.pk});
+        }
       }
     };
   }

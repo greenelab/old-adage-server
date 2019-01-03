@@ -77,9 +77,12 @@
       </tr>
     </tbody>
   </table>
-  <heatmap mlmodel="modelInUrl" samples="sb.samples"></heatmap>
   <nav class="navbar navbar-default">
     <p class="navbar-text">Visualize</p>
+    <button type="button" class="btn btn-default navbar-btn"
+    ng-click="showHeatmap()">
+      Heatmap
+    </button>
     <button type="button" class="btn btn-default navbar-btn"
     ng-click="showVolcanoPlot()">
       Volcano Plot

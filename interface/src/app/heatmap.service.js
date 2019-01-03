@@ -36,13 +36,21 @@ angular.module('adage.heatmap.service', [
           $log.warn('Heatmap.loadData called before setting sample list');
           return;
         }
-        // FIXME restore query progress messages (see rebuildHeatmapActivity)
-        //  note: progress can be reported by returning a $promise to the caller
-        // respObj.queryStatus = 'Retrieving sample activity...';
-        this.rebuildHeatmapActivity();
+        var promises = [];
+        promises.push(this.loadSampleObjects());
+        promises.push(this.rebuildHeatmapActivity());
+        return $q.all(promises);
       },
 
-      getSampleObjects: function() {
+      loadSampleObjects: function() {
+        return Sample.getSampleListPromise(this.vegaData.samples)
+          .then(function(sampleList) {
+            Heatmap.vegaData.sampleObjects = sampleList;
+          }).catch(function(errObject) {
+            $log.warn('Heatmap.loadSampleObjects error:', errObject);
+          });
+      },
+      getSampleActivity: function() {
         // reformat data from vegaData.activity to a form that can be used
         // by hcluster.js: need a separate array of objects for each sample
         return this.vegaData.samples.map(function(val) {
@@ -66,7 +74,7 @@ angular.module('adage.heatmap.service', [
         // the array corresponds to one mark on the heatmap. For clustering by
         // hcluster.js, on the other hand, we need to reorganize the data so
         // that all activity for each *signature* is collected in an array. The
-        // result is essentially the same as that from `getSampleObjects`
+        // result is essentially the same as that from `getSampleActivity`
         // above, but transposed. We achieve this without too many intermediate
         // steps via two nested Array.prototype.map() operations:
 
@@ -112,8 +120,6 @@ angular.module('adage.heatmap.service', [
         $log.error(errGen('Query errored', httpResponse));
       },
       rebuildHeatmapActivity: function() {
-        // TODO #280 need a "reloading..." notice while this happens
-        //  note: progress can be reported by returning a $promise to the caller
         if (!this.mlmodel.id) {
           // ignore "rebuild" requests until a model is specified
           $log.info(
@@ -190,7 +196,7 @@ angular.module('adage.heatmap.service', [
           }
         });
         // when the cache is ready, update the heatmap activity data
-        $q.all(activityPromises)
+        return $q.all(activityPromises)
           .then(updateHeatmapActivity)
           .catch(this.logError);
       },
@@ -215,7 +221,7 @@ angular.module('adage.heatmap.service', [
             .distance('euclidean')
             .linkage('avg')
             .posKey('activity')
-            .data(Heatmap.getSampleObjects());
+            .data(Heatmap.getSampleActivity());
           Heatmap.vegaData.samples = sampleClust.orderedNodes().map(
             Heatmap._getIDs
           );

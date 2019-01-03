@@ -98,6 +98,14 @@ angular.module('adage.gene.network', [
       // The following properties of "self" will be available to HTML.
       self.edgeSign = 'both';
       self.statusMessage = 'Connecting to the server ...';
+      self.filterInfo = {
+        totalEdges: 0,
+        totalGenes: 0,
+        showingEdges: 0,
+        showingGenes: 0,
+        showingEdgesText: 'all',
+        showingGenesText: 'all'
+      };
 
       var minCorrelation = -1.0, maxCorrelation = 1.0;
       var midPoint = (minCorrelation + maxCorrelation) / 2.0;
@@ -121,7 +129,72 @@ angular.module('adage.gene.network', [
       // disabled in adage-server:
       // https://github.com/greenelab/adage-server/issues/295
 
+      // This method is very helpful for debugging internal network state
+      self.getNetwork = function() {
+        return network;
+      };
+
       var geneTip, edgeTip;
+
+      var updateGeneDownload = function() {
+        // format a list of genes for download & update self.geneDownload
+        if (!!self.geneDownload) {
+          // release a previously-created Blob
+          URL.revokeObjectURL(self.geneDownload);
+        }
+        self.geneDownload = URL.createObjectURL(new Blob(
+          network.drawGenes().map(function(g, index) {
+            var geneStr = g.label + ',' + g.entrezid + '\n';
+            if (index === 0) {
+              // prepend a column header
+              geneStr = 'Gene,EntrezID\n' + geneStr;
+            }
+            return geneStr;
+          })
+        ));
+      };
+
+      var updateEdgeDownload = function() {
+        // format a list of edges for download & update self.edgeDownload
+        if (!!self.edgeDownload) {
+          // release a previously-created Blob
+          URL.revokeObjectURL(self.edgeDownload);
+        }
+        self.edgeDownload = URL.createObjectURL(new Blob(
+          network.drawEdges().map(function(e, index) {
+            var edgeStr = (
+              e.gene1.label + ',' + e.gene1.entrezid + ',' +
+              e.gene2.label + ',' + e.gene2.entrezid + ',' +
+              e.weight + '\n'
+            );
+            if (index === 0) {
+              // prepend a column header
+              edgeStr = 'Gene1,EntrezID1,Gene2,EntrezID2,Weight\n' + edgeStr;
+            }
+            return edgeStr;
+          })
+        ));
+      };
+
+      var updateFilterInfo = function() {
+        var f = self.filterInfo;
+        f.totalEdges = network.edges().length;
+        f.totalGenes = network.genes().length;
+        f.showingEdges = network.drawEdges().length;
+        f.showingGenes = network.drawGenes().length;
+        if (f.showingEdges === f.totalEdges) {
+          f.showingEdgesText = 'all ';
+        } else {
+          f.showingEdgesText = f.showingEdges + ' of ';
+        }
+        f.showingEdgesText = f.showingEdgesText + f.totalEdges;
+        if (f.showingGenes === f.totalGenes) {
+          f.showingGenesText = 'all ';
+        } else {
+          f.showingGenesText = f.showingGenes + ' of ';
+        }
+        f.showingGenesText = f.showingGenesText + f.totalGenes;
+      };
 
       self.renderNetwork = function() {
         geneTip.hide();
@@ -138,6 +211,9 @@ angular.module('adage.gene.network', [
           self.minEdgeWeightSlider.value, maxCorrelation, correlationSign,
           self.maxGeneNumSlider.value);
         network.draw();
+        updateGeneDownload();
+        updateEdgeDownload();
+        updateFilterInfo();
       };
 
       self.minEdgeWeightSlider = {  // slider that controls min edge weight

@@ -14,35 +14,60 @@
   <h3 class="text-warning" ng-bind="ctrl.statusMessage"></h3>
 
   <div ng-hide="ctrl.statusMessage">
-    <div class="well well-sm">
-    <form>
-      <strong>Min edge weight:</strong>&nbsp;
-      <input type="radio" name="edgeSign" ng-model="ctrl.edgeSign"
-             ng-change="ctrl.renderNetwork()" value="negOnly">
-      Negative only
-      &nbsp;
-      <input type="radio" name="edgeSign" ng-model="ctrl.edgeSign"
-             ng-change="ctrl.renderNetwork()" value="posOnly">
-      Positive only
-      &nbsp;
-      <input type="radio" name="edgeSign" ng-model="ctrl.edgeSign"
-             ng-change="ctrl.renderNetwork()" value="both">
-      Both
-    </form>
-    <rzslider id="edge-slider"
-              rz-slider-model="ctrl.minEdgeWeightSlider.value"
-              rz-slider-options="ctrl.minEdgeWeightSlider.options">
-    </rzslider>
-    </div>
-
-    <div class="well well-sm">
+    <div class="network-filters well well-sm">
+      <form>
+        <strong>Min edge weight:</strong>&nbsp;
+        <input type="radio" name="edgeSign" ng-model="ctrl.edgeSign"
+               ng-change="ctrl.renderNetwork()" value="negOnly">
+        Negative only
+        &nbsp;
+        <input type="radio" name="edgeSign" ng-model="ctrl.edgeSign"
+               ng-change="ctrl.renderNetwork()" value="posOnly">
+        Positive only
+        &nbsp;
+        <input type="radio" name="edgeSign" ng-model="ctrl.edgeSign"
+               ng-change="ctrl.renderNetwork()" value="both">
+        Both
+      </form>
+      <rzslider class="edge-slider"
+                rz-slider-model="ctrl.minEdgeWeightSlider.value"
+                rz-slider-options="ctrl.minEdgeWeightSlider.options">
+      </rzslider>
+      <br>
       <strong>Max # of genes:</strong>
       <br>
-      <rzslider id="gene-slider"
+      <rzslider class="gene-slider"
                 rz-slider-model="ctrl.maxGeneNumSlider.value"
                 rz-slider-options="ctrl.maxGeneNumSlider.options">
       </rzslider>
     </div>
+    <div class="btn-group download-menu" uib-dropdown>
+      <button class="btn btn-secondary dropdown-toggle"
+        type="button" id="download-button" uib-dropdown-toggle
+        uib-tooltip="Download network data shown below"
+        aria-haspopup="true" aria-expanded="false">
+        Download <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu" uib-dropdown-menu role="menu"
+        aria-labelledby="download-button">
+        <li role="menuitem">
+          <a href="{{ctrl.geneDownload}}"
+            download="genes.csv" type="text/csv">
+            Genes
+          </a>
+        </li>
+        <li role="menuitem">
+          <a href="{{ctrl.edgeDownload}}"
+            download="edges.csv" type="text/csv">
+            Edges (CSV)
+          </a>
+        </li>
+      </ul>
+    </div>
+    <p>
+      Showing {{ctrl.filterInfo.showingEdgesText}} edges and
+      {{ctrl.filterInfo.showingGenesText}} genes.
+    </p>
   </div>
 </div>
 

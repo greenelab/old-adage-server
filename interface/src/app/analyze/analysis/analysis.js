@@ -58,6 +58,12 @@ function AnalysisCtrl($scope, $log, $q, $state, $stateParams,
   // give our templates a way to access the SampleBin service
   $scope.sb = SampleBin;
 
+  $scope.showHeatmap = function() {
+    $state.go('heatmap', {
+      'mlmodel': $scope.modelInUrl,
+      'samplelist': SampleBin.samples.join()
+    });
+  };
   $scope.showVolcanoPlot = function() {
     $state.go('volcano', {'mlmodel': $scope.modelInUrl});
   };
@@ -73,7 +79,7 @@ function AnalysisCtrl($scope, $log, $q, $state, $stateParams,
   var pArrSamples = [];
   SampleBin.samples.forEach(function(sampleID) {
     var pSample = Sample
-      .getSampleDetails(sampleID)
+      .getSamplePromise(sampleID)
       .then(function() {
         // pull data from Sample's cache to display on the page
         $scope.analysis.sampleDetails[sampleID] = Sample.getCached(sampleID);

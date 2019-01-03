@@ -13,8 +13,8 @@ angular.module('adage.sampleBin.addItemAnalyze', [
       var ctrl = this;
       ctrl.sb = SampleBin;
 
-      ctrl.addItemAnalyze = function() {
-        SampleBin.addItem(ctrl.item);
+      ctrl.addItemAnalyze = function($event) {
+        SampleBin.addItem(ctrl.item, $event);
         $state.go('analysis-detail', {'mlmodel': MlModelTracker.id});
       };
 

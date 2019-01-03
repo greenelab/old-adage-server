@@ -10,7 +10,7 @@
      it will leave "$scope.detail" undefined and cause errors. -->
 <div ng-show="isValidModel">
   <div>
-    <div id="search" ng-class="detail.showing ? 'with-detail':''">
+    <div id="search">
       <p>
         Search for an experiment or set of samples. Click on a search result
         to view more details, add them to an analysis with the
@@ -25,7 +25,7 @@
           <li ng-repeat="searchItem in analyze.query_results"
               ng-class="analyze.itemStyle(searchItem)"
               class="list-group-item">
-            <a id="{{searchItem.pk}}" ng-click="detail.show(searchItem)">
+            <a id="{{searchItem.pk}}" ng-click="analyze.showDetail(searchItem)">
               <div class="media-left">
                 <span ng-if="searchItem.itemType === 'experiment'"
                       class="badge">
@@ -47,9 +47,6 @@
           </li>
         </ul>
       </div>
-    </div>
-    <div id="search-detail" ng-show="detail.showing" class="col-sm-6">
-      <search-detail></search-detail>
     </div>
   </div>
 </div>

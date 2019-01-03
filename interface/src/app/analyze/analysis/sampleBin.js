@@ -70,12 +70,13 @@ MathFuncts, errGen, MlModelTracker, Heatmap) {
       }
     },
 
-    addItem: function(searchItem) {
+    addItem: function(searchItem, $event) {
       if (searchItem.itemType === 'sample') {
         this.addSample(searchItem.pk);
       } else if (searchItem.itemType === 'experiment') {
         this.addExperiment(searchItem.relatedItems);
       }
+      $event.stopPropagation();
     },
 
     hasItem: function(searchItem) {

@@ -21,6 +21,7 @@ angular.module('adage', [
   'adage.signatureSearch',
   'adage.help',
   'adage.sampleAnnotation',
+  'adage.heatmap.view',
   'adage.volcano-plot.view',
   'adage.utils'
 ])
@@ -35,15 +36,21 @@ angular.module('adage', [
   $resourceProvider.defaults.stripTrailingSlashes = false;
 }])
 
+// To download `blob:` objects, we need that scheme in our whitelist
+.config(['$compileProvider', function($compileProvider) {
+  $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|blob):/);
+}])
+
 // Google Analytics config, see more details at:
 // https://github.com/angulartics/angulartics/issues/112#issuecomment-60341150
 .config(['$analyticsProvider', function($analyticsProvider) {
   $analyticsProvider.virtualPageviews(false);
 }])
 
-.controller('AppCtrl',
-  ['$scope', '$state', '$location', '$analytics', 'UserFactory', 'MlModelTracker',
-  function AppCtrl($scope, $state, $location, $analytics, UserFactory, MlModelTracker) {
+.controller('AppCtrl', ['$scope', '$state', '$location', '$analytics',
+  'Userfactoryweb-mode', 'MlModelTracker',
+  function AppCtrl($scope, $state, $location, $analytics, UserFactory,
+                   MlModelTracker) {
     // Machine learning model
     $scope.modelInfo = MlModelTracker;
 
@@ -63,11 +70,11 @@ angular.module('adage', [
         if (angular.isDefined(toState.data.pageTitle)) {
           $scope.pageTitle = toState.data.pageTitle + ' | adage';
 
-	  // Use setTimeout() to ensure that Google Analytics gets updated
-	  // pageTitle. See more details at:
-	  // https://github.com/angulartics/angulartics/issues/112#issuecomment-60341150
+          // Use setTimeout() to ensure that Google Analytics gets updated
+          // pageTitle. See more details at:
+          // https://github.com/angulartics/angulartics/issues/112#issuecomment-60341150
           setTimeout(function() {
-	    // Use url() method instead of path() to record parameters
+            // Use url() method instead of path() to record parameters
             $analytics.pageTrack($location.url());
           }, 0);
         }

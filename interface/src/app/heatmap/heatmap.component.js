@@ -24,7 +24,7 @@ angular.module('adage.heatmap.component', [
       ctrl.sampleDetails = Sample.cache;
 
       ctrl.$onInit = function() {
-        ctrl.status = '';
+        ctrl.status = 'retrieving data...';
         Heatmap.samplesMissingActivity = [];
       };
       ctrl.$onChanges = function(changesObj) {
@@ -42,11 +42,13 @@ angular.module('adage.heatmap.component', [
           return;
         }
         ctrl.$onInit();   // re-initialize properties
-        ctrl.status = 'reloading...';
         Heatmap.init(mlmodel, samples);
-        // TODO #280 need to make this call asynchronous
-        Heatmap.loadData();
-        ctrl.status = '';
+        Heatmap.loadData().then(function() {
+          ctrl.status = '';
+        }).catch(function(errObject) {
+          $log.error('Heatmap data load failed', errObject);
+          ctrl.status = 'An error occurred while loading heatmap data.';
+        });
       };
       ctrl.clearSamplesMissingActivity = function() {
         Heatmap.samplesMissingActivity = [];

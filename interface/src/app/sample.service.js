@@ -3,8 +3,8 @@ angular.module('adage.sample.service', [
   'adage.utils'
 ])
 
-.factory('Sample', ['$resource', '$http', 'ApiBasePath',
-  function($resource, $http, ApiBasePath) {
+.factory('Sample', ['$resource', '$http', '$q', 'ApiBasePath',
+  function($resource, $http, $q, ApiBasePath) {
     var Sample = $resource(
       ApiBasePath + 'sample/:id/',
       // TODO need to add logic for handling pagination of results.
@@ -60,7 +60,10 @@ angular.module('adage.sample.service', [
     Sample.setCache = function(id, obj) {
       this.cache[id] = obj;
     };
-    Sample.getSampleDetails = function(pk) {
+
+    Sample.promises = {};
+
+    Sample.getSamplePromise = function(pk) {
       var pSample = Sample.get({id: pk},
         function success(responseObject, responseHeaders) {
           if (responseObject) {
@@ -74,7 +77,43 @@ angular.module('adage.sample.service', [
           $log.error($scope.analysis.queryStatus);
         }
       ).$promise;
+      Sample.promises[pk] = pSample;
       return pSample;
+    };
+
+    Sample.getSampleListPromise = function(pkList) {
+      return $q(function(resolve, reject) {
+        var cachedSamples = [];
+        var promisedSampleIDs = [];
+        var newSamplePromises = [];
+        // check cached samples and promise queue before making any
+        // redundant requests
+        pkList.forEach(function(pk) {
+          var cached = Sample.getCached(pk);
+          if (!!cached) {
+            cachedSamples.push(cached);
+          } else if (!!Sample.promises[pk]) {
+            promisedSampleIDs.push(pk);
+            newSamplePromises.push(Sample.promises[pk]);
+          } else {
+            // not cached and not in promise queue yet, so make a new request
+            promisedSampleIDs.push(pk);
+            newSamplePromises.push(Sample.getSamplePromise(pk));
+          }
+        });
+
+        // when the promises in our list all come back we can finish up
+        $q.all(newSamplePromises)
+          .then(function() {
+            promisedSampleIDs.forEach(function(pk) {
+              cachedSamples.push(Sample.getCached(pk));
+            });
+            resolve(cachedSamples);
+          }).catch(function(errObject) {
+            $log.error('getSampleListPromise failed:', errObject);
+            reject(errObject);
+          });
+      });
     };
 
     return Sample;
