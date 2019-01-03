@@ -15,6 +15,9 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.views.generic import TemplateView
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.conf import settings
 from tastypie.api import Api
 from organisms.api import OrganismResource
 from genes.api import GeneResource
@@ -40,6 +43,9 @@ v0_api.register(ParticipationResource())
 v0_api.register(ExpressionValueResource())
 
 urlpatterns = [
+    url(r'^$',
+        ensure_csrf_cookie(TemplateView.as_view(template_name="index.html")),
+        {'ga_code': settings.GA_CODE}, name='home'),
     url(r'^admin/', include(admin.site.urls)),
     url(r'^api/', include(v0_api.urls)),
     url(r'^tribe_client/', include('tribe_client.urls')),

@@ -68,6 +68,9 @@ INSTALLED_APPS = (
 API_LIMIT_PER_PAGE = 50
 TASTYPIE_FULL_DEBUG = True
 
+# Google Analytics code (should be defined in config.py)
+GA_CODE = CONFIG.get('ga_code', 'ga-code-not-found')
+
 HAYSTACK_CONNECTIONS = CONFIG['haystack']
 # HAYSTACK_DEFAULT_OPERATOR = 'OR'
 # TODO what is HAYSTACK_SEARCH_RESULTS_PER_PAGE doing for us?
