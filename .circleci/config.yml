@@ -1,6 +1,5 @@
 # See version 2 example at:
 # https://circleci.com/docs/2.0/configuration-reference/#full-example
-
 version: 2
 jobs:
   test:
@@ -17,7 +16,6 @@ jobs:
         cd ~/adage-server
         pip install -r adage/requirements.txt
         python adage/manage.py test adage
-
 
 workflows:
   version: 2
