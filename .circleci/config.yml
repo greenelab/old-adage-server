@@ -1,22 +1,21 @@
 version: 2
 jobs:
-  test:
+  tests:
     docker:
       - image: ubuntu:16.04
 
     steps:
       - checkout
 
-      - run: |
-        hg clone https://bitbucket.org/greenelab/get_pseudomonas
-        ln -s get_pseudomonas/gen_spreadsheets.py .
-        ln -s get_pseudomonas/get_pseudo_sdrf.py  .
-        cd ~/adage-server
-        pip install -r adage/requirements.txt
-        python adage/manage.py test adage
+      - run: hg clone https://bitbucket.org/greenelab/get_pseudomonas
+      - run: ln -s get_pseudomonas/gen_spreadsheets.py .
+      - run: ln -s get_pseudomonas/get_pseudo_sdrf.py  .
+      - run: cd ~/adage-server
+      - run: pip install -r adage/requirements.txt
+      - run: python adage/manage.py test adage
 
 workflows:
   version: 2
   test:
     jobs:
-      - test
+      - tests
