@@ -1,0 +1,26 @@
+# See version 2 example at:
+# https://circleci.com/docs/2.0/configuration-reference/#full-example
+
+version: 2
+jobs:
+  test:
+    docker:
+      - image: ubuntu:16.04
+
+    steps:
+      - checkout
+
+      - run: |
+        hg clone https://bitbucket.org/greenelab/get_pseudomonas
+        ln -s get_pseudomonas/gen_spreadsheets.py .
+        ln -s get_pseudomonas/get_pseudo_sdrf.py  .
+        cd ~/adage-server
+        pip install -r adage/requirements.txt
+        python adage/manage.py test adage
+
+
+workflows:
+  version: 2
+  test:
+    jobs:
+      - test
