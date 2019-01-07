@@ -48,7 +48,7 @@ angular.module('adage', [
 }])
 
 .controller('AppCtrl', ['$scope', '$state', '$location', '$analytics',
-  'Userfactoryweb-mode', 'MlModelTracker',
+  'UserFactory', 'MlModelTracker',
   function AppCtrl($scope, $state, $location, $analytics, UserFactory,
                    MlModelTracker) {
     // Machine learning model
