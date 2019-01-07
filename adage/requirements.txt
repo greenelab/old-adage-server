@@ -1,5 +1,5 @@
 argparse==1.2.1
-Django==1.8.11
+Django==1.8.19
 django-fixtureless==1.4.3.3
 django-haystack==2.6.0
 django-tastypie==0.13.3
