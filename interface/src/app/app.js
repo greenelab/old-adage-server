@@ -1,6 +1,8 @@
 angular.module('adage', [
   'ui.router',
   'ngResource',
+  'angulartics',
+  'angulartics.google.analytics',
   'templates-app',
   'templates-common',
   'adage.home',
@@ -24,9 +26,9 @@ angular.module('adage', [
   'adage.utils'
 ])
 
-.config(function myAppConfig($stateProvider, $urlRouterProvider) {
+.config(['$urlRouterProvider', function($urlRouterProvider) {
   $urlRouterProvider.otherwise('/home');
-})
+}])
 
 // This configuration is required for all REST calls to the back end.
 .config(['$resourceProvider', function($resourceProvider) {
@@ -39,8 +41,16 @@ angular.module('adage', [
   $compileProvider.aHrefSanitizationWhitelist(/^\s*(https?|ftp|mailto|blob):/);
 }])
 
-.controller('AppCtrl', ['$scope', '$state', 'UserFactory', 'MlModelTracker',
-  function AppCtrl($scope, $state, UserFactory, MlModelTracker) {
+// Google Analytics config, see more details at:
+// https://github.com/angulartics/angulartics/issues/112#issuecomment-60341150
+.config(['$analyticsProvider', function($analyticsProvider) {
+  $analyticsProvider.virtualPageviews(false);
+}])
+
+.controller('AppCtrl', ['$scope', '$state', '$location', '$analytics',
+  'UserFactory', 'MlModelTracker',
+  function AppCtrl($scope, $state, $location, $analytics, UserFactory,
+                   MlModelTracker) {
     // Machine learning model
     $scope.modelInfo = MlModelTracker;
 
@@ -59,6 +69,14 @@ angular.module('adage', [
       function(event, toState, toParams, fromState, fromParams) {
         if (angular.isDefined(toState.data.pageTitle)) {
           $scope.pageTitle = toState.data.pageTitle + ' | adage';
+
+          // Use setTimeout() to ensure that Google Analytics gets updated
+          // pageTitle. See more details at:
+          // https://github.com/angulartics/angulartics/issues/112#issuecomment-60341150
+          setTimeout(function() {
+            // Use url() method instead of path() to record parameters
+            $analytics.pageTrack($location.url());
+          }, 0);
         }
       }
     );

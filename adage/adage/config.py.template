@@ -123,6 +123,8 @@ AWS_CONFIG = {
         }
     },
 
+    'ga_code': '<google-analytics-code>',  # Google Analytics code
+
     # configure the following section to enable sign-in via Tribe's OAuth2
     'tribe_id': '<configure:ClientIDHere>',
     'tribe_secret': '<config-secret:ClientSecretHere>',

@@ -1,7 +1,7 @@
 {
   "author": "GreeneLab",
   "name": "adage",
-  "version": "0.11.0-beta",
+  "version": "0.12.0-beta",
   "description": "ADAGE web server",
   "homepage": "http://adage.greenelab.com",
   "license": "(MIT AND BSD-3-Clause)",
