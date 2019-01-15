@@ -134,7 +134,7 @@ module.exports = function ( grunt ) {
         files: {
           // this takes browserify output and just transpiles in place
           'node_modules/ttest/greenelab.stats.ttest.js':
-            'node_modules/ttest/greenelab.stats.ttest.js'
+          'node_modules/ttest/greenelab.stats.ttest.js'
         }
       }
     },

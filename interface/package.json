@@ -18,6 +18,7 @@
     "hclusterjs": "^1.3.1",
     "multtest": "^0.1.7",
     "ttest": "^1.1.0",
+    "mathfn": "1.0.0",
     "d3-network": "git+https://github.com/greenelab/d3-network.git"
   },
   "devDependencies": {
@@ -38,7 +39,7 @@
     "grunt-contrib-watch": "^1.0.0",
     "grunt-conventional-changelog": "^6.1.0",
     "grunt-eslint": "^19.0.0",
-    "grunt-html2js": "^0.3.6",
+    "grunt-html2js": "^0.5.1",
     "grunt-karma": "^2.0.0",
     "grunt-ng-annotate": "^2.0.2",
     "grunt-protractor-runner": "^3.2.0",
