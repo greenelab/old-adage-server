@@ -2,12 +2,15 @@ version: 2
 jobs:
   tests:
     docker:
+      # Primary docker container where the tests will be run
       - image: ubuntu:18.04
 
+      # Secondary docker container for database service
       - image: postgres:9.5.14
         environment:
           POSTGRES_USER: root
 
+      # Secondary docker container for Elasticsearch service
       - image: elasticsearch:2.4.6
 
     working_directory: ~/adage-server
