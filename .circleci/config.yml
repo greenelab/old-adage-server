@@ -32,7 +32,6 @@ jobs:
             createdb -h localhost circleci_test
             pip install -r requirements.txt
             python manage.py test
-
       - run:
           name: frontend tests
           working_directory: ~/adage-server/interface
