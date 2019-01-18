@@ -1,6 +1,5 @@
 # adage-server
 
-[ ![Codeship Status for greenelab/adage-server](https://app.codeship.com/projects/f37eb3a0-667f-0134-56d8-262a64e36cc9/status?branch=master)](https://app.codeship.com/projects/175929)
 [![Code Climate](https://codeclimate.com/github/greenelab/adage-server/badges/gpa.svg)](https://codeclimate.com/github/greenelab/adage-server)
 
 This codebase tracks work in progress toward a web server that will
