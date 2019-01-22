@@ -183,23 +183,6 @@ CI_CONFIG.update({
     }
 })
 
-# Codeship server deployment credentials and configuration
-CODESHIP_CONFIG = CI_CONFIG.copy()
-CODESHIP_CONFIG.update({
-    # see https://codeship.com/documentation/databases/postgresql/
-    'databases': {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            # database name and user cannot have upper case letters
-            'NAME': 'adageci',
-            'USER': '<configure>',
-            'PASSWORD': '<config-secret>',
-            'HOST': '127.0.0.1',
-            'PORT': '5434',  # v. 9.4
-        }
-    },
-})
-
 CIRCLECI_CONFIG = CI_CONFIG.copy()
 CIRCLECI_CONFIG.update({
     'databases': {
