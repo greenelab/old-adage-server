@@ -19,11 +19,11 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # come from config.py, which is never checked into source control.
 # If we're running under CircleCI, we build a CONFIG on the fly using
 # `config.py.template`.
-if os.environ.get('CIRCLECI') == 'true':
+if os.environ.get('CIRCLECI', 'false'):
     with open(os.path.join(BASE_DIR, 'adage', 'config.py.template')) as f:
         exec f
     CONFIG = CIRCLECI_CONFIG
-elif os.environ.get('DOCKER_DEV') == 'true':
+elif os.environ.get('DOCKER_DEV', 'false'):
     with open(os.path.join(BASE_DIR, 'adage', 'config.py.template')) as f:
         exec f
     CONFIG = DOCKER_DEV

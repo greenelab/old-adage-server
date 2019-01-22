@@ -1,4 +1,3 @@
-argparse==1.2.1
 Django==1.11.18
 django-fixtureless==1.4.3.3
 django-haystack==2.8.1
