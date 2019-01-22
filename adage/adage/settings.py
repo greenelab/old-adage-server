@@ -16,15 +16,10 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # Any deployment configuration settings (including all secrets)
-# come from config.py, which is never checked into source control. If we're
-# running under Codeship we build a CONFIG on the fly using config.py.template
-if os.environ.get('CODESHIP_SETTINGS') == 'YES':
-    with open(os.path.join(BASE_DIR, 'adage', 'config.py.template')) as f:
-        exec f
-    CONFIG = CODESHIP_CONFIG
-    CONFIG['databases']['default']['USER'] = os.environ.get('PG_USER')
-    CONFIG['databases']['default']['PASSWORD'] = os.environ.get('PG_PASSWORD')
-elif os.environ.get('CIRCLECI') == 'true':
+# come from config.py, which is never checked into source control.
+# If we're running under CircleCI, we build a CONFIG on the fly using
+# `config.py.template`.
+if os.environ.get('CIRCLECI') == 'true':
     with open(os.path.join(BASE_DIR, 'adage', 'config.py.template')) as f:
         exec f
     CONFIG = CIRCLECI_CONFIG
