@@ -13,7 +13,7 @@ If using [fabric](http://www.fabfile.org/), these can also be loaded using the
 `import_data_and_index()` function in
 [fabfile/adage_server.py](https://github.com/greenelab/adage-server/blob/master/fabfile/adage_server.py).
 The
-[adage/adage/config.py.template file](https://github.com/greenelab/adage-server/blob/master/adage/adage/config.py.template)
+[adage/adage/config-template.py file](https://github.com/greenelab/adage-server/blob/master/adage/adage/config-template.py)
 specifies which files are loaded by this `import_data_and_index()` function.
 
 All of the files below are tab-delimited text files (the decompressed form

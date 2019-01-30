@@ -150,7 +150,7 @@ The file `config.py` (in the `adage-server/adage/adage folder`) contains all of
 the settings that must be edited for deployment. Because this file contains
 secrets and deployment-specific information, it is not tracked under source
 control. You should copy the file
-`adage-server/adage/adage/config.py.template` from the repository and use that
+`adage-server/adage/adage/config-template.py` from the repository and use that
 as a starting point for your own deployment's `config.py`. This puts all of the
 secrets and deployment-specific information into a single, easily-controlled
 file.
