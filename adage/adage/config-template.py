@@ -13,14 +13,14 @@ REPO_ROOT = os.path.dirname(BASE_DIR)
 
 # AWS credentials and configuration
 AWS_DEPLOY = {
-    'aws_access_key_id':        '<config-secret>',
-    'aws_secret_access_key':    '<config-secret>',
-    'region_name':              'us-east-1',
+    'aws_access_key_id': '<config-secret>',
+    'aws_secret_access_key': '<config-secret>',
+    'region_name': 'us-east-1',
     # 'dbmaster' holds credentials for the RDS instance used on AWS
     'dbmaster': {
-        # database user with CREATE DATABASE & ROLE privs
-        # these are used to bootstrap a new database as
-        # specified in CONFIG['databases']['default']
+        # Database user with CREATE DATABASE & ROLE privileges.
+        # These are used to bootstrap a new database as specified in
+        # CONFIG['databases']['default']
         'NAME': 'adage_db',
         'USER': 'adage_db',
         'PASSWORD': '<config-secret>',
@@ -31,7 +31,7 @@ AWS_DEPLOY = {
         'ImageId': 'ami-4f680658',    # Ubuntu 16.04
         'MinCount': 1, 'MaxCount': 1,
         'KeyName': '<configure>',
-        'SecurityGroups':  ['<configure>'],
+        'SecurityGroups': ['<configure>'],
         'InstanceType': 't2.small',
     },
     'host_conn': {
@@ -51,26 +51,25 @@ AWS_DEPLOY = {
 
 # configure the user account that will host the source code and build output
 OS_CONFIG = {
-    'user':         '<configure:default=adage>',
-    'host':         None,               # must be supplied at runtime!
-    'home_dir':     '/home/<configure:default=adage>/',
-    'keyfile':      '<configure>',      # local file: used to login
-    'keyfile_pub':  '<configure>'       # local file: added to authorized_keys
+    'user': '<configure:default=adage>',
+    'host': None,                 # must be supplied at runtime!
+    'home_dir': '/home/<configure:default=adage>/',
+    'keyfile': '<configure>',     # local file: used to login
+    'keyfile_pub': '<configure>'  # local file: added to authorized_keys
 }
 
 
 # data for bootstrapping the database and testing
 DATA_CONFIG = {
-    'data_dir':      os.path.join(OS_CONFIG['home_dir'],
-                                  'adage-server', 'data'),
+    'data_dir': os.path.join(OS_CONFIG['home_dir'],
+                             'adage-server', 'data'),
 }
 DATA_CONFIG.update({
     'annotation_file': os.path.join(
         DATA_CONFIG['data_dir'], 'PseudomonasAnnotation.tsv'),
     'activity_file': os.path.join(
         DATA_CONFIG['data_dir'], 'sample_signature_activity.txt'),
-    'pao1_genes_url':
-        'ftp://ftp.ncbi.nih.gov/gene/DATA/GENE_INFO/Archaea_Bacteria/Pseudomonas_aeruginosa_PAO1.gene_info.gz',
+    'pao1_genes_url': 'ftp://ftp.ncbi.nih.gov/gene/DATA/GENE_INFO/Archaea_Bacteria/Pseudomonas_aeruginosa_PAO1.gene_info.gz',  # noqa
     'pao1_genes_file': os.path.join(
         DATA_CONFIG['data_dir'], 'Pseudomonas_aeruginosa_PAO1.gene_info'),
     'gene_history_url': 'ftp://ftp.ncbi.nih.gov/gene/DATA/gene_history.gz',
@@ -86,23 +85,23 @@ DATA_CONFIG.update({
 # deployment server credentials and configuration (for AWS)
 AWS_CONFIG = {
     # Set up some parameters for deployment
-    'os':            OS_CONFIG,
-    'repo':          'git@github.com:greenelab/adage-server.git',
-    'data':          DATA_CONFIG,
-    'host_conn':     AWS_DEPLOY['host_conn'],
-    'virt_env':      OS_CONFIG['home_dir'] + '.virtualenvs/adage',
-    'django_dir':    os.path.join(OS_CONFIG['home_dir'],
-                                  'adage-server', 'adage'),
-    'django_super':  '<configure:desc=superuser>',
-    'django_email':  '<configure:desc=superuser_email>',
-    'interface_dir': os.path.join(OS_CONFIG['home_dir'],
-                                  'adage-server', 'interface'),
-    'dbmaster':      AWS_DEPLOY['dbmaster'],
+    'os': OS_CONFIG,
+    'repo': 'git@github.com:greenelab/adage-server.git',
+    'data': DATA_CONFIG,
+    'host_conn': AWS_DEPLOY['host_conn'],
+    'virt_env': OS_CONFIG['home_dir'] + '.virtualenvs/adage',
+    'django_dir': os.path.join(OS_CONFIG['home_dir'],
+                               'adage-server', 'adage'),
+    'django_super': '<configure:desc=superuser>',
+    'django_email': '<configure:desc=superuser_email>',
+    'interface_dir': os.path.join(
+        OS_CONFIG['home_dir'], 'adage-server', 'interface'),
+    'dbmaster': AWS_DEPLOY['dbmaster'],
 
     # The following keys are all that are needed for runtime use:
     # django_key, databases, haystack,
     # tribe_{id, secret, redirect_uri, scope, login_redirect, logout_redirect}
-    'django_key':    '<config-secret>',
+    'django_key': '<config-secret>',
     'databases': {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
@@ -116,8 +115,7 @@ AWS_CONFIG = {
     },
     'haystack': {
         'default': {
-            'ENGINE':
-                'adage.search_backend.CustomElasticsearchEngine',
+            'ENGINE': 'adage.search_backend.CustomElasticsearchEngine',
             'URL': 'http://127.0.0.1:9200/',
             'INDEX_NAME': 'haystack',
         }
@@ -128,13 +126,12 @@ AWS_CONFIG = {
     # configure the following section to enable sign-in via Tribe's OAuth2
     'tribe_id': '<configure:ClientIDHere>',
     'tribe_secret': '<config-secret:ClientSecretHere>',
-    'tribe_redirect_uri':
-        '<configure:http://example.com/tribe_client/get_token>',
+    'tribe_redirect_uri': '<configure:http://example.com/tribe_client/get_token>',  # noqa
     'tribe_scope': 'write',
     'tribe_login_redirect': '/#/home',
     'tribe_logout_redirect': '/#/home',
-    'public_geneset_folder': os.path.join(OS_CONFIG['home_dir'],
-                                        'adage-server', 'data')
+    'public_geneset_folder': os.path.join(
+        OS_CONFIG['home_dir'], 'adage-server', 'data')
 }
 
 # development server deployment credentials and configuration (maybe on VMware)
@@ -169,17 +166,16 @@ DEV_CONFIG.update({
     },
 })
 
-# Configuration for our CI services
-
+# Configuration for CI services
 CI_CONFIG = AWS_CONFIG.copy()
 CI_CONFIG.update({
-    'django_dir':    os.path.join(REPO_ROOT, 'adage'),
-    'django_key':    str(random.randint(0, 1000000)),
+    'django_dir': os.path.join(REPO_ROOT, 'adage'),
+    'django_key': str(random.randint(0, 1000000)),
     'interface_dir': os.path.join(REPO_ROOT, 'interface'),
     'data': {
         'data_dir': os.path.join(REPO_ROOT, 'data'),
-        'annotation_file': os.path.join(REPO_ROOT, 'data',
-                                        'PseudomonasAnnotation.tsv')
+        'annotation_file': os.path.join(
+            REPO_ROOT, 'data', 'PseudomonasAnnotation.tsv')
     }
 })
 
@@ -188,7 +184,6 @@ CIRCLECI_CONFIG.update({
     'databases': {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            # database name and user cannot have upper case letters
             'NAME': 'circleci_test',
             'USER': 'ubuntu',
             'PASSWORD': '',
@@ -203,7 +198,6 @@ DOCKER_DEV.update({
     'databases': {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            # database name and user cannot have upper case letters
             'NAME': 'docker_adage',
             'USER': 'docker_adage',
             'PASSWORD': 'password123',
@@ -213,8 +207,7 @@ DOCKER_DEV.update({
     },
     'haystack': {
         'default': {
-            'ENGINE':
-                'adage.search_backend.CustomElasticsearchEngine',
+            'ENGINE': 'adage.search_backend.CustomElasticsearchEngine',
             'URL': 'elasticsearch',
             'INDEX_NAME': 'haystack',
         }
