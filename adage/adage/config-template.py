@@ -61,8 +61,7 @@ OS_CONFIG = {
 
 # data for bootstrapping the database and testing
 DATA_CONFIG = {
-    'data_dir': os.path.join(OS_CONFIG['home_dir'],
-                             'adage-server', 'data'),
+    'data_dir': os.path.join(OS_CONFIG['home_dir'], 'adage-server', 'data'),
 }
 DATA_CONFIG.update({
     'annotation_file': os.path.join(
