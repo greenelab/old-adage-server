@@ -18,13 +18,13 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Any deployment configuration settings (including all secrets)
 # come from config.py, which is never checked into source control.
 # If we're running under CircleCI, we build a CONFIG on the fly using
-# `config.py.template`.
+# `config-template.py`.
 if os.environ.get('CIRCLECI', 'false') == 'true':
-    with open(os.path.join(BASE_DIR, 'adage', 'config.py.template')) as f:
+    with open(os.path.join(BASE_DIR, 'adage', 'config-template.py')) as f:
         exec f
     CONFIG = CIRCLECI_CONFIG
 elif os.environ.get('DOCKER_DEV', 'false') == 'true':
-    with open(os.path.join(BASE_DIR, 'adage', 'config.py.template')) as f:
+    with open(os.path.join(BASE_DIR, 'adage', 'config-template.py')) as f:
         exec f
     CONFIG = DOCKER_DEV
 else:
