@@ -3,8 +3,9 @@
 # the detailed sample code on how to do this. -mhuyck, 2015-08-24
 
 from django.conf import settings
-from haystack.backends.elasticsearch_backend import \
+from haystack.backends.elasticsearch_backend import (
     ElasticsearchSearchBackend, ElasticsearchSearchEngine
+)
 
 
 def merge_dicts(a, b):
@@ -55,35 +56,45 @@ class CustomElasticsearchBackend(ElasticsearchSearchBackend):
             connection_alias, **connection_options
         )
         custom_index_settings = getattr(settings,
-                'ELASTICSEARCH_INDEX_SETTINGS', {})
+                                        'ELASTICSEARCH_INDEX_SETTINGS', {})
         if custom_index_settings:
             es_defaults = getattr(self, 'DEFAULT_SETTINGS')
             es_defaults = merge_dicts(es_defaults, custom_index_settings)
             setattr(self, 'DEFAULT_SETTINGS', es_defaults)
         custom_analyzer = getattr(settings,
-                'ELASTICSEARCH_DEFAULT_ANALYZER', "")
+                                  'ELASTICSEARCH_DEFAULT_ANALYZER', "")
         if custom_analyzer:
             setattr(self, 'DEFAULT_ANALYZER', custom_analyzer)
         self.custom_kwargs = getattr(settings,
-                'ELASTICSEARCH_DEFAULT_KWARGS', "")
+                                     'ELASTICSEARCH_DEFAULT_KWARGS', "")
 
     def build_search_kwargs(self,
-            query_string, sort_by=None, start_offset=0,
-            end_offset=None, fields='', highlight=False, facets=None,
-            date_facets=None, query_facets=None,
-            narrow_queries=None, spelling_query=None,
-            within=None, dwithin=None, distance_point=None,
-            models=None, limit_to_registered_models=None,
-            result_class=None):
+                            query_string,
+                            sort_by=None,
+                            start_offset=0,
+                            end_offset=None,
+                            fields='',
+                            highlight=False,
+                            facets=None,
+                            date_facets=None,
+                            query_facets=None,
+                            narrow_queries=None,
+                            spelling_query=None,
+                            within=None,
+                            dwithin=None,
+                            distance_point=None,
+                            models=None,
+                            limit_to_registered_models=None,
+                            result_class=None):
         # run the superclass's implementation
         kwargs = super(CustomElasticsearchBackend, self).build_search_kwargs(
-                query_string, sort_by, start_offset,
-                end_offset, fields, highlight, facets,
-                date_facets, query_facets,
-                narrow_queries, spelling_query,
-                within, dwithin, distance_point,
-                models, limit_to_registered_models,
-                result_class)
+            query_string, sort_by, start_offset,
+            end_offset, fields, highlight, facets,
+            date_facets, query_facets,
+            narrow_queries, spelling_query,
+            within, dwithin, distance_point,
+            models, limit_to_registered_models,
+            result_class)
         # modify the results with our additions before returning
         if self.custom_kwargs:
             kwargs = merge_dicts(kwargs, self.custom_kwargs)
@@ -91,16 +102,17 @@ class CustomElasticsearchBackend(ElasticsearchSearchBackend):
 
     def build_schema(self, fields):
         # run the superclass's implementation
-        content_field_name, mapping = \
-                super(CustomElasticsearchBackend, self).build_schema(fields)
+        content_field_name, mapping = super(
+            CustomElasticsearchBackend, self
+        ).build_schema(fields)
 
         # modify the results to allow us to use our own DEFAULT_ANALYZER
         for field_name, field_class in fields.items():
             field_mapping = mapping[field_class.index_fieldname]
 
             if field_mapping['type'] == 'string' and field_class.indexed:
-                if not hasattr(field_class, 'facet_for') and not \
-                        field_class.field_type in ('ngram', 'edge_ngram'):
+                if not hasattr(field_class, 'facet_for') and \
+                   field_class.field_type not in ('ngram', 'edge_ngram'):
                     field_mapping['analyzer'] = self.DEFAULT_ANALYZER
             mapping.update({field_class.index_fieldname: field_mapping})
         return (content_field_name, mapping)
