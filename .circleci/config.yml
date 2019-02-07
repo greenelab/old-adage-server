@@ -41,7 +41,7 @@ jobs:
           command: |
             apt install node.js npm libfontconfig -y
             npm -g install grunt-cli karma-cli bower npm
-            apt purge npm && hash -r
+            apt purge npm --yes && hash -r
             npm install
             bower install --allow-root
             grunt
