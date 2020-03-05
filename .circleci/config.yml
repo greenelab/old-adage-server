@@ -6,7 +6,7 @@ jobs:
       - image: ubuntu:18.04
 
       # Secondary docker container for database service
-      - image: postgres:10.4
+      - image: postgres:11.5
         environment:
           POSTGRES_USER: root
 
