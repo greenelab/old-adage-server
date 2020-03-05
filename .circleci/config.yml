@@ -16,32 +16,36 @@ jobs:
     working_directory: ~/adage-server
 
     steps:
+      - run:
+          name: Install git and ssh
+          command: |
+            apt-get update && apt-get upgrade --yes
+            apt-get install git ssh --yes
       - checkout
       - run:
-          name: get_pseudomonas
+          name: Configure get_pseudomonas
           working_directory: ~/
           command: |
-            apt update && apt upgrade -y
-            apt install git mercurial -y
+            apt-get install mercurial --yes
             hg clone --config ui.tls=false https://bitbucket.org/greenelab/get_pseudomonas
             ln -s ~/get_pseudomonas/gen_spreadsheets.py ~/
             ln -s ~/get_pseudomonas/get_pseudo_sdrf.py  ~/
       - run:
-          name: backend tests
+          name: Backend tests
           working_directory: ~/adage-server/adage
           command: |
-            apt install postgresql-client python-pip -y
+            apt-get install postgresql-client python-pip -y
             createuser -h localhost --superuser ubuntu
             createdb -h localhost circleci_test
             pip install -r requirements.txt
             python manage.py test
       - run:
-          name: frontend tests
+          name: Frontend tests
           working_directory: ~/adage-server/interface
           command: |
-            apt install node.js npm libfontconfig -y
+            apt-get install node.js npm libfontconfig -y
             npm -g install grunt-cli karma-cli bower npm
-            apt purge npm --yes && hash -r
+            apt-get purge npm --yes && hash -r
             npm install
             bower install --allow-root
             grunt
