@@ -34,7 +34,7 @@ jobs:
           name: Backend tests
           working_directory: ~/adage-server/adage
           command: |
-            apt-get install postgresql-client libpq-dev python-pip -y
+            apt-get install postgresql-client libpq-dev libpython-dev python-pip -y
             createuser -h localhost --superuser ubuntu
             createdb -h localhost circleci_test
             pip install -r requirements.txt
