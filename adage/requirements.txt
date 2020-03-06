@@ -7,7 +7,7 @@ django-tastypie==0.14.3
 elasticsearch==2.4.1
 gunicorn==19.9.0
 lxml==3.7.3
-psycopg2-binary==2.8.4
+psycopg2==2.8.4
 python-dateutil==2.5.0
 python-mimeparse==1.5.1
 PyYAML==5.3
