@@ -38,10 +38,9 @@ else:
 SECRET_KEY = CONFIG['django_key']
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = CONFIG.get('debug', True)
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = CONFIG.get('allowed_hosts', [])
 
 # Application definition
 INSTALLED_APPS = (
