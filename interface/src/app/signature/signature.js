@@ -361,13 +361,8 @@ angular.module('adage.signature', [
         // It calculates the enrichment for each geneset that has genes
         // also present in the signature's high weight genes, and pushes that
         // geneset into the releventGenesetArray.
-        console.log('CALCULATE ENRICHMENTS');
         var calculateEnrichments = function(geneGenesets, allGenesetInfo,
                                             totalGeneNum, cutoff) {
-          console.log('GENE GENESETS:', geneGenesets);
-          console.log('ALL GENESET INFO:', allGenesetInfo);
-          console.log('TOTAL GENE NUM:', totalGeneNum);
-          console.log('SCOPE GENES:', $scope.genes);
           var N = totalGeneNum;
 
           // This will be the number of genes from the high weight gene list
@@ -398,24 +393,20 @@ angular.module('adage.signature', [
                         'genesets.');
             }
           }
-          console.log('GENESET GENES:', genesetGenes);
 
           var pValueArray = [];
 
           var enrichedGenesetIDs = Object.keys(genesetGenes);
-          console.log('ENRICHED GENESET IDS:', enrichedGenesetIDs);
 
           for (i = 0; i < enrichedGenesetIDs.length; i++) {
             var k = genesetGenes[enrichedGenesetIDs[i]].length;
             var n = allGenesetInfo[enrichedGenesetIDs[i]].size;
 
             var pValue = 1 - MathFuncts.hyperGeometricTest(k, m, n, N);
-            console.log('hyper geometric:', k, m, n, N, pValue);
             pValueArray.push(pValue);
           }
-          console.log('P VALUE ARRAY:', pValueArray);
+
           var correctedPValues = MathFuncts.multTest.fdr(pValueArray);
-          console.log('CORRECTED P VALUES:', correctedPValues);
 
           for (i = 0; i < enrichedGenesetIDs.length; i++) {
             if (correctedPValues[i] < $scope.pValueCutoff) {
@@ -423,10 +414,6 @@ angular.module('adage.signature', [
                 pValueDigits);
               var gsID = enrichedGenesetIDs[i];
               var genesetInfoObj = allGenesetInfo[gsID];
-              console.log('corrected p value:', correctedPValues[i]);
-              console.log('corrected p value prec:', correctedPValue);
-              console.log('gs id:', gsID);
-              console.log('geneset info obj:', genesetInfoObj);
 
               relevantGenesetArray.push({
                 'name': genesetInfoObj.name, 'dbase': genesetInfoObj.dbase,
@@ -442,7 +429,6 @@ angular.module('adage.signature', [
             return a.pValue - b.pValue;
           });
 
-          console.log('RELEVANT GENESET ARRAY:', relevantGenesetArray);
           return relevantGenesetArray;
         };
 
