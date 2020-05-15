@@ -1,5 +1,11 @@
 # adage-server
 
+**IMPORTANT:** This repository has been deprecated since May, 2020. The latest adage-server 
+backend is now hosted at: 
+[py3-adage-backend](https://github.com/greenelab/py3-adage-backend),
+and the latest adage-server frontend is hosted at:
+[adage-frontend](https://github.com/greenelab/adage-frontend).
+
 [![Code Climate](https://codeclimate.com/github/greenelab/adage-server/badges/gpa.svg)](https://codeclimate.com/github/greenelab/adage-server)
 
 This codebase tracks work in progress toward a web server that will
