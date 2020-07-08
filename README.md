@@ -1,4 +1,4 @@
-# adage-server
+# old-adage-server
 
 **IMPORTANT:** This repository has been deprecated since May, 2020. The latest adage-server 
 backend is now hosted at: 
