@@ -2,7 +2,7 @@
 
 **IMPORTANT:** This repository has been deprecated since May, 2020. The latest adage-server 
 backend is now hosted at: 
-[py3-adage-backend](https://github.com/greenelab/py3-adage-backend),
+[adage-backend](https://github.com/greenelab/adage-backend),
 and the latest adage-server frontend is hosted at:
 [adage-frontend](https://github.com/greenelab/adage-frontend).
 
